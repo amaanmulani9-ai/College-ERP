@@ -969,4 +969,98 @@ def student_events_calendar(request):
     }
     return render(request, 'student_template/student_events_calendar.html', context)
 
+def student_view_exams(request):
+    student = get_object_or_404(Student, admin=request.user)
+    subjects = Subject.objects.filter(course=student.course)
+    
+    # Exams for the student's subjects that they haven't taken yet
+    taken_exam_ids = OnlineExamResult.objects.filter(student=student).values_list('exam_id', flat=True)
+    available_exams = Exam.objects.filter(subject__in=subjects, is_active=True).exclude(id__in=taken_exam_ids)
+    
+    # Previous results
+    results = OnlineExamResult.objects.filter(student=student).order_by('-submitted_at')
+    
+    context = {
+        'available_exams': available_exams,
+        'results': results,
+        'page_title': 'Online Examinations'
+    }
+    return render(request, 'student_template/view_exams.html', context)
 
+def student_take_exam(request, exam_id):
+    student = get_object_or_404(Student, admin=request.user)
+    exam = get_object_or_404(Exam, id=exam_id, is_active=True)
+    
+    # Verify not already taken
+    if OnlineExamResult.objects.filter(student=student, exam=exam).exists():
+        messages.error(request, "You have already attempted this exam.")
+        return redirect(reverse('student_view_exams'))
+        
+    questions = exam.questions.all()
+    context = {
+        'exam': exam,
+        'questions': questions,
+        'page_title': f'Taking Exam: {exam.title}'
+    }
+    return render(request, 'student_template/take_exam.html', context)
+
+def submit_exam(request, exam_id):
+    if request.method == 'POST':
+        student = get_object_or_404(Student, admin=request.user)
+        exam = get_object_or_404(Exam, id=exam_id)
+        
+        if OnlineExamResult.objects.filter(student=student, exam=exam).exists():
+            messages.error(request, "Exam already submitted.")
+            return redirect(reverse('student_view_exams'))
+            
+        questions = exam.questions.all()
+        score = 0
+        total_marks = 0
+        
+        for q in questions:
+            total_marks += q.marks
+            selected_option = request.POST.get(f'question_{q.id}')
+            if selected_option == q.correct_option:
+                score += q.marks
+                
+        # Save Result
+        OnlineExamResult.objects.create(
+            student=student,
+            exam=exam,
+            score=score,
+            total_marks=total_marks
+        )
+        messages.success(request, f"Exam submitted! You scored {score}/{total_marks}.")
+        return redirect(reverse('student_view_exams'))
+    return redirect(reverse('student_view_exams'))
+
+@csrf_exempt
+def ai_chat_assistant(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            prompt = data.get('prompt', '')
+            
+            # Since no API key was provided by the user, we will return a mocked intelligent response
+            # In production, integrate google.generativeai here.
+            
+            mock_responses = {
+                'quiz': "Here is a quick quiz on Physics:\n1. What is the formula for Force? (F=ma)\n2. What is the speed of light? (3x10^8 m/s)",
+                'summarize': "Summary: Quantum mechanics is a fundamental theory in physics that provides a description of the physical properties of nature at the scale of atoms and subatomic particles.",
+            }
+            
+            response_text = "I am the AI Study Assistant. I am here to help you study your current course materials! (Mocked Response)"
+            
+            if 'quiz' in prompt.lower():
+                response_text = mock_responses['quiz']
+            elif 'summarize' in prompt.lower():
+                response_text = mock_responses['summarize']
+                
+            return JsonResponse({'status': 'success', 'response': response_text})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+            
+    context = {
+        'page_title': 'AI Study Assistant'
+    }
+    return render(request, 'student_template/ai_assistant.html', context)

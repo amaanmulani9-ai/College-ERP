@@ -498,3 +498,62 @@ def staff_events_calendar(request):
     }
     return render(request, 'student_template/student_events_calendar.html', context)
 
+def staff_manage_exams(request):
+    staff = get_object_or_404(Staff, admin=request.user)
+    exams = Exam.objects.filter(staff=staff).order_by('-created_at')
+    context = {
+        'exams': exams,
+        'page_title': 'Manage Online Exams'
+    }
+    return render(request, 'staff_template/manage_exams.html', context)
+
+def staff_create_exam(request):
+    staff = get_object_or_404(Staff, admin=request.user)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        subject_id = request.POST.get('subject')
+        duration = request.POST.get('duration')
+        
+        subject = get_object_or_404(Subject, id=subject_id, staff=staff)
+        exam = Exam.objects.create(title=title, subject=subject, staff=staff, duration_minutes=duration)
+        messages.success(request, f"Exam '{title}' created successfully!")
+        return redirect(reverse('staff_add_question', args=[exam.id]))
+        
+    subjects = Subject.objects.filter(staff=staff)
+    context = {
+        'subjects': subjects,
+        'page_title': 'Create New Exam'
+    }
+    return render(request, 'staff_template/create_exam.html', context)
+
+def staff_add_question(request, exam_id):
+    staff = get_object_or_404(Staff, admin=request.user)
+    exam = get_object_or_404(Exam, id=exam_id, staff=staff)
+    
+    if request.method == 'POST':
+        question_text = request.POST.get('question_text')
+        opt1 = request.POST.get('option_1')
+        opt2 = request.POST.get('option_2')
+        opt3 = request.POST.get('option_3')
+        opt4 = request.POST.get('option_4')
+        correct = request.POST.get('correct_option')
+        marks = request.POST.get('marks')
+        
+        Question.objects.create(
+            exam=exam,
+            question_text=question_text,
+            option_1=opt1, option_2=opt2, option_3=opt3, option_4=opt4,
+            correct_option=correct,
+            marks=marks
+        )
+        messages.success(request, "Question added successfully!")
+        return redirect(reverse('staff_add_question', args=[exam.id]))
+        
+    questions = exam.questions.all()
+    context = {
+        'exam': exam,
+        'questions': questions,
+        'page_title': f'Add Questions to {exam.title}'
+    }
+    return render(request, 'staff_template/add_question.html', context)
+

@@ -266,5 +266,4 @@ def mark_notifications_read(request):
             pass
     return JsonResponse({'status': 'ok'})
 
-d e f   o f f l i n e ( r e q u e s t ) :   r e t u r n   r e n d e r ( r e q u e s t ,   ' m a i n _ a p p / o f f l i n e . h t m l ' )  
- 
+def offline(request): return render(request, 'main_app/offline.html')

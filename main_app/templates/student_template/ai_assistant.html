@@ -1,0 +1,117 @@
+{% extends 'main_app/base.html' %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card direct-chat direct-chat-primary shadow-sm" style="height: 70vh;">
+                    <div class="card-header bg-primary">
+                        <h3 class="card-title text-white"><i class="fas fa-robot mr-2"></i>AI Study Assistant</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <!-- Conversations are loaded here -->
+                        <div class="direct-chat-messages" id="chat-messages" style="height: 100%;">
+                            <!-- Message. Default to the left -->
+                            <div class="direct-chat-msg">
+                                <div class="direct-chat-infos clearfix">
+                                    <span class="direct-chat-name float-left">AI Assistant</span>
+                                </div>
+                                <img class="direct-chat-img" src="/static/dist/img/avatar.png" alt="AI">
+                                <div class="direct-chat-text">
+                                    Hello! I am your AI Study Assistant. You can ask me to explain a concept or generate a practice quiz.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer">
+                        <form id="chatForm">
+                            <div class="input-group">
+                                <input type="text" id="promptInput" name="message" placeholder="Ask me to summarize or generate a quiz..." class="form-control" required>
+                                <span class="input-group-append">
+                                    <button type="submit" class="btn btn-primary" id="sendBtn">Send</button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                    <!-- /.card-footer-->
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+    document.getElementById('chatForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        let prompt = document.getElementById('promptInput').value;
+        if (!prompt.trim()) return;
+        
+        let chatMessages = document.getElementById('chat-messages');
+        let sendBtn = document.getElementById('sendBtn');
+        
+        // Append User Message
+        let userMsg = `
+        <div class="direct-chat-msg right">
+            <div class="direct-chat-infos clearfix">
+                <span class="direct-chat-name float-right">You</span>
+            </div>
+            <img class="direct-chat-img" src="/static/dist/img/avatar5.png" alt="User">
+            <div class="direct-chat-text bg-primary text-white border-primary">
+                ${prompt}
+            </div>
+        </div>`;
+        chatMessages.innerHTML += userMsg;
+        document.getElementById('promptInput').value = '';
+        
+        // Scroll down
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // Disable button
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        // Send request to server
+        fetch("{% url 'ai_chat_assistant' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({prompt: prompt})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                let aiMsg = `
+                <div class="direct-chat-msg">
+                    <div class="direct-chat-infos clearfix">
+                        <span class="direct-chat-name float-left">AI Assistant</span>
+                    </div>
+                    <img class="direct-chat-img" src="/static/dist/img/avatar.png" alt="AI">
+                    <div class="direct-chat-text">
+                        ${data.response.replace(/\n/g, '<br>')}
+                    </div>
+                </div>`;
+                chatMessages.innerHTML += aiMsg;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } else {
+                alert("Error: " + data.message);
+            }
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = 'Send';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = 'Send';
+        });
+    });
+</script>
+{% endblock custom_js %}

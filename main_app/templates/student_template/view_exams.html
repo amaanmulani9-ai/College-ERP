@@ -1,0 +1,84 @@
+{% extends 'main_app/base.html' %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Available Exams -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Available Exams</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for exam in available_exams %}
+                            <div class="col-md-4">
+                                <div class="card border border-info shadow-sm">
+                                    <div class="card-body text-center">
+                                        <h5 class="font-weight-bold text-info">{{ exam.title }}</h5>
+                                        <p class="text-muted mb-1">{{ exam.subject.name }}</p>
+                                        <p class="mb-3"><i class="fas fa-clock mr-1"></i> {{ exam.duration_minutes }} mins</p>
+                                        <a href="{% url 'student_take_exam' exam.id %}" class="btn btn-primary btn-block">Take Exam</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12 text-center text-muted">
+                                <p>No exams available at this moment.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Past Results -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title">Past Exam Results</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Exam Title</th>
+                                    <th>Subject</th>
+                                    <th>Score</th>
+                                    <th>Percentage</th>
+                                    <th>Submitted On</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for res in results %}
+                                <tr>
+                                    <td>{{ res.exam.title }}</td>
+                                    <td>{{ res.exam.subject.name }}</td>
+                                    <td><span class="badge bg-success">{{ res.score }} / {{ res.total_marks }}</span></td>
+                                    <td>
+                                        {% if res.total_marks > 0 %}
+                                            {% widthratio res.score res.total_marks 100 %}%
+                                        {% else %}
+                                            0%
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ res.submitted_at|date:"M d, Y h:i A" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No past exams taken.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

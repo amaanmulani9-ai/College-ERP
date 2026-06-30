@@ -530,3 +530,37 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
+
+class Exam(models.Model):
+    title = models.CharField(max_length=200)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    duration_minutes = models.IntegerField(default=30)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.subject.name}"
+
+class Question(models.Model):
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name='questions')
+    question_text = models.TextField()
+    option_1 = models.CharField(max_length=200)
+    option_2 = models.CharField(max_length=200)
+    option_3 = models.CharField(max_length=200)
+    option_4 = models.CharField(max_length=200)
+    correct_option = models.CharField(max_length=1, choices=[('1', 'Option 1'), ('2', 'Option 2'), ('3', 'Option 3'), ('4', 'Option 4')])
+    marks = models.IntegerField(default=1)
+
+    def __str__(self):
+        return self.question_text
+
+class OnlineExamResult(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
+    score = models.IntegerField(default=0)
+    total_marks = models.IntegerField(default=0)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.admin.get_full_name()} - {self.exam.title} : {self.score}/{self.total_marks}"

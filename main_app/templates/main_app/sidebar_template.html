@@ -395,6 +395,13 @@
                             </li>
 
                             <li class="nav-item">
+                                <a href="{% url 'staff_manage_exams' %}" class="nav-link {% if request.path == '/staff/exams/' %} active {% endif %}">
+                                    <i class="nav-icon fas fa-laptop-code"></i>
+                                    <p>Online Exams</p>
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
                                 {% url 'staff_events_calendar' as staff_events_calendar %}
                                 <a href="{{staff_events_calendar}}"
                                     class="nav-link {% if staff_events_calendar == request.path %} active {% endif %}">
@@ -634,6 +641,22 @@
                                                 class="nav-link {% if student_events_calendar in request.path %} active {% endif %}">
                                                 <i class="nav-icon fas fa-calendar-day"></i>
                                                 <p>Event Calendar</p>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a href="{% url 'student_view_exams' %}"
+                                                class="nav-link {% if 'exams' in request.path %} active {% endif %}">
+                                                <i class="nav-icon fas fa-laptop-code"></i>
+                                                <p>Online Exams</p>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            <a href="{% url 'ai_chat_assistant' %}"
+                                                class="nav-link {% if 'ai-assistant' in request.path %} active {% endif %}">
+                                                <i class="nav-icon fas fa-robot"></i>
+                                                <p>AI Study Assistant</p>
                                             </a>
                                         </li>
 

@@ -159,6 +159,10 @@ urlpatterns = [
     path("student/ai-assistant/chat/", student_views.student_ai_chat, name='student_ai_chat'),
     path("student/report-card/", student_views.student_report_card, name='student_report_card'),
     path("student/events/", student_views.student_events_calendar, name='student_events_calendar'),
+    path("student/exams/", student_views.student_view_exams, name='student_view_exams'),
+    path("student/exams/<int:exam_id>/take/", student_views.student_take_exam, name='student_take_exam'),
+    path("student/exams/<int:exam_id>/submit/", student_views.submit_exam, name='submit_exam'),
+    path("student/ai-assistant/", student_views.ai_chat_assistant, name='ai_chat_assistant'),
 
     # --- Online Registration Portal ---
     path("student/registration/personal/", student_views.student_reg_personal, name='student_reg_personal'),
@@ -191,4 +195,7 @@ urlpatterns = [
     path("staff/registrations/", staff_views.staff_manage_registrations, name='staff_manage_registrations'),
     path("staff/registrations/view/<int:reg_id>/", staff_views.staff_view_registration, name='staff_view_registration'),
     path("staff/events/", staff_views.staff_events_calendar, name='staff_events_calendar'),
+    path("staff/exams/", staff_views.staff_manage_exams, name='staff_manage_exams'),
+    path("staff/exams/create/", staff_views.staff_create_exam, name='staff_create_exam'),
+    path("staff/exams/<int:exam_id>/add_question/", staff_views.staff_add_question, name='staff_add_question'),
 ]

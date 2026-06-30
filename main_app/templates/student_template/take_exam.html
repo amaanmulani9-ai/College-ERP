@@ -1,0 +1,78 @@
+{% extends 'main_app/base.html' %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card card-primary">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title m-0">{{ exam.title }} - {{ exam.subject.name }}</h3>
+                        <div class="badge badge-warning" style="font-size: 1rem;">
+                            <i class="fas fa-hourglass-half mr-1"></i> Time Left: <span id="timer">{{ exam.duration_minutes }}:00</span>
+                        </div>
+                    </div>
+                    <form method="POST" action="{% url 'submit_exam' exam.id %}" id="examForm">
+                        {% csrf_field %}
+                        <div class="card-body">
+                            {% for q in questions %}
+                            <div class="mb-4 p-3 border rounded">
+                                <h5 class="mb-3"><strong>Q{{ forloop.counter }}.</strong> {{ q.question_text }}</h5>
+                                <div class="custom-control custom-radio mb-2">
+                                    <input class="custom-control-input" type="radio" id="q_{{ q.id }}_1" name="question_{{ q.id }}" value="1" required>
+                                    <label for="q_{{ q.id }}_1" class="custom-control-label font-weight-normal">{{ q.option_1 }}</label>
+                                </div>
+                                <div class="custom-control custom-radio mb-2">
+                                    <input class="custom-control-input" type="radio" id="q_{{ q.id }}_2" name="question_{{ q.id }}" value="2" required>
+                                    <label for="q_{{ q.id }}_2" class="custom-control-label font-weight-normal">{{ q.option_2 }}</label>
+                                </div>
+                                <div class="custom-control custom-radio mb-2">
+                                    <input class="custom-control-input" type="radio" id="q_{{ q.id }}_3" name="question_{{ q.id }}" value="3" required>
+                                    <label for="q_{{ q.id }}_3" class="custom-control-label font-weight-normal">{{ q.option_3 }}</label>
+                                </div>
+                                <div class="custom-control custom-radio mb-2">
+                                    <input class="custom-control-input" type="radio" id="q_{{ q.id }}_4" name="question_{{ q.id }}" value="4" required>
+                                    <label for="q_{{ q.id }}_4" class="custom-control-label font-weight-normal">{{ q.option_4 }}</label>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-center text-muted">No questions available for this exam.</p>
+                            {% endfor %}
+                        </div>
+                        <div class="card-footer text-center">
+                            <button type="submit" class="btn btn-success btn-lg px-5" {% if not questions %}disabled{% endif %}>
+                                <i class="fas fa-paper-plane mr-2"></i> Submit Exam
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+    // Timer Logic
+    let timeLeft = {{ exam.duration_minutes }} * 60; // in seconds
+    const timerDisplay = document.getElementById('timer');
+    const examForm = document.getElementById('examForm');
+
+    const interval = setInterval(function() {
+        timeLeft--;
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        
+        if (seconds < 10) { seconds = "0" + seconds; }
+        timerDisplay.textContent = minutes + ":" + seconds;
+        
+        if (timeLeft <= 0) {
+            clearInterval(interval);
+            // Auto submit when time is up
+            examForm.submit();
+        }
+    }, 1000);
+</script>
+{% endblock custom_js %}
