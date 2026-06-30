@@ -1,0 +1,156 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Add Fee Record Form -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-plus mr-2"></i>Generate Student Fee Particular</h3>
+                    </div>
+                    <form method="POST" action="{% url 'admin_add_fee' %}">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 form-group">
+                                    <label>Select Student</label>
+                                    <select class="form-control" name="student" required>
+                                        <option value="">-- Select Student --</option>
+                                        <option value="ALL">-- ALL STUDENTS --</option>
+                                        {% for student in students %}
+                                        <option value="{{ student.id }}">{{ student.admin.get_full_name }} ({{ student.course.name }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3 form-group">
+                                    <label>Fee Category / Particular</label>
+                                    <input type="text" class="form-control" name="category" placeholder="e.g. Academic Tuition Fee Sem V" required>
+                                </div>
+                                <div class="col-md-2 form-group">
+                                    <label>Amount (₹)</label>
+                                    <input type="number" step="0.01" class="form-control" name="amount" placeholder="Amount" required>
+                                </div>
+                                <div class="col-md-3 form-group">
+                                    <label>Due Date</label>
+                                    <input type="date" class="form-control" name="due_date" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Generate Fee Record</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Left Column: Fee Records -->
+            <div class="col-md-7">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-file-invoice-dollar mr-2"></i>Active Student Fee Particulars</h3>
+                    </div>
+                    <div class="card-body" style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
+                        <table class="table table-bordered table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Paid</th>
+                                    <th>Balance</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in fee_records %}
+                                <tr>
+                                    <td>{{ record.student.admin.get_full_name }}</td>
+                                    <td>{{ record.category }}</td>
+                                    <td>₹{{ record.amount|floatformat:2 }}</td>
+                                    <td>₹{{ record.amount_paid|floatformat:2 }}</td>
+                                    <td>
+                                        ₹<span class="text-danger font-weight-bold">
+                                            <!-- Simple inline JS for balance -->
+                                            <script>document.write({{ record.amount }} - {{ record.amount_paid }})</script>
+                                        </span>
+                                    </td>
+                                    <td>{{ record.due_date }}</td>
+                                    <td>
+                                        {% if record.status == 'Paid' %}
+                                        <span class="badge badge-success">Paid</span>
+                                        {% elif record.status == 'Partial' %}
+                                        <span class="badge badge-warning">Partial</span>
+                                        {% else %}
+                                        <span class="badge badge-danger">Unpaid</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'admin_edit_fee' record.id %}" class="btn btn-sm btn-info" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'admin_print_fee' record.id %}" target="_blank" class="btn btn-sm btn-secondary" title="Print Invoice">
+                                            <i class="fas fa-print"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No fee records found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Recent Transactions -->
+            <div class="col-md-5">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-history mr-2"></i>Recent Payment Transactions</h3>
+                    </div>
+                    <div class="card-body" style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
+                        <table class="table table-bordered table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Transaction ID / Student</th>
+                                    <th>Amount</th>
+                                    <th>Method / Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td>
+                                        <strong>ID:</strong> {{ payment.transaction_id }}<br>
+                                        <small>{{ payment.fee_record.student.admin.get_full_name }}</small>
+                                    </td>
+                                    <td>₹{{ payment.amount_paid|floatformat:2 }}</td>
+                                    <td>
+                                        <span class="badge badge-info">{{ payment.payment_method }}</span><br>
+                                        <small>{{ payment.payment_date|date:"d-m-Y H:i" }}</small>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No payment transactions recorded yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

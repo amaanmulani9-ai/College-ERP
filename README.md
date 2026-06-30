@@ -77,10 +77,30 @@ Here are some glimpses of the **College ERP** in action:
 
 ## 💻 Tech Stack
 
-- **Backend:** Python, Django
-- **Frontend:** HTML5, CSS3 (Custom Glassmorphism Design), JavaScript, Bootstrap 5
+- **Backend:** Python, Django (`backend/`)
+- **Frontend:** HTML5, CSS3 (Custom Glassmorphism Design), JavaScript, Bootstrap 5 (`frontend/`)
 - **Database:** SQLite3 (Development) / PostgreSQL (Production)
 - **Security:** CSRF Protection, Password Hashing, Role-Based Access Control
+
+---
+
+## 📁 Project Structure
+
+```
+College-ERP/
+├── backend/          # Django server, models, views, API logic
+│   ├── college_management_system/
+│   ├── main_app/
+│   ├── manage.py
+│   └── requirements.txt
+├── frontend/         # Templates, CSS/JS, translations
+│   ├── templates/
+│   ├── static/
+│   └── locale/
+├── manage.py         # Run Django commands from project root
+├── Showcase/         # Screenshots
+└── README.md
+```
 
 ---
 
@@ -110,7 +130,7 @@ Make sure you have [Python 3.8+](https://www.python.org/downloads/) installed on
 
 3. **Install dependencies**
    ```bash
-   pip install -r requirements.txt
+   pip install -r backend/requirements.txt
    ```
 
 4. **Apply database migrations**
@@ -131,6 +151,46 @@ Make sure you have [Python 3.8+](https://www.python.org/downloads/) installed on
 
 7. **Access the application**
    Open your browser and navigate to `http://localhost:8000`.
+
+---
+
+## ☁️ Deploy on Vercel (with Supabase Postgres)
+
+### 1. Connect Supabase to Vercel
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. In **Project Settings → Database**, copy the connection strings
+3. In Vercel → **Project Settings → Environment Variables**, add:
+
+| Variable | Value |
+|----------|-------|
+| `POSTGRES_PRISMA_URL` | **Transaction pooler** (port `6543`) — app runtime |
+| `POSTGRES_HOST` | `db.your-project-ref.supabase.co` |
+| `POSTGRES_USER` | `postgres` |
+| `POSTGRES_PASSWORD` | Your database password |
+| `POSTGRES_DATABASE` | `postgres` |
+| `SUPABASE_URL` | `https://your-project-ref.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | From Supabase API settings |
+| `SUPABASE_SERVICE_ROLE_KEY` | From Supabase API settings (server only) |
+| `SECRET_KEY` | A long random Django secret |
+| `DEBUG` | `False` |
+
+**Important:** For migrations, use the **direct** host (`db.xxx.supabase.co:5432`), not the pooler on port 5432. The build command handles this automatically via `POSTGRES_HOST`.
+
+### 2. Deploy
+
+```bash
+git push
+```
+
+Vercel will run migrations (direct connection) → `collectstatic` → deploy.
+
+### 3. Create admin account
+
+```bash
+vercel env pull .env.local
+python manage.py createsuperuser
+```
 
 ---
 

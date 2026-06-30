@@ -1,5 +1,5 @@
 import os
-d = r'main_app\templates'
+d = r'frontend\templates'
 for r, _, fs in os.walk(d):
     for f in fs:
         if f.endswith('.html'):
