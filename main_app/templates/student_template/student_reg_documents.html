@@ -356,7 +356,7 @@
             <p>Upload self-attested copies of original marksheets and verification IDs. Unverified documents will cause rejection.</p>
         </div>
         
-        <form method="POST" action="{% url 'student_reg_documents' %}" id="doc-form">
+        <form method="POST" action="{% url 'student_reg_documents' %}" id="doc-form" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="reg-card-body">
                 
@@ -518,10 +518,10 @@
                     </table>
                 </div>
 
-                <!-- Hidden inputs to trigger mock file selection -->
-                <input type="file" id="file-input-sem6" style="display: none;" onchange="handleFileUpload('sem6', this)">
+                <!-- Hidden inputs to trigger real file selection -->
+                <input type="file" id="file-input-sem6" name="marksheet_file" style="display: none;" onchange="handleFileUpload('sem6', this)">
                 <input type="file" id="file-input-sem5" style="display: none;" onchange="handleFileUpload('sem5', this)">
-                <input type="file" id="file-input-aadhaar" style="display: none;" onchange="handleFileUpload('aadhaar', this)">
+                <input type="file" id="file-input-aadhaar" name="aadhar_file" style="display: none;" onchange="handleFileUpload('aadhaar', this)">
                 <input type="file" id="file-input-abc" style="display: none;" onchange="handleFileUpload('abc', this)">
                 {% if reg.caste_category != "GENERAL" %}
                 <input type="file" id="file-input-caste" style="display: none;" onchange="handleFileUpload('caste', this)">

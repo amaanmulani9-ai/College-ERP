@@ -66,6 +66,35 @@ def admin_home(request):
         student_attendance_present_list.append(attendance)
         student_attendance_leave_list.append(leave+absent)
         student_name_list.append(student.admin.first_name)
+        
+    # --- Advanced Analytics Data ---
+    # 1. Fee Collection
+    total_fee_collected = sum(f.amount_paid for f in FeeRecord.objects.all())
+    total_fee_pending = sum(f.balance for f in FeeRecord.objects.all())
+    
+    # 2. Pass/Fail Ratio
+    results = StudentResult.objects.all()
+    pass_count = 0
+    fail_count = 0
+    for r in results:
+        if (r.test + r.exam) >= 40:
+            pass_count += 1
+        else:
+            fail_count += 1
+            
+    # 3. Monthly Enrollment Trend (mock data or real data if available)
+    # Using real data from CustomUser date_joined
+    from django.db.models import Count
+    from django.db.models.functions import TruncMonth
+    import calendar
+    
+    enrollments = CustomUser.objects.filter(user_type='3').annotate(month=TruncMonth('date_joined')).values('month').annotate(count=Count('id')).order_by('month')
+    months = []
+    monthly_enrollments = []
+    for e in enrollments:
+        if e['month']:
+            months.append(e['month'].strftime('%b %Y'))
+            monthly_enrollments.append(e['count'])
 
     context = {
         'page_title': "Administrative Dashboard",
@@ -81,7 +110,13 @@ def admin_home(request):
         "student_count_list_in_subject": student_count_list_in_subject,
         "student_count_list_in_course": student_count_list_in_course,
         "course_name_list": course_name_list,
-
+        # Analytics Additions
+        "total_fee_collected": total_fee_collected,
+        "total_fee_pending": total_fee_pending,
+        "pass_count": pass_count,
+        "fail_count": fail_count,
+        "enrollment_months": json.dumps(months),
+        "enrollment_counts": json.dumps(monthly_enrollments)
     }
     return render(request, 'hod_template/home_content.html', context)
 
@@ -517,6 +552,18 @@ def view_staff_leave(request):
             leave = get_object_or_404(LeaveReportStaff, id=id)
             leave.status = status
             leave.save()
+            
+            # Send Email Notification for Staff Leave
+            try:
+                from django.core.mail import send_mail
+                from django.conf import settings
+                status_text = "Approved" if status == 1 else "Rejected"
+                subject_text = f"Leave Application {status_text}"
+                message = f"Hello {leave.staff.admin.first_name},\n\nYour leave application from {leave.date} has been {status_text}.\n\nRegards,\nCollege ERP System"
+                send_mail(subject_text, message, settings.EMAIL_HOST_USER, [leave.staff.admin.email])
+            except Exception as e:
+                print("Email error:", e)
+                
             return HttpResponse(True)
         except Exception as e:
             return HttpResponse("False")
@@ -542,6 +589,18 @@ def view_student_leave(request):
             leave = get_object_or_404(LeaveReportStudent, id=id)
             leave.status = status
             leave.save()
+            
+            # Send Email Notification for Student Leave
+            try:
+                from django.core.mail import send_mail
+                from django.conf import settings
+                status_text = "Approved" if status == 1 else "Rejected"
+                subject_text = f"Leave Application {status_text}"
+                message = f"Hello {leave.student.admin.first_name},\n\nYour leave application from {leave.date} has been {status_text}.\n\nRegards,\nCollege ERP System"
+                send_mail(subject_text, message, settings.EMAIL_HOST_USER, [leave.student.admin.email])
+            except Exception as e:
+                print("Email error:", e)
+                
             return HttpResponse(True)
         except Exception as e:
             return HttpResponse("False")

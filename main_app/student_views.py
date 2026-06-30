@@ -438,6 +438,11 @@ def student_payable_fees(request):
 
 
 def student_fee_receipt(request, payment_id):
+    import io
+    from xhtml2pdf import pisa
+    from django.template.loader import get_template
+    from django.http import HttpResponse
+
     student = get_object_or_404(Student, admin=request.user)
     payment = get_object_or_404(FeePayment, id=payment_id, fee_record__student=student)
     
@@ -446,7 +451,20 @@ def student_fee_receipt(request, payment_id):
         'student': student,
         'page_title': "Fee Receipt"
     }
-    return render(request, "student_template/student_fee_receipt.html", context)
+    
+    template_path = 'student_template/student_fee_receipt_pdf.html'
+    template = get_template(template_path)
+    html = template.render(context)
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="fee_receipt_{payment.transaction_id}.pdf"'
+    
+    pisa_status = pisa.CreatePDF(
+       html, dest=response)
+       
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
 
 
 def student_certificates(request):
@@ -777,7 +795,12 @@ def student_reg_documents(request):
     reg = get_object_or_404(StudentRegistration, student=student)
     
     if request.method == "POST":
-        messages.success(request, "Step 4: Documents checklist confirmed.")
+        if 'aadhar_file' in request.FILES:
+            reg.aadhar_file = request.FILES['aadhar_file']
+        if 'marksheet_file' in request.FILES:
+            reg.marksheet_file = request.FILES['marksheet_file']
+        reg.save()
+        messages.success(request, "Step 4: Documents uploaded and confirmed.")
         return redirect(reverse('student_reg_confirm'))
         
     context = {

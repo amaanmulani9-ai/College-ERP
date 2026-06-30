@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Fee Receipt PDF</title>
+    <style>
+        @page {
+            size: a4 portrait;
+            margin: 2cm;
+        }
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            color: #333333;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #1f2937;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 18px;
+            margin: 0 0 5px 0;
+            color: #111827;
+        }
+        .header p {
+            margin: 0;
+            font-size: 12px;
+            color: #4b5563;
+        }
+        .receipt-title {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .receipt-title h2 {
+            font-size: 16px;
+            color: #1e3a8a;
+            margin: 0;
+        }
+        .receipt-title p {
+            margin: 5px 0 0 0;
+            color: #6b7280;
+        }
+        table.details-table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+        table.details-table td {
+            padding: 5px;
+            vertical-align: top;
+        }
+        table.details-table td.label {
+            font-weight: bold;
+            width: 35%;
+        }
+        table.itemized-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        table.itemized-table th {
+            background-color: #f3f4f6;
+            border: 1px solid #d1d5db;
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+        }
+        table.itemized-table td {
+            border: 1px solid #d1d5db;
+            padding: 10px;
+        }
+        .total-row td {
+            font-weight: bold;
+            background-color: #f9fafb;
+        }
+        .signature-section {
+            margin-top: 50px;
+            text-align: right;
+        }
+        .signature-section .sig-name {
+            font-family: serif;
+            font-size: 20px;
+            color: #1e3a8a;
+            font-style: italic;
+        }
+        .signature-section .sig-label {
+            border-top: 1px solid #333;
+            width: 200px;
+            display: inline-block;
+            text-align: center;
+            padding-top: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>SIR SITARAM AND LADY SHANTABAI PATKAR COLLEGE</h1>
+        <p>An Autonomous College Affiliated to University of Mumbai</p>
+        <p>S.V. Road, Goregaon (West), Mumbai - 400062</p>
+    </div>
+
+    <div class="receipt-title">
+        <h2>FEE RECEIPT</h2>
+        <p>Receipt No: RCP-2026-{{ payment.id|stringformat:"05d" }}</p>
+    </div>
+
+    <table class="details-table">
+        <tr>
+            <td style="width: 50%;">
+                <h4 style="margin-bottom: 10px;">Candidate Information</h4>
+                <table style="width: 100%;">
+                    <tr>
+                        <td class="label">Student Name:</td>
+                        <td>{{ student.admin.get_full_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Enrollment No:</td>
+                        <td>PAT/2026/{{ student.id|stringformat:"04d" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Course:</td>
+                        <td>{{ student.course.name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Academic Batch:</td>
+                        <td>{{ student.session }}</td>
+                    </tr>
+                </table>
+            </td>
+            <td style="width: 50%;">
+                <h4 style="margin-bottom: 10px;">Transaction Details</h4>
+                <table style="width: 100%;">
+                    <tr>
+                        <td class="label">Transaction ID:</td>
+                        <td>{{ payment.transaction_id }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Payment Date:</td>
+                        <td>{{ payment.payment_date|date:"F d, Y, h:i A" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Payment Method:</td>
+                        <td>{{ payment.payment_method }}</td>
+                    </tr>
+                    <tr>
+                        <td class="label">Status:</td>
+                        <td style="color: green;">SUCCESS</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <table class="itemized-table">
+        <thead>
+            <tr>
+                <th style="width: 10%;">Sr. No.</th>
+                <th style="width: 60%;">Fee Particulars / Description</th>
+                <th style="width: 30%; text-align: right;">Amount Paid (INR)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>
+                    <b>{{ payment.fee_record.category }}</b><br>
+                    <span style="font-size: 10px; color: #666;">Payment towards course fees, tuition, and university dues.</span>
+                </td>
+                <td style="text-align: right;">INR {{ payment.amount_paid|floatformat:2 }}</td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="2" style="text-align: right;">Total Amount Received:</td>
+                <td style="text-align: right; color: #1e3a8a;">INR {{ payment.amount_paid|floatformat:2 }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="signature-section">
+        <div class="sig-name">M. K. Mehta</div>
+        <div class="sig-label">Authorized Signatory<br>Accounts Cell</div>
+    </div>
+
+</body>
+</html>

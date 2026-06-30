@@ -138,6 +138,56 @@
         </div>
     </div>
 
+    <!-- Advanced Analytics Dashboard -->
+    <div class="row">
+        <!-- Monthly Enrollment Trend -->
+        <div class="col-12 mb-4">
+            <div class="erpnext-card">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="card-title text-white">
+                        <i class="fas fa-chart-line me-2 text-primary"></i>
+                        Advanced Analytics: Monthly Enrollment Trend
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="enrollmentTrendChart" style="height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Pass/Fail Ratio -->
+        <div class="col-lg-6">
+            <div class="erpnext-card border-info">
+                <div class="card-header border-info">
+                    <h3 class="card-title text-info">
+                        <i class="fas fa-poll me-2"></i>
+                        Overall Pass/Fail Ratio
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="passFailChart" style="height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fee Collection Stats -->
+        <div class="col-lg-6">
+            <div class="erpnext-card border-success">
+                <div class="card-header border-success">
+                    <h3 class="card-title text-success">
+                        <i class="fas fa-rupee-sign me-2"></i>
+                        Fee Collection Statistics
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="feeCollectionChart" style="height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Actions -->
     <div class="row">
         <div class="col-12">
@@ -374,6 +424,83 @@
                 }
             }
         });
+        
+        // --- Advanced Analytics Charts ---
+        
+        // 1. Enrollment Trend (Line Chart)
+        const trendCtx = document.getElementById('enrollmentTrendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: {{ enrollment_months|safe }},
+                datasets: [{
+                    label: 'New Enrollments',
+                    data: {{ enrollment_counts|safe }},
+                    borderColor: colors.primary,
+                    backgroundColor: 'rgba(94, 100, 255, 0.1)',
+                    borderWidth: 3,
+                    pointBackgroundColor: colors.primary,
+                    pointRadius: 4,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f1f3f4' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 2. Pass/Fail Ratio (Pie Chart)
+        const pfCtx = document.getElementById('passFailChart').getContext('2d');
+        new Chart(pfCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Passed', 'Failed'],
+                datasets: [{
+                    data: [{{ pass_count }}, {{ fail_count }}],
+                    backgroundColor: [colors.success, colors.danger],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { usePointStyle: true } }
+                }
+            }
+        });
+
+        // 3. Fee Collection (Bar Chart)
+        const feeCtx = document.getElementById('feeCollectionChart').getContext('2d');
+        new Chart(feeCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Collected', 'Pending'],
+                datasets: [{
+                    label: 'Amount in INR',
+                    data: [{{ total_fee_collected }}, {{ total_fee_pending }}],
+                    backgroundColor: [colors.success, colors.warning],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f1f3f4' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+        
     });
 </script>
 {% endblock custom_js %}

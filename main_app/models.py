@@ -469,6 +469,10 @@ class StudentRegistration(models.Model):
     student_phone = models.CharField(max_length=50, default="")
     student_email = models.EmailField(default="")
     
+    # Document Uploads
+    aadhar_file = models.FileField(upload_to='student_documents/aadhar/', null=True, blank=True)
+    marksheet_file = models.FileField(upload_to='student_documents/marksheet/', null=True, blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

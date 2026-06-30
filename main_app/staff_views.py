@@ -277,10 +277,32 @@ def staff_add_result(request):
                 data.exam = exam
                 data.test = test
                 data.save()
+                
+                # Send Email Notification for Result Update
+                try:
+                    from django.core.mail import send_mail
+                    from django.conf import settings
+                    subject_text = f"Result Updated for {subject.name}"
+                    message = f"Hello {student.admin.first_name},\n\nYour result for {subject.name} has been updated.\nExam Score: {exam}\nTest Score: {test}\n\nPlease login to your portal to view more details.\n\nRegards,\nCollege ERP System"
+                    send_mail(subject_text, message, settings.EMAIL_HOST_USER, [student.admin.email])
+                except Exception as e:
+                    print("Email error:", e)
+                    
                 messages.success(request, "Scores Updated")
             except:
                 result = StudentResult(student=student, subject=subject, test=test, exam=exam)
                 result.save()
+                
+                # Send Email Notification for New Result
+                try:
+                    from django.core.mail import send_mail
+                    from django.conf import settings
+                    subject_text = f"New Result Published for {subject.name}"
+                    message = f"Hello {student.admin.first_name},\n\nA new result for {subject.name} has been published.\nExam Score: {exam}\nTest Score: {test}\n\nPlease login to your portal to view more details.\n\nRegards,\nCollege ERP System"
+                    send_mail(subject_text, message, settings.EMAIL_HOST_USER, [student.admin.email])
+                except Exception as e:
+                    print("Email error:", e)
+                    
                 messages.success(request, "Scores Saved")
         except Exception as e:
             messages.warning(request, "Error Occured While Processing Form")
