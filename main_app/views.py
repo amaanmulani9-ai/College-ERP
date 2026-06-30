@@ -7,7 +7,8 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from .EmailBackend import EmailBackend
-from .models import Attendance, Session, Subject 
+from .models import Attendance, Session, Subject, NotificationStudent, NotificationStaff
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -202,3 +203,63 @@ def discussion_board(request):
         'page_title': "Classroom Discussion Board"
     }
     return render(request, "main_app/discussion_board.html", context)
+
+
+# --- Notification Bell API ---
+
+@login_required
+def get_notifications_json(request):
+    """Returns unread notification count and latest 5 notifications as JSON for the bell dropdown."""
+    user = request.user
+    notifs = []
+    unread_count = 0
+
+    if user.user_type == '3':  # Student
+        try:
+            student = user.student
+            qs = NotificationStudent.objects.filter(student=student).order_by('-created_at')[:5]
+            unread_count = NotificationStudent.objects.filter(student=student, is_read=False).count()
+            for n in qs:
+                notifs.append({
+                    'id': n.id,
+                    'message': n.message,
+                    'is_read': n.is_read,
+                    'created_at': n.created_at.strftime('%b %d, %Y %H:%M'),
+                })
+        except Exception:
+            pass
+    elif user.user_type == '2':  # Staff
+        try:
+            staff = user.staff
+            qs = NotificationStaff.objects.filter(staff=staff).order_by('-created_at')[:5]
+            unread_count = NotificationStaff.objects.filter(staff=staff, is_read=False).count()
+            for n in qs:
+                notifs.append({
+                    'id': n.id,
+                    'message': n.message,
+                    'is_read': n.is_read,
+                    'created_at': n.created_at.strftime('%b %d, %Y %H:%M'),
+                })
+        except Exception:
+            pass
+
+    return JsonResponse({'unread_count': unread_count, 'notifications': notifs})
+
+
+@login_required
+@csrf_exempt
+def mark_notifications_read(request):
+    """Marks all notifications as read for the logged-in user."""
+    user = request.user
+    if user.user_type == '3':
+        try:
+            NotificationStudent.objects.filter(student=user.student, is_read=False).update(is_read=True)
+        except Exception:
+            pass
+    elif user.user_type == '2':
+        try:
+            NotificationStaff.objects.filter(staff=user.staff, is_read=False).update(is_read=True)
+        except Exception:
+            pass
+    return JsonResponse({'status': 'ok'})
+

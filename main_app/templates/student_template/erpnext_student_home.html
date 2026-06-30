@@ -659,6 +659,25 @@
         </div>
     </div>
 
+    <!-- ⚠️ Attendance Warning Banner -->
+    {% for s in subject_attendance_data %}{% if s.low %}
+    {% if forloop.first %}
+    <div class="alert alert-warning alert-dismissible fade show d-flex align-items-start gap-3 mb-3" role="alert" style="border-left:4px solid #ffc107;border-radius:10px;">
+        <i class="fas fa-exclamation-triangle fa-lg mt-1" style="color:#ffc107;"></i>
+        <div>
+            <strong>⚠️ Low Attendance Warning!</strong> You have fallen below 75% attendance in one or more subjects:
+            <ul class="mb-0 mt-1">
+    {% endif %}
+                <li><strong>{{ s.name }}</strong> &mdash; {{ s.percent }}% ({{ s.present }}/{{ s.total }} classes)</li>
+    {% if forloop.last %}
+            </ul>
+            <small class="text-muted">Maintain at least 75% attendance to be eligible for exams.</small>
+        </div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+    {% endif %}{% endfor %}
+
     <!-- Quick Access Stat Widgets -->
     <div class="row mb-4 g-3">
         <div class="col-6 col-md-3">

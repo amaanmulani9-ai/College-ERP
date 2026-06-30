@@ -417,3 +417,34 @@ def staff_view_registration(request, reg_id):
         'can_edit_registration': False,
     }
     return render(request, "hod_template/view_registration.html", context)
+
+
+def staff_events_calendar(request):
+    from .models import CollegeEvent
+    import json
+    events = CollegeEvent.objects.all().order_by('date')
+    color_map = {
+        'exam': '#dc3545',
+        'holiday': '#28a745',
+        'event': '#5e64ff',
+        'seminar': '#fd7e14',
+        'deadline': '#ffc107',
+    }
+    events_json = []
+    for e in events:
+        events_json.append({
+            'title': e.title,
+            'start': str(e.date),
+            'end': str(e.end_date) if e.end_date else str(e.date),
+            'color': color_map.get(e.event_type, '#5e64ff'),
+            'description': e.description,
+            'type': e.get_event_type_display(),
+        })
+
+    context = {
+        'events_json': json.dumps(events_json),
+        'events': events,
+        'page_title': 'College Event Calendar',
+    }
+    return render(request, 'student_template/student_events_calendar.html', context)
+

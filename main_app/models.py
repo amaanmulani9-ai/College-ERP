@@ -180,6 +180,7 @@ class FeedbackStaff(models.Model):
 class NotificationStaff(models.Model):
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
     message = models.TextField()
+    is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -187,8 +188,30 @@ class NotificationStaff(models.Model):
 class NotificationStudent(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     message = models.TextField()
+    is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class CollegeEvent(models.Model):
+    EVENT_TYPE_CHOICES = [
+        ('exam', 'Exam'),
+        ('holiday', 'Holiday'),
+        ('event', 'Event/Fest'),
+        ('seminar', 'Seminar'),
+        ('deadline', 'Deadline'),
+    ]
+    title = models.CharField(max_length=200)
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPE_CHOICES, default='event')
+    date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)
+    description = models.TextField(blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.get_event_type_display()}) on {self.date}"
+
+
 
 
 class StudentResult(models.Model):

@@ -607,6 +607,23 @@
                                             </a>
                                         </li>
 
+                                        <li class="nav-item">
+                                            {% url 'student_report_card' as student_report_card %}
+                                            <a href="{{ student_report_card }}"
+                                                class="nav-link {% if student_report_card in request.path %} active {% endif %}">
+                                                <i class="nav-icon fas fa-file-alt"></i>
+                                                <p>Report Card</p>
+                                            </a>
+                                        </li>
+
+                                        <li class="nav-item">
+                                            {% url 'student_events_calendar' as student_events_calendar %}
+                                            <a href="{{ student_events_calendar }}"
+                                                class="nav-link {% if student_events_calendar in request.path %} active {% endif %}">
+                                                <i class="nav-icon fas fa-calendar-day"></i>
+                                                <p>Event Calendar</p>
+                                            </a>
+                                        </li>
 
                                         {% endif %}
                                     </ul>

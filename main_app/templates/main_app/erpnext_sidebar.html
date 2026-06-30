@@ -214,6 +214,14 @@
             </a>
         </div>
 
+        <div class="nav-item">
+            {% url 'admin_events' as admin_events %}
+            <a href="{{ admin_events }}" class="nav-link {% if 'events' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-calendar-day"></i>
+                <span class="nav-text">Event Calendar</span>
+            </a>
+        </div>
+
     {% elif user.user_type == '2' %}
         <!-- Staff Navigation -->
         <h6 class="nav-section-title">Main</h6>
@@ -319,6 +327,14 @@
             <a href="{{ staff_feedback }}" class="nav-link {% if staff_feedback == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-comment-alt"></i>
                 <span class="nav-text">Feedback</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
+            {% url 'staff_events_calendar' as staff_events_calendar %}
+            <a href="{{ staff_events_calendar }}" class="nav-link {% if 'events' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-calendar-day"></i>
+                <span class="nav-text">Event Calendar</span>
             </a>
         </div>
 
@@ -608,6 +624,30 @@
             <a href="{{ student_payable_fees }}" class="nav-link {% if student_payable_fees == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-credit-card"></i>
                 <span class="nav-text">Payable Fees</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
+            {% url 'student_payable_fees' as student_payable_fees %}
+            <a href="{{ student_payable_fees }}" class="nav-link {% if student_payable_fees == request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-credit-card"></i>
+                <span class="nav-text">Payable Fees</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
+            {% url 'student_report_card' as student_report_card %}
+            <a href="{{ student_report_card }}" class="nav-link {% if 'report-card' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-file-alt"></i>
+                <span class="nav-text">Report Card</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
+            {% url 'student_events_calendar' as student_events_calendar %}
+            <a href="{{ student_events_calendar }}" class="nav-link {% if 'events' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-calendar-day"></i>
+                <span class="nav-text">Event Calendar</span>
             </a>
         </div>
 

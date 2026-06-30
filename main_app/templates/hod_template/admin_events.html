@@ -1,0 +1,184 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block page_title %}Event Calendar{% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Event Calendar</li>
+{% endblock breadcrumb %}
+
+{% block custom_css %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css' rel='stylesheet' />
+<style>
+.legend-badge {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+.event-list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color, #eee);
+}
+.event-list-item:last-child { border-bottom: none; }
+.event-type-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    min-width: 80px;
+    text-align: center;
+}
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="row mb-4">
+    <!-- Add Event Form -->
+    <div class="col-lg-4">
+        <div class="erpnext-card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-plus-circle me-2"></i>Add New Event</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'admin_events' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Event Title *</label>
+                        <input type="text" name="title" class="form-control" placeholder="e.g. Mid-Term Exam" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Event Type *</label>
+                        <select name="event_type" class="form-select">
+                            {% for val, label in event_type_choices %}
+                            <option value="{{ val }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Start Date *</label>
+                        <input type="date" name="date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">End Date (optional)</label>
+                        <input type="date" name="end_date" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Description</label>
+                        <textarea name="description" class="form-control" rows="2" placeholder="Optional details..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-calendar-plus me-2"></i>Add Event
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="erpnext-card mt-3">
+            <div class="card-header"><h3 class="card-title"><i class="fas fa-info-circle me-2"></i>Legend</h3></div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    <span><span class="legend-badge" style="background:#dc3545"></span>Exam</span>
+                    <span><span class="legend-badge" style="background:#28a745"></span>Holiday</span>
+                    <span><span class="legend-badge" style="background:#5e64ff"></span>Event/Fest</span>
+                    <span><span class="legend-badge" style="background:#fd7e14"></span>Seminar</span>
+                    <span><span class="legend-badge" style="background:#ffc107"></span>Deadline</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar -->
+    <div class="col-lg-8">
+        <div class="erpnext-card">
+            <div class="card-header"><h3 class="card-title"><i class="fas fa-calendar-alt me-2"></i>Calendar View</h3></div>
+            <div class="card-body">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Event List -->
+<div class="erpnext-card">
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-list me-2"></i>All Events</h3>
+    </div>
+    <div class="card-body">
+        {% if events %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Description</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td><strong>{{ event.title }}</strong></td>
+                        <td>
+                            {% if event.event_type == 'exam' %}<span class="badge" style="background:#dc3545">Exam</span>
+                            {% elif event.event_type == 'holiday' %}<span class="badge" style="background:#28a745">Holiday</span>
+                            {% elif event.event_type == 'seminar' %}<span class="badge" style="background:#fd7e14">Seminar</span>
+                            {% elif event.event_type == 'deadline' %}<span class="badge" style="background:#ffc107;color:#333">Deadline</span>
+                            {% else %}<span class="badge" style="background:#5e64ff">Event</span>{% endif %}
+                        </td>
+                        <td>{{ event.date }}</td>
+                        <td>{{ event.end_date|default:"-" }}</td>
+                        <td>{{ event.description|default:"-"|truncatechars:40 }}</td>
+                        <td>
+                            <a href="{% url 'admin_delete_event' event.id %}" class="btn btn-danger btn-sm"
+                               onclick="return confirm('Delete this event?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+            <i class="fas fa-calendar-times fa-3x mb-3"></i>
+            <p>No events yet. Add your first event using the form!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+    const events = {{ events_json|safe }};
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek'
+        },
+        events: events,
+        eventClick: function(info) {
+            alert(info.event.title + '\n' + (info.event.extendedProps.description || 'No description'));
+        },
+        height: 'auto',
+    });
+    calendar.render();
+});
+</script>
+{% endblock custom_js %}

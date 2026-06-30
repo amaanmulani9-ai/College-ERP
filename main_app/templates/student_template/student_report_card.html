@@ -1,0 +1,182 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block page_title %}Report Card{% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Report Card</li>
+{% endblock breadcrumb %}
+
+{% block custom_css %}
+<style>
+@media print {
+    .erpnext-navbar, .erpnext-sidebar, .page-header, .breadcrumb, .no-print, nav { display: none !important; }
+    .erpnext-main { margin: 0 !important; padding: 0 !important; }
+    body { background: #fff !important; }
+    .print-card { box-shadow: none !important; border: 1px solid #ccc !important; }
+}
+
+.report-header {
+    background: linear-gradient(135deg, #5e64ff, #8b5cf6);
+    color: #fff;
+    border-radius: 12px 12px 0 0;
+    padding: 30px;
+    text-align: center;
+}
+.report-header h2 { margin: 0; font-size: 1.8rem; font-weight: 700; }
+.report-header p { margin: 4px 0 0; opacity: 0.85; }
+
+.grade-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #fff;
+}
+.grade-A { background: #28a745; }
+.grade-B { background: #5e64ff; }
+.grade-C { background: #fd7e14; }
+.grade-F { background: #dc3545; }
+
+.result-banner {
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 20px;
+}
+.result-pass { background: rgba(40,167,69,0.1); color: #28a745; border: 2px solid #28a745; }
+.result-fail { background: rgba(220,53,69,0.1); color: #dc3545; border: 2px solid #dc3545; }
+
+.stat-pill {
+    display: inline-block;
+    background: rgba(94,100,255,0.1);
+    color: #5e64ff;
+    border-radius: 20px;
+    padding: 5px 15px;
+    font-weight: 600;
+    margin: 0 5px;
+}
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="erpnext-card print-card p-0 overflow-hidden">
+            <!-- Report Header -->
+            <div class="report-header">
+                <h2>🎓 College ERP</h2>
+                <p>Official Academic Report Card</p>
+            </div>
+
+            <!-- Student Info -->
+            <div class="p-4 border-bottom">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless mb-0">
+                            <tr><td class="text-muted fw-semibold" style="width:130px">Student Name</td><td><strong>{{ student.admin.get_full_name }}</strong></td></tr>
+                            <tr><td class="text-muted fw-semibold">Email</td><td>{{ student.admin.email }}</td></tr>
+                            <tr><td class="text-muted fw-semibold">Course</td><td>{{ student.course.name }}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless mb-0">
+                            <tr><td class="text-muted fw-semibold" style="width:130px">Session</td><td>{{ student.session }}</td></tr>
+                            <tr><td class="text-muted fw-semibold">Total Subjects</td><td>{{ result_data|length }}</td></tr>
+                            <tr><td class="text-muted fw-semibold">Generated On</td><td>{% now "d M Y" %}</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marks Table -->
+            <div class="p-4">
+                {% if result_data %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Subject</th>
+                                <th class="text-center">Test (30)</th>
+                                <th class="text-center">Exam (70)</th>
+                                <th class="text-center">Total (100)</th>
+                                <th class="text-center">%</th>
+                                <th class="text-center">Grade</th>
+                                <th class="text-center">Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in result_data %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td><strong>{{ r.subject }}</strong></td>
+                                <td class="text-center">{{ r.test }}</td>
+                                <td class="text-center">{{ r.exam }}</td>
+                                <td class="text-center"><strong>{{ r.total }}</strong></td>
+                                <td class="text-center">{{ r.percentage }}%</td>
+                                <td class="text-center"><span class="grade-badge grade-{{ r.grade }}">{{ r.grade }}</span></td>
+                                <td class="text-center">
+                                    {% if r.passed %}
+                                    <span class="badge bg-success">PASS</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">FAIL</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <th colspan="4" class="text-end">TOTAL</th>
+                                <th class="text-center">{{ total_obtained }} / {{ total_marks }}</th>
+                                <th class="text-center">{{ overall_pct }}%</th>
+                                <th colspan="2"></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Summary Stat Pills -->
+                <div class="text-center my-3">
+                    <span class="stat-pill">Marks: {{ total_obtained }}/{{ total_marks }}</span>
+                    <span class="stat-pill">Percentage: {{ overall_pct }}%</span>
+                </div>
+
+                <!-- Overall Result Banner -->
+                <div class="result-banner {% if overall_result == 'PASS' %}result-pass{% else %}result-fail{% endif %}">
+                    {% if overall_result == 'PASS' %}
+                    🎉 PASS — Congratulations!
+                    {% else %}
+                    ❌ FAIL — Keep Working Hard!
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fas fa-file-alt fa-3x mb-3"></i>
+                    <p>No results have been published for your subjects yet.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Footer Signature -->
+            <div class="p-4 border-top text-center text-muted" style="font-size:0.85rem;">
+                <p class="mb-0">This is a computer-generated report. No signature required. | College ERP &copy; Amaan</p>
+            </div>
+        </div>
+
+        <!-- Print Button -->
+        <div class="text-center mt-3 no-print">
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print me-2"></i>Print Report Card
+            </button>
+            <a href="{% url 'student_home' %}" class="btn btn-outline-secondary ms-2">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock content %}

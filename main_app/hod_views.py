@@ -989,3 +989,58 @@ def admin_delete_registration(request, reg_id):
     except Exception as e:
         messages.error(request, f"Error deleting registration: {e}")
     return redirect(reverse('admin_manage_registrations'))
+
+
+def admin_events(request):
+    """Admin Event Calendar — create, view, and delete college events."""
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        event_type = request.POST.get('event_type', 'event')
+        date = request.POST.get('date')
+        end_date = request.POST.get('end_date') or None
+        description = request.POST.get('description', '')
+        if title and date:
+            CollegeEvent.objects.create(
+                title=title,
+                event_type=event_type,
+                date=date,
+                end_date=end_date,
+                description=description,
+            )
+            messages.success(request, f"Event '{title}' added successfully!")
+        else:
+            messages.error(request, "Title and Date are required.")
+        return redirect(reverse('admin_events'))
+
+    events = CollegeEvent.objects.all().order_by('date')
+    color_map = {
+        'exam': '#dc3545',
+        'holiday': '#28a745',
+        'event': '#5e64ff',
+        'seminar': '#fd7e14',
+        'deadline': '#ffc107',
+    }
+    events_json = []
+    for e in events:
+        events_json.append({
+            'title': e.title,
+            'start': str(e.date),
+            'end': str(e.end_date) if e.end_date else str(e.date),
+            'color': color_map.get(e.event_type, '#5e64ff'),
+            'description': e.description,
+        })
+
+    context = {
+        'events': events,
+        'events_json': json.dumps(events_json),
+        'page_title': 'Event Calendar',
+        'event_type_choices': CollegeEvent.EVENT_TYPE_CHOICES,
+    }
+    return render(request, 'hod_template/admin_events.html', context)
+
+
+def admin_delete_event(request, event_id):
+    event = get_object_or_404(CollegeEvent, id=event_id)
+    event.delete()
+    messages.success(request, f"Event deleted.")
+    return redirect(reverse('admin_events'))

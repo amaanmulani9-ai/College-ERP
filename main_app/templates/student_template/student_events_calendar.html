@@ -1,0 +1,112 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block page_title %}Event Calendar{% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active">Event Calendar</li>
+{% endblock breadcrumb %}
+
+{% block custom_css %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css' rel='stylesheet' />
+<style>
+.legend-badge {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+.event-list-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: var(--card-bg, #f8f9fc);
+    border-left: 4px solid #5e64ff;
+}
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="row">
+    <!-- Calendar -->
+    <div class="col-lg-8 mb-4">
+        <div class="erpnext-card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-calendar-alt me-2"></i>College Event Calendar</h3>
+            </div>
+            <div class="card-body">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Events List + Legend -->
+    <div class="col-lg-4 mb-4">
+        <div class="erpnext-card mb-3">
+            <div class="card-header"><h3 class="card-title"><i class="fas fa-info-circle me-2"></i>Legend</h3></div>
+            <div class="card-body">
+                <div class="d-flex flex-column gap-2">
+                    <span><span class="legend-badge" style="background:#dc3545"></span>Exam</span>
+                    <span><span class="legend-badge" style="background:#28a745"></span>Holiday</span>
+                    <span><span class="legend-badge" style="background:#5e64ff"></span>Event/Fest</span>
+                    <span><span class="legend-badge" style="background:#fd7e14"></span>Seminar</span>
+                    <span><span class="legend-badge" style="background:#ffc107"></span>Deadline</span>
+                </div>
+            </div>
+        </div>
+        <div class="erpnext-card">
+            <div class="card-header"><h3 class="card-title"><i class="fas fa-list me-2"></i>Upcoming Events</h3></div>
+            <div class="card-body">
+                {% if events %}
+                    {% for event in events %}
+                    <div class="event-list-row" style="border-left-color:
+                        {% if event.event_type == 'exam' %}#dc3545
+                        {% elif event.event_type == 'holiday' %}#28a745
+                        {% elif event.event_type == 'seminar' %}#fd7e14
+                        {% elif event.event_type == 'deadline' %}#ffc107
+                        {% else %}#5e64ff{% endif %};">
+                        <div>
+                            <strong>{{ event.title }}</strong><br>
+                            <small class="text-muted">{{ event.date }} &bull; {{ event.get_event_type_display }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="text-center text-muted py-3">
+                    <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                    <p>No events yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarEl = document.getElementById('calendar');
+    const events = {{ events_json|safe }};
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,listWeek'
+        },
+        events: events,
+        eventClick: function(info) {
+            alert('📅 ' + info.event.title + '\n\n' + (info.event.extendedProps.description || 'No description provided.'));
+        },
+        height: 'auto',
+    });
+    calendar.render();
+});
+</script>
+{% endblock custom_js %}

@@ -117,6 +117,10 @@ urlpatterns = [
     path('staff/result/fetch/', staff_views.fetch_student_result,
          name='fetch_student_result'),
 
+    # Notification Bell API
+    path("notifications/json/", views.get_notifications_json, name='get_notifications_json'),
+    path("notifications/read/", views.mark_notifications_read, name='mark_notifications_read'),
+
 
 
     # Student
@@ -151,6 +155,8 @@ urlpatterns = [
     path("student/certificates/request/", student_views.student_request_certificate, name='student_request_certificate'),
     path("student/placements/", student_views.student_placements, name='student_placements'),
     path("student/ai-assistant/chat/", student_views.student_ai_chat, name='student_ai_chat'),
+    path("student/report-card/", student_views.student_report_card, name='student_report_card'),
+    path("student/events/", student_views.student_events_calendar, name='student_events_calendar'),
 
     # --- Online Registration Portal ---
     path("student/registration/personal/", student_views.student_reg_personal, name='student_reg_personal'),
@@ -159,6 +165,10 @@ urlpatterns = [
     path("student/registration/documents/", student_views.student_reg_documents, name='student_reg_documents'),
     path("student/registration/confirm/", student_views.student_reg_confirm, name='student_reg_confirm'),
     path("student/registration/print/", student_views.student_reg_print, name='student_reg_print'),
+
+    # --- Event Calendar ---
+    path("admin/events/", hod_views.admin_events, name='admin_events'),
+    path("admin/events/delete/<int:event_id>/", hod_views.admin_delete_event, name='admin_delete_event'),
 
     # --- Admin ERP Management Routes ---
     path("admin/placements/", hod_views.admin_manage_placements, name='admin_manage_placements'),
@@ -178,4 +188,5 @@ urlpatterns = [
     path("staff/timetable/", staff_views.staff_view_timetable, name='staff_view_timetable'),
     path("staff/registrations/", staff_views.staff_manage_registrations, name='staff_manage_registrations'),
     path("staff/registrations/view/<int:reg_id>/", staff_views.staff_view_registration, name='staff_view_registration'),
+    path("staff/events/", staff_views.staff_events_calendar, name='staff_events_calendar'),
 ]
