@@ -269,5 +269,3 @@ def mark_notifications_read(request):
         except Exception:
             pass
     return JsonResponse({'status': 'ok'})
-
-def offline(request): return render(request, 'main_app/offline.html')

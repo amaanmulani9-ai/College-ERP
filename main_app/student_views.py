@@ -890,56 +890,6 @@ def student_reg_print(request):
     return render(request, "student_template/student_registration_form.html", context)
 
 
-def student_report_card(request):
-    student = get_object_or_404(Student, admin=request.user)
-    results = StudentResult.objects.filter(student=student).select_related('subject')
-
-    result_data = []
-    total_marks = 0
-    total_obtained = 0
-    pass_count = 0
-    fail_count = 0
-
-    for r in results:
-        obtained = r.test + r.exam
-        max_marks = 100  # Assuming 100 total (30 test + 70 exam)
-        passed = obtained >= 40  # 40% passing criterion
-        percentage = round((obtained / max_marks) * 100, 1)
-
-        if passed:
-            pass_count += 1
-            grade = 'A' if percentage >= 80 else ('B' if percentage >= 60 else 'C')
-        else:
-            fail_count += 1
-            grade = 'F'
-
-        total_marks += max_marks
-        total_obtained += obtained
-        result_data.append({
-            'subject': r.subject.name,
-            'test': r.test,
-            'exam': r.exam,
-            'total': obtained,
-            'max': max_marks,
-            'percentage': percentage,
-            'grade': grade,
-            'passed': passed,
-        })
-
-    overall_pct = round((total_obtained / total_marks) * 100, 1) if total_marks > 0 else 0
-    overall_result = 'PASS' if fail_count == 0 else 'FAIL'
-
-    context = {
-        'student': student,
-        'result_data': result_data,
-        'total_obtained': total_obtained,
-        'total_marks': total_marks,
-        'overall_pct': overall_pct,
-        'overall_result': overall_result,
-        'page_title': 'Report Card',
-    }
-    return render(request, 'student_template/student_report_card.html', context)
-
 
 def student_events_calendar(request):
     from .models import CollegeEvent
