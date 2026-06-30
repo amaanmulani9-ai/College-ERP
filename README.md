@@ -112,7 +112,6 @@ If you have seeded the database with test data, you can use the following defaul
 
 | Role | Email Address | Password |
 |------|---------------|----------|
-| **Admin** | `admin@college.com` | (Your Superuser Password) |
 | **Staff** | `staffone@staff.com` | `staffone` |
 | **Student** | `studentone@student.com` | `studentone` |
 
