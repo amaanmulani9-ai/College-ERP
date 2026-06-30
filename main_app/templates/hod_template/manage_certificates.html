@@ -1,0 +1,76 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-certificate mr-2"></i>Student Certificate Requests</h3>
+                    </div>
+                    <div class="card-body" style="overflow-x: auto;">
+                        <table class="table table-bordered table-striped table-hover">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Student</th>
+                                    <th>Certificate Type</th>
+                                    <th>Reason / Purpose</th>
+                                    <th>Request Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for req in requests %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <strong>{{ req.student.admin.get_full_name }}</strong><br>
+                                        <small>{{ req.student.course.name }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-info">{{ req.certificate_type }}</span>
+                                    </td>
+                                    <td>{{ req.reason }}</td>
+                                    <td>{{ req.created_at|date:"d-m-Y"|default:"N/A" }}</td>
+                                    <td>
+                                        {% if req.status == 'Approved' %}
+                                        <span class="badge badge-success"><i class="fas fa-check-circle"></i> Approved</span><br>
+                                        <small class="text-muted">on {{ req.approved_date }}</small>
+                                        {% elif req.status == 'Rejected' %}
+                                        <span class="badge badge-danger"><i class="fas fa-times-circle"></i> Rejected</span>
+                                        {% else %}
+                                        <span class="badge badge-warning"><i class="fas fa-spinner"></i> Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if req.status == 'Pending' %}
+                                        <a href="{% url 'admin_approve_certificate' req.id %}" class="btn btn-sm btn-success">
+                                            <i class="fas fa-check"></i> Approve
+                                        </a>
+                                        <a href="{% url 'admin_reject_certificate' req.id %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-times"></i> Reject
+                                        </a>
+                                        {% else %}
+                                        <span class="text-muted">Processed</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">No certificate requests found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

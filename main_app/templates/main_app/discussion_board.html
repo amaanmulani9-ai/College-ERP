@@ -1,0 +1,458 @@
+{% extends 'main_app/erpnext_base.html' %}
+{% load static %}
+
+{% block page_title %}Classroom Discussion Board{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    .discussion-container {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 20px;
+        height: calc(100vh - var(--navbar-height) - 130px);
+        min-height: 500px;
+    }
+
+    /* Subjects List Sidebar */
+    .subjects-card {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .subjects-header {
+        padding: 20px;
+        font-weight: 700;
+        font-size: 16px;
+        border-bottom: 1px solid var(--border-color);
+        background: #f8f9fc;
+        color: var(--dark-color);
+    }
+
+    .subjects-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .subject-item-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 20px;
+        color: var(--dark-color);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f1f3f4;
+        border-left: 4px solid transparent;
+    }
+
+    .subject-item-link:hover {
+        background-color: #f5f6fa;
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .subject-item-link.active {
+        background-color: #e8f2ff;
+        color: var(--primary-color);
+        border-left-color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    .subject-icon-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: rgba(94, 100, 255, 0.1);
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .subject-item-link.active .subject-icon-circle {
+        background-color: var(--primary-color);
+        color: #fff;
+    }
+
+    /* Chat Workspace Area */
+    .chat-card {
+        background: #fff;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .chat-header {
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border-color);
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .chat-header h5 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--dark-color);
+    }
+
+    .chat-header small {
+        color: var(--text-muted);
+    }
+
+    /* Message Stream */
+    .chat-body {
+        flex: 1;
+        padding: 24px;
+        overflow-y: auto;
+        background-color: #f8f9fc;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .message-row {
+        display: flex;
+        flex-direction: column;
+        max-width: 75%;
+    }
+
+    .message-row.me {
+        align-self: flex-end;
+    }
+
+    .message-row.others {
+        align-self: flex-start;
+    }
+
+    .message-meta {
+        font-size: 11.5px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .message-row.me .message-meta {
+        align-self: flex-end;
+    }
+
+    .role-badge {
+        font-size: 9px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .role-badge.admin {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #b8860b;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+
+    .role-badge.staff {
+        background-color: rgba(40, 167, 69, 0.15);
+        color: #1e7e34;
+        border: 1px solid rgba(40, 167, 69, 0.3);
+    }
+
+    .role-badge.student {
+        background-color: rgba(94, 100, 255, 0.1);
+        color: var(--primary-color);
+        border: 1px solid rgba(94, 100, 255, 0.2);
+    }
+
+    .message-bubble {
+        padding: 12px 18px;
+        border-radius: 16px;
+        font-size: 14px;
+        line-height: 1.5;
+        position: relative;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .message-row.me .message-bubble {
+        background: var(--primary-gradient, linear-gradient(135deg, #5e64ff 0%, #4c52ff 100%));
+        color: #fff;
+        border-top-right-radius: 4px;
+    }
+
+    .message-row.others .message-bubble {
+        background: #ffffff;
+        color: var(--dark-color);
+        border-top-left-radius: 4px;
+        border: 1px solid var(--border-color);
+    }
+
+    .message-text {
+        white-space: pre-line;
+        word-break: break-word;
+    }
+
+    /* Message Input Box */
+    .chat-footer {
+        padding: 18px 24px;
+        border-top: 1px solid var(--border-color);
+        background: #ffffff;
+    }
+
+    .chat-input-form {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+    }
+
+    .chat-input-form textarea {
+        flex: 1;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 12px 16px;
+        resize: none;
+        height: 50px;
+        max-height: 120px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        background-color: #f8f9fc;
+    }
+
+    .chat-input-form textarea:focus {
+        border-color: var(--primary-color);
+        background-color: #ffffff;
+        outline: none;
+        box-shadow: 0 0 8px rgba(94, 100, 255, 0.15);
+    }
+
+    .chat-send-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    /* Empty state */
+    .chat-empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        background-color: #f8f9fc;
+        color: var(--text-muted);
+        text-align: center;
+        padding: 40px;
+    }
+
+    .chat-empty-state i {
+        font-size: 64px;
+        color: #d1d8dd;
+        margin-bottom: 16px;
+    }
+
+    .dark-mode .subjects-card,
+    .dark-mode .chat-card,
+    .dark-mode .chat-header,
+    .dark-mode .chat-footer {
+        background-color: #2d3748;
+        border-color: #4a5568;
+    }
+
+    .dark-mode .subjects-header {
+        background-color: #262f3f;
+        border-color: #4a5568;
+        color: #f7fafc;
+    }
+
+    .dark-mode .subject-item-link {
+        color: #e2e8f0;
+        border-bottom-color: #4a5568;
+    }
+
+    .dark-mode .subject-item-link:hover {
+        background-color: #374151;
+        color: #66b3ff;
+    }
+
+    .dark-mode .subject-item-link.active {
+        background-color: #1a365d;
+        color: #66b3ff;
+        border-left-color: #66b3ff;
+    }
+
+    .dark-mode .chat-header h5 {
+        color: #f7fafc;
+    }
+
+    .dark-mode .chat-body {
+        background-color: #1a202c;
+    }
+
+    .dark-mode .chat-empty-state {
+        background-color: #1a202c;
+    }
+
+    .dark-mode .message-row.others .message-bubble {
+        background-color: #2d3748;
+        color: #e2e8f0;
+        border-color: #4a5568;
+    }
+
+    .dark-mode .chat-input-form textarea {
+        background-color: #1a202c;
+        border-color: #4a5568;
+        color: #f7fafc;
+    }
+
+    .dark-mode .chat-input-form textarea:focus {
+        background-color: #2d3748;
+        border-color: #66b3ff;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="discussion-container">
+    
+    <!-- Left Panel: Subjects Sidebar -->
+    <div class="subjects-card">
+        <div class="subjects-header">
+            <i class="fas fa-layer-group me-2"></i> Enrolled Subjects
+        </div>
+        <ul class="subjects-list">
+            {% for subj in subjects %}
+            <li>
+                <a href="?subject_id={{ subj.id }}" class="subject-item-link {% if active_subject.id == subj.id %}active{% endif %}">
+                    <div class="subject-icon-circle">
+                        <i class="fas fa-book-reader"></i>
+                    </div>
+                    <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <div style="font-size: 13.5px; font-weight: 500;">{{ subj.name }}</div>
+                        <small style="color: var(--text-muted); font-size: 11px;">{{ subj.course.name }}</small>
+                    </div>
+                </a>
+            </li>
+            {% empty %}
+            <li class="p-4 text-center text-muted">No subjects assigned.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Right Panel: Chat Workspace -->
+    <div class="chat-card">
+        {% if active_subject %}
+        <div class="chat-header">
+            <div class="subject-icon-circle" style="background-color: var(--primary-color); color: #fff;">
+                <i class="fas fa-comments"></i>
+            </div>
+            <div>
+                <h5>{{ active_subject.name }}</h5>
+                <small>Instructor: {{ active_subject.staff.admin.first_name }} {{ active_subject.staff.admin.last_name }}</small>
+            </div>
+        </div>
+
+        <!-- Chat Stream -->
+        <div class="chat-body" id="chat-stream">
+            {% for msg in discussion_messages %}
+            <div class="message-row {% if msg.user.id == request.user.id %}me{% else %}others{% endif %}">
+                <div class="message-meta">
+                    <span style="font-weight: 600;">
+                        {% if msg.user.id == request.user.id %}You{% else %}{{ msg.user.first_name }} {{ msg.user.last_name }}{% endif %}
+                    </span>
+                    
+                    <!-- Role badges -->
+                    {% if msg.user.user_type == '1' %}
+                    <span class="role-badge admin">Admin</span>
+                    {% elif msg.user.user_type == '2' %}
+                    <span class="role-badge staff">Instructor</span>
+                    {% else %}
+                    <span class="role-badge student">Student</span>
+                    {% endif %}
+                    
+                    <span>•</span>
+                    <span>{{ msg.created_at|date:"M d, g:i A" }}</span>
+                </div>
+                <div class="message-bubble">
+                    <div class="message-text">{{ msg.message }}</div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="chat-empty-state" style="flex: 1;">
+                <i class="far fa-comments"></i>
+                <h6>No messages yet.</h6>
+                <p style="font-size: 13px; max-width: 300px; margin: 0;">Start the conversation by posting a question or an announcement below!</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Message Input -->
+        <div class="chat-footer">
+            <form action="?subject_id={{ active_subject.id }}" method="post" class="chat-input-form" id="post-form">
+                {% csrf_token %}
+                <textarea name="message" id="message-text" placeholder="Type your message here..." required rows="1"></textarea>
+                <button type="submit" class="btn btn-primary chat-send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <!-- Empty state when no subject is selected -->
+        <div class="chat-empty-state">
+            <i class="fas fa-comments"></i>
+            <h5>Discussion Workspace</h5>
+            <p style="max-width: 350px;">Select a subject from the sidebar to view class conversations, ask questions, or view instructor announcements.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatBody = document.getElementById('chat-stream');
+        if (chatBody) {
+            // Auto scroll to bottom of chat
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // Auto-expand textarea on typing
+        const textarea = document.getElementById('message-text');
+        if (textarea) {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+
+            // Enter key submits form (Shift+Enter adds newline)
+            textarea.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.getElementById('post-form').submit();
+                }
+            });
+        }
+    });
+</script>
+{% endblock custom_js %}

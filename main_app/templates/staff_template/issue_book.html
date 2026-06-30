@@ -1,0 +1,87 @@
+{% extends 'main_app/erpnext_base.html' %}
+{% load static %}
+
+{% block page_title %}Issue Book to Student{% endblock page_title %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="erpnext-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-book-reader me-2"></i> Issue Book Form
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if alert %}
+                <div class="alert alert-success text-center">
+                    <i class="fas fa-check-circle me-2"></i> Book issued successfully! Expiry date is {{ obj.expiry_date|date:"M d, Y" }}.
+                </div>
+                {% endif %}
+
+                <form method="POST" class="mt-2">
+                    {% csrf_token %}
+                    
+                    {% for field in form %}
+                    <div class="form-group mb-4">
+                        <label class="form-label font-weight-bold" style="color: var(--dark-color);">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                        <small class="text-muted d-block mt-1">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                        <small class="text-danger d-block mt-1">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                    
+                    <div class="d-flex gap-2 justify-content-end mt-4">
+                        <a href="{% url 'view_issued_book' %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Tracker
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fas fa-check me-1"></i> Issue Book
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styling form select controls to look modern and premium */
+    form select {
+        display: block;
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.5;
+        color: var(--dark-color);
+        background-color: #f8f9fc;
+        background-clip: padding-box;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+    
+    form select:focus {
+        border-color: var(--primary-color);
+        background-color: #ffffff;
+        outline: 0;
+        box-shadow: 0 0 0 3px rgba(94, 100, 255, 0.25);
+    }
+
+    .dark-mode form select {
+        background-color: #1a202c;
+        border-color: #4a5568;
+        color: #f7fafc;
+    }
+
+    .dark-mode form select:focus {
+        background-color: #2d3748;
+        border-color: #66b3ff;
+    }
+</style>
+{% endblock content %}

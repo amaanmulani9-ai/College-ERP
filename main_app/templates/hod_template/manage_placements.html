@@ -1,0 +1,152 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Add Placement Drive Form -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-plus mr-2"></i>Post New Placement Drive</h3>
+                    </div>
+                    <form method="POST" action="{% url 'admin_manage_placements' %}">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 form-group">
+                                    <label>Company Name</label>
+                                    <input type="text" class="form-control" name="company_name" placeholder="e.g. Microsoft India" required>
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <label>Job Role</label>
+                                    <input type="text" class="form-control" name="job_role" placeholder="e.g. Software Engineer" required>
+                                </div>
+                                <div class="col-md-2 form-group">
+                                    <label>Package / CTC</label>
+                                    <input type="text" class="form-control" name="package" placeholder="e.g. 15.0 LPA" required>
+                                </div>
+                                <div class="col-md-2 form-group">
+                                    <label>Drive Date</label>
+                                    <input type="date" class="form-control" name="drive_date" required>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>Eligibility Criteria</label>
+                                    <input type="text" class="form-control" name="eligibility" placeholder="e.g. CGPA > 8.0, No Backlogs" required>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    <label>Status</label>
+                                    <select class="form-control" name="status">
+                                        <option value="Active">Active</option>
+                                        <option value="Closed">Closed</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12 form-group">
+                                    <label>Job Description</label>
+                                    <textarea class="form-control" name="description" rows="3" placeholder="Enter drive details, rounds, skills required..." required></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Publish Placement Drive</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Left Column: Active Drives -->
+            <div class="col-md-7">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-briefcase mr-2"></i>Active Placement Drives</h3>
+                    </div>
+                    <div class="card-body" style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
+                        <table class="table table-bordered table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Company & Role</th>
+                                    <th>Package</th>
+                                    <th>Drive Date</th>
+                                    <th>Eligibility</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for drive in drives %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ drive.company_name }}</strong><br>
+                                        <small>{{ drive.job_role }}</small>
+                                    </td>
+                                    <td>{{ drive.package }}</td>
+                                    <td>{{ drive.drive_date }}</td>
+                                    <td><small>{{ drive.eligibility }}</small></td>
+                                    <td>
+                                        {% if drive.status == 'Active' %}
+                                        <span class="badge badge-success">Active</span>
+                                        {% else %}
+                                        <span class="badge badge-secondary">Closed</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No placement drives published yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Registered Students -->
+            <div class="col-md-5">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-users mr-2"></i>Candidate Registrations</h3>
+                    </div>
+                    <div class="card-body" style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
+                        <table class="table table-bordered table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Drive</th>
+                                    <th>Resume URL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reg in registrations %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ reg.student.admin.get_full_name }}</strong><br>
+                                        <small>{{ reg.student.course.name }}</small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ reg.drive.company_name }}</strong><br>
+                                        <small>{{ reg.drive.job_role }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{{ reg.resume_url }}" target="_blank" class="badge badge-primary">
+                                            <i class="fas fa-file-pdf"></i> View Resume
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">No students registered for drives yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

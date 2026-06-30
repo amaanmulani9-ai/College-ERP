@@ -1,0 +1,355 @@
+{% extends 'main_app/erpnext_base.html' %}
+{% load static %}
+
+{% block page_title %}Examination Admit Card (Hall Ticket){% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Hall Ticket</li>
+{% endblock breadcrumb %}
+
+{% block custom_css %}
+<style>
+    .hall-ticket-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+        padding: 40px;
+        max-width: 900px;
+        margin: 0 auto 30px auto;
+        position: relative;
+    }
+
+    body.dark-mode .hall-ticket-card {
+        background: #ffffff; /* Admit cards should always print white, so we keep it white even in dark mode for screen preview consistency */
+        color: #1f2937;
+        border-color: #d1d5db;
+    }
+
+    .ticket-header {
+        text-align: center;
+        border-bottom: 3px double #1f2937;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+    }
+
+    .ticket-college-title {
+        font-family: 'Outfit', 'Times New Roman', serif;
+        font-size: 1.35rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #111827;
+        margin-bottom: 6px;
+        line-height: 1.3;
+    }
+
+    .ticket-subtitle {
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: #4b5563;
+        text-transform: uppercase;
+    }
+
+    .ticket-title-badge {
+        display: inline-block;
+        background: #111827;
+        color: #ffffff;
+        padding: 4px 16px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 10px;
+    }
+
+    .candidate-info-section {
+        display: flex;
+        justify-content: space-between;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+
+    .candidate-details-table {
+        width: 100%;
+        font-size: 0.9rem;
+    }
+
+    .candidate-details-table td {
+        padding: 8px 12px;
+        vertical-align: top;
+    }
+
+    .details-label {
+        font-weight: 700;
+        color: #4b5563;
+        width: 35%;
+    }
+
+    .details-value {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .candidate-photo-box {
+        width: 130px;
+        height: 150px;
+        border: 2px solid #1f2937;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #f9fafb;
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .candidate-photo-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .photo-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: rgba(0, 0, 0, 0.7);
+        color: #ffffff;
+        width: 100%;
+        text-align: center;
+        position: absolute;
+        bottom: 0;
+        padding: 4px 0;
+    }
+
+    .schedule-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 35px;
+        font-size: 0.85rem;
+    }
+
+    .schedule-table th {
+        background: #f3f4f6;
+        border: 1px solid #d1d5db;
+        padding: 12px;
+        font-weight: 700;
+        text-align: left;
+        text-transform: uppercase;
+        color: #374151;
+    }
+
+    .schedule-table td {
+        border: 1px solid #d1d5db;
+        padding: 12px;
+        font-weight: 500;
+    }
+
+    .instructions-section {
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 20px;
+        background: #f9fafb;
+        font-size: 0.8rem;
+        line-height: 1.5;
+        margin-bottom: 40px;
+    }
+
+    .instructions-title {
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        color: #1f2937;
+    }
+
+    .instructions-list {
+        padding-left: 20px;
+        margin: 0;
+    }
+
+    .instructions-list li {
+        margin-bottom: 6px;
+    }
+
+    .signature-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 40px;
+        padding: 0 20px;
+    }
+
+    .sig-box {
+        text-align: center;
+        width: 200px;
+    }
+
+    .sig-line {
+        border-top: 1px solid #1f2937;
+        margin-top: 50px;
+        padding-top: 8px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #374151;
+        text-transform: uppercase;
+    }
+
+    /* Print styling to hide sidebar, navbar, and print only the ticket card */
+    @media print {
+        body {
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
+
+        .erpnext-navbar,
+        .erpnext-sidebar,
+        .page-header,
+        .breadcrumb,
+        .btn-print-container,
+        footer {
+            display: none !important;
+        }
+
+        .erpnext-main {
+            margin-left: 0 !important;
+            padding: 0 !important;
+            background: none !important;
+        }
+
+        .content-area {
+            padding: 0 !important;
+        }
+
+        .hall-ticket-card {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+        }
+
+        .candidate-photo-box {
+            border-color: #000000 !important;
+        }
+
+        .schedule-table th {
+            background: #e5e7eb !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="container-fluid">
+    
+    <!-- Action Button Row -->
+    <div class="d-flex justify-content-end mb-4 btn-print-container">
+        <button class="btn btn-primary" onclick="window.print()">
+            <i class="fas fa-print me-2"></i> Print Admit Card
+        </button>
+    </div>
+
+    <!-- Official Admit Card Document -->
+    <div class="hall-ticket-card">
+        
+        <!-- Document Header -->
+        <div class="ticket-header">
+            <h1 class="ticket-college-title">SIR SITARAM AND LADY SHANTABAI PATKAR COLLEGE</h1>
+            <p class="ticket-subtitle">Autonomous college affiliated to University of Mumbai</p>
+            <span class="ticket-title-badge">Examination Admit Card (Hall Ticket)</span>
+        </div>
+        
+        <!-- Candidate Details -->
+        <div class="candidate-info-section">
+            <div style="flex-grow: 1;">
+                <table class="candidate-details-table">
+                    <tr>
+                        <td class="details-label">Candidate Name:</td>
+                        <td class="details-value">{{ student.admin.get_full_name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="details-label">Seat Number:</td>
+                        <td class="details-value">{{ seat_number }}</td>
+                    </tr>
+                    <tr>
+                        <td class="details-label">PRN / Roll No:</td>
+                        <td class="details-value">PAT/2026/{{ student.id|stringformat:"04d" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="details-label">Course Name:</td>
+                        <td class="details-value">{{ student.course.name }}</td>
+                    </tr>
+                    <tr>
+                        <td class="details-label">Semester / Term:</td>
+                        <td class="details-value">Semester IV (End Semester Examination)</td>
+                    </tr>
+                    <tr>
+                        <td class="details-label">Exam Center:</td>
+                        <td class="details-value">{{ center }}</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="candidate-photo-box">
+                <img src="{% if student.admin.profile_pic %}{{ student.admin.profile_pic.url }}{% else %}https://ui-avatars.com/api/?name={{ student.admin.get_full_name|urlencode }}&background=111&color=fff&size=120&rounded=false{% endif %}" alt="Candidate Photo" class="candidate-photo-img">
+                <div class="photo-label">Candidate Photo</div>
+            </div>
+        </div>
+        
+        <!-- Exam Schedule Table -->
+        <h4 class="mb-3 font-size-15 font-weight-700 text-uppercase" style="letter-spacing: 0.5px; border-left: 3px solid #111827; padding-left: 8px;">Examination Schedule</h4>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Subject Code</th>
+                    <th style="width: 45%;">Course / Subject Name</th>
+                    <th style="width: 25%;">Exam Date</th>
+                    <th style="width: 15%;">Timings</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in schedule %}
+                    <tr>
+                        <td><b>{{ item.code }}</b></td>
+                        <td>{{ item.subject }}</td>
+                        <td>{{ item.date }}</td>
+                        <td>{{ item.time }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No subjects mapped to this hall ticket.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Instructions -->
+        <div class="instructions-section">
+            <h5 class="instructions-title">⚠️ Important Instructions for Candidates</h5>
+            <ol class="instructions-list">
+                <li>Candidates must bring this Admit Card along with their official College Identity Card to the examination hall. No entry will be permitted without these.</li>
+                <li>Please report to the examination center at least 30 minutes before the scheduled start of the examination. Late entry after 15 minutes of commencement is strictly prohibited.</li>
+                <li>Cell phones, smart watches, calculators, books, notes, or any other electronic devices are strictly prohibited in the exam hall.</li>
+                <li>Any candidate found adopting unfair means during the exam will be summarily disqualified and subject to severe disciplinary action by the University Exam Cell.</li>
+            </ol>
+        </div>
+        
+        <!-- Signatures -->
+        <div class="signature-row">
+            <div class="sig-box">
+                <div class="sig-line">Candidate Signature</div>
+            </div>
+            <div class="sig-box">
+                <div style="height: 50px; font-family: 'Courier New', monospace; font-weight: bold; color: #1e3a8a; font-style: italic; display: flex; align-items: flex-end; justify-content: center;">
+                    Exam Controller
+                </div>
+                <div class="sig-line">Controller of Exams</div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock content %}

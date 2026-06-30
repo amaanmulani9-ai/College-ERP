@@ -1,0 +1,120 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Add Slot Form -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-plus mr-2"></i>Add Timetable Slot</h3>
+                    </div>
+                    <form method="POST" action="{% url 'admin_add_timetable_slot' %}">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 form-group">
+                                    <label>Course</label>
+                                    <select class="form-control" name="course" required>
+                                        <option value="">-- Select Course --</option>
+                                        {% for course in courses %}
+                                        <option value="{{ course.id }}">{{ course.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3 form-group">
+                                    <label>Subject</label>
+                                    <select class="form-control" name="subject" required>
+                                        <option value="">-- Select Subject --</option>
+                                        {% for subject in subjects %}
+                                        <option value="{{ subject.id }}">{{ subject.name }} ({{ subject.course.name }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2 form-group">
+                                    <label>Day of Week</label>
+                                    <select class="form-control" name="day_of_week" required>
+                                        <option value="0">Monday</option>
+                                        <option value="1">Tuesday</option>
+                                        <option value="2">Wednesday</option>
+                                        <option value="3">Thursday</option>
+                                        <option value="4">Friday</option>
+                                        <option value="5">Saturday</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 form-group">
+                                    <label>Start Time</label>
+                                    <input type="time" class="form-control" name="start_time" required>
+                                </div>
+                                <div class="col-md-2 form-group">
+                                    <label>End Time</label>
+                                    <input type="time" class="form-control" name="end_time" required>
+                                </div>
+                                <div class="col-md-2 form-group">
+                                    <label>Classroom</label>
+                                    <input type="text" class="form-control" name="classroom" placeholder="e.g. Room 102" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Add Timetable Slot</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Timetable Grid View -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-calendar-alt mr-2"></i>Weekly Class Timetable Slots</h3>
+                    </div>
+                    <div class="card-body" style="overflow-x: auto;">
+                        <table class="table table-bordered table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Course</th>
+                                    <th>Subject</th>
+                                    <th>Time Slot</th>
+                                    <th>Classroom</th>
+                                    <th>Faculty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for slot in timetable_slots %}
+                                <tr>
+                                    <td>
+                                        {% if slot.day_of_week == 0 %}Monday
+                                        {% elif slot.day_of_week == 1 %}Tuesday
+                                        {% elif slot.day_of_week == 2 %}Wednesday
+                                        {% elif slot.day_of_week == 3 %}Thursday
+                                        {% elif slot.day_of_week == 4 %}Friday
+                                        {% elif slot.day_of_week == 5 %}Saturday
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ slot.course.name }}</td>
+                                    <td><strong>{{ slot.subject.name }}</strong></td>
+                                    <td>{{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}</td>
+                                    <td><span class="badge badge-info">{{ slot.classroom }}</span></td>
+                                    <td>{{ slot.subject.staff.admin.get_full_name }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No timetable slots configured yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

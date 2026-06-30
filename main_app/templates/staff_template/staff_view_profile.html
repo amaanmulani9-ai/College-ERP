@@ -1,0 +1,210 @@
+{% extends 'main_app/erpnext_base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    .profile-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        max-width: 700px;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+
+    .profile-header-gradient {
+        background: linear-gradient(135deg, var(--primary-color) 0%, #6f42c1 100%);
+        padding: 40px 20px;
+        text-align: center;
+        color: #ffffff;
+        position: relative;
+    }
+
+    /* Live Preview Circle */
+    .avatar-preview-container {
+        width: 130px;
+        height: 130px;
+        border-radius: 50%;
+        border: 4px solid #ffffff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        margin: 0 auto -20px auto;
+        position: relative;
+        background-color: #f8f9fc;
+        overflow: hidden;
+        z-index: 5;
+    }
+
+    .avatar-preview-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-preview-icon {
+        font-size: 110px;
+        color: #d1d8dd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+    }
+
+    .profile-body {
+        padding: 40px;
+        padding-top: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 8px;
+        display: block;
+        font-size: 13.5px;
+    }
+
+    /* Form Fields Override for Premium Look */
+    form input, form select, form textarea {
+        display: block;
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.5;
+        color: var(--dark-color);
+        background-color: #f8f9fc;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+
+    form input:focus, form select:focus, form textarea:focus {
+        border-color: var(--primary-color);
+        background-color: #ffffff;
+        outline: 0;
+        box-shadow: 0 0 0 3px rgba(94, 100, 255, 0.25);
+    }
+
+    .dark-mode .profile-card,
+    .dark-mode .profile-body {
+        background-color: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+
+    .dark-mode .form-group label {
+        color: #f7fafc;
+    }
+
+    .dark-mode form input,
+    .dark-mode form select,
+    .dark-mode form textarea {
+        background-color: #1a202c;
+        border-color: #4a5568;
+        color: #f7fafc;
+    }
+
+    .dark-mode form input:focus,
+    .dark-mode form select:focus,
+    .dark-mode form textarea:focus {
+        background-color: #2d3748;
+        border-color: #66b3ff;
+    }
+
+    .dark-mode .avatar-preview-container {
+        background-color: #4a5568;
+        border-color: #2d3748;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="profile-card">
+    <!-- Header with Background Gradient -->
+    <div class="profile-header-gradient">
+        <h4 style="margin: 0; font-weight: 700; font-size: 20px;">{{ request.user.get_full_name|default:request.user.username }}</h4>
+        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.8;">Staff Portal • View & Edit Account Profile</p>
+    </div>
+
+    <!-- Live Picture Preview Circle -->
+    <div class="avatar-preview-container">
+        {% if request.user.profile_pic %}
+        <img src="{{ request.user.profile_pic }}" alt="Avatar Preview" class="avatar-preview-img" id="avatar-preview">
+        {% else %}
+        <i class="fas fa-user-circle avatar-preview-icon" id="avatar-icon"></i>
+        <img src="" alt="Avatar Preview" class="avatar-preview-img" id="avatar-preview" style="display: none;">
+        {% endif %}
+    </div>
+
+    <!-- Edit Form Body -->
+    <div class="profile-body">
+        <form role="form" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="form-group">
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <small class="text-muted d-block mt-1">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                <small class="text-danger d-block mt-1">{{ error }}</small>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-primary btn-block" style="padding: 12px; font-weight: 600;">
+                    <i class="fas fa-save me-1"></i> Update Profile Details
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+    $(document).ready(function(){
+        // Warning when password changes
+        var ifNotified = false;
+        $("#id_password").on("change", function(){
+            if (!ifNotified){
+                ifNotified = true;
+                alert("Security Note:\n\nUpdating your password will terminate your current session.\nYou will be required to log in again with your new password.");
+            }
+        });
+
+        // Interactive Live Image Preview
+        const fileInput = document.getElementById('id_profile_pic');
+        const previewImg = document.getElementById('avatar-preview');
+        const previewIcon = document.getElementById('avatar-icon');
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        if (previewImg) {
+                            previewImg.src = e.target.result;
+                            previewImg.style.display = 'block';
+                        }
+                        if (previewIcon) {
+                            previewIcon.style.display = 'none';
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+</script>
+{% endblock custom_js %}

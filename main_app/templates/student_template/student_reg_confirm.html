@@ -1,0 +1,460 @@
+{% extends 'main_app/erpnext_base.html' %}
+{% load static %}
+
+{% block page_title %}Online Registration - Step 5: Confirm details{% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">Online Registration</li>
+<li class="breadcrumb-item active" aria-current="page">Confirm Details</li>
+{% endblock breadcrumb %}
+
+{% block custom_css %}
+<style>
+    /* Reuse styles */
+    .registration-steps {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 20px 30px;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+    body.dark-mode .registration-steps {
+        background: rgba(31, 41, 55, 0.8);
+        border-color: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .step-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+        flex: 1;
+    }
+    .step-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #f3f4f6;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 3px solid #ffffff;
+        box-shadow: 0 0 0 1px #e5e7eb;
+    }
+    body.dark-mode .step-icon {
+        background: #374151;
+        color: #6b7280;
+        border-color: #1f2937;
+        box-shadow: 0 0 0 1px #4b5563;
+    }
+    .step-item.active .step-icon {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #ffffff;
+        box-shadow: 0 0 0 2px #3b82f6, 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+        transform: scale(1.15);
+    }
+    .step-item.completed .step-icon {
+        background: #10b981;
+        color: #ffffff;
+        box-shadow: 0 0 0 2px #10b981;
+    }
+    .step-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6b7280;
+        margin-top: 8px;
+        text-align: center;
+    }
+    body.dark-mode .step-label {
+        color: #9ca3af;
+    }
+    .step-item.active .step-label {
+        color: #1e3a8a;
+        font-weight: 700;
+    }
+    body.dark-mode .step-item.active .step-label {
+        color: #60a5fa;
+    }
+    .step-item.completed .step-label {
+        color: #10b981;
+    }
+    .step-line {
+        height: 4px;
+        background: #e5e7eb;
+        flex-grow: 1;
+        margin: 0 -20px;
+        position: relative;
+        top: -10px;
+        z-index: 1;
+        border-radius: 2px;
+    }
+    body.dark-mode .step-line {
+        background: #374151;
+    }
+    .step-line.completed {
+        background: #10b981;
+    }
+
+    .reg-card {
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    body.dark-mode .reg-card {
+        background: #1f2937;
+        border-color: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    .card-gradient-header {
+        background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+        padding: 24px 30px;
+        color: #ffffff;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .card-gradient-header h5 {
+        font-weight: 700;
+        margin: 0;
+        font-size: 1.25rem;
+    }
+    .card-gradient-header p {
+        margin: 6px 0 0 0;
+        font-size: 0.85rem;
+        opacity: 0.8;
+    }
+    .reg-card-body {
+        padding: 35px;
+    }
+    
+    .section-subtitle {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        border-bottom: 2px solid rgba(30, 58, 138, 0.1);
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 20px;
+    }
+    body.dark-mode .section-subtitle {
+        color: #60a5fa;
+        border-bottom-color: rgba(96, 165, 250, 0.15);
+    }
+    
+    /* Confirmation details table/grid */
+    .confirm-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        background: #f9fafb;
+        padding: 24px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+    body.dark-mode .confirm-grid {
+        background: #374151;
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .confirm-item {
+        display: flex;
+        flex-direction: column;
+    }
+    .confirm-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #6b7280;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+    }
+    body.dark-mode .confirm-label {
+        color: #9ca3af;
+    }
+    .confirm-value {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #1f2937;
+    }
+    body.dark-mode .confirm-value {
+        color: #ffffff;
+    }
+    
+    .declaration-box {
+        background: rgba(59, 130, 246, 0.04);
+        border: 1px solid rgba(59, 130, 246, 0.15);
+        border-radius: 16px;
+        padding: 24px;
+        margin-top: 30px;
+    }
+    body.dark-mode .declaration-box {
+        background: rgba(96, 165, 250, 0.05);
+        border-color: rgba(96, 165, 250, 0.15);
+    }
+    .declaration-title {
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: #1e3a8a;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+    }
+    body.dark-mode .declaration-title {
+        color: #60a5fa;
+    }
+    .declaration-text {
+        font-size: 0.82rem;
+        line-height: 1.6;
+        color: #4b5563;
+        margin-bottom: 16px;
+    }
+    body.dark-mode .declaration-text {
+        color: #d1d5db;
+    }
+    
+    .btn-confirm {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #ffffff;
+        border: none;
+        padding: 14px 40px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s;
+        box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.2);
+    }
+    .btn-confirm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 20px -3px rgba(16, 185, 129, 0.35);
+        color: #ffffff;
+    }
+    .btn-back {
+        background: transparent;
+        color: #4b5563;
+        border: 1px solid #d1d5db;
+        padding: 14px 30px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+    body.dark-mode .btn-back {
+        color: #9ca3af;
+        border-color: #4b5563;
+    }
+    .btn-back:hover {
+        background: #f3f4f6;
+        color: #1f2937;
+    }
+    body.dark-mode .btn-back:hover {
+        background: #374151;
+        color: #ffffff;
+    }
+    .form-check-input:checked {
+        background-color: #10b981;
+        border-color: #10b981;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Step Indicator -->
+    <div class="registration-steps">
+        <div class="step-item completed">
+            <div class="step-icon"><i class="fas fa-check"></i></div>
+            <div class="step-label">Personal Details</div>
+        </div>
+        <div class="step-line completed"></div>
+        <div class="step-item completed">
+            <div class="step-icon"><i class="fas fa-check"></i></div>
+            <div class="step-label">Address & Contacts</div>
+        </div>
+        <div class="step-line completed"></div>
+        <div class="step-item completed">
+            <div class="step-icon"><i class="fas fa-check"></i></div>
+            <div class="step-label">Photo & Sign</div>
+        </div>
+        <div class="step-line completed"></div>
+        <div class="step-item completed">
+            <div class="step-icon"><i class="fas fa-check"></i></div>
+            <div class="step-label">Documents</div>
+        </div>
+        <div class="step-line completed"></div>
+        <div class="step-item active">
+            <div class="step-icon">5</div>
+            <div class="step-label">Confirm</div>
+        </div>
+    </div>
+
+    <!-- Confirm details Card -->
+    <div class="reg-card">
+        <div class="card-gradient-header">
+            <h5><i class="fas fa-check-double me-2"></i> Review and Lock Admission Application</h5>
+            <p>Please double-check all details below. Once confirmed, your application will be locked and sent to the Admission Committee.</p>
+        </div>
+        
+        <form method="POST" action="{% url 'student_reg_confirm' %}">
+            {% csrf_token %}
+            <div class="reg-card-body">
+                
+                <!-- Section 1: Identity & Academic -->
+                <h6 class="section-subtitle">Student Profile & Identity</h6>
+                <div class="confirm-grid mb-4">
+                    <div class="confirm-item">
+                        <span class="confirm-label">Full Name</span>
+                        <span class="confirm-value">{{ reg.surname }} {{ reg.first_name }} {{ reg.father_name }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Marathi Name</span>
+                        <span class="confirm-value">{{ reg.marathi_name }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Application Course</span>
+                        <span class="confirm-value">{{ reg.course_name }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Enrollment / PRN No</span>
+                        <span class="confirm-value">{{ reg.prn_no }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">ABC ID</span>
+                        <span class="confirm-value">{{ reg.abc_id }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Date of Birth</span>
+                        <span class="confirm-value">{{ dob_str }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Gender</span>
+                        <span class="confirm-value">{{ reg.gender }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Blood Group</span>
+                        <span class="confirm-value">{{ reg.blood_group }}</span>
+                    </div>
+                </div>
+
+                <!-- Section 2: Demographics -->
+                <h6 class="section-subtitle">Demographics & Vital Parameters</h6>
+                <div class="confirm-grid mb-4">
+                    <div class="confirm-item">
+                        <span class="confirm-label">Religion</span>
+                        <span class="confirm-value">{{ reg.religion }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Caste / Category</span>
+                        <span class="confirm-value">{{ reg.caste_category }} ({{ reg.caste }})</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Nationality</span>
+                        <span class="confirm-value">{{ reg.nationality }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Mother Tongue</span>
+                        <span class="confirm-value">{{ reg.mother_tongue }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Aadhaar Card Number</span>
+                        <span class="confirm-value">{{ reg.aadhaar_no }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Passport Number</span>
+                        <span class="confirm-value">{{ reg.passport_no|default:"N/A" }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Voter ID</span>
+                        <span class="confirm-value">{{ reg.voter_id|default:"N/A" }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Height & Weight</span>
+                        <span class="confirm-value">{{ reg.height }} cm / {{ reg.weight }} kg</span>
+                    </div>
+                </div>
+
+                <!-- Section 3: Parent & Address -->
+                <h6 class="section-subtitle">Parent, Contacts & Address Details</h6>
+                <div class="confirm-grid mb-4">
+                    <div class="confirm-item">
+                        <span class="confirm-label">Father's Name</span>
+                        <span class="confirm-value">{{ reg.father_name }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Mother's Name</span>
+                        <span class="confirm-value">{{ reg.mother_name }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Guardian Mobile / Income</span>
+                        <span class="confirm-value">{{ reg.guardian_mobile }} / INR {{ reg.guardian_income|floatformat:2 }}</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span class="confirm-label">Student Phone / Email</span>
+                        <span class="confirm-value">{{ reg.student_phone }} / {{ reg.student_email }}</span>
+                    </div>
+                    <div class="confirm-item" style="grid-column: 1 / -1;">
+                        <span class="confirm-label">Address of Correspondence</span>
+                        <span class="confirm-value">{{ reg.address }}, City: {{ reg.city }}, Pincode: {{ reg.pincode }} ({{ reg.state }})</span>
+                    </div>
+                    <div class="confirm-item" style="grid-column: 1 / -1; margin-top: 10px;">
+                        <span class="confirm-label">Permanent Address</span>
+                        <span class="confirm-value">{{ reg.perm_address }}, City: {{ reg.perm_city }}, Pincode: {{ reg.perm_pincode }} ({{ reg.perm_state }})</span>
+                    </div>
+                </div>
+
+                <!-- Declarations Checklist -->
+                <div class="declaration-box">
+                    <div class="declaration-title">
+                        <i class="fas fa-file-contract me-2"></i> Declaration by Student
+                    </div>
+                    <p class="declaration-text">
+                        I hereby declare that, I have read the rules related to admission and the information filled in by me in this form is accurate and true to the best of my knowledge. I will be responsible for any discrepancy, arising out of the form signed by me and I undertake that, in absence of any document the final admission will not be granted and / or admission will stand cancel.
+                    </p>
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="student_agree" required>
+                        <label class="form-check-label font-weight-700" for="student_agree" style="font-size: 0.85rem; cursor: pointer;">
+                            I, {{ reg.first_name }} {{ reg.surname }}, agree and sign this declaration on today's date.
+                        </label>
+                    </div>
+
+                    <div class="declaration-title mt-4">
+                        <i class="fas fa-user-shield me-2"></i> Declaration by Guardian / Parent
+                    </div>
+                    <p class="declaration-text">
+                        I have permitted my son / daughter / ward to join your college. The information supplied by him / her is correct to the best of my knowledge. I have acquainted myself with the rules and fees, dues to my son / daughter / ward and see that he / she observes.
+                    </p>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="parent_agree" required>
+                        <label class="form-check-label font-weight-700" for="parent_agree" style="font-size: 0.85rem; cursor: pointer;">
+                            I endorse the above undertaking and declaration on behalf of my ward.
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="d-flex justify-content-between pt-4 mt-4 border-top border-light">
+                    <a href="{% url 'student_reg_documents' %}" class="btn btn-back">
+                        <i class="fas fa-arrow-left me-2"></i> Step 4: Documents Upload
+                    </a>
+                    <button type="submit" class="btn btn-confirm">
+                        <i class="fas fa-lock me-2"></i> Lock Application & Submit
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

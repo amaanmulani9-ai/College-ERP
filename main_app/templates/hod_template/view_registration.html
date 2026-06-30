@@ -1,0 +1,184 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4">
+                <!-- Profile Image / General Info -->
+                <div class="card card-primary card-outline">
+                    <div class="card-body box-profile text-center">
+                        <div class="text-center">
+                            <i class="fas fa-user-circle fa-7x text-primary mb-3"></i>
+                        </div>
+                        <h3 class="profile-username text-center">{{ reg.first_name }} {{ reg.father_name }} {{ reg.surname }}</h3>
+                        <p class="text-muted text-center">{{ reg.course_name }} ({{ reg.session }})</p>
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>PRN No:</b> <a class="float-right text-dark font-weight-bold">{{ reg.prn_no }}</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>App No:</b> <a class="float-right text-dark font-weight-bold">{{ reg.application_no }}</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>ABC ID:</b> <a class="float-right text-dark font-weight-bold">{{ reg.abc_id }}</a>
+                            </li>
+                        </ul>
+                        <a href="{% url 'student_reg_print' %}?reg_id={{ reg.id }}" target="_blank" class="btn btn-primary btn-block">
+                            <i class="fas fa-print"></i> <b>Print Admission Form</b>
+                        </a>
+                        {% if can_edit_registration %}
+                        <a href="{% url 'admin_edit_registration' reg.id %}" class="btn btn-warning btn-block text-white font-weight-bold mt-2">
+                            <i class="fas fa-edit"></i> <b>Edit Registration Details</b>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card card-primary card-outline">
+                    <div class="card-header p-2">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item"><a class="nav-link active" href="#personal" data-bs-toggle="tab">Personal Details</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#address" data-bs-toggle="tab">Address & Contacts</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#documents" data-bs-toggle="tab">Verified Documents</a></li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <!-- Personal Tab -->
+                            <div class="active tab-pane" id="personal">
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th width="30%">Student Marathi Name</th>
+                                        <td>{{ reg.marathi_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Date of Birth / Gender</th>
+                                        <td>{{ reg.dob }} / {{ reg.gender }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Place of Birth</th>
+                                        <td>{{ reg.place_of_birth }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Religion / Marital Status</th>
+                                        <td>{{ reg.religion }} / {{ reg.marital_status }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Nationality / Mother Tongue</th>
+                                        <td>{{ reg.nationality }} / {{ reg.mother_tongue }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Blood Group / Employment</th>
+                                        <td>{{ reg.blood_group }} / {{ reg.employment_status }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Aadhaar Number</th>
+                                        <td>{{ reg.aadhaar_no }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Passport Number</th>
+                                        <td>{{ reg.passport_no|default:"N/A" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Voter ID</th>
+                                        <td>{{ reg.voter_id|default:"N/A" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Caste Category / Caste</th>
+                                        <td><span class="badge badge-warning">{{ reg.caste_category }}</span> / {{ reg.caste }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Birth State / District / Tehsil</th>
+                                        <td>{{ reg.birth_state }} / {{ reg.birth_district }} / {{ reg.birth_tehsil }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>NCC / NSS</th>
+                                        <td>{{ reg.ncc_nss }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Physically Handicap / Orphan</th>
+                                        <td>{{ reg.handicap }} / {{ reg.is_orphan }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Height / Weight</th>
+                                        <td>{{ reg.height|floatformat:1 }} cm / {{ reg.weight|floatformat:1 }} kg</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Device / Internet / Municipal Ward</th>
+                                        <td>{{ reg.has_device }} / {{ reg.has_internet }} / {{ reg.municipal_ward }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Address Tab -->
+                            <div class="tab-pane" id="address">
+                                <h5>Correspondence Address</h5>
+                                <p class="bg-light p-3 rounded">{{ reg.address }}, {{ reg.city }}, {{ reg.district }} - {{ reg.pincode }} ({{ reg.state }})</p>
+                                
+                                <h5>Permanent Address</h5>
+                                <p class="bg-light p-3 rounded">{{ reg.perm_address }}, {{ reg.perm_city }}, {{ reg.perm_district }} - {{ reg.perm_pincode }} ({{ reg.perm_state }})</p>
+                                
+                                <h5>Guardian Details</h5>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th width="30%">Guardian Occupation</th>
+                                        <td>{{ reg.guardian_occupation }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Guardian Phone</th>
+                                        <td>{{ reg.guardian_mobile }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Annual Income</th>
+                                        <td>₹{{ reg.guardian_income|floatformat:2 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Student Phone</th>
+                                        <td>{{ reg.student_phone }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Student Email</th>
+                                        <td>{{ reg.student_email }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <!-- Documents Tab -->
+                            <div class="tab-pane" id="documents">
+                                <h5>Compliance & Document Checklist</h5>
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        M.SC. IT Part I / Graduation Marksheet
+                                        <span class="badge badge-success"><i class="fas fa-check"></i> Verified & Uploaded</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        College Leaving Certificate (LC)
+                                        <span class="badge badge-success"><i class="fas fa-check"></i> Verified & Uploaded</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Aadhaar Card copy
+                                        <span class="badge badge-success"><i class="fas fa-check"></i> Verified & Uploaded</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        ABC ID Certificate
+                                        <span class="badge badge-success"><i class="fas fa-check"></i> Verified & Uploaded</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Caste Certificate / Non-Creamy Layer (OBC)
+                                        <span class="badge badge-success"><i class="fas fa-check"></i> Verified & Uploaded</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

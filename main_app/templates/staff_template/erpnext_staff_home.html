@@ -1,0 +1,295 @@
+{% extends 'main_app/erpnext_base.html' %}
+{% load static %}
+
+{% block page_title %}Staff Dashboard{% endblock page_title %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Staff Dashboard</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="stat-number primary">{{ total_students }}</div>
+            <p class="stat-label">Total Students</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-number success">{{ total_attendance }}</div>
+            <p class="stat-label">Total Attendance Taken</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                <i class="fas fa-calendar-times"></i>
+            </div>
+            <div class="stat-number warning">{{ total_leave }}</div>
+            <p class="stat-label">Total Leave Applied</p>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon danger">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-number danger">{{ total_subject }}</div>
+            <p class="stat-label">Total Subjects</p>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row">
+        <!-- Attendance vs Leave Chart -->
+        <div class="col-lg-6">
+            <div class="erpnext-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Attendance vs Leave Overview
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="pieChart" style="height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subject-wise Attendance Chart -->
+        <div class="col-lg-6">
+            <div class="erpnext-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Subject-wise Attendance
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="barChart" style="height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Calendar & Notice Board -->
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="erpnext-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-calendar-alt me-2"></i> Notice Board & Event Calendar
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div id="calendar" style="min-height: 450px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-2">
+        <div class="col-12">
+            <div class="erpnext-card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-bolt me-2"></i>
+                        Quick Actions
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'staff_take_attendance' %}" class="btn btn-primary btn-sm mt-2 w-100">
+                                <i class="fas fa-check-circle mb-2"></i><br>
+                                Take Attendance
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'staff_add_result' %}" class="btn btn-success btn-sm mt-2 w-100">
+                                <i class="fas fa-plus-circle mb-2"></i><br>
+                                Add Result
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'staff_apply_leave' %}" class="btn btn-warning btn-sm mt-2 w-100">
+                                <i class="fas fa-calendar-plus mb-2"></i><br>
+                                Apply for Leave
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'add_book' %}" class="btn btn-secondary btn-sm mt-2 w-100">
+                                <i class="fas fa-book-open mb-2"></i><br>
+                                Add Books
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize chart instances and creators arrays
+        window.chartInstances = window.chartInstances || [];
+
+        // Chart.js Configuration
+        Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
+        
+        // Set initial colors based on current theme
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const textColor = isDarkMode ? '#e0e0e0' : '#262626';
+        Chart.defaults.color = textColor;
+        
+        // ERPNext-style color palette using CSS variables
+        const colors = {
+            primary: '#5e64ff',
+            success: '#28a745',
+            warning: '#ffc107',
+            danger: '#dc3545',
+            info: '#17a2b8',
+            light: '#f8f9fc',
+            dark: '#262626'
+        };
+
+        // Donut Chart
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        const pieChart = new Chart(pieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Attendance Taken', 'Leave Days'],
+                datasets: [{
+                    data: [{{ total_attendance }}, {{ total_leave }}],
+                    backgroundColor: [colors.success, colors.warning],
+                    borderWidth: 0,
+                    cutout: '65%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            color: textColor
+                        }
+                    }
+                }
+            }
+        });
+        window.chartInstances.push(pieChart);
+
+        // Bar Chart
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        const barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ subject_list|safe }},
+                datasets: [{
+                    label: 'Attendance Count',
+                    data: {{ attendance_list }},
+                    backgroundColor: colors.info,
+                    borderRadius: 4,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: isDarkMode ? '#404040' : '#f1f3f4'
+                        },
+                        ticks: {
+                            color: textColor
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: textColor
+                        }
+                    }
+                }
+            }
+        });
+        window.chartInstances.push(barChart);
+
+        // -------------
+        //- CALENDAR -
+        const calendarEl = document.getElementById('calendar');
+        if (calendarEl) {
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek'
+                },
+                themeSystem: 'standard',
+                events: [
+                    {
+                        title: 'Midterm Exams (HOD Scheduled)',
+                        start: '2026-07-10',
+                        end: '2026-07-15',
+                        color: colors.danger
+                    },
+                    {
+                        title: 'Staff Meeting: Syllabus Review',
+                        start: '2026-07-02',
+                        color: colors.primary
+                    },
+                    {
+                        title: 'Grade Submission Deadline',
+                        start: '2026-07-25',
+                        color: colors.warning
+                    },
+                    {
+                        title: 'Guest Lecture: Cloud Computing',
+                        start: '2026-07-18',
+                        color: colors.info
+                    }
+                ],
+                eventClick: function(info) {
+                    alert('Event: ' + info.event.title + '\nDescription: Staff Academic Calendar Event');
+                }
+            });
+            calendar.render();
+            
+            // Re-size calendar on changes
+            window.addEventListener('resize', function() {
+                calendar.updateSize();
+            });
+            
+            const themeSwitch = document.getElementById('theme-switch');
+            if (themeSwitch) {
+                themeSwitch.addEventListener('change', function() {
+                    setTimeout(function() {
+                        calendar.updateSize();
+                    }, 100);
+                });
+            }
+        }
+    });
+</script>
+{% endblock custom_js %}

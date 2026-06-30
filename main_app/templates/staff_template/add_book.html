@@ -1,0 +1,71 @@
+{% extends 'main_app/erpnext_base.html' %}
+{% load static %}
+
+{% block page_title %}Add New Book{% endblock page_title %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="erpnext-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-plus-circle me-2"></i> Add Book to Catalog
+                </h3>
+            </div>
+            <div class="card-body">
+                {% if alert %}
+                <div class="alert alert-success text-center">
+                    <i class="fas fa-check-circle me-2"></i> Book added successfully to the library catalog!
+                </div>
+                {% endif %}
+
+                <form method="POST" class="mt-2"> 
+                    {% csrf_token %}
+                    
+                    <div class="form-group mb-4">
+                        <label class="form-label font-weight-bold">Book Name</label>
+                        <input type="text" class="form-control" name="name" placeholder="e.g. Introduction to Algorithms" required autocomplete="off">
+                    </div>
+                
+                    <div class="form-group mb-4">
+                        <label class="form-label font-weight-bold">Author Name</label>
+                        <input type="text" class="form-control" name="author" placeholder="e.g. Thomas H. Cormen" required autocomplete="off">
+                    </div>
+                
+                    <div class="form-group mb-4">
+                        <label class="form-label font-weight-bold">ISBN Number</label>
+                        <input type="number" class="form-control" name="isbn" placeholder="e.g. 9780262033" required autocomplete="off">
+                    </div>
+                
+                    <div class="form-group mb-4">
+                        <label class="form-label font-weight-bold">Category</label>
+                        <input type="text" class="form-control" name="category" placeholder="e.g. Computer Science" required autocomplete="off">
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end mt-5">
+                        <a href="{% url 'view_issued_book' %}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Tracker
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fas fa-check me-1"></i> Add Book
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+{% if alert %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Automatically redirect to library page after 2 seconds
+        setTimeout(function() {
+            window.location.href = "{% url 'view_books' %}";
+        }, 2000);
+    });
+</script>
+{% endif %}
+{% endblock custom_js %}

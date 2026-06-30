@@ -1,0 +1,599 @@
+{% extends 'main_app/erpnext_base.html' %}
+{% load static %}
+
+{% block page_title %}Print Admission Application Form{% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">Online Registration</li>
+<li class="breadcrumb-item active" aria-current="page">Application Print</li>
+{% endblock breadcrumb %}
+
+{% block custom_css %}
+<style>
+    /* Print-specific stylesheet */
+    .print-container {
+        background: #ffffff;
+        color: #000000;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        max-width: 900px;
+        margin: 0 auto 30px auto;
+        font-family: 'Times New Roman', Times, serif, Arial, sans-serif;
+        border: 1px solid #ddd;
+    }
+    
+    .print-header-section {
+        border-bottom: 2px double #000000;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .print-logo-box {
+        width: 75px;
+        height: 75px;
+        flex-shrink: 0;
+    }
+    .print-logo-box svg {
+        width: 100%;
+        height: 100%;
+    }
+    .print-college-title {
+        text-align: center;
+        flex-grow: 1;
+    }
+    .print-college-title h2 {
+        font-size: 1.15rem;
+        font-weight: 800;
+        margin: 0;
+        color: #000000;
+        line-height: 1.3;
+        text-transform: uppercase;
+    }
+    .print-college-title p {
+        font-size: 0.8rem;
+        margin: 4px 0 0 0;
+        color: #333333;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    .form-title-badge {
+        border: 1px solid #000000;
+        padding: 8px 15px;
+        text-align: center;
+        font-weight: 700;
+        margin-bottom: 20px;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        background: #f3f4f6;
+    }
+    
+    .section-banner {
+        background: #e5e7eb;
+        font-weight: 700;
+        font-size: 0.85rem;
+        padding: 4px 10px;
+        border: 1px solid #000000;
+        border-bottom: none;
+        text-transform: uppercase;
+    }
+    
+    /* Standardized grid tables */
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        font-size: 0.8rem;
+    }
+    .data-table th, .data-table td {
+        border: 1px solid #000000;
+        padding: 6px 8px;
+        text-align: left;
+        vertical-align: middle;
+    }
+    .data-table th {
+        background: #f9fafb;
+        font-weight: 700;
+        width: 25%;
+    }
+    .data-table td {
+        width: 25%;
+    }
+    .data-table .label-cell {
+        font-weight: 700;
+        background: #f3f4f6;
+        width: 20%;
+    }
+    .data-table .value-cell {
+        width: 30%;
+    }
+
+    .photo-box-frame {
+        width: 120px;
+        height: 140px;
+        border: 1px solid #000000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        text-align: center;
+        background: #ffffff;
+    }
+    .photo-box-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .declaration-block {
+        font-size: 0.75rem;
+        line-height: 1.5;
+        text-align: justify;
+        margin-bottom: 15px;
+    }
+    
+    .signature-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        font-size: 0.8rem;
+    }
+    
+    .office-use-box {
+        border: 2px solid #000000;
+        padding: 15px;
+        margin-top: 25px;
+        margin-bottom: 25px;
+    }
+    
+    .action-panel {
+        background: #ffffff;
+        padding: 15px 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        max-width: 900px;
+        margin: 0 auto 20px auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #e5e7eb;
+    }
+    body.dark-mode .action-panel {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    .btn-print {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        color: #ffffff;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+    }
+    .btn-print:hover {
+        background: #3b82f6;
+    }
+    
+    /* Printable specific overrides */
+    @media print {
+        body {
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
+        /* Hide entire web layout */
+        .sidebar, .navbar, .header, .footer, .action-panel, .breadcrumb-box, .nav-section, .sidebar-wrapper, .main-header, .breadcrumb {
+            display: none !important;
+        }
+        .main-panel, .content-wrapper, .content, .container-fluid {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-shadow: none !important;
+            border: none !important;
+        }
+        .print-container {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<!-- Control Action Panel -->
+<div class="action-panel">
+    <div>
+        <h6 class="font-weight-700 mb-1" style="color: var(--primary-color);">Application Form Ready</h6>
+        <p class="mb-0 text-muted font-size-12">Click print to save as PDF or print directly on A4 paper.</p>
+    </div>
+    <div>
+        <a href="{% url 'student_reg_confirm' %}" class="btn btn-sm btn-outline-secondary me-2"><i class="fas fa-edit me-1"></i> Edit Details</a>
+        <button type="button" class="btn-print" onclick="window.print()"><i class="fas fa-print me-1"></i> Print Form</button>
+    </div>
+</div>
+
+<!-- Printable Area -->
+<div class="print-container">
+    
+    <!-- HEADER -->
+    <div class="print-header-section">
+        <div class="print-logo-box">
+            <!-- Sleek college crest/shield logo -->
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" fill="none" stroke="black" stroke-width="2"/>
+                <circle cx="50" cy="50" r="44" fill="none" stroke="black" stroke-dasharray="2,2"/>
+                <path d="M 30 35 L 50 20 L 70 35 L 70 65 L 50 80 L 30 65 Z" fill="none" stroke="black" stroke-width="1.5"/>
+                <path d="M 35 38 L 50 26 L 65 38 L 65 62 L 50 74 L 35 62 Z" fill="#e5e7eb" stroke="black" stroke-width="1"/>
+                <!-- Open Book Inside -->
+                <path d="M 42 48 Q 50 44 50 52 Q 50 44 58 48 L 58 58 Q 50 54 50 62 Q 50 54 42 58 Z" fill="none" stroke="black" stroke-width="1"/>
+                <!-- Graduation Cap -->
+                <path d="M 40 38 L 50 34 L 60 38 L 50 42 Z" fill="black"/>
+                <path d="M 45 40 L 45 44 Q 50 47 55 44 L 55 40" fill="none" stroke="black" stroke-width="1"/>
+                <path d="M 57 39 L 61 45" fill="none" stroke="black" stroke-width="0.75"/>
+            </svg>
+        </div>
+        <div class="print-college-title">
+            <h2>Sir Sitaram and Lady Shantabai Patkar College of Arts and Science and V. P. Varde College of Commerce and Economics (Autonomous)</h2>
+            <p>S. V. Road, Goregaon (West), Mumbai - 400 104.</p>
+        </div>
+    </div>
+
+    <!-- Title Badge -->
+    <div class="form-title-badge">
+        Application for Admission to {{ reg.course_name }}<br>
+        Academic Session {{ reg.session }}
+    </div>
+
+    <!-- Application Number & Student Photo Row -->
+    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+        <div style="flex-grow: 1; padding-right: 20px;">
+            <table class="data-table" style="margin-bottom: 0;">
+                <tr>
+                    <th style="width: 35%;">Application No.</th>
+                    <td style="font-weight: 700; font-size: 0.9rem;">{{ reg.application_no }}</td>
+                </tr>
+                <tr>
+                    <th>Enrollment Number</th>
+                    <td>N/A</td>
+                </tr>
+                <tr>
+                    <th>PRN Number</th>
+                    <td style="font-weight: 700;">{{ reg.prn_no }}</td>
+                </tr>
+                <tr>
+                    <th>Academic Bank Credit (ABC ID)</th>
+                    <td style="font-weight: 700;">{{ reg.abc_id }}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="photo-box-frame">
+            {% if student.admin.profile_pic %}
+                <img src="{{ student.admin.profile_pic }}" alt="Student Photo">
+            {% else %}
+                <span>Affix Passport Size Photograph Here</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Applicant's Personal Details -->
+    <div class="section-banner">Applicant's Personal Details</div>
+    <table class="data-table">
+        <tr>
+            <td class="label-cell">Name of Student</td>
+            <td colspan="3" style="font-size: 0.85rem; font-weight: 700;">{{ reg.surname }} {{ reg.first_name }} {{ reg.father_name }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Name in Marathi</td>
+            <td colspan="3" style="font-size: 0.85rem; font-weight: 700;">{{ reg.marathi_name }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Mother's Name</td>
+            <td class="value-cell" style="font-weight: 700;">{{ reg.mother_name }}</td>
+            <td class="label-cell">Gender</td>
+            <td class="value-cell">{{ reg.gender }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Date of Birth</td>
+            <td class="value-cell">{{ dob_str }}</td>
+            <td class="label-cell">Place Of Birth</td>
+            <td class="value-cell">{{ reg.place_of_birth }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Religion</td>
+            <td class="value-cell">{{ reg.religion }}</td>
+            <td class="label-cell">Nationality</td>
+            <td class="value-cell">{{ reg.nationality }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Blood Group</td>
+            <td class="value-cell" style="font-weight: 700;">{{ reg.blood_group }}</td>
+            <td class="label-cell">Marital Status</td>
+            <td class="value-cell">{{ reg.marital_status }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Aadhaar Card No.</td>
+            <td class="value-cell" style="font-weight: 700;">{{ reg.aadhaar_no }}</td>
+            <td class="label-cell">Mother Tongue</td>
+            <td class="value-cell">{{ reg.mother_tongue }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Passport Number</td>
+            <td class="value-cell">{{ reg.passport_no|default:"N/A" }}</td>
+            <td class="label-cell">Voter Id</td>
+            <td class="value-cell">{{ reg.voter_id|default:"N/A" }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Employment Status</td>
+            <td class="value-cell">{{ reg.employment_status }}</td>
+            <td class="label-cell">NCC/NSS</td>
+            <td class="value-cell">{{ reg.ncc_nss }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Birth State</td>
+            <td class="value-cell">{{ reg.birth_state }}</td>
+            <td class="label-cell">Birth District / Tehsil</td>
+            <td class="value-cell">{{ reg.birth_district }} / {{ reg.birth_tehsil }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Caste Category</td>
+            <td class="value-cell" style="font-weight: 700;">{{ reg.caste_category }}</td>
+            <td class="label-cell">Caste</td>
+            <td class="value-cell">{{ reg.caste }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Eligibility No.</td>
+            <td class="value-cell">N/A</td>
+            <td class="label-cell">EID Number</td>
+            <td class="value-cell">N/A</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Handicap / Orphan</td>
+            <td class="value-cell">{{ reg.handicap }} / {{ reg.is_orphan }}</td>
+            <td class="label-cell">Height & Weight</td>
+            <td class="value-cell">{{ reg.height|floatformat:2 }} cm / {{ reg.weight|floatformat:2 }} kg</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Smart Device/PC</td>
+            <td class="value-cell">{{ reg.has_device }}</td>
+            <td class="label-cell">Internet / Ward</td>
+            <td class="value-cell">{{ reg.has_internet }} / {{ reg.municipal_ward }}</td>
+        </tr>
+    </table>
+
+    <!-- Parent's / Guardian Details -->
+    <div class="section-banner">Parent's / Guardian Details</div>
+    <table class="data-table">
+        <tr>
+            <td class="label-cell" style="width: 25%;">Father's Name</td>
+            <td style="width: 75%; font-weight: 700;" colspan="3">{{ reg.father_name }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Occupation</td>
+            <td class="value-cell">{{ reg.guardian_occupation }}</td>
+            <td class="label-cell">Mobile Number</td>
+            <td class="value-cell">{{ reg.guardian_mobile }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Gross Annual Income</td>
+            <td class="value-cell" style="font-weight: 700;">INR {{ reg.guardian_income|floatformat:2 }}</td>
+            <td class="label-cell">Office Address</td>
+            <td class="value-cell">N/A</td>
+        </tr>
+    </table>
+
+    <!-- Address Details -->
+    <div class="section-banner">Address details</div>
+    <table class="data-table">
+        <tr>
+            <td class="label-cell" style="width: 25%;">Address of Correspondence</td>
+            <td style="width: 75%;" colspan="3">{{ reg.address }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Correspondence City</td>
+            <td class="value-cell">{{ reg.city }} ({{ reg.state }})</td>
+            <td class="label-cell">Tehsil & Pincode</td>
+            <td class="value-cell">{{ reg.tehsil }} - {{ reg.pincode }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Permanent Address</td>
+            <td colspan="3">{{ reg.perm_address }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Permanent City</td>
+            <td class="value-cell">{{ reg.perm_city }} ({{ reg.perm_state }})</td>
+            <td class="label-cell">Tehsil & Pincode</td>
+            <td class="value-cell">{{ reg.perm_tehsil }} - {{ reg.perm_pincode }}</td>
+        </tr>
+    </table>
+
+    <!-- Contact & Payment Details -->
+    <div class="section-banner">Contact & Admission Payment Details</div>
+    <table class="data-table">
+        <tr>
+            <td class="label-cell">Student Phone / Mob.</td>
+            <td class="value-cell">{{ reg.student_phone }}</td>
+            <td class="label-cell">Student Email Id</td>
+            <td class="value-cell">{{ reg.student_email }}</td>
+        </tr>
+        <tr>
+            <td class="label-cell">Parent Alt Phone</td>
+            <td class="value-cell">{{ reg.guardian_mobile }}</td>
+            <td class="label-cell">Payment Mode</td>
+            <td class="value-cell" style="font-weight: 700; text-transform: uppercase;">Offline</td>
+        </tr>
+    </table>
+
+    <!-- Last Examination Details -->
+    <div class="section-banner">Last Examination details</div>
+    <table class="data-table">
+        <thead>
+            <tr style="background: #f3f4f6; font-weight: 700;">
+                <th>Exam Name</th>
+                <th>Board / University</th>
+                <th>Roll Number</th>
+                <th>Marks Obt / Max</th>
+                <th>Percentage</th>
+                <th>Result / Div</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="font-weight: 700;">M.SC.IT - PART- I</td>
+                <td>University of Mumbai</td>
+                <td>MSIT250021</td>
+                <td>485 / 600</td>
+                <td style="font-weight: 700;">80.83 %</td>
+                <td>Passed / First Class with Distinction</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Declaration by Student -->
+    <div class="section-banner">Declaration by Student</div>
+    <div class="declaration-block" style="border: 1px solid #000000; border-top: none; padding: 10px; margin-bottom: 20px;">
+        I hereby declare that, I have read the rules related to admission and the information filled in by me in this form is accurate and true to the best of my knowledge. I will be responsible for any discrepancy, arising out of the form signed by me and I undertake that, in absence of any document the final admission will not be granted and / or admission will stand cancel.
+        <div class="signature-row">
+            <div>Date: {{ current_date }}</div>
+            <div style="text-align: right; border-top: 1px dashed #000000; width: 200px; padding-top: 5px;">Signature of the Student</div>
+        </div>
+    </div>
+
+    <!-- Declaration by Guardian / Parent -->
+    <div class="section-banner">Declaration by Guardian / Parent</div>
+    <div class="declaration-block" style="border: 1px solid #000000; border-top: none; padding: 10px; margin-bottom: 25px;">
+        I have permitted my son / daughter / ward to join your college. The information supplied by him / her is correct to the best of my knowledge. I have acquainted myself with the rules and fees, dues to my son / daughter / ward and see that he / she observes.
+        <div class="signature-row">
+            <div>Date: {{ current_date }}</div>
+            <div style="text-align: right; border-top: 1px dashed #000000; width: 200px; padding-top: 5px;">Signature of the Guardian/Parent</div>
+        </div>
+    </div>
+
+    <!-- For College / Institute Use Only -->
+    <div class="office-use-box">
+        <div style="font-weight: 800; text-align: center; text-transform: uppercase; border-bottom: 1px solid #000000; padding-bottom: 5px; margin-bottom: 15px; font-size: 0.9rem;">
+            For College / Institute Use Only
+        </div>
+        <table class="data-table" style="margin-bottom: 15px;">
+            <thead>
+                <tr style="background: #f3f4f6; font-weight: 700;">
+                    <th style="width: 25%;">Designation</th>
+                    <th style="width: 50%;">Remarks / Particulars / Recommendations</th>
+                    <th style="width: 25%;">Signature and Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="height: 40px;">
+                    <td style="font-weight: 700;">Admission Clerk</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="height: 40px;">
+                    <td style="font-weight: 700;">Admission Committee</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="height: 40px;">
+                    <td style="font-weight: 700;">Accountant / Cashier</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="height: 40px;">
+                    <td style="font-weight: 700;">Registrar/Office Supt.</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div style="font-size: 0.8rem; line-height: 1.8;">
+            <strong>REMARK OF THE ADMISSION COMMITTEE:</strong><br>
+            May be admitted to Class: __________________________________________________ Section: __________________<br>
+            May be Rejected: ____________________________________________________________________________________<br>
+            Last date of payment of fees: __________________________________________________________________________<br>
+            <em style="font-size: 0.75rem; color: #333;">(Admission may be cancelled if the fees are not paid by this date.)</em>
+        </div>
+        
+        <div class="signature-row" style="margin-top: 40px; margin-bottom: 0;">
+            <div style="border-top: 1px dashed #000000; width: 200px; padding-top: 5px; text-align: center;">Signature of Admission Committee</div>
+            <div style="border-top: 1px dashed #000000; width: 200px; padding-top: 5px; text-align: center; font-weight: 700;">Principal</div>
+        </div>
+    </div>
+
+    <!-- PAGE BREAK FOR UNDERTAKING IF PRINTED -->
+    <div class="page-break"></div>
+
+    <!-- UNDERTAKING PART -->
+    <div class="print-header-section" style="margin-top: 20px;">
+        <div class="print-logo-box">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="48" fill="none" stroke="black" stroke-width="2"/>
+                <circle cx="50" cy="50" r="44" fill="none" stroke="black" stroke-dasharray="2,2"/>
+                <path d="M 30 35 L 50 20 L 70 35 L 70 65 L 50 80 L 30 65 Z" fill="none" stroke="black" stroke-width="1.5"/>
+                <path d="M 35 38 L 50 26 L 65 38 L 65 62 L 50 74 L 35 62 Z" fill="#e5e7eb" stroke="black" stroke-width="1"/>
+                <path d="M 42 48 Q 50 44 50 52 Q 50 44 58 48 L 58 58 Q 50 54 50 62 Q 50 54 42 58 Z" fill="none" stroke="black" stroke-width="1"/>
+                <path d="M 40 38 L 50 34 L 60 38 L 50 42 Z" fill="black"/>
+                <path d="M 45 40 L 45 44 Q 50 47 55 44 L 55 40" fill="none" stroke="black" stroke-width="1"/>
+                <path d="M 57 39 L 61 45" fill="none" stroke="black" stroke-width="0.75"/>
+            </svg>
+        </div>
+        <div class="print-college-title">
+            <h2>Sir Sitaram and Lady Shantabai Patkar College of Arts and Science and V. P. Varde College of Commerce and Economics (Autonomous)</h2>
+            <p>S. V. Road, Goregaon (West), Mumbai - 400 104.</p>
+        </div>
+    </div>
+
+    <div class="form-title-badge">
+        DECLARATION / UNDERTAKING FROM THE STUDENT<br>
+        ACADEMIC YEAR: 2026-2027
+    </div>
+
+    <div style="font-size: 0.8rem; line-height: 1.6; margin-bottom: 20px; text-align: justify;">
+        I, Mr./Ms. <strong>{{ reg.surname }} {{ reg.first_name }} {{ reg.father_name }}</strong>, applying for <strong>{{ reg.course_name }}</strong>, wish to seek admission in SIR SITARAM AND LADY SHANTABAI PATKAR COLLEGE OF ARTS AND SCIENCE AND V. P. VARDE COLLEGE OF COMMERCE AND ECONOMICS (AUTONOMOUS) for the Academic Year 2026-2027.<br><br>
+        <strong>Student Mobile Number:</strong> {{ reg.student_phone }}<br>
+        <strong>Address:</strong> {{ reg.address }}, City: {{ reg.city }} - {{ reg.pincode }} ({{ reg.state }})<br><br>
+        Do hereby Undertake on this date <strong>{{ current_date }}</strong> the following:-
+        <ol style="margin-top: 10px; padding-left: 20px; text-align: justify;">
+            <li style="margin-bottom: 10px;">I, hereby, declare that, the entries made by me in the Application/Admission Form are complete and true to the best of my knowledge and based on records.</li>
+            <li style="margin-bottom: 10px;">I, hereby, undertake to present the original documents immediately upon demand by the authorities concerned of SIR SITARAM AND LADY SHANTABAI PATKAR COLLEGE OF ARTS AND SCIENCE AND V. P. VARDE COLLEGE OF COMMERCE AND ECONOMICS (AUTONOMOUS).</li>
+            <li style="margin-bottom: 10px;">I, hereby, undertake to abide by the rules and regulations, concerning discipline, attendance, etc. of the University of Mumbai and or SIR SITARAM AND LADY SHANTABAI PATKAR COLLEGE OF ARTS AND SCIENCE AND V. P. VARDE COLLEGE OF COMMERCE AND ECONOMICS (AUTONOMOUS), and also to follow the Code of Conduct prescribed for the Students by the College from time to time and subsequent changes/modifications/amendment made there in. I acknowledge that, the College has the authority for taking punitive actions against me for violation and/or non-compliance of the same.</li>
+            <li style="margin-bottom: 10px;">I, hereby declare that, I will not indulge in, nor tolerate ragging, in any form, even in words or intentions, and I accept to give an undertaking in the prescribed format for the same.</li>
+            <li style="margin-bottom: 10px;">I, further declare that, my admission may be cancelled, at any stage, if I am found ineligible and/or the information's provided by me is found to be incorrect and false.</li>
+            <li style="margin-bottom: 10px;">I, hereby undertake to inform the College, about any changes in information submitted by me, in the Application/Admission Form and any other documents, including change in addresses and phone nos., from time to time.</li>
+        </ol>
+    </div>
+
+    <div class="signature-row" style="margin-top: 40px; margin-bottom: 30px;">
+        <div>Date: {{ current_date }}</div>
+        <div style="text-align: right; border-top: 1px dashed #000000; width: 200px; padding-top: 5px; text-align: center;">Signature of the Student</div>
+    </div>
+
+    <!-- DECLARATION BY PARENT / GUARDIAN -->
+    <div class="form-title-badge" style="margin-top: 40px;">
+        DECLARATION BY PARENT / GUARDIAN
+    </div>
+
+    <div style="font-size: 0.8rem; line-height: 1.6; text-align: justify; margin-bottom: 40px;">
+        I, <strong>{{ reg.father_name }}</strong> (Mother / Father / Guardian) hereby fully endorse the above undertaking/declaration given by my ward. I undertake the responsibility of the ward's attendance in lectures / tutorials / practical as per the O.6086 and his/her behaviour in the premises of the College.
+    </div>
+
+    <div class="signature-row">
+        <div>Date: {{ current_date }}</div>
+        <div style="text-align: right; border-top: 1px dashed #000000; width: 220px; padding-top: 5px; text-align: center;">Signature of Parent / Guardian</div>
+    </div>
+
+</div>
+{% endblock content %}

@@ -1,0 +1,77 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary card-outline">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title"><i class="fas fa-calendar-alt mr-2"></i>Weekly Class Timetable: {{ course.name|default:"No Course Assigned" }}</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if not course %}
+                        <div class="alert alert-warning text-center">
+                            <h5><i class="icon fas fa-exclamation-triangle"></i> Course Assignment Required</h5>
+                            You are not currently assigned to any specific academic course. Please contact the administrator/HOD to map your profile to a course.
+                        </div>
+                        {% else %}
+                        <div class="row">
+                            
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead class="thead-dark">
+                                            <tr>
+                                                <th width="15%">Day</th>
+                                                <th>Subject / Module</th>
+                                                <th width="25%">Time Slot</th>
+                                                <th width="15%">Classroom</th>
+                                                <th width="20%">Assigned Faculty</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for slot in timetable_slots %}
+                                            <tr>
+                                                <td>
+                                                    <strong>
+                                                        {% if slot.day_of_week == 0 %}Monday
+                                                        {% elif slot.day_of_week == 1 %}Tuesday
+                                                        {% elif slot.day_of_week == 2 %}Wednesday
+                                                        {% elif slot.day_of_week == 3 %}Thursday
+                                                        {% elif slot.day_of_week == 4 %}Friday
+                                                        {% elif slot.day_of_week == 5 %}Saturday
+                                                        {% endif %}
+                                                    </strong>
+                                                </td>
+                                                <td><span class="text-primary font-weight-bold">{{ slot.subject.name }}</span></td>
+                                                <td>{{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}</td>
+                                                <td><span class="badge badge-info">{{ slot.classroom }}</span></td>
+                                                <td>
+                                                    {% if slot.subject.staff.admin.id == request.user.id %}
+                                                    <span class="badge badge-success">✓ You ({{ slot.subject.staff.admin.get_full_name }})</span>
+                                                    {% else %}
+                                                    {{ slot.subject.staff.admin.get_full_name }}
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted">No timetable lectures configured for this course yet.</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

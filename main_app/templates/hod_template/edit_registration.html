@@ -1,0 +1,292 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-edit mr-2"></i>Edit Student Admission & Registration Details</h3>
+                    </div>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <!-- tab navigation -->
+                            <ul class="nav nav-tabs mb-4" id="editRegTabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="personal-tab" data-bs-toggle="tab" href="#personal" role="tab">1. Personal Information</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="address-tab" data-bs-toggle="tab" href="#address" role="tab">2. Correspondence & Permanent Address</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="guardian-tab" data-bs-toggle="tab" href="#guardian" role="tab">3. Parents & Contact Details</a>
+                                </li>
+                            </ul>
+
+                            <div class="tab-content" id="editRegTabContent">
+                                <!-- Tab 1: Personal -->
+                                <div class="tab-pane fade show active" id="personal" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-md-3 form-group">
+                                            <label>Surname (English)</label>
+                                            <input type="text" class="form-control" name="surname" value="{{ reg.surname }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>First Name (English)</label>
+                                            <input type="text" class="form-control" name="first_name" value="{{ reg.first_name }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Father's Name (English)</label>
+                                            <input type="text" class="form-control" name="father_name" value="{{ reg.father_name }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Mother's Name (English)</label>
+                                            <input type="text" class="form-control" name="mother_name" value="{{ reg.mother_name }}" required>
+                                        </div>
+                                        <div class="col-md-4 form-group">
+                                            <label>Student Name in Devnagari (Marathi)</label>
+                                            <input type="text" class="form-control" name="marathi_name" value="{{ reg.marathi_name }}" required>
+                                        </div>
+                                        <div class="col-md-2 form-group">
+                                            <label>Gender</label>
+                                            <select class="form-control" name="gender" required>
+                                                <option value="MALE" {% if reg.gender == "MALE" %}selected{% endif %}>Male</option>
+                                                <option value="FEMALE" {% if reg.gender == "FEMALE" %}selected{% endif %}>Female</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Date of Birth</label>
+                                            <input type="date" class="form-control" name="dob" value="{{ dob_str }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Place of Birth</label>
+                                            <input type="text" class="form-control" name="place_of_birth" value="{{ reg.place_of_birth }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Marital Status</label>
+                                            <select class="form-control" name="marital_status" required>
+                                                <option value="UNMARRIED" {% if reg.marital_status == "UNMARRIED" %}selected{% endif %}>Unmarried</option>
+                                                <option value="MARRIED" {% if reg.marital_status == "MARRIED" %}selected{% endif %}>Married</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Religion</label>
+                                            <input type="text" class="form-control" name="religion" value="{{ reg.religion }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Nationality</label>
+                                            <input type="text" class="form-control" name="nationality" value="{{ reg.nationality }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Blood Group</label>
+                                            <input type="text" class="form-control" name="blood_group" value="{{ reg.blood_group }}" required>
+                                        </div>
+                                        <div class="col-md-4 form-group">
+                                            <label>Aadhaar Card Number</label>
+                                            <input type="text" class="form-control" name="aadhaar_no" value="{{ reg.aadhaar_no }}" required>
+                                        </div>
+                                        <div class="col-md-4 form-group">
+                                            <label>Passport Number</label>
+                                            <input type="text" class="form-control" name="passport_no" value="{{ reg.passport_no }}">
+                                        </div>
+                                        <div class="col-md-4 form-group">
+                                            <label>Voter ID</label>
+                                            <input type="text" class="form-control" name="voter_id" value="{{ reg.voter_id }}">
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Mother Tongue</label>
+                                            <input type="text" class="form-control" name="mother_tongue" value="{{ reg.mother_tongue }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Employment Status</label>
+                                            <select class="form-control" name="employment_status" required>
+                                                <option value="Unemployed" {% if reg.employment_status == "Unemployed" %}selected{% endif %}>Unemployed</option>
+                                                <option value="Employed" {% if reg.employment_status == "Employed" %}selected{% endif %}>Employed</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>NCC / NSS</label>
+                                            <select class="form-control" name="ncc_nss">
+                                                <option value="NO" {% if reg.ncc_nss == "NO" %}selected{% endif %}>NO</option>
+                                                <option value="NCC" {% if reg.ncc_nss == "NCC" %}selected{% endif %}>NCC</option>
+                                                <option value="NSS" {% if reg.ncc_nss == "NSS" %}selected{% endif %}>NSS</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Birth State</label>
+                                            <input type="text" class="form-control" name="birth_state" value="{{ reg.birth_state }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Birth District</label>
+                                            <input type="text" class="form-control" name="birth_district" value="{{ reg.birth_district }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Birth Tehsil</label>
+                                            <input type="text" class="form-control" name="birth_tehsil" value="{{ reg.birth_tehsil }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Caste Category (e.g. OBC, General)</label>
+                                            <input type="text" class="form-control" name="caste_category" value="{{ reg.caste_category }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Caste</label>
+                                            <input type="text" class="form-control" name="caste" value="{{ reg.caste }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>PRN (Enrollment Number)</label>
+                                            <input type="text" class="form-control" name="prn_no" value="{{ reg.prn_no }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>ABC ID</label>
+                                            <input type="text" class="form-control" name="abc_id" value="{{ reg.abc_id }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Physically Handicap</label>
+                                            <select class="form-control" name="handicap" required>
+                                                <option value="NO" {% if reg.handicap == "NO" %}selected{% endif %}>NO</option>
+                                                <option value="YES" {% if reg.handicap == "YES" %}selected{% endif %}>YES</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Orphan</label>
+                                            <select class="form-control" name="is_orphan" required>
+                                                <option value="NO" {% if reg.is_orphan == "NO" %}selected{% endif %}>NO</option>
+                                                <option value="YES" {% if reg.is_orphan == "YES" %}selected{% endif %}>YES</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Height (cm)</label>
+                                            <input type="number" step="0.1" class="form-control" name="height" value="{{ reg.height }}">
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Weight (kg)</label>
+                                            <input type="number" step="0.1" class="form-control" name="weight" value="{{ reg.weight }}">
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Has Device</label>
+                                            <select class="form-control" name="has_device">
+                                                <option value="YES" {% if reg.has_device == "YES" %}selected{% endif %}>YES</option>
+                                                <option value="NO" {% if reg.has_device == "NO" %}selected{% endif %}>NO</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>Has Internet</label>
+                                            <select class="form-control" name="has_internet">
+                                                <option value="NO" {% if reg.has_internet == "NO" %}selected{% endif %}>NO</option>
+                                                <option value="YES" {% if reg.has_internet == "YES" %}selected{% endif %}>YES</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 form-group">
+                                            <label>Municipal Ward</label>
+                                            <input type="text" class="form-control" name="municipal_ward" value="{{ reg.municipal_ward }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 2: Address -->
+                                <div class="tab-pane fade" id="address" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <h5>Correspondence Address Details</h5>
+                                            <hr>
+                                        </div>
+                                        <div class="col-md-12 form-group">
+                                            <label>Flat/House No, Building, Road, Area</label>
+                                            <textarea class="form-control" name="address" rows="2" required>{{ reg.address }}</textarea>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>State</label>
+                                            <input type="text" class="form-control" name="state" value="{{ reg.state }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>District</label>
+                                            <input type="text" class="form-control" name="district" value="{{ reg.district }}" required>
+                                        </div>
+                                        <div class="col-md-2 form-group">
+                                            <label>Tehsil</label>
+                                            <input type="text" class="form-control" name="tehsil" value="{{ reg.tehsil }}" required>
+                                        </div>
+                                        <div class="col-md-2 form-group">
+                                            <label>City/Town</label>
+                                            <input type="text" class="form-control" name="city" value="{{ reg.city }}" required>
+                                        </div>
+                                        <div class="col-md-2 form-group">
+                                            <label>Pincode</label>
+                                            <input type="text" class="form-control" name="pincode" value="{{ reg.pincode }}" required>
+                                        </div>
+
+                                        <div class="col-md-12 mt-4">
+                                            <h5>Permanent Address Details</h5>
+                                            <hr>
+                                        </div>
+                                        <div class="col-md-12 form-group">
+                                            <label>Flat/House No, Building, Road, Area</label>
+                                            <textarea class="form-control" name="perm_address" rows="2" required>{{ reg.perm_address }}</textarea>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>State</label>
+                                            <input type="text" class="form-control" name="perm_state" value="{{ reg.perm_state }}" required>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>District</label>
+                                            <input type="text" class="form-control" name="perm_district" value="{{ reg.perm_district }}" required>
+                                        </div>
+                                        <div class="col-md-2 form-group">
+                                            <label>Tehsil</label>
+                                            <input type="text" class="form-control" name="perm_tehsil" value="{{ reg.perm_tehsil }}" required>
+                                        </div>
+                                        <div class="col-md-2 form-group">
+                                            <label>City/Town</label>
+                                            <input type="text" class="form-control" name="perm_city" value="{{ reg.perm_city }}" required>
+                                        </div>
+                                        <div class="col-md-2 form-group">
+                                            <label>Pincode</label>
+                                            <input type="text" class="form-control" name="perm_pincode" value="{{ reg.perm_pincode }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 3: Guardian & Contact -->
+                                <div class="tab-pane fade" id="guardian" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-md-4 form-group">
+                                            <label>Guardian Occupation</label>
+                                            <input type="text" class="form-control" name="guardian_occupation" value="{{ reg.guardian_occupation }}" required>
+                                        </div>
+                                        <div class="col-md-4 form-group">
+                                            <label>Guardian Mobile Number</label>
+                                            <input type="text" class="form-control" name="guardian_mobile" value="{{ reg.guardian_mobile }}" required>
+                                        </div>
+                                        <div class="col-md-4 form-group">
+                                            <label>Guardian Annual Income (₹)</label>
+                                            <input type="number" step="0.01" class="form-control" name="guardian_income" value="{{ reg.guardian_income }}" required>
+                                        </div>
+                                        <div class="col-md-6 form-group">
+                                            <label>Student Personal Phone Number</label>
+                                            <input type="text" class="form-control" name="student_phone" value="{{ reg.student_phone }}" required>
+                                        </div>
+                                        <div class="col-md-6 form-group">
+                                            <label>Student Email Address</label>
+                                            <input type="email" class="form-control" name="student_email" value="{{ reg.student_email }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save mr-2"></i>Update Admission & Registration Profile</button>
+                            <a href="{% url 'admin_view_registration' reg.id %}" class="btn btn-default">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

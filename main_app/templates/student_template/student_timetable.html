@@ -1,0 +1,328 @@
+{% extends 'main_app/erpnext_base.html' %}
+{% load static %}
+
+{% block page_title %}Class Timetable{% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Timetable</li>
+{% endblock breadcrumb %}
+
+{% block custom_css %}
+<style>
+    .timetable-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
+        margin-top: 10px;
+    }
+
+    .day-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    body.dark-mode .day-card {
+        background: #1f2937;
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .day-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .day-header {
+        padding: 16px 20px;
+        color: #ffffff;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* Gradient headers for each day of the week */
+    .day-0 .day-header { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); } /* Mon */
+    .day-1 .day-header { background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); } /* Tue */
+    .day-2 .day-header { background: linear-gradient(135deg, #b45309 0%, #f59e0b 100%); } /* Wed */
+    .day-3 .day-header { background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%); } /* Thu */
+    .day-4 .day-header { background: linear-gradient(135deg, #be185d 0%, #ec4899 100%); } /* Fri */
+    .day-5 .day-header { background: linear-gradient(135deg, #475569 0%, #64748b 100%); } /* Sat */
+
+    .day-body {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        min-height: 150px;
+    }
+
+    .slot-item {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        padding-bottom: 14px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    body.dark-mode .slot-item {
+        border-bottom-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .slot-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .slot-time-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 85px;
+        background: #f3f4f6;
+        border-radius: 8px;
+        padding: 8px 6px;
+        flex-shrink: 0;
+    }
+
+    body.dark-mode .slot-time-col {
+        background: #374151;
+    }
+
+    .slot-start-time {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    body.dark-mode .slot-start-time { color: #f3f4f6; }
+
+    .slot-end-time {
+        font-size: 0.7rem;
+        color: #6b7280;
+        font-weight: 500;
+        margin-top: 2px;
+    }
+
+    body.dark-mode .slot-end-time { color: #9ca3af; }
+
+    .slot-info-col {
+        flex-grow: 1;
+    }
+
+    .slot-subject {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0 0 2px 0;
+    }
+
+    body.dark-mode .slot-subject { color: #ffffff; }
+
+    .slot-faculty {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    body.dark-mode .slot-faculty { color: #9ca3af; }
+
+    .slot-room {
+        display: inline-block;
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: #1e3a8a;
+        background: rgba(30, 58, 138, 0.08);
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    body.dark-mode .slot-room {
+        color: #60a5fa;
+        background: rgba(96, 165, 250, 0.15);
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="timetable-grid">
+        
+        <!-- Monday -->
+        <div class="day-card day-0">
+            <div class="day-header">
+                <span><i class="far fa-calendar-alt me-2"></i> Monday</span>
+                <span class="badge bg-white text-dark font-size-11">Classes</span>
+            </div>
+            <div class="day-body">
+                {% for slot in timetable_by_day.0 %}
+                    <div class="slot-item">
+                        <div class="slot-time-col">
+                            <span class="slot-start-time">{{ slot.start_time|time:"H:i" }}</span>
+                            <span class="slot-end-time">{{ slot.end_time|time:"H:i" }}</span>
+                        </div>
+                        <div class="slot-info-col">
+                            <h5 class="slot-subject">{{ slot.subject.name }}</h5>
+                            <span class="slot-faculty"><i class="far fa-user me-1"></i> {{ slot.subject.staff }}</span>
+                            <span class="slot-room"><i class="fas fa-map-marker-alt me-1"></i> {{ slot.classroom }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-muted py-4">
+                        <i class="fas fa-bed fa-2x mb-2 text-secondary"></i>
+                        <p class="mb-0 font-size-13">No classes scheduled</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Tuesday -->
+        <div class="day-card day-1">
+            <div class="day-header">
+                <span><i class="far fa-calendar-alt me-2"></i> Tuesday</span>
+                <span class="badge bg-white text-dark font-size-11">Classes</span>
+            </div>
+            <div class="day-body">
+                {% for slot in timetable_by_day.1 %}
+                    <div class="slot-item">
+                        <div class="slot-time-col">
+                            <span class="slot-start-time">{{ slot.start_time|time:"H:i" }}</span>
+                            <span class="slot-end-time">{{ slot.end_time|time:"H:i" }}</span>
+                        </div>
+                        <div class="slot-info-col">
+                            <h5 class="slot-subject">{{ slot.subject.name }}</h5>
+                            <span class="slot-faculty"><i class="far fa-user me-1"></i> {{ slot.subject.staff }}</span>
+                            <span class="slot-room"><i class="fas fa-map-marker-alt me-1"></i> {{ slot.classroom }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-muted py-4">
+                        <i class="fas fa-bed fa-2x mb-2 text-secondary"></i>
+                        <p class="mb-0 font-size-13">No classes scheduled</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Wednesday -->
+        <div class="day-card day-2">
+            <div class="day-header">
+                <span><i class="far fa-calendar-alt me-2"></i> Wednesday</span>
+                <span class="badge bg-white text-dark font-size-11">Classes</span>
+            </div>
+            <div class="day-body">
+                {% for slot in timetable_by_day.2 %}
+                    <div class="slot-item">
+                        <div class="slot-time-col">
+                            <span class="slot-start-time">{{ slot.start_time|time:"H:i" }}</span>
+                            <span class="slot-end-time">{{ slot.end_time|time:"H:i" }}</span>
+                        </div>
+                        <div class="slot-info-col">
+                            <h5 class="slot-subject">{{ slot.subject.name }}</h5>
+                            <span class="slot-faculty"><i class="far fa-user me-1"></i> {{ slot.subject.staff }}</span>
+                            <span class="slot-room"><i class="fas fa-map-marker-alt me-1"></i> {{ slot.classroom }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-muted py-4">
+                        <i class="fas fa-bed fa-2x mb-2 text-secondary"></i>
+                        <p class="mb-0 font-size-13">No classes scheduled</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Thursday -->
+        <div class="day-card day-3">
+            <div class="day-header">
+                <span><i class="far fa-calendar-alt me-2"></i> Thursday</span>
+                <span class="badge bg-white text-dark font-size-11">Classes</span>
+            </div>
+            <div class="day-body">
+                {% for slot in timetable_by_day.3 %}
+                    <div class="slot-item">
+                        <div class="slot-time-col">
+                            <span class="slot-start-time">{{ slot.start_time|time:"H:i" }}</span>
+                            <span class="slot-end-time">{{ slot.end_time|time:"H:i" }}</span>
+                        </div>
+                        <div class="slot-info-col">
+                            <h5 class="slot-subject">{{ slot.subject.name }}</h5>
+                            <span class="slot-faculty"><i class="far fa-user me-1"></i> {{ slot.subject.staff }}</span>
+                            <span class="slot-room"><i class="fas fa-map-marker-alt me-1"></i> {{ slot.classroom }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-muted py-4">
+                        <i class="fas fa-bed fa-2x mb-2 text-secondary"></i>
+                        <p class="mb-0 font-size-13">No classes scheduled</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Friday -->
+        <div class="day-card day-4">
+            <div class="day-header">
+                <span><i class="far fa-calendar-alt me-2"></i> Friday</span>
+                <span class="badge bg-white text-dark font-size-11">Classes</span>
+            </div>
+            <div class="day-body">
+                {% for slot in timetable_by_day.4 %}
+                    <div class="slot-item">
+                        <div class="slot-time-col">
+                            <span class="slot-start-time">{{ slot.start_time|time:"H:i" }}</span>
+                            <span class="slot-end-time">{{ slot.end_time|time:"H:i" }}</span>
+                        </div>
+                        <div class="slot-info-col">
+                            <h5 class="slot-subject">{{ slot.subject.name }}</h5>
+                            <span class="slot-faculty"><i class="far fa-user me-1"></i> {{ slot.subject.staff }}</span>
+                            <span class="slot-room"><i class="fas fa-map-marker-alt me-1"></i> {{ slot.classroom }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-muted py-4">
+                        <i class="fas fa-bed fa-2x mb-2 text-secondary"></i>
+                        <p class="mb-0 font-size-13">No classes scheduled</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Saturday -->
+        <div class="day-card day-5">
+            <div class="day-header">
+                <span><i class="far fa-calendar-alt me-2"></i> Saturday</span>
+                <span class="badge bg-white text-dark font-size-11">Classes</span>
+            </div>
+            <div class="day-body">
+                {% for slot in timetable_by_day.5 %}
+                    <div class="slot-item">
+                        <div class="slot-time-col">
+                            <span class="slot-start-time">{{ slot.start_time|time:"H:i" }}</span>
+                            <span class="slot-end-time">{{ slot.end_time|time:"H:i" }}</span>
+                        </div>
+                        <div class="slot-info-col">
+                            <h5 class="slot-subject">{{ slot.subject.name }}</h5>
+                            <span class="slot-faculty"><i class="far fa-user me-1"></i> {{ slot.subject.staff }}</span>
+                            <span class="slot-room"><i class="fas fa-map-marker-alt me-1"></i> {{ slot.classroom }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="d-flex flex-column align-items-center justify-content-center flex-grow-1 text-muted py-4">
+                        <i class="fas fa-bed fa-2x mb-2 text-secondary"></i>
+                        <p class="mb-0 font-size-13">No classes scheduled</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

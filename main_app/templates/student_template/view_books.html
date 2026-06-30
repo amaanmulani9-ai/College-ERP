@@ -1,0 +1,361 @@
+{% extends 'main_app/erpnext_base.html' %}
+{% load static %}
+
+{% block page_title %}Library Portal{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    .library-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 24px;
+        margin-top: 20px;
+    }
+
+    /* Bookshelf Shelf Style */
+    .bookshelf-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        margin-bottom: 30px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .bookshelf-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #6f42c1, #a78bfa);
+    }
+
+    /* Book Cards */
+    .book-card {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .book-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-color: rgba(94, 100, 255, 0.3);
+    }
+
+    .book-cover-placeholder {
+        height: 160px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-size: 48px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Dynamic Cover Gradients based on Category */
+    .cover-cs {
+        background: linear-gradient(135deg, #5e64ff 0%, #3f2b96 100%);
+    }
+    .cover-se {
+        background: linear-gradient(135deg, #6f42c1 0%, #a28bfa 100%);
+    }
+    .cover-db {
+        background: linear-gradient(135deg, #17a2b8 0%, #117a8b 100%);
+    }
+    .cover-gen {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    }
+
+    .book-cover-icon {
+        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+        transition: transform 0.3s ease;
+    }
+
+    .book-card:hover .book-cover-icon {
+        transform: scale(1.1) rotate(-5deg);
+    }
+
+    .book-details {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .book-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin: 0 0 4px 0;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        height: 44px;
+    }
+
+    .book-author {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+    }
+
+    .book-meta {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        border-top: 1px solid #f1f3f4;
+        padding-top: 14px;
+    }
+
+    .book-isbn {
+        font-size: 12px;
+        color: #718096;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .category-tag {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 8px;
+        border-radius: 6px;
+        align-self: flex-start;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .category-tag.cs {
+        background-color: rgba(94, 100, 255, 0.1);
+        color: var(--primary-color);
+    }
+    .category-tag.se {
+        background-color: rgba(111, 66, 193, 0.1);
+        color: #6f42c1;
+    }
+    .category-tag.db {
+        background-color: rgba(23, 162, 184, 0.1);
+        color: #17a2b8;
+    }
+    .category-tag.gen {
+        background-color: rgba(108, 117, 125, 0.1);
+        color: #6c757d;
+    }
+
+    /* Shelf Table */
+    .shelf-table {
+        margin: 0;
+        width: 100%;
+        font-size: 13.5px;
+    }
+
+    .shelf-table th {
+        background-color: #f8f9fc;
+        border-bottom: 2px solid var(--border-color);
+        font-weight: 600;
+        color: var(--dark-color);
+        padding: 14px 20px;
+    }
+
+    .shelf-table td {
+        padding: 14px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+    }
+
+    .shelf-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .fine-badge {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 4px;
+    }
+
+    .fine-badge.none {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+
+    .fine-badge.active {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+
+    /* Empty state */
+    .empty-shelf {
+        padding: 40px;
+        text-align: center;
+        color: var(--text-muted);
+    }
+    
+    .empty-shelf i {
+        font-size: 48px;
+        color: #cbd5e0;
+        margin-bottom: 12px;
+    }
+
+    .dark-mode .bookshelf-card,
+    .dark-mode .book-card,
+    .dark-mode .book-details,
+    .dark-mode .shelf-table td {
+        background-color: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+
+    .dark-mode .book-title {
+        color: #f7fafc;
+    }
+
+    .dark-mode .shelf-table th {
+        background-color: #1a202c;
+        border-color: #4a5568;
+        color: #f7fafc;
+    }
+
+    .dark-mode .book-meta {
+        border-top-color: #4a5568;
+    }
+
+    .dark-mode .book-isbn {
+        color: #a0aec0;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="container-fluid p-0">
+
+    <!-- Section 1: My Bookshelf -->
+    <div class="bookshelf-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title">
+                <i class="fas fa-bookmark me-2"></i> My Bookshelf
+            </h3>
+            <span class="badge bg-purple">{{ borrowed_books|length }} Active Loan{{ borrowed_books|pluralize }}</span>
+        </div>
+        
+        {% if borrowed_books %}
+        <div class="table-responsive">
+            <table class="table shelf-table">
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>Borrowed Date</th>
+                        <th>Return Deadline</th>
+                        <th>Live Fine</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loan in borrowed_books %}
+                    <tr>
+                        <td style="font-weight: 600;">{{ loan.name }}</td>
+                        <td>{{ loan.author }}</td>
+                        <td><code style="font-size: 12px; color: var(--primary-color);">{{ loan.isbn }}</code></td>
+                        <td>{{ loan.issued_date|date:"M d, Y" }}</td>
+                        <td style="font-weight: 500; color: #6f42c1;">{{ loan.expiry_date|date:"M d, Y" }}</td>
+                        <td>
+                            {% if loan.fine > 0 %}
+                            <span class="fine-badge active">₹{{ loan.fine }}</span>
+                            {% else %}
+                            <span class="fine-badge none">No Fine</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-shelf">
+            <i class="fas fa-book-reader"></i>
+            <h6>Your bookshelf is empty.</h6>
+            <p style="font-size: 13px; margin: 0;">Browse the catalog below to borrow books for your courses.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Section 2: Library Book Catalog -->
+    <div class="erpnext-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-compass me-2"></i> Library Catalog
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="library-grid">
+                {% for book in books %}
+                <div class="book-card">
+                    <!-- Book Cover Gradient Based on Category -->
+                    <div class="book-cover-placeholder 
+                        {% if 'computer' in book.category|lower %}cover-cs
+                        {% elif 'software' in book.category|lower %}cover-se
+                        {% elif 'database' in book.category|lower %}cover-db
+                        {% else %}cover-gen{% endif %}">
+                        <i class="fas fa-book book-cover-icon"></i>
+                    </div>
+                    
+                    <div class="book-details">
+                        <!-- Category Tag -->
+                        <span class="category-tag mb-2
+                            {% if 'computer' in book.category|lower %}cs
+                            {% elif 'software' in book.category|lower %}se
+                            {% elif 'database' in book.category|lower %}db
+                            {% else %}gen{% endif %}">
+                            {{ book.category }}
+                        </span>
+                        
+                        <h4 class="book-title" title="{{ book.name }}">{{ book.name }}</h4>
+                        <div class="book-author">by {{ book.author }}</div>
+                        
+                        <div class="book-meta">
+                            <div class="book-isbn">
+                                <span>ISBN Code</span>
+                                <span style="font-weight: 600;">{{ book.isbn }}</span>
+                            </div>
+                            
+                            <!-- Borrow Action Button -->
+                            {% if book.is_borrowed %}
+                            <button class="btn btn-secondary btn-sm w-100 mt-2" disabled style="cursor: not-allowed; opacity: 0.7;">
+                                <i class="fas fa-check-circle me-1"></i> On Your Shelf
+                            </button>
+                            {% else %}
+                            <a href="{% url 'borrow_book' isbn=book.isbn %}" class="btn btn-primary btn-sm w-100 mt-2">
+                                <i class="fas fa-plus-circle me-1"></i> Borrow Book
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center text-muted p-5">
+                    <i class="fas fa-book-dead mb-3" style="font-size: 48px;"></i>
+                    <p>No books are currently available in the library.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}

@@ -1,0 +1,134 @@
+{% extends 'main_app/erpnext_base.html' %}
+{% load static %}
+
+{% block page_title %}Issued Books Tracker{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    .issued-books-table {
+        width: 100%;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+    
+    .issued-books-table th {
+        background-color: #f8f9fc;
+        border-bottom: 2px solid var(--border-color);
+        font-weight: 600;
+        color: var(--dark-color);
+        padding: 16px 20px;
+    }
+    
+    .issued-books-table td {
+        padding: 16px 20px;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+    }
+    
+    .fine-badge {
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 8px;
+        border-radius: 6px;
+        display: inline-block;
+    }
+    
+    .fine-badge.none {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+        border: 1px solid rgba(40, 167, 69, 0.2);
+    }
+    
+    .fine-badge.active {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border: 1px solid rgba(220, 53, 69, 0.2);
+    }
+    
+    .student-info-col {
+        font-weight: 500;
+        color: var(--dark-color);
+    }
+    
+    .book-title-col {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .dark-mode .issued-books-table th {
+        background-color: #1a202c;
+        border-color: #4a5568;
+        color: #f7fafc;
+    }
+
+    .dark-mode .issued-books-table td {
+        border-bottom-color: #4a5568;
+        color: #e2e8f0;
+    }
+
+    .dark-mode .student-info-col {
+        color: #e2e8f0;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="erpnext-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title">
+                    <i class="fas fa-list-alt me-2"></i> Active Book Loans
+                </h3>
+                <a href="{% url 'issue_book' %}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus-circle me-1"></i> Issue New Book
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if details %}
+                <div class="table-responsive">
+                    <table class="table issued-books-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Book Title</th>
+                                <th>ISBN</th>
+                                <th>Student Details</th>
+                                <th>Issued Date</th>
+                                <th>Deadline</th>
+                                <th>Active Fine</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in details %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td class="book-title-col">{{ record.book_name }}</td>
+                                <td><code style="font-size: 13px; color: #6f42c1;">{{ record.isbn }}</code></td>
+                                <td class="student-info-col">{{ record.student_name }}</td>
+                                <td>{{ record.issued_date|date:"M d, Y" }}</td>
+                                <td style="font-weight: 500; color: #6f42c1;">{{ record.expiry_date|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if record.fine > 0 %}
+                                    <span class="fine-badge active">₹{{ record.fine }}</span>
+                                    {% else %}
+                                    <span class="fine-badge none">No Fine</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center p-5 text-muted">
+                    <i class="fas fa-book-reader mb-3" style="font-size: 48px; color: #cbd5e0;"></i>
+                    <h5>No active book loans.</h5>
+                    <p style="font-size: 13px; margin: 0;">Use the "Issue New Book" button to manually check out a book for a student.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

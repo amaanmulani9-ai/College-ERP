@@ -1,0 +1,435 @@
+{% extends 'main_app/erpnext_base.html' %}
+{% load static %}
+
+{% block page_title %}Certificates Portal{% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Certificates</li>
+{% endblock breadcrumb %}
+
+{% block custom_css %}
+<style>
+    .split-layout {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 24px;
+        align-items: start;
+    }
+
+    @media (max-width: 992px) {
+        .split-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .form-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+    }
+
+    body.dark-mode .form-card {
+        background: #1f2937;
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .form-card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    body.dark-mode .form-card-title {
+        color: #60a5fa;
+    }
+
+    /* Certificates History Table */
+    .history-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    body.dark-mode .history-card {
+        background: #1f2937;
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Ornamental Certificate Modal */
+    .cert-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.75);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1100;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .cert-modal-container {
+        width: 100%;
+        max-width: 850px;
+        animation: certScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes certScaleUp {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    .certificate-ornamental {
+        background: #fdfbf7; /* Classic cream certificate color */
+        border: 20px double #78350f; /* Thick double wood/gold-colored border */
+        padding: 40px;
+        color: #1e293b;
+        font-family: 'Times New Roman', Times, serif;
+        position: relative;
+        text-align: center;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .cert-inner-border {
+        border: 2px solid #78350f;
+        padding: 24px;
+        height: 100%;
+    }
+
+    .cert-college-title {
+        font-size: 1.6rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #78350f;
+        margin-bottom: 4px;
+    }
+
+    .cert-college-subtitle {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #4b5563;
+        margin-bottom: 20px;
+    }
+
+    .cert-headline {
+        font-size: 2.2rem;
+        font-weight: bold;
+        font-style: italic;
+        color: #1e3a8a;
+        margin-bottom: 20px;
+        font-family: 'Brush Script MT', cursive, Georgia, serif;
+    }
+
+    .cert-body-text {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #334155;
+        max-width: 650px;
+        margin: 0 auto 30px auto;
+        text-align: justify;
+    }
+
+    .cert-meta-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: 50px;
+        padding: 0 40px;
+    }
+
+    .cert-seal {
+        width: 110px;
+        height: 110px;
+        border: 2px dashed #b45309;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #b45309;
+        font-weight: bold;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        padding: 4px;
+        transform: rotate(-5deg);
+    }
+
+    .cert-sig-box {
+        text-align: center;
+    }
+
+    .cert-sig-line {
+        border-top: 1px solid #78350f;
+        width: 180px;
+        padding-top: 6px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #4b5563;
+    }
+
+    .cert-sig-sign {
+        font-family: 'Brush Script MT', cursive, sans-serif;
+        font-size: 1.6rem;
+        color: #1e3a8a;
+        margin-bottom: 4px;
+        height: 35px;
+    }
+
+    /* Print styling to isolate certificate framing */
+    @media print {
+        body {
+            background: #ffffff !important;
+        }
+
+        .erpnext-navbar,
+        .erpnext-sidebar,
+        .page-header,
+        .breadcrumb,
+        .split-layout,
+        .cert-modal-buttons,
+        footer {
+            display: none !important;
+        }
+
+        .erpnext-main {
+            margin-left: 0 !important;
+            padding: 0 !important;
+            background: none !important;
+        }
+
+        .content-area {
+            padding: 0 !important;
+        }
+
+        .cert-modal-overlay {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            background: none !important;
+            backdrop-filter: none !important;
+            display: flex !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .cert-modal-container {
+            max-width: 100% !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+        }
+
+        .certificate-ornamental {
+            box-shadow: none !important;
+            border-color: #78350f !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="split-layout">
+        
+        <!-- Left Column: Submission Form -->
+        <div class="form-card">
+            <h4 class="form-card-title"><i class="fas fa-file-signature text-primary"></i> Request Certificate</h4>
+            <form action="{% url 'student_request_certificate' %}" method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label font-size-13 font-weight-bold">Certificate Type</label>
+                    <select class="form-select" name="certificate_type" required>
+                        <option value="" disabled selected>Select certificate type...</option>
+                        <option value="Bonafide">Bonafide Certificate</option>
+                        <option value="Character">Character Certificate</option>
+                        <option value="Leaving">Leaving Certificate</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label font-size-13 font-weight-bold">Purpose / Reason for Request</label>
+                    <textarea class="form-control" name="reason" rows="4" placeholder="State reason clearly (e.g., For applying to State EBC Scholarship, passport application, etc.)" required></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100 py-2 font-weight-bold text-uppercase">
+                    <i class="fas fa-paper-plane me-2"></i> Submit Request
+                </button>
+            </form>
+        </div>
+        
+        <!-- Right Column: Status Board -->
+        <div class="history-card">
+            <div class="p-3 bg-light border-bottom">
+                <h5 class="m-0 font-weight-bold text-uppercase font-size-11" style="color: #4b5563; letter-spacing: 0.5px;">Certificate Request Status</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
+                    <thead>
+                        <tr class="table-light text-uppercase font-size-11" style="color: #6b7280; letter-spacing: 0.5px;">
+                            <th>Certificate Type</th>
+                            <th>Purpose</th>
+                            <th>Submitted On</th>
+                            <th>Status</th>
+                            <th>Approved Date</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in requests %}
+                            <tr>
+                                <td>
+                                    <span class="d-flex align-items-center">
+                                        <div class="bg-light p-2 rounded me-3 text-primary"><i class="fas fa-certificate"></i></div>
+                                        <b>{{ req.get_certificate_type_display }}</b>
+                                    </span>
+                                </td>
+                                <td><span class="text-muted font-size-13" style="max-width: 250px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ req.reason }}</span></td>
+                                <td><i class="far fa-calendar-alt me-1 text-muted"></i> {{ req.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if req.status == 'Approved' %}
+                                        <span class="badge bg-success" style="padding: 5px 10px; font-weight: 600;"><i class="fas fa-check me-1"></i> Approved</span>
+                                    {% elif req.status == 'Rejected' %}
+                                        <span class="badge bg-danger" style="padding: 5px 10px; font-weight: 600;"><i class="fas fa-times me-1"></i> Rejected</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark" style="padding: 5px 10px; font-weight: 600;"><i class="fas fa-spinner fa-spin me-1"></i> Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if req.approved_date %}
+                                        <i class="far fa-calendar-check me-1 text-success"></i> {{ req.approved_date|date:"M d, Y" }}
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if req.status == 'Approved' %}
+                                        <button class="btn btn-sm btn-outline-success" onclick="viewOrnamentalCertificate('{{ req.certificate_type }}', '{{ req.approved_date|date:'M d, Y' }}')">
+                                            <i class="fas fa-eye me-1"></i> View & Save
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-sm btn-outline-secondary" disabled>
+                                            <i class="fas fa-lock me-1"></i> Locked
+                                        </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">You have not requested any academic certificates yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Premium Certificate Modal Overlay -->
+<div class="cert-modal-overlay" id="certModalOverlay">
+    <div class="cert-modal-container">
+        
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-between mb-3 cert-modal-buttons">
+            <button class="btn btn-secondary btn-sm" onclick="closeCertificateModal()">
+                <i class="fas fa-arrow-left me-1"></i> Return to Portal
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="window.print()">
+                <i class="fas fa-print me-1"></i> Print / Save as PDF
+            </button>
+        </div>
+        
+        <!-- Ornamental Framed Certificate Document -->
+        <div class="certificate-ornamental">
+            <div class="cert-inner-border">
+                <h3 class="cert-college-title">SIR SITARAM AND LADY SHANTABAI PATKAR COLLEGE</h3>
+                <p class="cert-college-subtitle">Autonomous college affiliated to University of Mumbai | Goregaon, Mumbai</p>
+                
+                <h1 class="cert-headline" id="certTypeTitle">Bonafide Certificate</h1>
+                
+                <div class="cert-body-text" id="certDynamicText">
+                    <!-- Text dynamically injected via Javascript -->
+                </div>
+                
+                <!-- Signatures and seal -->
+                <div class="cert-meta-row">
+                    <div style="text-align: left; font-size: 0.95rem; color: #4b5563;">
+                        <div><b>Dated:</b> <span id="certIssueDate"></span></div>
+                        <div style="margin-top: 4px;"><b>Place:</b> Mumbai, India</div>
+                    </div>
+                    
+                    <div class="cert-seal">
+                        <span>Patkar College</span>
+                        <span style="font-size: 0.5rem; margin: 3px 0; font-weight: bold; color: #b45309;">OFFICIAL SEAL</span>
+                        <span>AUTONOMOUS</span>
+                    </div>
+                    
+                    <div class="cert-sig-box">
+                        <div class="cert-sig-sign">Dr. A. B. Joshi</div>
+                        <div class="cert-sig-line">Dean of Academics</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+function openCertificateModal() {
+    document.getElementById('certModalOverlay').style.display = 'flex';
+}
+
+function closeCertificateModal() {
+    document.getElementById('certModalOverlay').style.display = 'none';
+}
+
+function viewOrnamentalCertificate(type, approvedDate) {
+    const titleEl = document.getElementById('certTypeTitle');
+    const textEl = document.getElementById('certDynamicText');
+    const dateEl = document.getElementById('certIssueDate');
+    
+    // Set Issue Date
+    dateEl.innerText = approvedDate || new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    
+    const studentName = "<b>Amaan Mulani</b>";
+    const rollNo = "<b>PAT/2026/0001</b>";
+    const courseName = "<b>Computer Science & Engineering</b>";
+    const batchYears = "<b>2026 - 2027</b>";
+    
+    if (type === 'Bonafide') {
+        titleEl.innerText = "Bonafide Certificate";
+        textEl.innerHTML = `This is to officially certify that Mr. ${studentName}, bearing Roll Number ${rollNo}, is a bonafide student of this institution, currently enrolled in the ${courseName} degree program for the Academic Session ${batchYears}. To the best of our knowledge and college records, his academic conduct and character have been consistently outstanding during his tenure at this college. This certificate is issued for academic and scholarship verification purposes.`;
+    } else if (type === 'Character') {
+        titleEl.innerText = "Conduct & Character Certificate";
+        textEl.innerHTML = `This is to certify that Mr. ${studentName}, son of Mr. Salim Mulani, enrolled in the ${courseName} under Roll Number ${rollNo}, has been a regular student of this college during the academic years ${batchYears}. During his course of study, his general behavior, morals, and conduct have been found to be **EXCELLENT**. We wish him every success in all his future academic and professional endeavors.`;
+    } else {
+        titleEl.innerText = "College Leaving Certificate";
+        textEl.innerHTML = `This is to certify that Mr. ${studentName}, student of the ${courseName} program under Roll Number ${rollNo}, has officially completed his course requirements and is leaving this institution. All his financial and library accounts are fully cleared. His date of birth as per college records is **January 15, 2005**. His character during his tenure at this college was excellent, and he bears no outstanding liabilities.`;
+    }
+    
+    openCertificateModal();
+}
+</script>
+{% endblock custom_js %}
