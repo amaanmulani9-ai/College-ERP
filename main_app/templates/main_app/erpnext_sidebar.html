@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 
 <!-- Sidebar Header -->
 <div class="sidebar-header">
@@ -30,7 +30,7 @@
             {% url 'admin_home' as admin_home %}
             <a href="{{ admin_home }}" class="nav-link {% if admin_home == request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
-                <span class="nav-text">Dashboard</span>
+                <span class="nav-text">{% trans "Dashboard" %}</span>
             </a>
         </div>
         
@@ -38,7 +38,7 @@
             {% url 'admin_view_profile' as admin_view_profile %}
             <a href="{{ admin_view_profile }}" class="nav-link {% if admin_view_profile == request.path %}active{% endif %}">
                 <i class="fas fa-user-circle"></i>
-                <span class="nav-text">Profile</span>
+                <span class="nav-text">{% trans "Profile" %}</span>
             </a>
         </div>
 
@@ -47,7 +47,7 @@
         <div class="nav-item has-submenu {% if 'course' in request.path %}open{% endif %}">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-graduation-cap"></i>
-                <span class="nav-text">Courses</span>
+                <span class="nav-text">{% trans "Courses" %}</span>
                 <i class="nav-arrow fas fa-chevron-right"></i>
             </a>
             <div class="nav-submenu">
@@ -69,7 +69,7 @@
         <div class="nav-item has-submenu {% if 'subject' in request.path %}open{% endif %}">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-book"></i>
-                <span class="nav-text">Subjects</span>
+                <span class="nav-text">{% trans "Subjects" %}</span>
                 <i class="nav-arrow fas fa-chevron-right"></i>
             </a>
             <div class="nav-submenu">
@@ -91,7 +91,7 @@
         <div class="nav-item has-submenu {% if 'session' in request.path %}open{% endif %}">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-calendar-alt"></i>
-                <span class="nav-text">Sessions</span>
+                <span class="nav-text">{% trans "Sessions" %}</span>
                 <i class="nav-arrow fas fa-chevron-right"></i>
             </a>
             <div class="nav-submenu">
@@ -346,7 +346,7 @@
             </a>
         </div>
 
-    {% else %}
+    {% elif user.user_type == '3' %}
         <!-- Student Navigation -->
         <h6 class="nav-section-title">Main Portal</h6>
         

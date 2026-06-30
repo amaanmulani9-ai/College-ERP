@@ -1,0 +1,60 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-edit mr-2"></i>Edit Student Fee Particular</h3>
+                    </div>
+                    <form method="POST" action="{% url 'admin_edit_fee' fee_record.id %}">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 form-group">
+                                    <label>Student</label>
+                                    <input type="text" class="form-control" value="{{ fee_record.student.admin.get_full_name }} ({{ fee_record.student.course.name }})" disabled>
+                                </div>
+                                <div class="col-md-3 form-group">
+                                    <label>Fee Category / Particular</label>
+                                    <input type="text" class="form-control" name="category" value="{{ fee_record.category }}" required>
+                                </div>
+                                <div class="col-md-2 form-group">
+                                    <label>Total Amount (₹)</label>
+                                    <input type="number" step="0.01" class="form-control" name="amount" value="{{ fee_record.amount }}" required>
+                                </div>
+                                <div class="col-md-3 form-group">
+                                    <label>Due Date</label>
+                                    <input type="date" class="form-control" name="due_date" value="{{ fee_record.due_date|date:'Y-m-d' }}" required>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-4 form-group">
+                                    <label>Amount Paid (₹)</label>
+                                    <input type="text" class="form-control" value="{{ fee_record.amount_paid }}" disabled>
+                                </div>
+                                <div class="col-md-4 form-group">
+                                    <label>Status</label>
+                                    <select class="form-control" name="status">
+                                        <option value="Paid" {% if fee_record.status == 'Paid' %}selected{% endif %}>Paid</option>
+                                        <option value="Partial" {% if fee_record.status == 'Partial' %}selected{% endif %}>Partial</option>
+                                        <option value="Unpaid" {% if fee_record.status == 'Unpaid' %}selected{% endif %}>Unpaid</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Update Fee Record</button>
+                            <a href="{% url 'admin_manage_fees' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

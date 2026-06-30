@@ -12,4 +12,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Home"
-msgstr "الرئيسية"
+msgstr "الصفحة الرئيسية"
+
+msgid "Dashboard"
+msgstr "لوحة القيادة"
+
+msgid "Profile"
+msgstr "الملف الشخصي"
+
+msgid "Courses"
+msgstr "الدورات"
+
+msgid "Subjects"
+msgstr "المواضيع"
+
+msgid "Sessions"
+msgstr "الجلسات"

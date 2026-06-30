@@ -939,6 +939,38 @@ def admin_add_fee(request):
     return redirect(reverse('admin_manage_fees'))
 
 
+def admin_edit_fee(request, fee_id):
+    fee_record = get_object_or_404(FeeRecord, id=fee_id)
+    if request.method == "POST":
+        fee_record.category = request.POST.get("category")
+        fee_record.amount = request.POST.get("amount")
+        fee_record.due_date = request.POST.get("due_date")
+        fee_record.status = request.POST.get("status")
+        try:
+            fee_record.save()
+            messages.success(request, "Fee record updated successfully.")
+            return redirect(reverse('admin_manage_fees'))
+        except Exception as e:
+            messages.error(request, f"Error updating fee record: {e}")
+
+    context = {
+        'page_title': "Edit Fee Record",
+        'fee_record': fee_record
+    }
+    return render(request, "hod_template/edit_fee.html", context)
+
+
+def admin_print_fee(request, fee_id):
+    fee_record = get_object_or_404(FeeRecord, id=fee_id)
+    payments = FeePayment.objects.filter(fee_record=fee_record).order_by('-payment_date')
+    context = {
+        'page_title': "Print Fee Invoice",
+        'fee_record': fee_record,
+        'payments': payments
+    }
+    return render(request, "hod_template/fee_invoice.html", context)
+
+
 def admin_manage_timetable(request):
     courses = Course.objects.all()
     subjects = Subject.objects.all()
@@ -1174,5 +1206,64 @@ def add_parent(request):
         except Exception as e:
             messages.error(request, f"Could not create parent account: {e}")
             return redirect(reverse('add_parent'))
+            return redirect(reverse('add_parent'))
             
     return render(request, 'hod_template/add_parent.html', context)
+
+
+def manage_parent(request):
+    parents = Parent.objects.all().select_related('admin', 'student__admin')
+    context = {
+        'parents': parents,
+        'page_title': 'Manage Parents'
+    }
+    return render(request, "hod_template/manage_parent.html", context)
+
+
+def edit_parent(request, parent_id):
+    parent = get_object_or_404(Parent, id=parent_id)
+    students = Student.objects.all()
+    context = {
+        'parent': parent,
+        'students': students,
+        'page_title': 'Edit Parent'
+    }
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        mobile_number = request.POST.get('mobile_number')
+        student_id = request.POST.get('student')
+        
+        try:
+            student = Student.objects.get(id=student_id)
+            user = parent.admin
+            user.first_name = first_name
+            user.last_name = last_name
+            user.email = email
+            if password:
+                user.set_password(password)
+            user.save()
+            
+            parent.student = student
+            parent.mobile_number = mobile_number
+            parent.save()
+            
+            messages.success(request, "Parent details updated successfully!")
+            return redirect(reverse('edit_parent', args=[parent_id]))
+        except Exception as e:
+            messages.error(request, f"Could not update parent account: {e}")
+            return redirect(reverse('edit_parent', args=[parent_id]))
+            
+    return render(request, 'hod_template/edit_parent.html', context)
+
+
+def delete_parent(request, parent_id):
+    parent = get_object_or_404(Parent, id=parent_id)
+    try:
+        parent.admin.delete()  # This will cascade and delete the Parent record too
+        messages.success(request, "Parent deleted successfully!")
+    except Exception as e:
+        messages.error(request, f"Error deleting parent: {e}")
+    return redirect(reverse('manage_parent'))

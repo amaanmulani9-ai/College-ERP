@@ -557,3 +557,13 @@ def staff_add_question(request, exam_id):
     }
     return render(request, 'staff_template/add_question.html', context)
 
+
+def staff_manage_parent(request):
+    staff = get_object_or_404(Staff, admin=request.user)
+    # Get parents of students in the staff's course
+    parents = Parent.objects.filter(student__course=staff.course).select_related('admin', 'student__admin')
+    context = {
+        'parents': parents,
+        'page_title': 'Manage Parents'
+    }
+    return render(request, "staff_template/staff_manage_parent.html", context)

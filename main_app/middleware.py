@@ -38,7 +38,7 @@ class LoginCheckMiddleWare(MiddlewareMixin):
             else: # None of the aforementioned ? Please take the user to login page
                 return redirect(reverse('login_page'))
         else:
-            if request.path == reverse('login_page') or modulename == 'django.contrib.auth.views': # If the path is login or has anything to do with authentication, pass
+            if request.path in auth_allowed_paths or request.path == reverse('doLogin') or modulename == 'django.contrib.auth.views':
                 pass
             else:
                 return redirect(reverse('login_page'))

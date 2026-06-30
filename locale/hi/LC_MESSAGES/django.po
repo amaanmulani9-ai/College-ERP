@@ -13,3 +13,18 @@ msgstr ""
 
 msgid "Home"
 msgstr "होम"
+
+msgid "Dashboard"
+msgstr "डैशबोर्ड"
+
+msgid "Profile"
+msgstr "प्रोफ़ाइल"
+
+msgid "Courses"
+msgstr "पाठ्यक्रम"
+
+msgid "Subjects"
+msgstr "विषय"
+
+msgid "Sessions"
+msgstr "सत्र"
