@@ -9,8 +9,7 @@ class LoginCheckMiddleWare(MiddlewareMixin):
         modulename = view_func.__module__
         auth_allowed_paths = {
             reverse('login_page'),
-            reverse('user_login'),
-            reverse('user_logout'),
+            reverse('logout_user'),
         }
 
         try:
@@ -39,7 +38,7 @@ class LoginCheckMiddleWare(MiddlewareMixin):
             else: # None of the aforementioned ? Please take the user to login page
                 return redirect(reverse('login_page'))
         else:
-            if request.path == reverse('login_page') or modulename == 'django.contrib.auth.views' or request.path == reverse('user_login'): # If the path is login or has anything to do with authentication, pass
+            if request.path == reverse('login_page') or modulename == 'django.contrib.auth.views': # If the path is login or has anything to do with authentication, pass
                 pass
             else:
                 return redirect(reverse('login_page'))
