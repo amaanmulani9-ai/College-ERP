@@ -24,6 +24,20 @@ Whether you're managing attendance, tracking academic results, or handling leave
 
 ---
 
+## 📸 Screenshots
+
+Here are some glimpses of the **College ERP** in action:
+
+| Login Portal | Admin Dashboard |
+|:---:|:---:|
+| ![Login Page](Showcase/Screenshot_01.png) | ![Admin Dashboard](Showcase/Screenshot_02.png) |
+
+| Staff Portal | Student Portal |
+|:---:|:---:|
+| ![Staff Dashboard](Showcase/Screenshot_03.png) | ![Student Dashboard](Showcase/Screenshot_04.png) |
+
+---
+
 ## 🔥 Key Features
 
 ### 👨‍💼 Administration Portal
