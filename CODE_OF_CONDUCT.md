@@ -46,7 +46,7 @@ or harmful.
 ## Reporting
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the project maintainer at **amaanmulani9-ai@users.noreply.github.com**. 
+reported to the project maintainer at **amaanmulani9@gmail.com**. 
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the
