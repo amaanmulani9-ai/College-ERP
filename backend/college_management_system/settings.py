@@ -44,7 +44,10 @@ if env_path.exists():
 SECRET_KEY = os.environ.get('SECRET_KEY', 'f2zx8*lb*em*-*b+!&1lpp&$_9q9kmkar+l3x90do@s(+sr&x7')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
+if os.environ.get('VERCEL') and 'DEBUG' not in os.environ:
+    DEBUG = False
+else:
+    DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*,.vercel.app').split(',')
 
