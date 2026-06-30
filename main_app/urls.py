@@ -17,18 +17,20 @@ from django.urls import path
 
 from main_app.EditResultView import EditResultView
 
-from . import hod_views, staff_views, student_views, views
+from . import hod_views, staff_views, student_views, parent_views, views
 
 urlpatterns = [
-    path('', views.login_page, name='login'),
+    path("", views.login_page, name='login_page'),
     path('offline/', views.offline, name='offline'),
     path("get_attendance", views.get_attendance, name='get_attendance'),
     path("firebase-messaging-sw.js", views.showFirebaseJS, name='showFirebaseJS'),
-    path("doLogin/", views.doLogin, name='user_login'),
-    path("logout_user/", views.logout_user, name='user_logout'),
+    path("doLogin/", views.doLogin, name='doLogin'),
+    path("logout_user/", views.logout_user, name='logout_user'),
     path("admin/home/", hod_views.admin_home, name='admin_home'),
+    path("parent/home/", parent_views.parent_home, name='parent_home'),
     path("admin/export_staff_analytics/", hod_views.export_staff_analytics, name='export_staff_analytics'),
     path("staff/add", hod_views.add_staff, name='add_staff'),
+    path("parent/add", hod_views.add_parent, name='add_parent'),
     path("course/add", hod_views.add_course, name='add_course'),
     path("send_student_notification/", hod_views.send_student_notification,
          name='send_student_notification'),

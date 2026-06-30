@@ -1,0 +1,121 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Small boxes (Stat box) -->
+        <div class="row">
+            <div class="col-lg-4 col-6">
+                <!-- small box -->
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>{{ total_attendance }}</h3>
+                        <p>Total Attendance Taken</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-stats-bars"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-4 col-6">
+                <!-- small box -->
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>{{ attendance_present }}</h3>
+                        <p>Classes Present</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-checkmark-circled"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-4 col-6">
+                <!-- small box -->
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>{{ attendance_absent }}</h3>
+                        <p>Classes Absent</p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-close-circled"></i>
+                    </div>
+                </div>
+            </div>
+            <!-- ./col -->
+        </div>
+        <!-- /.row -->
+
+        <div class="row">
+            <!-- Offline Results -->
+            <div class="col-md-6">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Subject Results (Offline)</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Test Marks</th>
+                                    <th>Exam Marks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td>{{ result.subject.name }}</td>
+                                    <td>{{ result.test_marks }}</td>
+                                    <td>{{ result.exam_marks }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No Offline Results Published</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Online Exam Results -->
+            <div class="col-md-6">
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title">Online Exam Results</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Exam Title</th>
+                                    <th>Score</th>
+                                    <th>Submitted On</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in online_results %}
+                                <tr>
+                                    <td>{{ result.exam.title }}</td>
+                                    <td><span class="badge badge-success">{{ result.score }} / {{ result.total_marks }}</span></td>
+                                    <td>{{ result.submitted_at|date:"M d, Y" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No Online Exams Taken</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

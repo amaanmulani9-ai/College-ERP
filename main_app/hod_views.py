@@ -1148,3 +1148,31 @@ def admin_delete_event(request, event_id):
     event.delete()
     messages.success(request, f"Event deleted.")
     return redirect(reverse('admin_events'))
+
+def add_parent(request):
+    students = Student.objects.all()
+    context = {
+        'page_title': 'Add Parent',
+        'students': students
+    }
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        mobile_number = request.POST.get('mobile_number')
+        student_id = request.POST.get('student')
+        
+        try:
+            student = Student.objects.get(id=student_id)
+            user = CustomUser.objects.create_user(
+                email=email, password=password, first_name=first_name, last_name=last_name, user_type='4', gender='M'
+            )
+            Parent.objects.create(admin=user, student=student, mobile_number=mobile_number)
+            messages.success(request, f"Parent account for {first_name} {last_name} created successfully!")
+            return redirect(reverse('add_parent'))
+        except Exception as e:
+            messages.error(request, f"Could not create parent account: {e}")
+            return redirect(reverse('add_parent'))
+            
+    return render(request, 'hod_template/add_parent.html', context)

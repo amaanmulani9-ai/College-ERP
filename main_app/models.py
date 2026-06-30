@@ -40,7 +40,7 @@ class Session(models.Model):
 
 
 class CustomUser(AbstractUser):
-    USER_TYPE = ((1, "HOD"), (2, "Staff"), (3, "Student"))
+    USER_TYPE = ((1, "HOD"), (2, "Staff"), (3, "Student"), (4, "Parent"))
     GENDER = [("M", "Male"), ("F", "Female")]
     
     
@@ -564,3 +564,13 @@ class OnlineExamResult(models.Model):
 
     def __str__(self):
         return f"{self.student.admin.get_full_name()} - {self.exam.title} : {self.score}/{self.total_marks}"
+
+class Parent(models.Model):
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='parents')
+    mobile_number = models.CharField(max_length=15, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.admin.get_full_name()} (Parent of {self.student.admin.get_full_name()})"
