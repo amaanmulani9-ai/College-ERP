@@ -43,21 +43,34 @@ Here are some glimpses of the **College ERP** in action:
 ### 👨‍💼 Administration Portal
 - **Global Dashboard:** View real-time analytics on student enrollment, staff counts, and course metrics.
 - **Academic Management:** Create and manage Courses, Subjects, and Academic Sessions.
-- **User Management:** Full CRUD capabilities for Staff and Student accounts.
+- **User Management:** Full CRUD capabilities for Staff, Student, and Parent accounts.
 - **Oversight:** Monitor attendance, review leave applications, and process user feedback.
-- **Financials & Placements:** Manage student fees and organize campus placement drives.
+- **Financials & Placements:** Manage student fees, generate receipts, and organize campus placement drives.
+- **Document Management:** Securely upload and distribute general college documents.
 
 ### 👨‍🏫 Staff Portal
 - **Attendance Tracking:** Quickly take, update, and manage student attendance.
 - **Academic Grading:** Publish and edit student results securely.
+- **Online Exams:** Create, schedule, and grade automated MCQ exams.
 - **Library Management:** Issue books to students and track library inventory.
 - **Communication:** Apply for staff leave and send direct feedback to the Administration.
 
 ### 🎓 Student Portal
-- **Academic Dashboard:** View personalized timetables, attendance records, and exam results.
+- **Academic Dashboard:** View personalized timetables, attendance records, offline results, and online exam scores.
+- **Online Examinations:** Take secure, timed MCQ online exams directly from the portal.
+- **AI Study Assistant:** Get instant help with studying and generate practice quizzes using an integrated AI bot.
 - **Library Access:** Browse the library catalog and track borrowed books.
 - **Requests:** Submit leave applications and request official certificates directly from the dashboard.
 - **Finances:** Track fee structures and log fee payments.
+
+### 👪 Parent Portal
+- **Child Progress:** Securely log in to monitor linked student's academic progress.
+- **Real-time Analytics:** View attendance metrics, offline test scores, and online exam submissions.
+
+### 🌐 Global Features
+- **PWA Ready:** Installable on desktop and mobile devices for offline access and native app-like experience.
+- **Multi-Language (i18n):** Dynamically switch the interface between English, Hindi, and Arabic.
+
 
 ---
 
