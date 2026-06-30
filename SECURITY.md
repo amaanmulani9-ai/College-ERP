@@ -33,7 +33,7 @@ We actively maintain and release security patches for the following versions:
 
 > **Recommendation:** Always run the latest release. Older versions may contain
 > unpatched vulnerabilities. Check the
-> [Releases page](https://github.com/Ansarimajid/College-ERP/releases) for
+> [Releases page](https://github.com/amaanmulani9-ai/College-ERP/releases) for
 > the most current version.
 
 ---
@@ -48,7 +48,7 @@ puts all users of this software at risk.
 
 Send a detailed email to:
 
-**📧 ansmajidali@gmail.com**
+**📧 amaanmulani9-ai@users.noreply.github.com**
 
 Use the subject line:
 ```
@@ -91,7 +91,7 @@ Please provide as much of the following as possible:
 ### Encryption (optional)
 
 If your report contains highly sensitive details, you may request our PGP
-public key before sending by emailing ansmajidali@gmail.com with the subject
+public key before sending by emailing amaanmulani9-ai@users.noreply.github.com with the subject
 `[PGP KEY REQUEST]`.
 
 ---
@@ -133,7 +133,7 @@ We follow **Coordinated Vulnerability Disclosure (CVD)**:
 - Avoid accessing, modifying, or deleting data that does not belong to you
   during testing.
 - Limit testing to environments you own or have explicit permission to test.
-  Do **not** test against the live demo at `syncx.pythonanywhere.com` in ways
+  Do **not** test against the live demo at `localhost:8000` in ways
   that could affect other users.
 
 **We commit to:**
@@ -461,10 +461,10 @@ listed here with your name/handle and the nature of the finding.
 
 | Purpose | Contact |
 |---------|---------|
-| Security vulnerabilities | ansmajidali@gmail.com (**private — use for security only**) |
-| General bugs | [GitHub Issues](https://github.com/Ansarimajid/College-ERP/issues) |
-| Questions & ideas | [GitHub Discussions](https://github.com/Ansarimajid/College-ERP/discussions) |
-| LinkedIn | [ansmajidali](https://www.linkedin.com/in/ansmajidali) |
+| Security vulnerabilities | amaanmulani9-ai@users.noreply.github.com (**private — use for security only**) |
+| General bugs | [GitHub Issues](https://github.com/amaanmulani9-ai/College-ERP/issues) |
+| Questions & ideas | [GitHub Discussions](https://github.com/amaanmulani9-ai/College-ERP/discussions) |
+| LinkedIn | [amaanmulani9-ai](https://www.linkedin.com/in/amaanmulani9-ai) |
 
 ---
 
@@ -473,6 +473,6 @@ listed here with your name/handle and the nature of the finding.
 *This security policy is reviewed and updated with each major release.*
 *Last updated: v2.0.0 — February 2026*
 
-**Majid Ali Ansari** · [GitHub](https://github.com/Ansarimajid) · [ansmajidali@gmail.com](mailto:ansmajidali@gmail.com)
+**Amaan** · [GitHub](https://github.com/amaanmulani9-ai) · [amaanmulani9-ai@users.noreply.github.com](mailto:amaanmulani9-ai@users.noreply.github.com)
 
 </div>

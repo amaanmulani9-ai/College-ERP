@@ -62,7 +62,7 @@ We are committed to making this a welcoming space for everyone regardless of
 experience level, background, or identity. Harassment, discrimination, or
 disrespectful behavior of any kind will not be tolerated.
 
-**To report a violation:** Email **ansmajidali@gmail.com** — all reports are
+**To report a violation:** Email **amaanmulani9-ai@users.noreply.github.com** — all reports are
 handled confidentially.
 
 ---
@@ -79,9 +79,9 @@ to contribute. Here's a rough guide by experience level:
 | **Advanced** | Implement Roadmap features, refactor views, improve performance, add APIs |
 
 If you're unsure where to start, look for issues tagged
-[`good first issue`](https://github.com/Ansarimajid/College-ERP/issues?q=label%3A%22good+first+issue%22)
+[`good first issue`](https://github.com/amaanmulani9-ai/College-ERP/issues?q=label%3A%22good+first+issue%22)
 or
-[`help wanted`](https://github.com/Ansarimajid/College-ERP/issues?q=label%3A%22help+wanted%22).
+[`help wanted`](https://github.com/amaanmulani9-ai/College-ERP/issues?q=label%3A%22help+wanted%22).
 
 ---
 
@@ -90,22 +90,22 @@ or
 Contributing goes well beyond writing code:
 
 ### 🐛 Report bugs
-Found something broken on the [live demo](https://syncx.pythonanywhere.com)
+Found something broken on the [live demo](https://localhost:8000)
 or while running locally? Open an issue with detailed steps to reproduce.
 
 ### 💡 Suggest features
 Have an idea not on the Roadmap? Start a
-[GitHub Discussion](https://github.com/Ansarimajid/College-ERP/discussions)
+[GitHub Discussion](https://github.com/amaanmulani9-ai/College-ERP/discussions)
 first so the community can weigh in before it becomes a formal issue.
 
 ### 🔧 Fix bugs
 Browse open issues labeled
-[`bug`](https://github.com/Ansarimajid/College-ERP/issues?q=label%3Abug)
+[`bug`](https://github.com/amaanmulani9-ai/College-ERP/issues?q=label%3Abug)
 and submit a fix via pull request.
 
 ### ✨ Build features
 Pick something from the [Roadmap](#-roadmap--priorities) or a
-[`feature request`](https://github.com/Ansarimajid/College-ERP/issues?q=label%3Aenhancement)
+[`feature request`](https://github.com/amaanmulani9-ai/College-ERP/issues?q=label%3Aenhancement)
 issue. Comment on the issue first to avoid duplicate work.
 
 ### 📖 Improve documentation
@@ -126,7 +126,7 @@ Django i18n translations.
 
 ### 💬 Help other contributors
 Answer questions in
-[GitHub Discussions](https://github.com/Ansarimajid/College-ERP/discussions),
+[GitHub Discussions](https://github.com/amaanmulani9-ai/College-ERP/discussions),
 review open pull requests, or mentor new contributors.
 
 ---
@@ -159,7 +159,7 @@ pip --version
 **Step 1 — Fork the repository**
 
 Click the **Fork** button at the top-right of the
-[College-ERP repo](https://github.com/Ansarimajid/College-ERP).
+[College-ERP repo](https://github.com/amaanmulani9-ai/College-ERP).
 This creates your own copy under your GitHub account.
 
 **Step 2 — Clone your fork**
@@ -174,12 +174,12 @@ cd College-ERP
 This lets you pull future changes from the original repo:
 
 ```bash
-git remote add upstream https://github.com/Ansarimajid/College-ERP.git
+git remote add upstream https://github.com/amaanmulani9-ai/College-ERP.git
 
 # Verify remotes
 git remote -v
 # origin    https://github.com/YOUR_USERNAME/College-ERP.git (fetch)
-# upstream  https://github.com/Ansarimajid/College-ERP.git  (fetch)
+# upstream  https://github.com/amaanmulani9-ai/College-ERP.git  (fetch)
 ```
 
 ---
@@ -552,7 +552,7 @@ Closes #issue_number
 ## 🐛 Issue Reporting
 
 Before opening a new issue, please
-[search existing issues](https://github.com/Ansarimajid/College-ERP/issues)
+[search existing issues](https://github.com/amaanmulani9-ai/College-ERP/issues)
 to avoid duplicates.
 
 ### Bug Reports
@@ -591,7 +591,7 @@ Anything else that might be relevant.
 ### Feature Requests
 
 For new features, **please start a
-[GitHub Discussion](https://github.com/Ansarimajid/College-ERP/discussions)
+[GitHub Discussion](https://github.com/amaanmulani9-ai/College-ERP/discussions)
 first** rather than opening an issue directly. This lets the community
 validate the idea before development begins. Check the
 [Roadmap](#-roadmap--priorities) — it may already be planned.
@@ -604,7 +604,7 @@ created and labeled `enhancement`.
 **Do NOT report security vulnerabilities in public issues.**
 
 If you discover a security vulnerability, please email
-**ansmajidali@gmail.com** directly with:
+**amaanmulani9-ai@users.noreply.github.com** directly with:
 
 - A description of the vulnerability
 - Steps to reproduce it
@@ -904,7 +904,7 @@ on the related issue before starting, to avoid duplicate work.
 | 🟢 Low | i18n / Hindi & Urdu language support | Medium | Django i18n, translation files |
 
 If you want to propose something not on this list, start a
-[Discussion](https://github.com/Ansarimajid/College-ERP/discussions) first.
+[Discussion](https://github.com/amaanmulani9-ai/College-ERP/discussions) first.
 
 ---
 
@@ -912,9 +912,9 @@ If you want to propose something not on this list, start a
 
 | Channel | Use for |
 |---------|---------|
-| [GitHub Discussions](https://github.com/Ansarimajid/College-ERP/discussions) | Feature ideas, setup questions, general conversation |
-| [GitHub Issues](https://github.com/Ansarimajid/College-ERP/issues) | Confirmed bugs and approved feature requests only |
-| [Email](mailto:ansmajidali@gmail.com) | Security vulnerabilities, Code of Conduct reports |
+| [GitHub Discussions](https://github.com/amaanmulani9-ai/College-ERP/discussions) | Feature ideas, setup questions, general conversation |
+| [GitHub Issues](https://github.com/amaanmulani9-ai/College-ERP/issues) | Confirmed bugs and approved feature requests only |
+| [Email](mailto:amaanmulani9-ai@users.noreply.github.com) | Security vulnerabilities, Code of Conduct reports |
 
 **Response times:**
 - GitHub Discussions: within 24–48 hours
@@ -928,7 +928,7 @@ If you want to propose something not on this list, start a
 All contributors are recognized in the following ways:
 
 - Listed as a contributor in GitHub's
-  [Contributors graph](https://github.com/Ansarimajid/College-ERP/graphs/contributors)
+  [Contributors graph](https://github.com/amaanmulani9-ai/College-ERP/graphs/contributors)
 - Significant contributions are acknowledged in release notes
 - First-time contributors receive a personal thank-you comment on their
   merged PR
@@ -946,6 +946,6 @@ code · documentation · tests · bug reports · feature ideas · community supp
 around the world.*
 
 ⭐ If this project has been useful to you, consider
-[starring the repository](https://github.com/Ansarimajid/College-ERP)!
+[starring the repository](https://github.com/amaanmulani9-ai/College-ERP)!
 
 </div>
