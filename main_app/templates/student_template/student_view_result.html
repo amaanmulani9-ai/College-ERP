@@ -12,7 +12,11 @@
        
                 <!-- /.card -->
 <div class="card card-dark">
-    <div class="card-header"><h3 class="card-title">{{page_title}}</h3>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title">{{page_title}}</h3>
+        <a href="{% url 'student_report_card' %}" target="_blank" class="btn btn-sm btn-info ml-auto float-right">
+            <i class="fas fa-file-pdf"></i> Download Report Card
+        </a>
     </div>
    <div class="table p-2" style="overflow-x: auto; overflow-y: auto; max-height: 600px;">
 

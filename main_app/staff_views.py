@@ -89,6 +89,34 @@ def save_attendance(request):
             student = get_object_or_404(Student, id=student_dict.get('id'))
             attendance_report = AttendanceReport(student=student, attendance=attendance, status=student_dict.get('status'))
             attendance_report.save()
+            
+            # Check for low attendance (< 75%)
+            total_classes = Attendance.objects.filter(subject=subject, session=session).count()
+            if total_classes > 0:
+                present_classes = AttendanceReport.objects.filter(
+                    student=student, 
+                    attendance__subject=subject, 
+                    attendance__session=session, 
+                    status=True
+                ).count()
+                
+                percentage = (present_classes / total_classes) * 100
+                
+                if percentage < 75.0:
+                    try:
+                        from django.core.mail import send_mail
+                        from django.conf import settings
+                        subject_email = f"URGENT: Low Attendance Warning - {subject.name}"
+                        message = f"Dear {student.admin.first_name},\n\nYour attendance in {subject.name} has fallen to {percentage:.1f}%, which is below the required 75% threshold.\n\nPlease ensure you attend upcoming classes to avoid academic penalties.\n\nRegards,\nAdmin Office"
+                        send_mail(
+                            subject_email,
+                            message,
+                            settings.EMAIL_HOST_USER,
+                            [student.admin.email],
+                            fail_silently=True,
+                        )
+                    except Exception:
+                        pass
     except Exception as e:
         return HttpResponse("False")
 

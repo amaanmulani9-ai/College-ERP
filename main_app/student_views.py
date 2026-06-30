@@ -258,6 +258,45 @@ def student_view_result(request):
     }
     return render(request, "student_template/student_view_result.html", context)
 
+def student_report_card(request):
+    import io
+    from xhtml2pdf import pisa
+    from django.template.loader import get_template
+    from django.http import HttpResponse
+
+    student = get_object_or_404(Student, admin=request.user)
+    results = StudentResult.objects.filter(student=student)
+    
+    # Calculate overall stats
+    total_marks = 0
+    max_marks = 0
+    for r in results:
+        total_marks += (r.test + r.exam)
+        max_marks += 100
+        
+    percentage = (total_marks / max_marks * 100) if max_marks > 0 else 0
+    
+    context = {
+        'student': student,
+        'results': results,
+        'total_marks': total_marks,
+        'max_marks': max_marks,
+        'percentage': percentage,
+        'page_title': "Report Card"
+    }
+    
+    template_path = 'student_template/student_report_card_pdf.html'
+    template = get_template(template_path)
+    html = template.render(context)
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="report_card_{student.admin.first_name}.pdf"'
+    
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response
+
 
 #library
 from datetime import date, timedelta

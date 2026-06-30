@@ -513,3 +513,20 @@ class StudentRegistration(models.Model):
                     user._syncing_registration = False
         except Exception:
             pass
+
+class Event(models.Model):
+    EVENT_TYPES = (
+        ('Exam', 'Exam'),
+        ('Holiday', 'Holiday'),
+        ('General', 'General Event'),
+    )
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPES, default='General')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
