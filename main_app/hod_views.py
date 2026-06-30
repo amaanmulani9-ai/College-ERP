@@ -95,6 +95,25 @@ def admin_home(request):
         if e['month']:
             months.append(e['month'].strftime('%b %Y'))
             monthly_enrollments.append(e['count'])
+            
+    # 4. Staff Performance Analytics
+    staff_analytics = []
+    all_staff = Staff.objects.all()
+    for staff in all_staff:
+        # Number of subjects taught
+        subjects_taught = Subject.objects.filter(staff=staff).count()
+        # Number of attendance sessions taken
+        attendance_taken = Attendance.objects.filter(subject__staff=staff).count()
+        # Number of results published (approx by subject)
+        results_published = StudentResult.objects.filter(subject__staff=staff).count()
+        
+        staff_analytics.append({
+            'name': staff.admin.get_full_name(),
+            'department': staff.course.name if staff.course else "N/A",
+            'subjects': subjects_taught,
+            'attendance_taken': attendance_taken,
+            'results_published': results_published,
+        })
 
     context = {
         'page_title': "Administrative Dashboard",
@@ -116,9 +135,35 @@ def admin_home(request):
         "pass_count": pass_count,
         "fail_count": fail_count,
         "enrollment_months": json.dumps(months),
-        "enrollment_counts": json.dumps(monthly_enrollments)
+        "enrollment_counts": json.dumps(monthly_enrollments),
+        "staff_analytics": staff_analytics
     }
     return render(request, 'hod_template/home_content.html', context)
+
+def export_staff_analytics(request):
+    import csv
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="staff_performance_analytics.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Staff Name', 'Department', 'Subjects Taught', 'Attendance Sessions Taken', 'Results Published'])
+
+    all_staff = Staff.objects.all()
+    for staff in all_staff:
+        subjects_taught = Subject.objects.filter(staff=staff).count()
+        attendance_taken = Attendance.objects.filter(subject__staff=staff).count()
+        results_published = StudentResult.objects.filter(subject__staff=staff).count()
+        department = staff.course.name if staff.course else "N/A"
+        
+        writer.writerow([
+            staff.admin.get_full_name(),
+            department,
+            subjects_taught,
+            attendance_taken,
+            results_published
+        ])
+
+    return response
 
 
 def add_staff(request):

@@ -188,6 +188,53 @@
         </div>
     </div>
 
+    <!-- Staff Analytics -->
+    <div class="row">
+        <div class="col-12">
+            <div class="erpnext-card border-secondary">
+                <div class="card-header border-secondary d-flex justify-content-between align-items-center">
+                    <h3 class="card-title text-secondary m-0">
+                        <i class="fas fa-users-cog me-2"></i>
+                        Staff Performance Analytics
+                    </h3>
+                    <a href="{% url 'export_staff_analytics' %}" class="btn btn-sm btn-secondary float-right ml-auto">
+                        <i class="fas fa-download me-1"></i> Export to CSV
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Staff Name</th>
+                                    <th>Department</th>
+                                    <th>Subjects Taught</th>
+                                    <th>Attendance Sessions Taken</th>
+                                    <th>Results Published</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in staff_analytics %}
+                                <tr>
+                                    <td><strong>{{ stat.name }}</strong></td>
+                                    <td>{{ stat.department }}</td>
+                                    <td><span class="badge bg-primary">{{ stat.subjects }}</span></td>
+                                    <td><span class="badge bg-info">{{ stat.attendance_taken }}</span></td>
+                                    <td><span class="badge bg-success">{{ stat.results_published }}</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">No staff records found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Actions -->
     <div class="row">
         <div class="col-12">
