@@ -149,7 +149,7 @@ SHARED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'main_app.apps.MainAppConfig',
+    'main_app',
 )
 
 TENANT_APPS = (
@@ -160,7 +160,7 @@ TENANT_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'main_app.apps.MainAppConfig',
+    'main_app',
 )
 
 INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
