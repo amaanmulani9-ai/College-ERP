@@ -24,8 +24,7 @@ services:
         value: "False"
       - key: SECRET_KEY
         generateValue: true
-      - key: RENDER_EXTERNAL_HOSTNAME
-        sync: false
+
 
   - type: worker
     name: college-erp-celery
