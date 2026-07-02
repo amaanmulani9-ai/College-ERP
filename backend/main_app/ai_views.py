@@ -147,3 +147,32 @@ def staff_ai_grade_assignment(request):
             return JsonResponse({'status': 'error', 'message': str(e)})
             
     return JsonResponse({'status': 'error', 'message': 'Invalid action'})
+
+import jwt
+from datetime import datetime, timedelta
+from django.conf import settings
+
+@csrf_exempt
+def tinymce_jwt_provider(request):
+    """
+    Generates a JWT token for TinyMCE AI authentication.
+    """
+    # Use the provided key (or load from settings in production)
+    PRIVATE_KEY = getattr(settings, 'TINYMCE_PRIVATE_KEY', 'a0b7db0fd0bd5fe92a2335af8aff5e286fd673b0ebb1aa3242de02cc0cb32b89')
+    
+    # TinyMCE AI expects the subject (sub) to be a unique identifier for the user
+    user_id = str(request.user.id) if request.user.is_authenticated else 'anonymous_user'
+    
+    payload = {
+        "sub": user_id,
+        "iat": datetime.utcnow(),
+        "exp": datetime.utcnow() + timedelta(minutes=10)
+    }
+
+    try:
+        # Using HS256 with the symmetric key provided. 
+        # (Note: Tiny Cloud may require RS256 with an RSA key depending on their strictness).
+        encoded_jwt = jwt.encode(payload, PRIVATE_KEY, algorithm='HS256')
+        return JsonResponse({'token': encoded_jwt})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
