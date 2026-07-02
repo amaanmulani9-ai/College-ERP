@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+from .decorators import admin_required, staff_required, student_required
 import json
 import requests
 from django.contrib import messages
@@ -14,6 +16,8 @@ from .forms import *
 from .models import *
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_home(request):
     total_staff = Staff.objects.all().count()
     total_students = Student.objects.all().count()
@@ -140,6 +144,8 @@ def admin_home(request):
     }
     return render(request, 'hod_template/home_content.html', context)
 
+@login_required(login_url='/')
+@admin_required
 def export_staff_analytics(request):
     import csv
     response = HttpResponse(content_type='text/csv')
@@ -166,6 +172,8 @@ def export_staff_analytics(request):
     return response
 
 
+@login_required(login_url='/')
+@admin_required
 def add_staff(request):
     form = StaffForm(request.POST or None, request.FILES or None)
     context = {'form': form, 'page_title': 'Add Staff'}
@@ -204,6 +212,8 @@ def add_staff(request):
     return render(request, 'hod_template/add_staff_template.html', context)
 
 
+@login_required(login_url='/')
+@admin_required
 def add_student(request):
     student_form = StudentForm(request.POST or None, request.FILES or None)
     context = {'form': student_form, 'page_title': 'Add Student'}
@@ -242,6 +252,8 @@ def add_student(request):
     return render(request, 'hod_template/add_student_template.html', context)
 
 
+@login_required(login_url='/')
+@admin_required
 def add_course(request):
     form = CourseForm(request.POST or None)
     context = {
@@ -264,6 +276,8 @@ def add_course(request):
     return render(request, 'hod_template/add_course_template.html', context)
 
 
+@login_required(login_url='/')
+@admin_required
 def add_subject(request):
     form = SubjectForm(request.POST or None)
     context = {
@@ -292,6 +306,8 @@ def add_subject(request):
     return render(request, 'hod_template/add_subject_template.html', context)
 
 
+@login_required(login_url='/')
+@admin_required
 def manage_staff(request):
     allStaff = CustomUser.objects.filter(user_type=2)
     context = {
@@ -301,6 +317,8 @@ def manage_staff(request):
     return render(request, "hod_template/manage_staff.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def manage_student(request):
     students = CustomUser.objects.filter(user_type=3)
     context = {
@@ -310,6 +328,8 @@ def manage_student(request):
     return render(request, "hod_template/manage_student.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def manage_course(request):
     courses = Course.objects.all()
     context = {
@@ -319,6 +339,8 @@ def manage_course(request):
     return render(request, "hod_template/manage_course.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def manage_subject(request):
     subjects = Subject.objects.all()
     context = {
@@ -328,6 +350,8 @@ def manage_subject(request):
     return render(request, "hod_template/manage_subject.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def edit_staff(request, staff_id):
     staff = get_object_or_404(Staff, id=staff_id)
     form = StaffForm(request.POST or None, instance=staff)
@@ -377,6 +401,8 @@ def edit_staff(request, staff_id):
         return render(request, "hod_template/edit_staff_template.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def edit_student(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     form = StudentForm(request.POST or None, instance=student)
@@ -426,6 +452,8 @@ def edit_student(request, student_id):
         return render(request, "hod_template/edit_student_template.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def edit_course(request, course_id):
     instance = get_object_or_404(Course, id=course_id)
     form = CourseForm(request.POST or None, instance=instance)
@@ -450,6 +478,8 @@ def edit_course(request, course_id):
     return render(request, 'hod_template/edit_course_template.html', context)
 
 
+@login_required(login_url='/')
+@admin_required
 def edit_subject(request, subject_id):
     instance = get_object_or_404(Subject, id=subject_id)
     form = SubjectForm(request.POST or None, instance=instance)
@@ -478,6 +508,8 @@ def edit_subject(request, subject_id):
     return render(request, 'hod_template/edit_subject_template.html', context)
 
 
+@login_required(login_url='/')
+@admin_required
 def add_session(request):
     form = SessionForm(request.POST or None)
     context = {'form': form, 'page_title': 'Add Session'}
@@ -494,12 +526,16 @@ def add_session(request):
     return render(request, "hod_template/add_session_template.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def manage_session(request):
     sessions = Session.objects.all()
     context = {'sessions': sessions, 'page_title': 'Manage Sessions'}
     return render(request, "hod_template/manage_session.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def edit_session(request, session_id):
     instance = get_object_or_404(Session, id=session_id)
     form = SessionForm(request.POST or None, instance=instance)
@@ -524,6 +560,8 @@ def edit_session(request, session_id):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@admin_required
 def check_email_availability(request):
     email = request.POST.get("email")
     try:
@@ -536,6 +574,8 @@ def check_email_availability(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@admin_required
 def student_feedback_message(request):
     if request.method != 'POST':
         feedbacks = FeedbackStudent.objects.all()
@@ -557,6 +597,8 @@ def student_feedback_message(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@admin_required
 def staff_feedback_message(request):
     if request.method != 'POST':
         feedbacks = FeedbackStaff.objects.all()
@@ -578,6 +620,8 @@ def staff_feedback_message(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@admin_required
 def view_staff_leave(request):
     if request.method != 'POST':
         allLeave = LeaveReportStaff.objects.all()
@@ -615,6 +659,8 @@ def view_staff_leave(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@admin_required
 def view_student_leave(request):
     if request.method != 'POST':
         allLeave = LeaveReportStudent.objects.all()
@@ -651,6 +697,8 @@ def view_student_leave(request):
             return HttpResponse("False")
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_view_attendance(request):
     subjects = Subject.objects.all()
     sessions = Session.objects.all()
@@ -664,6 +712,8 @@ def admin_view_attendance(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@admin_required
 def get_admin_attendance(request):
     subject_id = request.POST.get('subject')
     session_id = request.POST.get('session')
@@ -687,6 +737,8 @@ def get_admin_attendance(request):
         return JsonResponse(json.dumps([]), safe=False)
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_view_profile(request):
     admin = get_object_or_404(Admin, admin=request.user)
     form = AdminForm(request.POST or None, request.FILES or None,
@@ -722,6 +774,8 @@ def admin_view_profile(request):
     return render(request, "hod_template/admin_view_profile.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_notify_staff(request):
     staff = CustomUser.objects.filter(user_type=2)
     context = {
@@ -731,6 +785,8 @@ def admin_notify_staff(request):
     return render(request, "hod_template/staff_notification.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_notify_student(request):
     student = CustomUser.objects.filter(user_type=3)
     context = {
@@ -741,6 +797,8 @@ def admin_notify_student(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@admin_required
 def send_student_notification(request):
     id = request.POST.get('id')
     message = request.POST.get('message')
@@ -768,6 +826,8 @@ def send_student_notification(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@admin_required
 def send_staff_notification(request):
     id = request.POST.get('id')
     message = request.POST.get('message')
@@ -794,6 +854,8 @@ def send_staff_notification(request):
         return HttpResponse("False")
 
 
+@login_required(login_url='/')
+@admin_required
 def delete_staff(request, staff_id):
     staff = get_object_or_404(CustomUser, staff__id=staff_id)
     staff.delete()
@@ -801,6 +863,8 @@ def delete_staff(request, staff_id):
     return redirect(reverse('manage_staff'))
 
 
+@login_required(login_url='/')
+@admin_required
 def delete_student(request, student_id):
     student = get_object_or_404(CustomUser, student__id=student_id)
     student.delete()
@@ -808,6 +872,8 @@ def delete_student(request, student_id):
     return redirect(reverse('manage_student'))
 
 
+@login_required(login_url='/')
+@admin_required
 def delete_course(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     try:
@@ -819,6 +885,8 @@ def delete_course(request, course_id):
     return redirect(reverse('manage_course'))
 
 
+@login_required(login_url='/')
+@admin_required
 def delete_subject(request, subject_id):
     subject = get_object_or_404(Subject, id=subject_id)
     subject.delete()
@@ -826,6 +894,8 @@ def delete_subject(request, subject_id):
     return redirect(reverse('manage_subject'))
 
 
+@login_required(login_url='/')
+@admin_required
 def delete_session(request, session_id):
     session = get_object_or_404(Session, id=session_id)
     try:
@@ -839,6 +909,8 @@ def delete_session(request, session_id):
 
 # --- HOD / Admin ERP Management Views ---
 
+@login_required(login_url='/')
+@admin_required
 def admin_manage_placements(request):
     drives = PlacementDrive.objects.all().order_by('-drive_date')
     registrations = PlacementRegistration.objects.all().select_related('student__admin', 'drive')
@@ -875,6 +947,8 @@ def admin_manage_placements(request):
     return render(request, "hod_template/manage_placements.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_manage_certificates(request):
     cert_requests = CertificateRequest.objects.all().select_related('student__admin').order_by('-id')
     context = {
@@ -884,6 +958,8 @@ def admin_manage_certificates(request):
     return render(request, "hod_template/manage_certificates.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_approve_certificate(request, req_id):
     cert_req = get_object_or_404(CertificateRequest, id=req_id)
     cert_req.status = "Approved"
@@ -893,6 +969,8 @@ def admin_approve_certificate(request, req_id):
     return redirect(reverse('admin_manage_certificates'))
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_reject_certificate(request, req_id):
     cert_req = get_object_or_404(CertificateRequest, id=req_id)
     cert_req.status = "Rejected"
@@ -901,6 +979,8 @@ def admin_reject_certificate(request, req_id):
     return redirect(reverse('admin_manage_certificates'))
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_manage_fees(request):
     students = Student.objects.all().select_related('admin', 'course')
     payments = FeePayment.objects.all().select_related('fee_record__student__admin').order_by('-payment_date')
@@ -915,6 +995,8 @@ def admin_manage_fees(request):
     return render(request, "hod_template/manage_fees.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_add_fee(request):
     if request.method == "POST":
         student_id = request.POST.get("student")
@@ -956,6 +1038,8 @@ def admin_add_fee(request):
     return redirect(reverse('admin_manage_fees'))
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_edit_fee(request, fee_id):
     fee_record = get_object_or_404(FeeRecord, id=fee_id)
     if request.method == "POST":
@@ -977,6 +1061,8 @@ def admin_edit_fee(request, fee_id):
     return render(request, "hod_template/edit_fee.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_print_fee(request, fee_id):
     fee_record = get_object_or_404(FeeRecord, id=fee_id)
     payments = FeePayment.objects.filter(fee_record=fee_record).order_by('-payment_date')
@@ -988,6 +1074,8 @@ def admin_print_fee(request, fee_id):
     return render(request, "hod_template/fee_invoice.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_manage_timetable(request):
     courses = Course.objects.all()
     subjects = Subject.objects.all()
@@ -1002,6 +1090,8 @@ def admin_manage_timetable(request):
     return render(request, "hod_template/manage_timetable.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_add_timetable_slot(request):
     if request.method == "POST":
         course_id = request.POST.get("course")
@@ -1029,6 +1119,8 @@ def admin_add_timetable_slot(request):
     return redirect(reverse('admin_manage_timetable'))
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_manage_registrations(request):
     registrations = StudentRegistration.objects.all().select_related('student__admin').order_by('-created_at')
     context = {
@@ -1038,6 +1130,8 @@ def admin_manage_registrations(request):
     return render(request, "hod_template/manage_registrations.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_view_registration(request, reg_id):
     registration = get_object_or_404(StudentRegistration, id=reg_id)
     context = {
@@ -1048,6 +1142,8 @@ def admin_view_registration(request, reg_id):
     return render(request, "hod_template/view_registration.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_edit_registration(request, reg_id):
     reg = get_object_or_404(StudentRegistration, id=reg_id)
     
@@ -1134,6 +1230,8 @@ def admin_edit_registration(request, reg_id):
     return render(request, "hod_template/edit_registration.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_delete_registration(request, reg_id):
     reg = get_object_or_404(StudentRegistration, id=reg_id)
     try:
@@ -1144,6 +1242,8 @@ def admin_delete_registration(request, reg_id):
     return redirect(reverse('admin_manage_registrations'))
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_events(request):
     """Admin Event Calendar — create, view, and delete college events."""
     if request.method == 'POST':
@@ -1192,12 +1292,16 @@ def admin_events(request):
     return render(request, 'hod_template/admin_events.html', context)
 
 
+@login_required(login_url='/')
+@admin_required
 def admin_delete_event(request, event_id):
     event = get_object_or_404(CollegeEvent, id=event_id)
     event.delete()
     messages.success(request, f"Event deleted.")
     return redirect(reverse('admin_events'))
 
+@login_required(login_url='/')
+@admin_required
 def add_parent(request):
     students = Student.objects.all()
     context = {
@@ -1228,6 +1332,8 @@ def add_parent(request):
     return render(request, 'hod_template/add_parent.html', context)
 
 
+@login_required(login_url='/')
+@admin_required
 def manage_parent(request):
     parents = Parent.objects.all().select_related('admin', 'student__admin')
     context = {
@@ -1237,6 +1343,8 @@ def manage_parent(request):
     return render(request, "hod_template/manage_parent.html", context)
 
 
+@login_required(login_url='/')
+@admin_required
 def edit_parent(request, parent_id):
     parent = get_object_or_404(Parent, id=parent_id)
     students = Student.objects.all()
@@ -1276,6 +1384,8 @@ def edit_parent(request, parent_id):
     return render(request, 'hod_template/edit_parent.html', context)
 
 
+@login_required(login_url='/')
+@admin_required
 def delete_parent(request, parent_id):
     parent = get_object_or_404(Parent, id=parent_id)
     try:

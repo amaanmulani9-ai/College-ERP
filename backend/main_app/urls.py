@@ -17,7 +17,7 @@ from django.urls import path
 
 from main_app.EditResultView import EditResultView
 
-from . import hod_views, staff_views, student_views, parent_views, views
+from . import hod_views, staff_views, student_views, parent_views, views, chat_views, smart_views, ai_views, analytics_views, mobile_api_views, finance_views, placement_views
 
 urlpatterns = [
     path("", views.login_page, name='login_page'),
@@ -27,6 +27,24 @@ urlpatterns = [
     path("doLogin/", views.doLogin, name='doLogin'),
     path("logout_user/", views.logout_user, name='logout_user'),
     path("admin/home/", hod_views.admin_home, name='admin_home'),
+    path("admin/analytics/", analytics_views.admin_analytics, name='admin_analytics'),
+    path("admin/analytics/export/<str:report_type>/", analytics_views.export_analytics_report, name='export_analytics_report'),
+    path("metrics", analytics_views.prometheus_metrics, name='prometheus_metrics'),
+    path("api/mobile/login/", mobile_api_views.mobile_login, name='mobile_login'),
+    path("api/mobile/timetable/", mobile_api_views.get_user_timetable, name='mobile_timetable'),
+    path("api/mobile/attendance/", mobile_api_views.get_user_attendance, name='mobile_attendance'),
+    path("api/mobile/qr_scan/", mobile_api_views.process_qr_scan, name='mobile_qr_scan'),
+    path("student/finances/", finance_views.student_finances, name='student_finances'),
+    path("api/finance/razorpay/checkout/", finance_views.razorpay_checkout, name='razorpay_checkout'),
+    path("api/finance/razorpay/webhook/", finance_views.razorpay_webhook, name='razorpay_webhook'),
+    path("admin/finance/", finance_views.admin_finance_dashboard, name='admin_finance_dashboard'),
+    path("admin/finance/gst_report/", finance_views.generate_gst_report, name='generate_gst_report'),
+    path("student/placement/", placement_views.student_placement_dashboard, name='student_placement_dashboard'),
+    path("api/placement/resume/save/", placement_views.save_json_resume, name='save_json_resume'),
+    path("api/placement/interviews/calendar/", placement_views.get_interviews_calendar_events, name='interviews_calendar'),
+    path("admin/placement/", placement_views.admin_placement_dashboard, name='admin_placement_dashboard'),
+    path("alumni/portal/", placement_views.alumni_portal, name='alumni_portal'),
+    path("company/dashboard/", placement_views.company_hr_dashboard, name='company_hr_dashboard'),
     path("parent/home/", parent_views.parent_home, name='parent_home'),
     path("admin/export_staff_analytics/", hod_views.export_staff_analytics, name='export_staff_analytics'),
     path("staff/add", hod_views.add_staff, name='add_staff'),
@@ -210,4 +228,59 @@ urlpatterns = [
     path("staff/exams/", staff_views.staff_manage_exams, name='staff_manage_exams'),
     path("staff/exams/create/", staff_views.staff_create_exam, name='staff_create_exam'),
     path("staff/exams/<int:exam_id>/add_question/", staff_views.staff_add_question, name='staff_add_question'),
+
+    # --- Staff LMS Routes ---
+    path("staff/lms/", staff_views.staff_lms_home, name='staff_lms_home'),
+    path("staff/lms/courses/add/", staff_views.staff_add_course, name='staff_add_course'),
+    path("staff/lms/courses/<int:course_id>/lessons/", staff_views.staff_manage_lessons, name='staff_manage_lessons'),
+    path("staff/lms/assignments/add/", staff_views.staff_add_assignment, name='staff_add_assignment'),
+    path("staff/lms/assignments/<int:assignment_id>/submissions/", staff_views.staff_view_submissions, name='staff_view_submissions'),
+    path("staff/lms/materials/add/", staff_views.staff_add_material, name='staff_add_material'),
+
+    # --- Student LMS Routes ---
+    path("student/lms/", student_views.student_lms_home, name='student_lms_home'),
+    path("student/lms/course/<int:course_id>/", student_views.student_view_course, name='student_view_course'),
+    path("student/lms/lesson/<int:lesson_id>/", student_views.student_watch_lesson, name='student_watch_lesson'),
+    path("student/lms/assignments/", student_views.student_assignments, name='student_assignments'),
+    path("student/lms/assignments/<int:assignment_id>/submit/", student_views.student_submit_assignment, name='student_submit_assignment'),
+    path("student/lms/materials/", student_views.student_materials, name='student_materials'),
+
+    # --- Live Virtual Classrooms (Version 2.5) ---
+    # Staff routes
+    path("staff/live_classes/", staff_views.staff_live_classes, name='staff_live_classes'),
+    path("staff/live_classes/schedule/", staff_views.staff_schedule_live_class, name='staff_schedule_live_class'),
+    path("staff/live_classes/host/<int:class_id>/", staff_views.staff_host_live_class, name='staff_host_live_class'),
+    path("staff/live_classes/end/<int:class_id>/", staff_views.staff_end_live_class, name='staff_end_live_class'),
+    # Student routes
+    path("student/live_classes/", student_views.student_live_classes, name='student_live_classes'),
+    path("student/live_classes/join/<int:class_id>/", student_views.student_join_live_class, name='student_join_live_class'),
+    path("student/live_classes/leave/<int:class_id>/", student_views.student_leave_live_class, name='student_leave_live_class'),
+
+    # --- Communication (Version 3.0) ---
+    path("chat/", chat_views.chat_home, name='chat_home'),
+    path("chat/send/", chat_views.send_chat_message, name='send_chat_message'),
+    path("chat/fetch/", chat_views.get_chat_messages, name='get_chat_messages'),
+    path("announcements/", chat_views.announcements_board, name='announcements_board'),
+    path("announcements/post/", chat_views.post_announcement, name='post_announcement'),
+
+    # --- Smart Campus (Version 3.5) ---
+    path("student/id-card/", smart_views.student_id_card, name='student_id_card'),
+    path("student/id-card/qr/<int:student_id>/", smart_views.generate_student_qr, name='generate_student_qr'),
+    
+    path("staff/scanner/", smart_views.staff_scanner_desk, name='staff_scanner_desk'),
+    path("staff/scanner/attendance/", smart_views.scan_attendance_qr, name='scan_attendance_qr'),
+    path("staff/scanner/library/", smart_views.scan_library_qr, name='scan_library_qr'),
+    
+    path("visitor/request/", smart_views.visitor_pass_request, name='visitor_pass_request'),
+    path("admin/visitors/", smart_views.admin_visitor_passes, name='admin_visitor_passes'),
+    path("staff/scanner/visitor/", smart_views.verify_visitor_pass, name='verify_visitor_pass'),
+
+    # --- AI Suite (Version 4.0) ---
+    path("student/resume-builder/", ai_views.student_resume_builder, name='student_resume_builder'),
+    path("student/ai-quiz/", ai_views.student_ai_quiz, name='student_ai_quiz'),
+    
+    path("staff/ai-paper/", ai_views.staff_generate_paper, name='staff_generate_paper'),
+    path("staff/ai-timetable/", ai_views.staff_generate_timetable, name='staff_generate_timetable'),
+    path("staff/ai-grade/", ai_views.staff_ai_grade_assignment, name='staff_ai_grade_assignment'),
 ]
+

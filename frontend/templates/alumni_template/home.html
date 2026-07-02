@@ -1,0 +1,27 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block page_title %}
+Alumni Portal
+{% endblock page_title %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Welcome Back, Alumni!</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Welcome to the College Alumni Portal. Stay connected with your peers, mentor current students, and share job opportunities.</p>
+                        <a href="#" class="btn btn-primary">Mentorship Program</a>
+                        <a href="#" class="btn btn-success">Refer a Student</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

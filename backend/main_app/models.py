@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from datetime import datetime,timedelta
+import uuid
 
 
 
@@ -40,7 +41,7 @@ class Session(models.Model):
 
 
 class CustomUser(AbstractUser):
-    USER_TYPE = ((1, "HOD"), (2, "Staff"), (3, "Student"), (4, "Parent"))
+    USER_TYPE = ((1, "HOD"), (2, "Staff"), (3, "Student"), (4, "Parent"), (5, "Alumni"), (6, "CompanyHR"))
     GENDER = [("M", "Male"), ("F", "Female")]
     
     
@@ -313,6 +314,10 @@ class FeeRecord(models.Model):
     def __str__(self):
         return f"{self.student} - {self.category} ({self.status})"
 
+    @property
+    def balance(self):
+        return self.amount - self.amount_paid
+
 
 class FeePayment(models.Model):
     fee_record = models.ForeignKey(FeeRecord, on_delete=models.CASCADE)
@@ -574,3 +579,292 @@ class Parent(models.Model):
 
     def __str__(self):
         return f"{self.admin.get_full_name()} (Parent of {self.student.admin.get_full_name()})"
+
+
+# --- Version 2.0 LMS Models ---
+
+class CourseCategory(models.Model):
+    name = models.CharField(max_length=120)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+class VideoCourse(models.Model):
+    title = models.CharField(max_length=200)
+    category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    description = models.TextField()
+    thumbnail = models.ImageField(upload_to='course_thumbnails/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+class VideoLesson(models.Model):
+    course = models.ForeignKey(VideoCourse, on_delete=models.CASCADE, related_name='lessons')
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    video_file = models.FileField(upload_to='course_videos/', blank=True, null=True)
+    video_url = models.URLField(blank=True, null=True)  # For external links like YouTube
+    order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.course.title} - {self.title}"
+
+class CourseProgress(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(VideoLesson, on_delete=models.CASCADE)
+    is_completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('student', 'lesson')
+
+    def __str__(self):
+        return f"{self.student} - {self.lesson.title} ({'Completed' if self.is_completed else 'In Progress'})"
+
+class Assignment(models.Model):
+    title = models.CharField(max_length=200)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    description = models.TextField()
+    attachment = models.FileField(upload_to='assignments/staff/', blank=True, null=True)
+    due_date = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+class AssignmentSubmission(models.Model):
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    submission_text = models.TextField(blank=True, null=True)
+    attachment = models.FileField(upload_to='assignments/students/', blank=True, null=True)
+    marks_obtained = models.FloatField(default=0.0)
+    feedback = models.TextField(blank=True, null=True)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student} - {self.assignment.title}"
+
+class StudyMaterial(models.Model):
+    title = models.CharField(max_length=200)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    file = models.FileField(upload_to='study_materials/')
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+
+def generate_room_name():
+    return f"PatkarERP-Live-{uuid.uuid4().hex[:8].upper()}"
+
+class LiveClass(models.Model):
+    title = models.CharField(max_length=200)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE)
+    scheduled_at = models.DateTimeField()
+    duration_minutes = models.IntegerField(default=60)
+    room_name = models.CharField(max_length=100, default=generate_room_name, unique=True)
+    is_active = models.BooleanField(default=True)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.room_name})"
+
+class LiveClassAttendance(models.Model):
+    live_class = models.ForeignKey(LiveClass, on_delete=models.CASCADE, related_name='attendances')
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    joined_at = models.DateTimeField(auto_now_add=True)
+    left_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('live_class', 'student')
+
+    def __str__(self):
+        return f"{self.student} in {self.live_class.title}"
+
+
+class ChatMessage(models.Model):
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='sent_messages')
+    recipient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='received_messages', null=True, blank=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='group_messages', null=True, blank=True)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        if self.course:
+            return f"Group Chat ({self.course.name}): {self.sender} - {self.message[:20]}"
+        return f"Direct Chat: {self.sender} -> {self.recipient} - {self.message[:20]}"
+
+
+class VisitorPass(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+    name = models.CharField(max_length=150)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    purpose = models.TextField()
+    host_person = models.CharField(max_length=150)
+    visit_date = models.DateField()
+    pass_code = models.CharField(max_length=50, unique=True, default=uuid.uuid4)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='Pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Visitor Pass: {self.name} -> {self.host_person} ({self.status})"
+
+# --- FINANCE MODULE MODELS ---
+
+class FeeType(models.Model):
+    name = models.CharField(max_length=100) # e.g., Tuition, Hostel, Transport
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Invoice(models.Model):
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
+    fee_type = models.ForeignKey(FeeType, on_delete=models.DO_NOTHING)
+    session = models.ForeignKey('Session', on_delete=models.DO_NOTHING)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    gst_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.0) # e.g., 18.0 for 18%
+    due_date = models.DateField()
+    is_paid = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Invoice {self.id} - {self.student} ({self.fee_type.name})"
+
+
+class Payment(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Completed', 'Completed'),
+        ('Failed', 'Failed'),
+    ]
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
+    gateway = models.CharField(max_length=50, default="Razorpay")
+    transaction_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    paid_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Payment {self.id} for Invoice {self.invoice.id} - {self.status}"
+
+
+class Scholarship(models.Model):
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
+    name = models.CharField(max_length=150)
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    is_active = models.BooleanField(default=True)
+    granted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.discount_percentage}%) - {self.student}"
+
+
+class Refund(models.Model):
+    STATUS_CHOICES = [
+        ('Requested', 'Requested'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+        ('Processed', 'Processed'),
+    ]
+    payment = models.ForeignKey(Payment, on_delete=models.CASCADE)
+    reason = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Requested')
+    requested_at = models.DateTimeField(auto_now_add=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Refund for Payment {self.payment.id} - {self.status}"
+
+# --- PLACEMENT MODULE MODELS ---
+
+class Company(models.Model):
+    name = models.CharField(max_length=200)
+    industry = models.CharField(max_length=150)
+    website = models.URLField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+class CompanyHR(models.Model):
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.admin.first_name} ({self.company.name})"
+
+class JobPosting(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    ctc_offered = models.CharField(max_length=100) # e.g. "8 LPA"
+    requirements = models.TextField()
+    deadline = models.DateField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} at {self.company.name}"
+
+class Resume(models.Model):
+    student = models.OneToOneField('Student', on_delete=models.CASCADE)
+    json_data = models.JSONField(default=dict, help_text="Stored in JSON Resume format")
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Resume for {self.student}"
+
+class Interview(models.Model):
+    STATUS_CHOICES = [
+        ('Scheduled', 'Scheduled'),
+        ('Completed', 'Completed'),
+        ('Cancelled', 'Cancelled'),
+    ]
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    job_posting = models.ForeignKey(JobPosting, on_delete=models.SET_NULL, null=True)
+    scheduled_time = models.DateTimeField()
+    jitsi_meet_url = models.URLField(blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Scheduled')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Interview: {self.student} with {self.company.name}"
+
+class OfferLetter(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Accepted', 'Accepted'),
+        ('Declined', 'Declined'),
+    ]
+    student = models.ForeignKey('Student', on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    job_posting = models.ForeignKey(JobPosting, on_delete=models.SET_NULL, null=True)
+    ctc_final = models.CharField(max_length=100)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    issued_date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Offer: {self.student} by {self.company.name}"

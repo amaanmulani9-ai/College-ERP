@@ -49,13 +49,19 @@ if os.environ.get('VERCEL') and 'DEBUG' not in os.environ:
 else:
     DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*,.vercel.app').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*,.vercel.app,.onrender.com').split(',')
 
 # Vercel sets VERCEL_URL automatically (e.g. my-app.vercel.app)
 if os.environ.get('VERCEL_URL'):
     vercel_host = os.environ['VERCEL_URL']
     if vercel_host not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(vercel_host)
+
+# Render sets RENDER_EXTERNAL_HOSTNAME automatically
+if os.environ.get('RENDER_EXTERNAL_HOSTNAME'):
+    render_host = os.environ['RENDER_EXTERNAL_HOSTNAME']
+    if render_host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(render_host)
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
@@ -64,6 +70,8 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 if os.environ.get('VERCEL_URL'):
     CSRF_TRUSTED_ORIGINS.append(f"https://{os.environ['VERCEL_URL']}")
+if os.environ.get('RENDER_EXTERNAL_HOSTNAME'):
+    CSRF_TRUSTED_ORIGINS.append(f"https://{os.environ['RENDER_EXTERNAL_HOSTNAME']}")
 
 
 def _build_supabase_direct_url():
@@ -77,6 +85,31 @@ def _build_supabase_direct_url():
     return f'postgresql://{user}:{password}@{host}:5432/{database}?sslmode=require'
 
 
+def _clean_postgres_url(url_str):
+    """Clean invalid connection options (e.g. pgbouncer, supa) from Postgres URL."""
+    if not url_str:
+        return url_str
+    if not (url_str.startswith('postgres://') or url_str.startswith('postgresql://')):
+        return url_str
+    from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
+    try:
+        parsed = urlparse(url_str)
+        qsl = parse_qsl(parsed.query)
+        allowed = {'sslmode', 'sslrootcert', 'sslcert', 'sslkey', 'connect_timeout'}
+        clean_qsl = [(k, v) for k, v in qsl if k in allowed]
+        new_query = urlencode(clean_qsl)
+        return urlunparse((
+            parsed.scheme,
+            parsed.netloc,
+            parsed.path,
+            parsed.params,
+            new_query,
+            parsed.fragment
+        ))
+    except Exception:
+        return url_str
+
+
 def get_database_url():
     """Resolve Postgres URL from Supabase/Vercel env vars, else SQLite."""
     for key in (
@@ -86,10 +119,10 @@ def get_database_url():
     ):
         url = os.environ.get(key)
         if url:
-            return url
+            return _clean_postgres_url(url)
     direct = _build_supabase_direct_url()
     if direct:
-        return direct
+        return _clean_postgres_url(direct)
     return f'sqlite:///{BASE_DIR / "db.sqlite3"}'
 
 
@@ -97,17 +130,28 @@ def get_migrations_database_url():
     """Direct connection for migrations (avoid transaction pooler)."""
     direct = _build_supabase_direct_url()
     if direct:
-        return direct
+        return _clean_postgres_url(direct)
     for key in ('POSTGRES_URL_NON_POOLING', 'DATABASE_URL'):
         url = os.environ.get(key)
         if url:
-            return url
+            return _clean_postgres_url(url)
     return get_database_url()
 
 # Application definition
 
-INSTALLED_APPS = [
-    # Django Apps
+SHARED_APPS = (
+    'django_tenants',
+    'saas_admin',
+    
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+)
+
+TENANT_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -115,11 +159,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # My Apps
-    'main_app.apps.MainAppConfig'
-]
+    'main_app.apps.MainAppConfig',
+)
+
+INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
+
+TENANT_MODEL = "saas_admin.Client"
+TENANT_DOMAIN_MODEL = "saas_admin.Domain"
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
 
 MIDDLEWARE = [
+    'django_tenants.middleware.main.TenantMainMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -131,9 +183,6 @@ MIDDLEWARE = [
 
     # Third Part Middleware
     'whitenoise.middleware.WhiteNoiseMiddleware',
-
-    # My Middleware
-    'main_app.middleware.LoginCheckMiddleWare',
 ]
 
 ROOT_URLCONF = 'college_management_system.urls'
@@ -172,8 +221,16 @@ DATABASES = {
         conn_max_age=600 if _using_postgres else 0,
         conn_health_checks=_using_postgres,
         ssl_require=_using_postgres,
-    )
+        engine='django_tenants.postgresql_backend',
+    ),
+    'legacy_sqlite': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+DATABASE_ROUTERS = (
+    'django_tenants.routers.TenantSyncRouter',
+)
 
 
 # Password validation
@@ -236,7 +293,10 @@ STATICFILES_DIRS = [
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_ROOT = BASE_DIR / 'media'
 AUTH_USER_MODEL = 'main_app.CustomUser'
-AUTHENTICATION_BACKENDS = ['main_app.EmailBackend.EmailBackend']
+AUTHENTICATION_BACKENDS = [
+    'mozilla_django_oidc.auth.OIDCAuthenticationBackend',
+    'main_app.EmailBackend.EmailBackend',
+]
 TIME_ZONE = 'Asia/Kolkata'
 
 # Session Configuration for Remember Me functionality
@@ -258,14 +318,56 @@ RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY', '')
 EMAIL_USE_TLS = True
 # DEFAULT_FROM_EMAIL = "School Management System <admin@admin.com>"
 
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-    },
-}
+# Redis Cache & Sessions (graceful fallback to DB sessions if Redis is unavailable)
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/1')
+try:
+    import redis as _redis_client
+    _r = _redis_client.from_url(REDIS_URL, socket_connect_timeout=1)
+    _r.ping()  # Test connectivity
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_URL,
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+    SESSION_CACHE_ALIAS = "default"
+except Exception:
+    # Redis not available — use default local memory cache and DB sessions
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+# S3/MinIO Storage Configuration
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', '')
+AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL', '') # MinIO support
+AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN', '')
+AWS_S3_FILE_OVERWRITE = False
+
+if AWS_STORAGE_BUCKET_NAME:
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
+else:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
+
 WHITENOISE_MANIFEST_STRICT = False
 
 # Supabase (optional — for future API/storage integrations)
@@ -287,3 +389,25 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+# --- Celery Configuration ---
+CELERY_BROKER_URL = os.environ.get('REDIS_URL', 'redis://redis:6379/1')
+CELERY_RESULT_BACKEND = os.environ.get('REDIS_URL', 'redis://redis:6379/1')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+# --- Keycloak (mozilla-django-oidc) Configuration ---
+OIDC_RP_CLIENT_ID = os.environ.get('OIDC_RP_CLIENT_ID', 'college-erp')
+OIDC_RP_CLIENT_SECRET = os.environ.get('OIDC_RP_CLIENT_SECRET', 'secret')
+OIDC_OP_AUTHORIZATION_ENDPOINT = os.environ.get('OIDC_OP_AUTHORIZATION_ENDPOINT', 'http://keycloak:8080/realms/college/protocol/openid-connect/auth')
+OIDC_OP_TOKEN_ENDPOINT = os.environ.get('OIDC_OP_TOKEN_ENDPOINT', 'http://keycloak:8080/realms/college/protocol/openid-connect/token')
+OIDC_OP_USER_ENDPOINT = os.environ.get('OIDC_OP_USER_ENDPOINT', 'http://keycloak:8080/realms/college/protocol/openid-connect/userinfo')
+OIDC_OP_JWKS_ENDPOINT = os.environ.get('OIDC_OP_JWKS_ENDPOINT', 'http://keycloak:8080/realms/college/protocol/openid-connect/certs')
+OIDC_RP_SIGN_ALGO = 'RS256'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+# --- Socket.IO configuration (via python-socketio) ---
+# Will be mounted as an ASGI app if Daphne/Uvicorn is used, 
+# for now settings act as a placeholder for Socket.IO init.
+SOCKETIO_PATH = 'socket.io'

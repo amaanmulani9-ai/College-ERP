@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+from .decorators import admin_required, staff_required, student_required
 import json
 import math
 from datetime import datetime
@@ -14,6 +16,8 @@ from .forms import *
 from .models import *
 
 
+@login_required(login_url='/')
+@student_required
 def student_home(request):
     student = get_object_or_404(Student, admin=request.user)
     total_subject = Subject.objects.filter(course=student.course).count()
@@ -105,6 +109,8 @@ def student_home(request):
 
 
 @ csrf_exempt
+@login_required(login_url='/')
+@student_required
 def student_view_attendance(request):
     student = get_object_or_404(Student, admin=request.user)
     if request.method != 'POST':
@@ -138,6 +144,8 @@ def student_view_attendance(request):
             return JsonResponse(json.dumps([]), safe=False)
 
 
+@login_required(login_url='/')
+@student_required
 def student_apply_leave(request):
     form = LeaveReportStudentForm(request.POST or None)
     student = get_object_or_404(Student, admin_id=request.user.id)
@@ -162,6 +170,8 @@ def student_apply_leave(request):
     return render(request, "student_template/student_apply_leave.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def student_feedback(request):
     form = FeedbackStudentForm(request.POST or None)
     student = get_object_or_404(Student, admin_id=request.user.id)
@@ -187,6 +197,8 @@ def student_feedback(request):
     return render(request, "student_template/student_feedback.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def student_view_profile(request):
     student = get_object_or_404(Student, admin=request.user)
     form = StudentEditForm(request.POST or None, request.FILES or None,
@@ -228,6 +240,8 @@ def student_view_profile(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@student_required
 def student_fcmtoken(request):
     token = request.POST.get('token')
     student_user = get_object_or_404(CustomUser, id=request.user.id)
@@ -239,6 +253,8 @@ def student_fcmtoken(request):
         return HttpResponse("False")
 
 
+@login_required(login_url='/')
+@student_required
 def student_view_notification(request):
     student = get_object_or_404(Student, admin=request.user)
     notifications = NotificationStudent.objects.filter(student=student)
@@ -249,6 +265,8 @@ def student_view_notification(request):
     return render(request, "student_template/student_view_notification.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def student_view_result(request):
     student = get_object_or_404(Student, admin=request.user)
     results = StudentResult.objects.filter(student=student)
@@ -258,6 +276,8 @@ def student_view_result(request):
     }
     return render(request, "student_template/student_view_result.html", context)
 
+@login_required(login_url='/')
+@student_required
 def student_report_card(request):
     import io
     from xhtml2pdf import pisa
@@ -301,6 +321,8 @@ def student_report_card(request):
 #library
 from datetime import date, timedelta
 
+@login_required(login_url='/')
+@student_required
 def view_books(request):
     books = Book.objects.all()
     borrowed_books = IssuedBook.objects.filter(student_id=request.user.email)
@@ -343,6 +365,8 @@ def view_books(request):
     return render(request, "student_template/view_books.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def borrow_book(request, isbn):
     student = get_object_or_404(Student, admin=request.user)
     book = get_object_or_404(Book, isbn=isbn)
@@ -367,6 +391,8 @@ def borrow_book(request, isbn):
 
 # --- New ERP Modules Views ---
 
+@login_required(login_url='/')
+@student_required
 def student_timetable(request):
     student = get_object_or_404(Student, admin=request.user)
     slots = Timetable.objects.filter(course=student.course).select_related('subject', 'subject__staff', 'subject__staff__admin').order_by('day_of_week', 'start_time')
@@ -386,6 +412,8 @@ def student_timetable(request):
     return render(request, "student_template/student_timetable.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def student_hall_ticket(request):
     student = get_object_or_404(Student, admin=request.user)
     subjects = Subject.objects.filter(course=student.course)
@@ -416,6 +444,8 @@ def student_hall_ticket(request):
     return render(request, "student_template/student_hall_ticket.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def student_payable_fees(request):
     student = get_object_or_404(Student, admin=request.user)
     fee_records = FeeRecord.objects.filter(student=student).order_by('due_date')
@@ -476,6 +506,8 @@ def student_payable_fees(request):
     return render(request, "student_template/student_payable_fees.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def student_print_fee(request, fee_id):
     student = get_object_or_404(Student, admin=request.user)
     fee_record = get_object_or_404(FeeRecord, id=fee_id, student=student)
@@ -488,6 +520,8 @@ def student_print_fee(request, fee_id):
     return render(request, "hod_template/fee_invoice.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def student_fee_receipt(request, payment_id):
     import io
     from xhtml2pdf import pisa
@@ -518,6 +552,8 @@ def student_fee_receipt(request, payment_id):
     return response
 
 
+@login_required(login_url='/')
+@student_required
 def student_certificates(request):
     student = get_object_or_404(Student, admin=request.user)
     requests = CertificateRequest.objects.filter(student=student).order_by('-created_at')
@@ -529,6 +565,8 @@ def student_certificates(request):
     return render(request, "student_template/student_certificates.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def student_request_certificate(request):
     if request.method == "POST":
         student = get_object_or_404(Student, admin=request.user)
@@ -548,6 +586,8 @@ def student_request_certificate(request):
     return redirect(reverse('student_certificates'))
 
 
+@login_required(login_url='/')
+@student_required
 def student_placements(request):
     student = get_object_or_404(Student, admin=request.user)
     drives = PlacementDrive.objects.all().order_by('-drive_date')
@@ -589,6 +629,8 @@ def student_placements(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@student_required
 def student_ai_chat(request):
     if request.method == "POST":
         try:
@@ -724,6 +766,8 @@ def student_ai_chat(request):
 
 # --- Online Registration Views ---
 
+@login_required(login_url='/')
+@student_required
 def student_reg_personal(request):
     student = get_object_or_404(Student, admin=request.user)
     reg, created = StudentRegistration.objects.get_or_create(student=student)
@@ -785,6 +829,8 @@ def student_reg_personal(request):
     return render(request, "student_template/student_reg_personal.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def student_reg_address(request):
     student = get_object_or_404(Student, admin=request.user)
     reg = get_object_or_404(StudentRegistration, student=student)
@@ -825,6 +871,8 @@ def student_reg_address(request):
     return render(request, "student_template/student_reg_address.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def student_reg_photo(request):
     student = get_object_or_404(Student, admin=request.user)
     reg = get_object_or_404(StudentRegistration, student=student)
@@ -841,6 +889,8 @@ def student_reg_photo(request):
     return render(request, "student_template/student_reg_photo.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def student_reg_documents(request):
     student = get_object_or_404(Student, admin=request.user)
     reg = get_object_or_404(StudentRegistration, student=student)
@@ -861,6 +911,8 @@ def student_reg_documents(request):
     return render(request, "student_template/student_reg_documents.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def student_reg_confirm(request):
     student = get_object_or_404(Student, admin=request.user)
     reg = get_object_or_404(StudentRegistration, student=student)
@@ -878,6 +930,8 @@ def student_reg_confirm(request):
     return render(request, "student_template/student_reg_confirm.html", context)
 
 
+@login_required(login_url='/')
+@student_required
 def student_reg_print(request):
     reg_id = request.GET.get('reg_id')
     if reg_id and request.user.user_type == '1':
@@ -903,6 +957,8 @@ def student_reg_print(request):
 
 
 
+@login_required(login_url='/')
+@student_required
 def student_events_calendar(request):
     from .models import CollegeEvent
     events = CollegeEvent.objects.all().order_by('date')
@@ -931,6 +987,8 @@ def student_events_calendar(request):
     }
     return render(request, 'student_template/student_events_calendar.html', context)
 
+@login_required(login_url='/')
+@student_required
 def student_view_exams(request):
     student = get_object_or_404(Student, admin=request.user)
     subjects = Subject.objects.filter(course=student.course)
@@ -949,6 +1007,8 @@ def student_view_exams(request):
     }
     return render(request, 'student_template/view_exams.html', context)
 
+@login_required(login_url='/')
+@student_required
 def student_take_exam(request, exam_id):
     student = get_object_or_404(Student, admin=request.user)
     exam = get_object_or_404(Exam, id=exam_id, is_active=True)
@@ -966,6 +1026,8 @@ def student_take_exam(request, exam_id):
     }
     return render(request, 'student_template/take_exam.html', context)
 
+@login_required(login_url='/')
+@student_required
 def submit_exam(request, exam_id):
     if request.method == 'POST':
         student = get_object_or_404(Student, admin=request.user)
@@ -997,26 +1059,19 @@ def submit_exam(request, exam_id):
     return redirect(reverse('student_view_exams'))
 
 @csrf_exempt
+@login_required(login_url='/')
+@student_required
 def ai_chat_assistant(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             prompt = data.get('prompt', '')
             
-            # Since no API key was provided by the user, we will return a mocked intelligent response
-            # In production, integrate google.generativeai here.
+            from .ai_helper import generate_ollama_response
+            response_text = generate_ollama_response(prompt, system_prompt="You are a helpful AI Study Assistant for Patkar College. Guide the student through their syllabus.")
             
-            mock_responses = {
-                'quiz': "Here is a quick quiz on Physics:\n1. What is the formula for Force? (F=ma)\n2. What is the speed of light? (3x10^8 m/s)",
-                'summarize': "Summary: Quantum mechanics is a fundamental theory in physics that provides a description of the physical properties of nature at the scale of atoms and subatomic particles.",
-            }
-            
-            response_text = "I am the AI Study Assistant. I am here to help you study your current course materials! (Mocked Response)"
-            
-            if 'quiz' in prompt.lower():
-                response_text = mock_responses['quiz']
-            elif 'summarize' in prompt.lower():
-                response_text = mock_responses['summarize']
+            if not response_text:
+                response_text = "I am currently offline or local AI server is down. Here is a helpful fallback response: Quantum mechanics is a fundamental theory in physics that provides a description of the physical properties of nature at the scale of atoms and subatomic particles."
                 
             return JsonResponse({'status': 'success', 'response': response_text})
         except Exception as e:
@@ -1026,3 +1081,189 @@ def ai_chat_assistant(request):
         'page_title': 'AI Study Assistant'
     }
     return render(request, 'student_template/ai_assistant.html', context)
+
+
+# --- Version 2.0 LMS Views ---
+
+@login_required(login_url='/')
+@student_required
+def student_lms_home(request):
+    student = get_object_or_404(Student, admin=request.user)
+    courses = VideoCourse.objects.filter(subject__course=student.course).order_by('-created_at')
+    assignments = Assignment.objects.filter(subject__course=student.course).order_by('-due_date')
+    materials = StudyMaterial.objects.filter(subject__course=student.course).order_by('-created_at')
+    
+    context = {
+        'page_title': 'Learning Management System (LMS)',
+        'courses': courses,
+        'assignments': assignments,
+        'materials': materials,
+    }
+    return render(request, "student_template/student_lms_home.html", context)
+
+@login_required(login_url='/')
+@student_required
+def student_view_course(request, course_id):
+    student = get_object_or_404(Student, admin=request.user)
+    course = get_object_or_404(VideoCourse, id=course_id, subject__course=student.course)
+    lessons = course.lessons.all().order_by('order')
+    
+    # Get completed lesson IDs for this student
+    completed_lesson_ids = CourseProgress.objects.filter(
+        student=student, lesson__in=lessons, is_completed=True
+    ).values_list('lesson_id', flat=True)
+    
+    context = {
+        'page_title': course.title,
+        'course': course,
+        'lessons': lessons,
+        'completed_lesson_ids': list(completed_lesson_ids),
+    }
+    return render(request, "student_template/student_view_course.html", context)
+
+@login_required(login_url='/')
+@student_required
+def student_watch_lesson(request, lesson_id):
+    student = get_object_or_404(Student, admin=request.user)
+    lesson = get_object_or_404(VideoLesson, id=lesson_id, course__subject__course=student.course)
+    course = lesson.course
+    lessons = course.lessons.all().order_by('order')
+    
+    # Mark completion or get progress
+    progress, created = CourseProgress.objects.get_or_create(student=student, lesson=lesson)
+    if request.method == 'POST':
+        progress.is_completed = True
+        progress.save()
+        messages.success(request, f"Lesson '{lesson.title}' marked as completed!")
+        return redirect(reverse('student_watch_lesson', args=[lesson.id]))
+        
+    completed_lesson_ids = CourseProgress.objects.filter(
+        student=student, lesson__in=lessons, is_completed=True
+    ).values_list('lesson_id', flat=True)
+    
+    context = {
+        'page_title': f"{lesson.title} - {course.title}",
+        'lesson': lesson,
+        'course': course,
+        'lessons': lessons,
+        'is_completed': progress.is_completed,
+        'completed_lesson_ids': list(completed_lesson_ids),
+    }
+    return render(request, "student_template/student_watch_lesson.html", context)
+
+@login_required(login_url='/')
+@student_required
+def student_assignments(request):
+    student = get_object_or_404(Student, admin=request.user)
+    assignments = Assignment.objects.filter(subject__course=student.course).order_by('-due_date')
+    
+    # Get student's submissions mapped by assignment id
+    submissions = AssignmentSubmission.objects.filter(student=student)
+    submitted_assignment_ids = submissions.values_list('assignment_id', flat=True)
+    
+    context = {
+        'page_title': 'My Assignments',
+        'assignments': assignments,
+        'submissions': {sub.assignment_id: sub for sub in submissions},
+        'submitted_assignment_ids': list(submitted_assignment_ids),
+    }
+    return render(request, "student_template/student_assignments.html", context)
+
+@login_required(login_url='/')
+@student_required
+def student_submit_assignment(request, assignment_id):
+    student = get_object_or_404(Student, admin=request.user)
+    assignment = get_object_or_404(Assignment, id=assignment_id, subject__course=student.course)
+    submission = AssignmentSubmission.objects.filter(assignment=assignment, student=student).first()
+    
+    if request.method == 'POST':
+        submission_text = request.POST.get('submission_text')
+        attachment = request.FILES.get('attachment')
+        
+        if submission:
+            submission.submission_text = submission_text
+            if attachment:
+                submission.attachment = attachment
+            submission.save()
+            messages.success(request, "Assignment submission updated!")
+        else:
+            AssignmentSubmission.objects.create(
+                assignment=assignment, student=student,
+                submission_text=submission_text, attachment=attachment
+            )
+            messages.success(request, "Assignment submitted successfully!")
+        return redirect(reverse('student_assignments'))
+        
+    context = {
+        'page_title': f"Submit Assignment: {assignment.title}",
+        'assignment': assignment,
+        'submission': submission,
+    }
+    return render(request, "student_template/student_submit_assignment.html", context)
+
+@login_required(login_url='/')
+@student_required
+def student_materials(request):
+    student = get_object_or_404(Student, admin=request.user)
+    materials = StudyMaterial.objects.filter(subject__course=student.course).order_by('-created_at')
+    
+    context = {
+        'page_title': 'Downloads & Study Materials Hub',
+        'materials': materials,
+    }
+    return render(request, "student_template/student_materials.html", context)
+
+
+@login_required(login_url='/')
+@student_required
+def student_live_classes(request):
+    student = get_object_or_404(Student, admin=request.user)
+    live_classes = LiveClass.objects.filter(subject__course=student.course).order_by('-scheduled_at')
+    context = {
+        'page_title': 'Live Virtual Classrooms',
+        'live_classes': live_classes,
+    }
+    return render(request, "student_template/student_live_classes.html", context)
+
+
+@login_required(login_url='/')
+@student_required
+def student_join_live_class(request, class_id):
+    student = get_object_or_404(Student, admin=request.user)
+    live_class = get_object_or_404(LiveClass, id=class_id, subject__course=student.course)
+    
+    from django.utils import timezone
+    attendance, created = LiveClassAttendance.objects.get_or_create(
+        live_class=live_class,
+        student=student,
+        defaults={'joined_at': timezone.now()}
+    )
+    if not created:
+        attendance.joined_at = timezone.now()
+        attendance.left_at = None
+        attendance.save()
+        
+    context = {
+        'page_title': f"Join: {live_class.title}",
+        'live_class': live_class,
+        'student': student,
+    }
+    return render(request, "student_template/student_join_live_class.html", context)
+
+
+@login_required(login_url='/')
+@student_required
+def student_leave_live_class(request, class_id):
+    student = get_object_or_404(Student, admin=request.user)
+    live_class = get_object_or_404(LiveClass, id=class_id, subject__course=student.course)
+    
+    from django.utils import timezone
+    LiveClassAttendance.objects.filter(
+        live_class=live_class,
+        student=student,
+        left_at__isnull=True
+    ).update(left_at=timezone.now())
+    
+    messages.success(request, f"You left the live class '{live_class.title}'.")
+    return redirect(reverse('student_live_classes'))
+

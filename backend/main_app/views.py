@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .EmailBackend import EmailBackend
 from .models import Attendance, Session, Subject, NotificationStudent, NotificationStaff
 from django.contrib.auth.decorators import login_required
+from .analytics_helper import log_analytics_event
 
 # Create your views here.
 
@@ -61,7 +62,14 @@ def doLogin(request, **kwargs):
         #Authenticate
         user = EmailBackend.authenticate(request, username=request.POST.get('email'), password=request.POST.get('password'))
         if user != None:
-            login(request, user)
+            login(request, user, backend='main_app.EmailBackend.EmailBackend')
+            
+            # Log login to MongoDB Analytics
+            log_analytics_event("user_login", {
+                "user_id": user.id,
+                "email": user.email,
+                "user_type": user.user_type
+            })
             
             # Handle "Remember Me" functionality
             remember_me = request.POST.get('remember')
@@ -88,7 +96,13 @@ def doLogin(request, **kwargs):
 
 
 def logout_user(request):
-    if request.user != None:
+    if request.user != None and request.user.is_authenticated:
+        # Log logout to MongoDB Analytics
+        log_analytics_event("user_logout", {
+            "user_id": request.user.id,
+            "email": request.user.email,
+            "user_type": request.user.user_type
+        })
         logout(request)
     return redirect("/")
 

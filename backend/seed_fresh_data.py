@@ -101,25 +101,25 @@ def seed_data():
     Book.objects.create(
         name="Introduction to Algorithms",
         author="Thomas H. Cormen",
-        isbn=9780262033,
+        isbn=978026203,
         category="Computer Science"
     )
     Book.objects.create(
         name="Clean Code",
         author="Robert C. Martin",
-        isbn=9780132350,
+        isbn=978013235,
         category="Software Engineering"
     )
     Book.objects.create(
         name="Design Patterns",
         author="Erich Gamma",
-        isbn=9780201633,
+        isbn=978020163,
         category="Software Engineering"
     )
     Book.objects.create(
         name="Database System Concepts",
         author="Abraham Silberschatz",
-        isbn=9780073523,
+        isbn=978007352,
         category="Databases"
     )
     
@@ -132,4 +132,6 @@ def seed_data():
     print("---------------------------------")
 
 if __name__ == "__main__":
-    seed_data()
+    from django_tenants.utils import schema_context
+    with schema_context('demo'):
+        seed_data()
