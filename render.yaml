@@ -1,7 +1,6 @@
 databases:
   - name: college-erp-db
     databaseName: college_erp
-    user: postgres
     plan: free
 
 services:
