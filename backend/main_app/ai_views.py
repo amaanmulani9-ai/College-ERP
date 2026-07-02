@@ -1,3 +1,4 @@
+import os
 import json
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
@@ -157,8 +158,10 @@ def tinymce_jwt_provider(request):
     """
     Generates a JWT token for TinyMCE AI authentication.
     """
-    # Use the provided key (or load from settings in production)
-    PRIVATE_KEY = getattr(settings, 'TINYMCE_PRIVATE_KEY', 'a0b7db0fd0bd5fe92a2335af8aff5e286fd673b0ebb1aa3242de02cc0cb32b89')
+    # Load from settings/environment in production
+    PRIVATE_KEY = getattr(settings, 'TINYMCE_PRIVATE_KEY', os.environ.get('TINYMCE_PRIVATE_KEY'))
+    if not PRIVATE_KEY:
+        return JsonResponse({'error': 'TinyMCE Private Key not configured.'}, status=500)
     
     # TinyMCE AI expects the subject (sub) to be a unique identifier for the user
     user_id = str(request.user.id) if request.user.is_authenticated else 'anonymous_user'

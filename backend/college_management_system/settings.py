@@ -41,7 +41,7 @@ if env_path.exists():
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'f2zx8*lb*em*-*b+!&1lpp&$_9q9kmkar+l3x90do@s(+sr&x7')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-key-change-me-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if os.environ.get('VERCEL') and 'DEBUG' not in os.environ:
