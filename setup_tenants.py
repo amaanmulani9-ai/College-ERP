@@ -10,8 +10,8 @@ django.setup()
 from saas_admin.models import Client, Domain
 
 def setup():
-    # Create the public tenant
-    public_tenant, created = Client.objects.get_or_create(
+    # Create or get the public tenant
+    public_tenant, _ = Client.objects.get_or_create(
         schema_name='public',
         defaults={
             'name': 'Public Schema',
@@ -19,16 +19,18 @@ def setup():
             'on_trial': False
         }
     )
-    if created:
-        Domain.objects.get_or_create(
-            domain='public.localhost',
-            tenant=public_tenant,
-            is_primary=True
-        )
-        print("Created public tenant and public.localhost domain.")
+    # Ensure public.localhost is mapped
+    Domain.objects.get_or_create(
+        domain='public.localhost',
+        defaults={
+            'tenant': public_tenant,
+            'is_primary': True
+        }
+    )
+    print("Ensured public tenant and public.localhost domain.")
 
-    # Create the demo tenant and map it to localhost
-    demo_tenant, created = Client.objects.get_or_create(
+    # Create or get the demo tenant
+    demo_tenant, _ = Client.objects.get_or_create(
         schema_name='demo',
         defaults={
             'name': 'Demo College',
@@ -37,13 +39,37 @@ def setup():
             'college_name': 'Demo College'
         }
     )
-    if created:
+    # Ensure localhost is mapped
+    Domain.objects.get_or_create(
+        domain='localhost',
+        defaults={
+            'tenant': demo_tenant,
+            'is_primary': True
+        }
+    )
+    print("Ensured demo tenant and localhost domain.")
+
+    # Dynamically add Render host if present
+    render_host = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+    if render_host:
         Domain.objects.get_or_create(
-            domain='localhost',
-            tenant=demo_tenant,
-            is_primary=True
+            domain=render_host,
+            defaults={
+                'tenant': demo_tenant,
+                'is_primary': False
+            }
         )
-        print("Created demo tenant and mapped to localhost domain.")
+        print(f"Mapped Render host ({render_host}) to demo tenant.")
+    
+    # Explicitly map the known Render domain as fallback
+    Domain.objects.get_or_create(
+        domain='college-erp-web.onrender.com',
+        defaults={
+            'tenant': demo_tenant,
+            'is_primary': False
+        }
+    )
+    print("Mapped college-erp-web.onrender.com to demo tenant.")
 
     print("Tenant setup completed.")
 
