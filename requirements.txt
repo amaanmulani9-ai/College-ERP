@@ -50,4 +50,5 @@ langchain==0.1.16
 sentence-transformers==2.7.0
 chromadb>=0.4.24
 django-tenants>=3.6.1
+qrcode>=7.4.2
 
