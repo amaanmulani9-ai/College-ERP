@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
 from .models import CustomUser, Student, Staff, Course, Subject, Session, Assignment, AssignmentSubmission
-from .ai_helper import ai_generate_resume, ai_generate_quiz, ai_generate_question_paper, ai_generate_timetable, ai_check_assignment
+# AI helper functions will be imported locally in views to save memory during startup
 
 @login_required
 def student_resume_builder(request):
@@ -30,6 +30,7 @@ def student_resume_builder(request):
             'course': student.course.name if student.course else 'N/A'
         }
         
+        from .ai_helper import ai_generate_resume
         generated_resume = ai_generate_resume(profile_data)
         
     context = {
@@ -56,6 +57,7 @@ def student_ai_quiz(request):
             subject_id = data.get('subject_id')
             subject = get_object_or_404(Subject, id=subject_id)
             
+            from .ai_helper import ai_generate_quiz
             quiz_data = ai_generate_quiz(subject.name)
             return JsonResponse({'status': 'success', 'quiz': quiz_data})
         except Exception as e:
@@ -80,6 +82,7 @@ def staff_generate_paper(request):
         total_marks = request.POST.get('marks', 50)
         selected_subject = get_object_or_404(Subject, id=subject_id)
         
+        from .ai_helper import ai_generate_question_paper
         generated_paper = ai_generate_question_paper(selected_subject.name, total_marks)
         
     context = {
@@ -110,6 +113,7 @@ def staff_generate_timetable(request):
         if not subject_names:
             messages.warning(request, "No subjects found for this course to generate timetable.")
         else:
+            from .ai_helper import ai_generate_timetable
             generated_timetable = ai_generate_timetable(selected_course.name, subject_names)
             
     context = {
@@ -132,6 +136,7 @@ def staff_ai_grade_assignment(request):
             assignment_desc = sub.assignment.description
             submission_text = sub.submission_text or "No submission text available. Document attached."
             
+            from .ai_helper import ai_check_assignment
             result = ai_check_assignment(submission_text, assignment_desc)
             return JsonResponse({
                 'status': 'success',
