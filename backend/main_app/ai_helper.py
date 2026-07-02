@@ -6,15 +6,8 @@ from django.conf import settings
 OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://localhost:11434')
 DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'gemma') # Default local model
 
-# Graceful Imports for SentenceTransformers and ChromaDB
-try:
-    from sentence_transformers import SentenceTransformer
-    import chromadb
-    import numpy as np
-    HAS_AI_LIBS = True
-except ImportError:
-    HAS_AI_LIBS = False
-    print("[AI HELPER] Warning: SentenceTransformers or ChromaDB not installed. Using pure Python fallbacks.")
+HAS_AI_LIBS = False
+print("[AI HELPER] AI ML libs disabled for Free Tier. Using pure Python fallbacks.")
 
 # ----------------- Pure Python Fallback Helpers -----------------
 class FallbackVectorDB:
