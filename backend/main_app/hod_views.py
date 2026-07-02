@@ -394,11 +394,9 @@ def edit_staff(request, staff_id):
             except Exception as e:
                 messages.error(request, "Could Not Update " + str(e))
         else:
-            messages.error(request, "Please fil form properly")
-    else:
-        user = CustomUser.objects.get(id=staff_id)
-        staff = Staff.objects.get(id=user.id)
-        return render(request, "hod_template/edit_staff_template.html", context)
+            messages.error(request, "Please fill form properly")
+    
+    return render(request, "hod_template/edit_staff_template.html", context)
 
 
 @login_required(login_url='/')
@@ -448,8 +446,8 @@ def edit_student(request, student_id):
                 messages.error(request, "Could Not Update " + str(e))
         else:
             messages.error(request, "Please Fill Form Properly!")
-    else:
-        return render(request, "hod_template/edit_student_template.html", context)
+            
+    return render(request, "hod_template/edit_student_template.html", context)
 
 
 @login_required(login_url='/')
