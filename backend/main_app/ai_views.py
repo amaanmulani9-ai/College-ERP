@@ -10,12 +10,22 @@ from django.contrib.auth.decorators import login_required
 from .models import CustomUser, Student, Staff, Course, Subject, Session, Assignment, AssignmentSubmission
 # AI helper functions will be imported locally in views to save memory during startup
 
+def check_ai_limit(request, limit=2):
+    usage = request.session.get('ai_usage_count', 0)
+    if usage >= limit:
+        return False
+    request.session['ai_usage_count'] = usage + 1
+    return True
+
 @login_required
 def student_resume_builder(request):
     student = get_object_or_404(Student, admin=request.user)
     
     generated_resume = None
     if request.method == "POST":
+        if not check_ai_limit(request):
+            messages.error(request, "AI usage limit reached for this demo (max 2 requests).")
+            return redirect('student_resume_builder')
         skills = request.POST.get('skills')
         projects = request.POST.get('projects')
         experience = request.POST.get('experience')
@@ -52,6 +62,8 @@ def student_ai_quiz(request):
     }
     
     if request.method == "POST":
+        if not check_ai_limit(request):
+            return JsonResponse({'status': 'error', 'message': 'AI usage limit reached for this demo (max 2 requests).'})
         # AJAX Quiz generation
         try:
             data = json.loads(request.body)
@@ -79,6 +91,9 @@ def staff_generate_paper(request):
     selected_subject = None
     
     if request.method == "POST":
+        if not check_ai_limit(request):
+            messages.error(request, "AI usage limit reached for this demo (max 2 requests).")
+            return redirect('staff_generate_paper')
         subject_id = request.POST.get('subject')
         total_marks = request.POST.get('marks', 50)
         selected_subject = get_object_or_404(Subject, id=subject_id)
@@ -105,6 +120,9 @@ def staff_generate_timetable(request):
     selected_course = None
     
     if request.method == "POST":
+        if not check_ai_limit(request):
+            messages.error(request, "AI usage limit reached for this demo (max 2 requests).")
+            return redirect('staff_generate_timetable')
         course_id = request.POST.get('course')
         selected_course = get_object_or_404(Course, id=course_id)
         
@@ -129,6 +147,8 @@ def staff_generate_timetable(request):
 @login_required
 def staff_ai_grade_assignment(request):
     if request.method == 'POST' and request.user.user_type in ['1', '2']:
+        if not check_ai_limit(request):
+            return JsonResponse({'status': 'error', 'message': 'AI usage limit reached for this demo (max 2 requests).'})
         try:
             data = json.loads(request.body)
             submission_id = data.get('submission_id')
