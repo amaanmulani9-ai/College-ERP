@@ -43,37 +43,35 @@ class FallbackVectorDB:
 # Global fallback vector DB instance
 _fallback_db = FallbackVectorDB()
 
-# ----------------- Core API Callers -----------------
+import google.generativeai as genai
+
+# Setup Gemini using API Key from Render environment variables
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+    
 def generate_ollama_response(prompt, system_prompt=None, response_format=None):
     """
-    Sends requests directly to the local Ollama REST API.
+    Sends requests to the Google Gemini API (replaces old local Ollama).
     """
-    url = f"{OLLAMA_URL}/api/generate"
-    
-    full_prompt = prompt
-    if system_prompt:
-        full_prompt = f"System: {system_prompt}\nUser: {prompt}"
-        
-    payload = {
-        "model": DEFAULT_MODEL,
-        "prompt": full_prompt,
-        "stream": False
-    }
-    
-    if response_format == "json":
-        payload["format"] = "json"
+    if not GEMINI_API_KEY:
+        print("[GEMINI] No GEMINI_API_KEY found in environment variables. Falling back to mock.")
+        return ""
         
     try:
-        res = requests.post(url, json=payload, timeout=30)
-        if res.status_code == 200:
-            data = res.json()
-            return data.get('response', '').strip()
-        else:
-            print(f"[OLLAMA] Failed with status {res.status_code}: {res.text}")
+        # We use gemini-1.5-flash as it is extremely fast and generous on the free tier
+        model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_prompt)
+        
+        # Configure output format if requested
+        generation_config = genai.types.GenerationConfig()
+        if response_format == "json":
+            generation_config.response_mime_type = "application/json"
+            
+        response = model.generate_content(prompt, generation_config=generation_config)
+        return response.text.strip()
     except Exception as e:
-        print(f"[OLLAMA] Connection failed: {str(e)}. Make sure Ollama is running locally.")
-    
-    # Smart Fallback if Ollama is not running
+        print(f"[GEMINI] Connection failed: {str(e)}")
+        
     return ""
 
 # ----------------- Structured AI Generators -----------------
