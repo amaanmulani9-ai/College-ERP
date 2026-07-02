@@ -49,7 +49,6 @@ pymongo==4.6.3
 redis==8.0.1
 langchain==0.1.16
 sentence-transformers==2.7.0
-chromadb==0.4.24
-numpy==1.26.4
-
+chromadb>=0.4.24
+numpy>=2.0.0
 

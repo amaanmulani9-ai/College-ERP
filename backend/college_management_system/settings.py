@@ -215,6 +215,33 @@ else:
     _database_url = get_database_url()
 _using_postgres = _database_url.startswith(('postgres://', 'postgresql://'))
 
+if _using_postgres:
+    try:
+        import psycopg2
+        parsed_db = dj_database_url.parse(_database_url)
+        # Fast 3-second timeout check
+        conn = psycopg2.connect(
+            dbname=parsed_db.get('NAME', ''),
+            user=parsed_db.get('USER', ''),
+            password=parsed_db.get('PASSWORD', ''),
+            host=parsed_db.get('HOST', ''),
+            port=parsed_db.get('PORT', 5432),
+            connect_timeout=3
+        )
+        conn.close()
+    except Exception as e:
+        print("\n" + "="*60)
+        print("!!! CRITICAL DATABASE ERROR !!!")
+        print("="*60)
+        print(f"Could not connect to the PostgreSQL database at: {parsed_db.get('HOST', 'Unknown')}")
+        print(f"Error Details: {e}")
+        print("-" * 60)
+        print("The College ERP uses 'django-tenants', which strictly requires PostgreSQL.")
+        print("If you are using Supabase, it might be paused or unreachable.")
+        print("Please check your .env file or start a local Postgres server.")
+        print("="*60 + "\n")
+        sys.exit(1)
+
 DATABASES = {
     'default': dj_database_url.config(
         default=_database_url,
