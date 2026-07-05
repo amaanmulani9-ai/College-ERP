@@ -81,6 +81,7 @@ urlpatterns = [
     path("subject/add/", hod_views.add_subject, name='add_subject'),
     path("staff/manage/", hod_views.manage_staff, name='manage_staff'),
     path("student/manage/", hod_views.manage_student, name='manage_student'),
+    path("student/id-card/<int:student_id>/", hod_views.admin_view_student_id_card, name='admin_view_student_id_card'),
     path("parent/manage/", hod_views.manage_parent, name='manage_parent'),
     path("course/manage/", hod_views.manage_course, name='manage_course'),
     path("subject/manage/", hod_views.manage_subject, name='manage_subject'),

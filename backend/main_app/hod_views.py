@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from .decorators import admin_required, staff_required, student_required
 import json
+import os
 import requests
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
@@ -14,6 +15,7 @@ from django.views.generic import UpdateView
 
 from .forms import *
 from .models import *
+from django.db.models import Sum
 
 
 @login_required(login_url='/')
@@ -33,51 +35,47 @@ def admin_home(request):
         subject_list.append(subject.name[:7])
         attendance_list.append(attendance_count)
 
+    from django.db.models import Count
     # Total Subjects and students in Each Course
-    course_all = Course.objects.all()
-    course_name_list = []
-    subject_count_list = []
-    student_count_list_in_course = []
-
-    for course in course_all:
-        subjects = Subject.objects.filter(course_id=course.id).count()
-        students = Student.objects.filter(course_id=course.id).count()
-        course_name_list.append(course.name)
-        subject_count_list.append(subjects)
-        student_count_list_in_course.append(students)
+    courses_with_counts = Course.objects.annotate(
+        subject_count=Count('subject', distinct=True),
+        student_count=Count('student', distinct=True)
+    )
+    course_name_list = [course.name for course in courses_with_counts]
+    subject_count_list = [course.subject_count for course in courses_with_counts]
+    student_count_list_in_course = [course.student_count for course in courses_with_counts]
     
-    subject_all = Subject.objects.all()
-    subject_list = []
-    student_count_list_in_subject = []
-    for subject in subject_all:
-        course = Course.objects.get(id=subject.course.id)
-        student_count = Student.objects.filter(course_id=course.id).count()
-        subject_list.append(subject.name)
-        student_count_list_in_subject.append(student_count)
+    subjects_with_counts = Subject.objects.select_related('course').annotate(
+        student_count=Count('course__student', distinct=True)
+    )
+    subject_list = [subject.name for subject in subjects_with_counts]
+    student_count_list_in_subject = [subject.student_count for subject in subjects_with_counts]
 
 
+    from django.db.models import Q
     # For Students
+    students_with_attendance = Student.objects.annotate(
+        present_count=Count('attendancereport', filter=Q(attendancereport__status=True), distinct=True),
+        absent_count=Count('attendancereport', filter=Q(attendancereport__status=False), distinct=True),
+        leave_count=Count('leavereportstudent', filter=Q(leavereportstudent__status=1), distinct=True)
+    ).select_related('admin')
+
     student_attendance_present_list=[]
     student_attendance_leave_list=[]
     student_name_list=[]
 
-    students = Student.objects.all()
-    for student in students:
-        
-        attendance = AttendanceReport.objects.filter(student_id=student.id, status=True).count()
-        absent = AttendanceReport.objects.filter(student_id=student.id, status=False).count()
-        leave = LeaveReportStudent.objects.filter(student_id=student.id, status=1).count()
-        student_attendance_present_list.append(attendance)
-        student_attendance_leave_list.append(leave+absent)
+    for student in students_with_attendance:
+        student_attendance_present_list.append(student.present_count)
+        student_attendance_leave_list.append(student.leave_count + student.absent_count)
         student_name_list.append(student.admin.first_name)
         
     # --- Advanced Analytics Data ---
     # 1. Fee Collection
-    total_fee_collected = sum(f.amount_paid for f in FeeRecord.objects.all())
-    total_fee_pending = sum(f.balance for f in FeeRecord.objects.all())
+    total_fee_collected = FeeRecord.objects.aggregate(total=Sum('amount_paid'))['total'] or 0
+    total_fee_pending = FeeRecord.objects.aggregate(total=Sum('balance'))['total'] or 0
     
     # 2. Pass/Fail Ratio
-    results = StudentResult.objects.all()
+    results = StudentResult.objects.select_related('student__admin', 'subject').all()
     pass_count = 0
     fail_count = 0
     for r in results:
@@ -102,21 +100,18 @@ def admin_home(request):
             
     # 4. Staff Performance Analytics
     staff_analytics = []
-    all_staff = Staff.objects.all()
-    for staff in all_staff:
-        # Number of subjects taught
-        subjects_taught = Subject.objects.filter(staff=staff).count()
-        # Number of attendance sessions taken
-        attendance_taken = Attendance.objects.filter(subject__staff=staff).count()
-        # Number of results published (approx by subject)
-        results_published = StudentResult.objects.filter(subject__staff=staff).count()
-        
+    staff_with_stats = Staff.objects.select_related('admin', 'course').annotate(
+        subjects_taught_count=Count('subject', distinct=True),
+        attendance_taken_count=Count('subject__attendance', distinct=True),
+        results_published_count=Count('subject__studentresult', distinct=True)
+    )
+    for staff in staff_with_stats:
         staff_analytics.append({
             'name': staff.admin.get_full_name(),
             'department': staff.course.name if staff.course else "N/A",
-            'subjects': subjects_taught,
-            'attendance_taken': attendance_taken,
-            'results_published': results_published,
+            'subjects': staff.subjects_taught_count,
+            'attendance_taken': staff.attendance_taken_count,
+            'results_published': staff.results_published_count,
         })
 
     context = {
@@ -269,8 +264,8 @@ def add_course(request):
                 course.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_course'))
-            except:
-                messages.error(request, "Could Not Add")
+            except Exception as e:
+                messages.error(request, f"Could Not Add: {str(e)}")
         else:
             messages.error(request, "Could Not Add")
     return render(request, 'hod_template/add_course_template.html', context)
@@ -468,8 +463,8 @@ def edit_course(request, course_id):
                 course.name = name
                 course.save()
                 messages.success(request, "Successfully Updated")
-            except:
-                messages.error(request, "Could Not Update")
+            except Exception as e:
+                messages.error(request, f"Could Not Update: {str(e)}")
         else:
             messages.error(request, "Could Not Update")
 
@@ -576,7 +571,7 @@ def check_email_availability(request):
 @admin_required
 def student_feedback_message(request):
     if request.method != 'POST':
-        feedbacks = FeedbackStudent.objects.all()
+        feedbacks = FeedbackStudent.objects.select_related('student__admin').all()
         context = {
             'feedbacks': feedbacks,
             'page_title': 'Student Feedback Messages'
@@ -661,7 +656,7 @@ def view_staff_leave(request):
 @admin_required
 def view_student_leave(request):
     if request.method != 'POST':
-        allLeave = LeaveReportStudent.objects.all()
+        allLeave = LeaveReportStudent.objects.select_related('student__admin').all()
         context = {
             'allLeave': allLeave,
             'page_title': 'Leave Applications From Students'
@@ -812,8 +807,8 @@ def send_student_notification(request):
             },
             'to': student.admin.fcm_token
         }
-        headers = {'Authorization':
-                   'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB',
+        fcm_key = os.environ.get('FCM_SERVER_KEY', 'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB')
+        headers = {'Authorization': fcm_key,
                    'Content-Type': 'application/json'}
         data = requests.post(url, data=json.dumps(body), headers=headers)
         notification = NotificationStudent(student=student, message=message)
@@ -841,8 +836,8 @@ def send_staff_notification(request):
             },
             'to': staff.admin.fcm_token
         }
-        headers = {'Authorization':
-                   'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB',
+        fcm_key = os.environ.get('FCM_SERVER_KEY', 'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB')
+        headers = {'Authorization': fcm_key,
                    'Content-Type': 'application/json'}
         data = requests.post(url, data=json.dumps(body), headers=headers)
         notification = NotificationStaff(staff=staff, message=message)
@@ -1325,7 +1320,6 @@ def add_parent(request):
         except Exception as e:
             messages.error(request, f"Could not create parent account: {e}")
             return redirect(reverse('add_parent'))
-            return redirect(reverse('add_parent'))
             
     return render(request, 'hod_template/add_parent.html', context)
 
@@ -1392,3 +1386,14 @@ def delete_parent(request, parent_id):
     except Exception as e:
         messages.error(request, f"Error deleting parent: {e}")
     return redirect(reverse('manage_parent'))
+
+@login_required(login_url='/')
+@admin_required
+def admin_view_student_id_card(request, student_id):
+    student = get_object_or_404(Student, admin_id=student_id)
+    context = {
+        'page_title': 'Student ID Card',
+        'student': student,
+        'prn_number': f"PAT-{student.id:04d}-{student.session.start_year.year if student.session else 2026}"
+    }
+    return render(request, "student_template/student_id_card.html", context)

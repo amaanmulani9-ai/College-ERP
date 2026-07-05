@@ -35,12 +35,15 @@ def student_home(request):
     data_absent = []
     subject_attendance_data = []
 
-    for subject in subjects:
-        attendance_qs = Attendance.objects.filter(subject=subject)
-        present_count = AttendanceReport.objects.filter(
-            attendance__in=attendance_qs, status=True, student=student).count()
-        absent_count = AttendanceReport.objects.filter(
-            attendance__in=attendance_qs, status=False, student=student).count()
+    from django.db.models import Count, Q
+    subjects_with_attendance = subjects.annotate(
+        present_count=Count('attendance__attendancereport', filter=Q(attendance__attendancereport__student=student, attendance__attendancereport__status=True)),
+        absent_count=Count('attendance__attendancereport', filter=Q(attendance__attendancereport__student=student, attendance__attendancereport__status=False))
+    )
+
+    for subject in subjects_with_attendance:
+        present_count = subject.present_count
+        absent_count = subject.absent_count
         total = present_count + absent_count
         pct = int((present_count / total) * 100) if total > 0 else 0
         subject_name.append(subject.name)
@@ -76,7 +79,7 @@ def student_home(request):
     ).select_related('subject', 'subject__staff', 'subject__staff__admin').order_by('start_time')
 
     # 2. Fees Status
-    fee_records = FeeRecord.objects.filter(student=student)
+    fee_records = FeeRecord.objects.filter(student=student).select_related('student__admin')
     pending_fees = 0.0
     for record in fee_records:
         if record.status in ['Unpaid', 'Partial']:
@@ -131,7 +134,7 @@ def student_view_attendance(request):
             attendance = Attendance.objects.filter(
                 date__range=(start_date, end_date), subject=subject)
             attendance_reports = AttendanceReport.objects.filter(
-                attendance__in=attendance, student=student)
+                attendance__in=attendance, student=student).select_related('attendance')
             json_data = []
             for report in attendance_reports:
                 data = {
@@ -216,9 +219,9 @@ def student_view_profile(request):
                 gender = form.cleaned_data.get('gender')
                 passport = request.FILES.get('profile_pic') or None
                 admin = student.admin
-                if password != None:
+                if password is not None:
                     admin.set_password(password)
-                if passport != None:
+                if passport is not None:
                     fs = FileSystemStorage()
                     filename = fs.save(passport.name, passport)
                     passport_url = fs.url(filename)
@@ -328,10 +331,14 @@ def view_books(request):
     borrowed_books = IssuedBook.objects.filter(student_id=request.user.email)
     borrowed_details = []
     
+    # Pre-fetch borrowed books
+    borrowed_isbns = [loan.isbn for loan in borrowed_books]
+    books_dict = {str(b.isbn): b for b in Book.objects.filter(isbn__in=borrowed_isbns)}
+    
     # Calculate live fines and collect borrowed details
     for loan in borrowed_books:
-        try:
-            book = Book.objects.get(isbn=loan.isbn)
+        book = books_dict.get(loan.isbn)
+        if book:
             days = (date.today() - loan.issued_date).days
             fine = max(0, (days - 14) * 5)
             borrowed_details.append({
@@ -342,8 +349,6 @@ def view_books(request):
                 'expiry_date': loan.expiry_date,
                 'fine': fine
             })
-        except Book.DoesNotExist:
-            pass
             
     # Mark books as borrowed in the catalog so the button changes state
     borrowed_isbns = [loan.isbn for loan in borrowed_books]
@@ -448,7 +453,7 @@ def student_hall_ticket(request):
 @student_required
 def student_payable_fees(request):
     student = get_object_or_404(Student, admin=request.user)
-    fee_records = FeeRecord.objects.filter(student=student).order_by('due_date')
+    fee_records = FeeRecord.objects.filter(student=student).select_related('student__admin').order_by('due_date')
     
     # Pre-calculate balance due for each record
     for record in fee_records:
@@ -642,9 +647,14 @@ def student_ai_chat(request):
             
             # --- 1. ATTENDANCE QUERY ---
             if "attendance" in query or "present" in query or "absent" in query or "classes" in query:
-                subjects = Subject.objects.filter(course=student.course)
-                total_att = AttendanceReport.objects.filter(student=student).count()
-                total_pres = AttendanceReport.objects.filter(student=student, status=True).count()
+                from django.db.models import Count, Q
+                subjects = Subject.objects.filter(course=student.course).annotate(
+                    present_count=Count('attendance__attendancereport', filter=Q(attendance__attendancereport__student=student, attendance__attendancereport__status=True)),
+                    absent_count=Count('attendance__attendancereport', filter=Q(attendance__attendancereport__student=student, attendance__attendancereport__status=False))
+                )
+                
+                total_att = sum(s.present_count + s.absent_count for s in subjects)
+                total_pres = sum(s.present_count for s in subjects)
                 overall = int((total_pres / total_att) * 100) if total_att > 0 else 0
                 
                 reply = f"🎓 **Attendance Overview:**\n"
@@ -652,9 +662,8 @@ def student_ai_chat(request):
                 reply += "Here is your subject-wise breakdown:\n"
                 
                 for subject in subjects:
-                    attendance_qs = Attendance.objects.filter(subject=subject)
-                    pres = AttendanceReport.objects.filter(attendance__in=attendance_qs, status=True, student=student).count()
-                    absn = AttendanceReport.objects.filter(attendance__in=attendance_qs, status=False, student=student).count()
+                    pres = subject.present_count
+                    absn = subject.absent_count
                     tot = pres + absn
                     pct = int((pres / tot) * 100) if tot > 0 else 0
                     
@@ -666,7 +675,7 @@ def student_ai_chat(request):
                     
             # --- 2. FEE QUERY ---
             elif "fee" in query or "due" in query or "payable" in query or "balance" in query or "money" in query or "cost" in query:
-                records = FeeRecord.objects.filter(student=student)
+                records = FeeRecord.objects.filter(student=student).select_related('student__admin')
                 pending_fees = 0.0
                 unpaid_details = []
                 
@@ -784,8 +793,9 @@ def student_reg_personal(request):
         if dob_val:
             try:
                 reg.dob = datetime.strptime(dob_val, "%Y-%m-%d").date()
-            except Exception:
-                pass
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning(f"Invalid dob_val {dob_val}: {e}")
                 
         reg.place_of_birth = request.POST.get('place_of_birth', reg.place_of_birth)
         reg.marital_status = request.POST.get('marital_status', reg.marital_status)
@@ -813,8 +823,9 @@ def student_reg_personal(request):
         try:
             reg.height = float(request.POST.get('height', reg.height) or 0)
             reg.weight = float(request.POST.get('weight', reg.weight) or 0)
-        except ValueError:
-            pass
+        except ValueError as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Invalid height/weight value: {e}")
             
         reg.abc_id = request.POST.get('abc_id', reg.abc_id)
         reg.save()
@@ -855,8 +866,9 @@ def student_reg_address(request):
         reg.guardian_mobile = request.POST.get('guardian_mobile', reg.guardian_mobile)
         try:
             reg.guardian_income = float(request.POST.get('guardian_income', reg.guardian_income) or 0)
-        except ValueError:
-            pass
+        except ValueError as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Invalid guardian_income: {e}")
             
         reg.student_phone = request.POST.get('student_phone', reg.student_phone)
         reg.student_email = request.POST.get('student_email', reg.student_email)
@@ -1158,7 +1170,7 @@ def student_assignments(request):
     assignments = Assignment.objects.filter(subject__course=student.course).order_by('-due_date')
     
     # Get student's submissions mapped by assignment id
-    submissions = AssignmentSubmission.objects.filter(student=student)
+    submissions = AssignmentSubmission.objects.filter(student=student).select_related('assignment', 'student__admin')
     submitted_assignment_ids = submissions.values_list('assignment_id', flat=True)
     
     context = {

@@ -249,7 +249,7 @@ DATABASES = {
         default=_database_url,
         conn_max_age=600 if _using_postgres else 0,
         conn_health_checks=_using_postgres,
-        ssl_require=_using_postgres,
+        ssl_require=_using_postgres and not DEBUG,
         engine='django_tenants.postgresql_backend',
     ),
     'legacy_sqlite': {
@@ -409,7 +409,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 # --- Security Configuration Enhancements ---
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+X_FRAME_OPTIONS = 'DENY'
 
 if not DEBUG:
     SECURE_SSL_REDIRECT = True

@@ -18,6 +18,7 @@
                             <thead class="thead-dark">
                                 <tr>
                                     <th>#</th>
+                                    <th>Course Code</th>
                                     <th>Course</th>
                                     <th>Actions</th>
                                 </tr>
@@ -26,6 +27,7 @@
                                 {% for course in courses %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
+                                    <td>CRS-{{course.id|stringformat:"03d"}}</td>
                                     <td>{{course.name}}</td>
                                     <td>
                                         <a href="{% url 'edit_course' course.id %}" class="btn btn-info">Edit</a> -

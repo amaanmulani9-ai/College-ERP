@@ -44,8 +44,8 @@
                                     </td>
                                     
                                     <td><a href="{% url 'edit_student' student.student.id %}" class="btn btn-info">Edit</a> -
-                                        <a href="{% url 'delete_student' student.student.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a>
-
+                                        <a href="{% url 'delete_student' student.student.id %}" class="btn btn-danger" onclick="return confirm('Are you sure about this ?')">Delete</a> -
+                                        <a href="{% url 'admin_view_student_id_card' student.id %}" class="btn btn-primary" target="_blank">ID Card</a>
                                     </td>
                                 </tr>
                                 {% endfor %}

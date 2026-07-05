@@ -47,7 +47,7 @@ class CustomUser(AbstractUser):
     
     username = None  # Removed username, using email instead
     email = models.EmailField(unique=True)
-    user_type = models.CharField(default=1, choices=USER_TYPE, max_length=1)
+    user_type = models.CharField(default='1', choices=USER_TYPE, max_length=1)
     gender = models.CharField(max_length=1, choices=GENDER)
     profile_pic = models.ImageField()
     address = models.TextField()
@@ -87,8 +87,8 @@ class Book(models.Model):
 
 class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
-    session = models.ForeignKey(Session, on_delete=models.DO_NOTHING, null=True)
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=False)
+    session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
@@ -110,7 +110,7 @@ class IssuedBook(models.Model):
 
 
 class Staff(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.DO_NOTHING, null=True, blank=False)
+    course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
 
     def __str__(self):

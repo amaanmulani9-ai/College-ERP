@@ -50,53 +50,67 @@ def doLogin(request, **kwargs):
             }
             # Make request
             try:
-                captcha_server = requests.post(url=captcha_url, data=data)
-                response = json.loads(captcha_server.text)
-                if response['success'] == False:
-                    messages.error(request, 'Invalid Captcha. Try Again')
-                    return redirect('/')
-            except:
-                messages.error(request, 'Captcha could not be verified. Try Again')
-                return redirect('/')
+                captcha_server = requests.post(url=captcha_url, data=data, timeout=10)
+                result = captcha_server.json()
+                if result.get("success", False):
+                    # recaptcha was successful
+                    pass
+                else:
+                    messages.error(request, "Invalid reCAPTCHA. Please try again.")
+                    return redirect(reverse('login'))
+            except Exception as e:
+                messages.error(request, "Error validating reCAPTCHA. Please try again later.")
+                import logging
+                logging.getLogger(__name__).error(f"ReCAPTCHA error: {e}")
+                return redirect(reverse('login'))
         
         #Authenticate
-        user = EmailBackend.authenticate(request, username=request.POST.get('email'), password=request.POST.get('password'))
-        if user != None:
-            login(request, user, backend='main_app.EmailBackend.EmailBackend')
-            
-            # Log login to MongoDB Analytics
-            log_analytics_event("user_login", {
-                "user_id": user.id,
-                "email": user.email,
-                "user_type": user.user_type
-            })
-            
-            # Handle "Remember Me" functionality
-            remember_me = request.POST.get('remember')
-            if remember_me:
-                # Set session to expire when browser closes = False
-                # Session will last for 30 days
-                request.session.set_expiry(30 * 24 * 60 * 60)  # 30 days in seconds
+        try:
+            user = EmailBackend.authenticate(request, username=request.POST.get('email'), password=request.POST.get('password'))
+            if user is not None:
+                login(request, user, backend='main_app.EmailBackend.EmailBackend')
+                
+                # Log login to MongoDB Analytics
+                log_analytics_event("user_login", {
+                    "user_id": user.id,
+                    "email": user.email,
+                    "user_type": user.user_type
+                })
+                
+                # Handle "Remember Me" functionality
+                remember_me = request.POST.get('remember')
+                if remember_me:
+                    # Set session to expire when browser closes = False
+                    # Session will last for 30 days
+                    request.session.set_expiry(30 * 24 * 60 * 60)  # 30 days in seconds
+                else:
+                    # Set session to expire when browser closes
+                    request.session.set_expiry(0)
+                
+                if user.user_type == '1':
+                    return redirect(reverse("admin_home"))
+                elif user.user_type == '2':
+                    return redirect(reverse("staff_home"))
+                elif user.user_type == '4':
+                    return redirect(reverse("parent_home"))
+                elif user.user_type == '3':
+                    return redirect(reverse("student_home"))
+                else:
+                    messages.error(request, "Invalid user type.")
+                    return redirect(reverse('login'))
             else:
-                # Set session to expire when browser closes
-                request.session.set_expiry(0)
-            
-            if user.user_type == '1':
-                return redirect(reverse("admin_home"))
-            elif user.user_type == '2':
-                return redirect(reverse("staff_home"))
-            elif user.user_type == '4':
-                return redirect(reverse("parent_home"))
-            else:
-                return redirect(reverse("student_home"))
-        else:
-            messages.error(request, "Invalid details")
-            return redirect("/")
+                messages.error(request, "Invalid details")
+                return redirect("/")
+        except Exception as e:
+            messages.error(request, "Error processing login. Please try again.")
+            import logging
+            logging.getLogger(__name__).error(f"Login error: {e}")
+            return redirect(reverse('login'))
 
 
 
 def logout_user(request):
-    if request.user != None and request.user.is_authenticated:
+    if request.user.is_authenticated:
         # Log logout to MongoDB Analytics
         log_analytics_event("user_logout", {
             "user_id": request.user.id,
@@ -120,7 +134,7 @@ def get_attendance(request):
             data = {
                     "id": attd.id,
                     "attendance_date": str(attd.date),
-                    "session": attd.session.id
+                    "session": attd.session_id
                     }
             attendance_list.append(data)
         return JsonResponse(json.dumps(attendance_list), safe=False)
@@ -215,7 +229,7 @@ def discussion_board(request):
     # Fetch messages for the active subject
     messages_list = []
     if active_subject:
-        messages_list = DiscussionMessage.objects.filter(subject=active_subject).order_by('created_at')
+        messages_list = DiscussionMessage.objects.filter(subject=active_subject).select_related('user').order_by('created_at')
         
     context = {
         'subjects': subjects,
@@ -247,8 +261,9 @@ def get_notifications_json(request):
                     'is_read': n.is_read,
                     'created_at': n.created_at.strftime('%b %d, %Y %H:%M'),
                 })
-        except Exception:
-            pass
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Error fetching unread messages for student: {e}")
     elif user.user_type == '2':  # Staff
         try:
             staff = user.staff
@@ -261,9 +276,9 @@ def get_notifications_json(request):
                     'is_read': n.is_read,
                     'created_at': n.created_at.strftime('%b %d, %Y %H:%M'),
                 })
-        except Exception:
-            pass
-
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Error fetching unread messages for staff: {e}")
     return JsonResponse({'unread_count': unread_count, 'notifications': notifs})
 
 
@@ -275,11 +290,13 @@ def mark_notifications_read(request):
     if user.user_type == '3':
         try:
             NotificationStudent.objects.filter(student=user.student, is_read=False).update(is_read=True)
-        except Exception:
-            pass
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Error updating notifications for student: {e}")
     elif user.user_type == '2':
         try:
             NotificationStaff.objects.filter(staff=user.staff, is_read=False).update(is_read=True)
-        except Exception:
-            pass
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Error updating notifications for staff: {e}")
     return JsonResponse({'status': 'ok'})

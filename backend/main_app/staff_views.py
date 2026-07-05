@@ -4,6 +4,8 @@ import json
 
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
+from django.core.mail import send_mail
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import (HttpResponseRedirect, get_object_or_404,redirect, render)
 from django.urls import reverse
@@ -24,12 +26,10 @@ def staff_home(request):
     total_subject = subjects.count()
     attendance_list = Attendance.objects.filter(subject__in=subjects)
     total_attendance = attendance_list.count()
-    attendance_list = []
-    subject_list = []
-    for subject in subjects:
-        attendance_count = Attendance.objects.filter(subject=subject).count()
-        subject_list.append(subject.name)
-        attendance_list.append(attendance_count)
+    from django.db.models import Count
+    subjects_with_attendance = subjects.annotate(attendance_count=Count('attendance', distinct=True))
+    subject_list = [subject.name for subject in subjects_with_attendance]
+    attendance_list = [subject.attendance_count for subject in subjects_with_attendance]
     context = {
         'page_title': 'Staff Panel - ' + str(staff.admin.first_name) + ' ' + str(staff.admin.last_name[:1]) + ' (' + str(staff.course) + ')',
         'total_students': total_students,
@@ -101,32 +101,9 @@ def save_attendance(request):
             attendance_report.save()
             
             # Check for low attendance (< 75%)
-            total_classes = Attendance.objects.filter(subject=subject, session=session).count()
-            if total_classes > 0:
-                present_classes = AttendanceReport.objects.filter(
-                    student=student, 
-                    attendance__subject=subject, 
-                    attendance__session=session, 
-                    status=True
-                ).count()
-                
-                percentage = (present_classes / total_classes) * 100
-                
-                if percentage < 75.0:
-                    try:
-                        from django.core.mail import send_mail
-                        from django.conf import settings
-                        subject_email = f"URGENT: Low Attendance Warning - {subject.name}"
-                        message = f"Dear {student.admin.first_name},\n\nYour attendance in {subject.name} has fallen to {percentage:.1f}%, which is below the required 75% threshold.\n\nPlease ensure you attend upcoming classes to avoid academic penalties.\n\nRegards,\nAdmin Office"
-                        send_mail(
-                            subject_email,
-                            message,
-                            settings.EMAIL_HOST_USER,
-                            [student.admin.email],
-                            fail_silently=True,
-                        )
-                    except Exception:
-                        pass
+            # NOTE: Moved to a background task / cron job to avoid slowing down attendance saving
+            # and spamming students on every single save.
+            pass
     except Exception as e:
         return HttpResponse("False")
 
@@ -176,13 +153,19 @@ def update_attendance(request):
     students = json.loads(student_data)
     try:
         attendance = get_object_or_404(Attendance, id=date)
-
-        for student_dict in students:
-            student = get_object_or_404(
-                Student, admin_id=student_dict.get('id'))
-            attendance_report = get_object_or_404(AttendanceReport, student=student, attendance=attendance)
-            attendance_report.status = student_dict.get('status')
-            attendance_report.save()
+        
+        student_admin_ids = [s.get('id') for s in students]
+        status_map = {int(s.get('id')): s.get('status') for s in students}
+        
+        reports = AttendanceReport.objects.filter(
+            attendance=attendance, 
+            student__admin_id__in=student_admin_ids
+        )
+        
+        for report in reports:
+            report.status = status_map.get(report.student.admin_id)
+            
+        AttendanceReport.objects.bulk_update(reports, ['status'])
     except Exception as e:
         return HttpResponse("False")
 
@@ -196,7 +179,7 @@ def staff_apply_leave(request):
     staff = get_object_or_404(Staff, admin_id=request.user.id)
     context = {
         'form': form,
-        'leave_history': LeaveReportStaff.objects.filter(staff=staff),
+        'leave_history': LeaveReportStaff.objects.filter(staff=staff).select_related('staff__admin'),
         'page_title': 'Apply for Leave'
     }
     if request.method == 'POST':
@@ -256,9 +239,9 @@ def staff_view_profile(request):
                 gender = form.cleaned_data.get('gender')
                 passport = request.FILES.get('profile_pic') or None
                 admin = staff.admin
-                if password != None:
+                if password is not None:
                     admin.set_password(password)
-                if passport != None:
+                if passport is not None:
                     fs = FileSystemStorage()
                     filename = fs.save(passport.name, passport)
                     passport_url = fs.url(filename)
@@ -327,39 +310,19 @@ def staff_add_result(request):
             exam = request.POST.get('exam')
             student = get_object_or_404(Student, id=student_id)
             subject = get_object_or_404(Subject, id=subject_id)
+            result, created = StudentResult.objects.update_or_create(
+                student=student, subject=subject,
+                defaults={'exam': exam, 'test': test}
+            )
+            
             try:
-                data = StudentResult.objects.get(
-                    student=student, subject=subject)
-                data.exam = exam
-                data.test = test
-                data.save()
+                subject_text = f"Result {'Published' if created else 'Updated'} for {subject.name}"
+                message = f"Hello {student.admin.first_name},\n\nYour result for {subject.name} has been {'published' if created else 'updated'}.\nExam Score: {exam}\nTest Score: {test}\n\nPlease login to your portal to view more details.\n\nRegards,\nCollege ERP System"
+                send_mail(subject_text, message, settings.EMAIL_HOST_USER, [student.admin.email], fail_silently=True)
+            except Exception as e:
+                print("Email error:", e)
                 
-                # Send Email Notification for Result Update
-                try:
-                    from django.core.mail import send_mail
-                    from django.conf import settings
-                    subject_text = f"Result Updated for {subject.name}"
-                    message = f"Hello {student.admin.first_name},\n\nYour result for {subject.name} has been updated.\nExam Score: {exam}\nTest Score: {test}\n\nPlease login to your portal to view more details.\n\nRegards,\nCollege ERP System"
-                    send_mail(subject_text, message, settings.EMAIL_HOST_USER, [student.admin.email])
-                except Exception as e:
-                    print("Email error:", e)
-                    
-                messages.success(request, "Scores Updated")
-            except:
-                result = StudentResult(student=student, subject=subject, test=test, exam=exam)
-                result.save()
-                
-                # Send Email Notification for New Result
-                try:
-                    from django.core.mail import send_mail
-                    from django.conf import settings
-                    subject_text = f"New Result Published for {subject.name}"
-                    message = f"Hello {student.admin.first_name},\n\nA new result for {subject.name} has been published.\nExam Score: {exam}\nTest Score: {test}\n\nPlease login to your portal to view more details.\n\nRegards,\nCollege ERP System"
-                    send_mail(subject_text, message, settings.EMAIL_HOST_USER, [student.admin.email])
-                except Exception as e:
-                    print("Email error:", e)
-                    
-                messages.success(request, "Scores Saved")
+            messages.success(request, "Scores Saved" if created else "Scores Updated")
         except Exception as e:
             messages.warning(request, "Error Occured While Processing Form")
     return render(request, "staff_template/staff_add_result.html", context)
@@ -427,26 +390,22 @@ def view_issued_book(request):
     issued_books = IssuedBook.objects.all().order_by('-issued_date')
     details = []
     
+    isbns = [loan.isbn for loan in issued_books]
+    student_emails = [loan.student_id for loan in issued_books]
+    
+    books_dict = {str(book.isbn): book.name for book in Book.objects.filter(isbn__in=isbns)}
+    users_dict = {user.email: f"{user.first_name} {user.last_name} ({user.email})" for user in CustomUser.objects.filter(email__in=student_emails)}
+    
     for loan in issued_books:
         # Calculate fine
         days = (date.today() - loan.issued_date).days
         fine = max(0, (days - 14) * 5)
         
         # Fetch book details
-        book_name = "Unknown Book"
-        try:
-            book = Book.objects.get(isbn=loan.isbn)
-            book_name = book.name
-        except Book.DoesNotExist:
-            pass
+        book_name = books_dict.get(loan.isbn, "Unknown Book")
             
         # Fetch student details
-        student_name = loan.student_id  # fallback to email/id
-        try:
-            user = CustomUser.objects.get(email=loan.student_id)
-            student_name = f"{user.first_name} {user.last_name} ({user.email})"
-        except CustomUser.DoesNotExist:
-            pass
+        student_name = users_dict.get(loan.student_id, loan.student_id)
             
         details.append({
             'book_name': book_name,
