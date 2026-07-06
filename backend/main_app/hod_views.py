@@ -362,6 +362,8 @@ def add_student(request):
                 student = user.student
                 student.session = session
                 student.course = course
+                student.current_semester = student_form.cleaned_data.get('current_semester') or 1
+                student.division = student_form.cleaned_data.get('division')
                 
                 # eSkooly student admission fields
                 student.registration_no = student_form.cleaned_data.get('registration_no')
@@ -488,11 +490,32 @@ def manage_staff(request):
 @login_required(login_url='/')
 @admin_required
 def manage_student(request):
-    students = CustomUser.objects.filter(user_type=3)
+    students = CustomUser.objects.filter(user_type=3).select_related('student', 'student__course', 'student__session')
     courses  = Course.objects.all()
+    sessions = Session.objects.all()
+    
+    course_filter = request.GET.get('course', '')
+    session_filter = request.GET.get('session', '')
+    semester_filter = request.GET.get('semester', '')
+    division_filter = request.GET.get('division', '')
+    
+    if course_filter:
+        students = students.filter(student__course_id=course_filter)
+    if session_filter:
+        students = students.filter(student__session_id=session_filter)
+    if semester_filter:
+        students = students.filter(student__current_semester=semester_filter)
+    if division_filter:
+        students = students.filter(student__division__iexact=division_filter)
+        
     context = {
         'students': students,
-        'courses':  courses,
+        'courses': courses,
+        'sessions': sessions,
+        'selected_course': course_filter,
+        'selected_session': session_filter,
+        'selected_semester': semester_filter,
+        'selected_division': division_filter,
         'page_title': 'Manage Students'
     }
     return render(request, "hod_template/manage_student.html", context)
@@ -639,6 +662,8 @@ def edit_student(request, student_id):
 
                 student.session = session
                 student.course = course
+                student.current_semester = form.cleaned_data.get('current_semester') or student.current_semester
+                student.division = form.cleaned_data.get('division') or student.division
                 
                 # eSkooly student admission fields
                 student.registration_no = form.cleaned_data.get('registration_no')
@@ -1087,10 +1112,12 @@ def send_student_notification(request):
             },
             'to': student.admin.fcm_token
         }
-        fcm_key = os.environ.get('FCM_SERVER_KEY', 'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB')
+        fcm_key = os.environ.get('FCM_SERVER_KEY', '')
+        if not fcm_key:
+            return HttpResponse("False")
         headers = {'Authorization': fcm_key,
                    'Content-Type': 'application/json'}
-        data = requests.post(url, data=json.dumps(body), headers=headers)
+        data = requests.post(url, data=json.dumps(body), headers=headers, timeout=10)
         notification = NotificationStudent(student=student, message=message)
         notification.save()
         return HttpResponse("True")
@@ -1116,10 +1143,12 @@ def send_staff_notification(request):
             },
             'to': staff.admin.fcm_token
         }
-        fcm_key = os.environ.get('FCM_SERVER_KEY', 'key=AAAA3Bm8j_M:APA91bElZlOLetwV696SoEtgzpJr2qbxBfxVBfDWFiopBWzfCfzQp2nRyC7_A2mlukZEHV4g1AmyC6P_HonvSkY2YyliKt5tT3fe_1lrKod2Daigzhb2xnYQMxUWjCAIQcUexAMPZePB')
+        fcm_key = os.environ.get('FCM_SERVER_KEY', '')
+        if not fcm_key:
+            return HttpResponse("False")
         headers = {'Authorization': fcm_key,
                    'Content-Type': 'application/json'}
-        data = requests.post(url, data=json.dumps(body), headers=headers)
+        data = requests.post(url, data=json.dumps(body), headers=headers, timeout=10)
         notification = NotificationStaff(staff=staff, message=message)
         notification.save()
         return HttpResponse("True")
@@ -1970,7 +1999,7 @@ def import_students_csv(request):
             error_count = 0
             
             for column in csv.reader(io_string, delimiter=',', quotechar='"'):
-                # Expected format: first_name, last_name, gender, course_id, session_id, date_of_admission, email (optional)
+                # Expected format: first_name, last_name, gender, course_id, session_id, date_of_admission, email (optional), semester (optional), division (optional)
                 if len(column) < 6:
                     continue
                     
@@ -1983,6 +2012,8 @@ def import_students_csv(request):
                 session_id = column[4].strip()
                 date_of_admission = column[5].strip()
                 provided_email = column[6].strip() if len(column) > 6 else ""
+                semester = int(column[7].strip()) if len(column) > 7 and column[7].strip() else 1
+                division = column[8].strip() if len(column) > 8 else ""
                 
                 email = None
                 if provided_email:
@@ -2019,6 +2050,8 @@ def import_students_csv(request):
                     student = user.student # Will be created by signal
                     student.course = course
                     student.session = session
+                    student.current_semester = semester
+                    student.division = division
                     if date_of_admission:
                         student.date_of_admission = date_of_admission
                     student.save()
@@ -2247,50 +2280,69 @@ def manage_login(request):
 def promote_students(request):
     """Promote Students interface."""
     courses = Course.objects.all()
+    sessions = Session.objects.all()
     
     # Handle promotion action
     if request.method == "POST":
         student_ids = request.POST.getlist('student_ids')
         target_course_id = request.POST.get('target_course')
+        target_session_id = request.POST.get('target_session')
+        target_semester = request.POST.get('target_semester')
         
         if not student_ids:
             messages.error(request, "No students selected for promotion.")
-        elif not target_course_id:
-            messages.error(request, "No target class selected.")
         else:
             try:
-                target_course = Course.objects.get(id=target_course_id)
                 students_to_promote = Student.objects.filter(id__in=student_ids)
                 count = students_to_promote.count()
                 
-                # Update course
-                students_to_promote.update(course=target_course)
+                update_fields = {}
+                if target_course_id:
+                    update_fields['course_id'] = target_course_id
+                if target_session_id:
+                    update_fields['session_id'] = target_session_id
+                if target_semester:
+                    update_fields['current_semester'] = target_semester
                 
-                messages.success(request, f"Successfully promoted {count} students to {target_course.name}.")
+                if update_fields:
+                    students_to_promote.update(**update_fields)
+                    messages.success(request, f"Successfully promoted {count} students.")
+                else:
+                    messages.warning(request, "No target specified for promotion.")
             except Exception as e:
                 messages.error(request, f"Error promoting students: {e}")
                 
-        # Redirect back to same page keeping any GET params if needed, 
-        # but standard redirect is cleaner
         return redirect(reverse('promote_students'))
         
     # GET request filtering
     course_filter = request.GET.get('course', '')
+    session_filter = request.GET.get('session', '')
+    semester_filter = request.GET.get('semester', '')
+    division_filter = request.GET.get('division', '')
     search_filter = request.GET.get('search', '')
     
-    students = Student.objects.select_related('admin', 'course').all()
+    students = CustomUser.objects.filter(user_type=3).select_related('student')
     
     if course_filter:
-        students = students.filter(course_id=course_filter)
+        students = students.filter(student__course_id=course_filter)
+    if session_filter:
+        students = students.filter(student__session_id=session_filter)
+    if semester_filter:
+        students = students.filter(student__current_semester=semester_filter)
+    if division_filter:
+        students = students.filter(student__division__iexact=division_filter)
     if search_filter:
-        students = students.filter(admin__first_name__icontains=search_filter) | students.filter(admin__last_name__icontains=search_filter) | students.filter(registration_no__icontains=search_filter)
+        students = students.filter(first_name__icontains=search_filter) | students.filter(last_name__icontains=search_filter)
         
     context = {
         'page_title': 'Promote Students',
-        'students': students,
         'courses': courses,
+        'sessions': sessions,
+        'students': students,
         'selected_course': course_filter,
+        'selected_session': session_filter,
+        'selected_semester': semester_filter,
+        'selected_division': division_filter,
+        'search_query': search_filter
     }
     return render(request, 'hod_template/promote_students.html', context)
-
-

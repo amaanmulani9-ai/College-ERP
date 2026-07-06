@@ -43,7 +43,7 @@ def send_email_brevo(to_email, subject, html_content):
                 "htmlContent": html_content
             }
             try:
-                res = requests.post(url, json=payload, headers=headers)
+                res = requests.post(url, json=payload, headers=headers, timeout=10)
                 if res.status_code in [200, 201]:
                     return True
             except Exception as ex:
@@ -71,7 +71,7 @@ def send_sms_twilio(to_number, message_body):
         "Body": message_body
     }
     try:
-        response = requests.post(url, data=data, auth=(account_sid, auth_token))
+        response = requests.post(url, data=data, auth=(account_sid, auth_token), timeout=10)
         if response.status_code in [200, 201]:
             return True
         else:
@@ -105,7 +105,7 @@ def send_fcm_push(fcm_token, title, body_text):
         }
     }
     try:
-        response = requests.post(url, json=payload, headers=headers)
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
         if response.status_code == 200:
             return True
     except Exception as e:

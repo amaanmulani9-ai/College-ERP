@@ -81,6 +81,7 @@ class Course(models.Model):
     name = models.CharField(max_length=120)
     monthly_fees = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     class_teacher = models.ForeignKey('Staff', on_delete=models.SET_NULL, null=True, blank=True, related_name='class_teacher_of')
+    total_semesters = models.IntegerField(default=6, help_text="Total semesters for this course (e.g., 6 for BSCIT, 4 for MSCIT)")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -103,6 +104,7 @@ class Student(models.Model):
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
     batch_year = models.IntegerField(default=2022)
     current_semester = models.IntegerField(default=1)
+    division = models.CharField(max_length=50, blank=True, null=True, help_text="Batch or Division (e.g. Batch A)")
     id_card_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
 
     # eSkooly student admission fields
@@ -340,6 +342,14 @@ def save_user_profile(sender, instance, **kwargs):
             if instance.student.session and reg.session != str(instance.student.session):
                 reg.session = str(instance.student.session)
                 reg_changed = True
+            
+            # Sync division and semester
+            if instance.student.division and reg.division != instance.student.division:
+                reg.division = instance.student.division
+                reg_changed = True
+            if reg.current_semester != instance.student.current_semester:
+                reg.current_semester = instance.student.current_semester
+                reg_changed = True
                 
             if reg_changed:
                 if not getattr(instance, '_syncing_registration', False):
@@ -481,6 +491,8 @@ class StudentRegistration(models.Model):
     application_no = models.CharField(max_length=100, default="")
     session = models.CharField(max_length=50, default="")
     course_name = models.CharField(max_length=100, default="")
+    current_semester = models.IntegerField(default=1)
+    division = models.CharField(max_length=50, default="")
     
     # Personal details
     surname = models.CharField(max_length=100, default="")

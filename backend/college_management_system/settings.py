@@ -41,7 +41,13 @@ if env_path.exists():
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-key-change-me-in-production')
+_secret_key = os.environ.get('SECRET_KEY', '')
+if not _secret_key:
+    # In development allow an insecure default; in production raise immediately.
+    if os.environ.get('VERCEL') or os.environ.get('RENDER'):
+        raise RuntimeError("SECRET_KEY environment variable is not set. Refusing to start in production without it.")
+    _secret_key = 'django-insecure-default-key-change-me-in-production'
+SECRET_KEY = _secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 if os.environ.get('VERCEL') and 'DEBUG' not in os.environ:

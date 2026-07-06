@@ -250,24 +250,47 @@ body, .erpnext-main { font-family: 'Poppins', sans-serif; }
 </div>
 
 <!-- Toolbar -->
-<div class="sk-toolbar">
-    <div class="sk-search-group" style="flex:2;">
-        <label>Search Student</label>
-        <input type="text" id="studentSearch" placeholder="Type student name or reg number..." oninput="filterStudents()">
-    </div>
-    <div class="sk-search-group" style="flex:1.5;">
-        <label>Filter By Class</label>
-        <select id="courseFilter" onchange="filterStudents()">
-            <option value="">-- Select a class --</option>
+<form method="GET" class="sk-toolbar">
+    <div class="sk-search-group" style="flex:1;">
+        <label>Class</label>
+        <select name="course" id="courseFilter" onchange="this.form.submit()">
+            <option value="">-- All --</option>
             {% for course in courses %}
-            <option value="{{ course.name }}">{{ course.name }}</option>
+            <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"s" %}selected{% endif %}>{{ course.name }}</option>
             {% endfor %}
         </select>
     </div>
-    <a href="{% url 'add_student' %}" class="sk-btn-add">
-        <i class="fas fa-plus"></i> + Add Student
+    <div class="sk-search-group" style="flex:1;">
+        <label>Academic Year</label>
+        <select name="session" onchange="this.form.submit()">
+            <option value="">-- All --</option>
+            {% for session in sessions %}
+            <option value="{{ session.id }}" {% if selected_session == session.id|stringformat:"s" %}selected{% endif %}>{{ session.start_year.year }}-{{ session.end_year.year }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="sk-search-group" style="flex:1;">
+        <label>Semester</label>
+        <select name="semester" onchange="this.form.submit()">
+            <option value="">-- All --</option>
+            <option value="1" {% if selected_semester == '1' %}selected{% endif %}>Sem 1</option>
+            <option value="2" {% if selected_semester == '2' %}selected{% endif %}>Sem 2</option>
+            <option value="3" {% if selected_semester == '3' %}selected{% endif %}>Sem 3</option>
+            <option value="4" {% if selected_semester == '4' %}selected{% endif %}>Sem 4</option>
+            <option value="5" {% if selected_semester == '5' %}selected{% endif %}>Sem 5</option>
+            <option value="6" {% if selected_semester == '6' %}selected{% endif %}>Sem 6</option>
+            <option value="7" {% if selected_semester == '7' %}selected{% endif %}>Sem 7</option>
+            <option value="8" {% if selected_semester == '8' %}selected{% endif %}>Sem 8</option>
+        </select>
+    </div>
+    <div class="sk-search-group" style="flex:1;">
+        <label>Division</label>
+        <input type="text" name="division" value="{{ selected_division }}" placeholder="e.g. Batch A" onchange="this.form.submit()">
+    </div>
+    <a href="{% url 'add_student' %}" class="sk-btn-add" style="margin-left:auto;">
+        <i class="fas fa-plus"></i> Add Student
     </a>
-</div>
+</form>
 
 <!-- Messages -->
 {% if messages %}
@@ -307,8 +330,8 @@ body, .erpnext-main { font-family: 'Poppins', sans-serif; }
         {% endif %}
 
         <!-- Name & Reg -->
-        <p class="sk-stu-name">{{ student.first_name }}</p>
-        <p class="sk-stu-reg">{{ student.student.registration_no|default:"—" }}</p>
+        <p class="sk-stu-name">{{ student.first_name }} {{ student.last_name }}</p>
+        <p class="sk-stu-reg">{{ student.student.course.name|default:"—" }} | Sem {{ student.student.current_semester }}<br>{{ student.student.division|default:"No Div" }}</p>
 
         <!-- Round Action Buttons -->
         <div class="sk-stu-actions">
@@ -359,33 +382,6 @@ body, .erpnext-main { font-family: 'Poppins', sans-serif; }
 
 {% block custom_js %}
 <script>
-function filterStudents() {
-    const search = document.getElementById('studentSearch').value.toLowerCase().trim();
-    const course = document.getElementById('courseFilter').value.toLowerCase();
-    const cards  = document.querySelectorAll('.sk-student-card');
-    const jsEmpty = document.getElementById('jsEmptyState');
-    let visible = 0;
-
-    cards.forEach(card => {
-        const name = card.dataset.name || '';
-        const reg  = (card.dataset.reg || '').toLowerCase();
-        const cardCourse = (card.dataset.course || '').toLowerCase();
-
-        const matchSearch = !search || name.includes(search) || reg.includes(search);
-        const matchCourse = !course || cardCourse === course;
-
-        if (matchSearch && matchCourse) {
-            card.style.display = '';
-            visible++;
-        } else {
-            card.style.display = 'none';
-        }
-    });
-
-    document.getElementById('resultLabel').textContent =
-        `Showing ${visible} student${visible !== 1 ? 's' : ''}`;
-
-    jsEmpty.style.display = visible === 0 && cards.length > 0 ? 'block' : 'none';
-}
+// We removed client side filtering since it's now server side
 </script>
 {% endblock custom_js %}
