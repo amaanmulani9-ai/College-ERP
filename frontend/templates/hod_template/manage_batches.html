@@ -1,0 +1,190 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Filter Box -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3"><i class="fas fa-filter text-primary me-2"></i>Filter Students by Batch</h5>
+                    <form method="GET" action="{% url 'admin_manage_batches' %}" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Course</label>
+                            <select name="course" class="form-select">
+                                <option value="">All Courses</option>
+                                {% for course in courses %}
+                                    <option value="{{ course.id }}" {% if selected_course == course.id %}selected{% endif %}>{{ course.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Academic Session</label>
+                            <select name="session" class="form-select">
+                                <option value="">All Sessions</option>
+                                {% for session in sessions %}
+                                    <option value="{{ session.id }}" {% if selected_session == session.id %}selected{% endif %}>{{ session }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Batch Year</label>
+                            <select name="batch_year" class="form-select">
+                                <option value="">All Batch Years</option>
+                                {% for year in batch_years %}
+                                    <option value="{{ year }}" {% if selected_batch_year == year %}selected{% endif %}>{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Current Semester</label>
+                            <select name="semester" class="form-select">
+                                <option value="">All Semesters</option>
+                                {% for sem in semesters %}
+                                    <option value="{{ sem }}" {% if selected_semester == sem %}selected{% endif %}>Semester {{ sem }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'admin_manage_batches' %}" class="btn btn-light px-4">Reset</a>
+                            <button type="submit" class="btn btn-primary px-4">Apply Filters</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Students List Box -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST" id="batchForm">
+                        {% csrf_token %}
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                            <h5 class="fw-bold mb-0">Students List ({{ students.count }})</h5>
+                            
+                            <!-- Operations Actions -->
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-outline-primary" onclick="submitBatchAction('print')">
+                                    <i class="fas fa-print me-1"></i> Print Selected ID Cards
+                                </button>
+                                <button type="button" class="btn btn-success" onclick="submitBatchAction('promote')">
+                                    <i class="fas fa-chevron-circle-up me-1"></i> Promote Semester
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="submitBatchAction('demote')">
+                                    <i class="fas fa-chevron-circle-down me-1"></i> Demote Semester
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Main Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 40px;">
+                                            <input class="form-check-input" type="checkbox" id="selectAllCheckbox">
+                                        </th>
+                                        <th>Photo</th>
+                                        <th>Name</th>
+                                        <th>Course</th>
+                                        <th>Session</th>
+                                        <th>Batch Year</th>
+                                        <th>Current Semester</th>
+                                        <th>Unique ID Code</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                    <tr>
+                                        <td>
+                                            <input class="form-check-input student-checkbox" type="checkbox" name="student_ids" value="{{ student.id }}">
+                                        </td>
+                                        <td>
+                                            <img src="{{ student.admin.profile_pic.url|default:'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}" class="rounded-circle shadow-sm" style="width: 40px; height: 40px; object-fit: cover;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold">{{ student.admin.get_full_name }}</span>
+                                            <div class="small text-muted">{{ student.admin.email }}</div>
+                                        </td>
+                                        <td><span class="badge bg-secondary-subtle text-secondary-emphasis">{{ student.course.name }}</span></td>
+                                        <td>{{ student.session }}</td>
+                                        <td>{{ student.batch_year }}</td>
+                                        <td>
+                                            <span class="badge bg-primary-subtle text-primary-emphasis">Sem {{ student.current_semester }}</span>
+                                        </td>
+                                        <td>
+                                            <code>{{ student.id_card_code|default:"Not Generated" }}</code>
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{% url 'admin_view_student_id_card' student.admin.id %}" class="btn btn-outline-dark btn-sm">
+                                                <i class="fas fa-id-card me-1"></i> ID Card
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="9" class="text-center py-5 text-muted">
+                                            <i class="fas fa-users fa-3x mb-3"></i>
+                                            <p class="mb-0">No students found matching current filters.</p>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const selectAll = document.getElementById("selectAllCheckbox");
+        const checkboxes = document.querySelectorAll(".student-checkbox");
+        
+        selectAll.addEventListener("change", function() {
+            checkboxes.forEach(cb => {
+                cb.checked = selectAll.checked;
+            });
+        });
+    });
+
+    function submitBatchAction(actionType) {
+        const form = document.getElementById("id=batchForm"); // Actually using standard select IDs
+        const selected = document.querySelectorAll('.student-checkbox:checked');
+        
+        if (selected.length === 0) {
+            alert("Please select at least one student!");
+            return;
+        }
+
+        if (actionType === 'print') {
+            const ids = Array.from(selected).map(cb => cb.value).join(',');
+            const url = `{% url "admin_print_batch_ids" %}?ids=${ids}`;
+            window.open(url, '_blank');
+        } else {
+            const confirmMsg = actionType === 'promote' 
+                ? `Are you sure you want to promote ${selected.length} selected students to their next semester?`
+                : `Are you sure you want to demote ${selected.length} selected students to their previous semester?`;
+            
+            if (confirm(confirmMsg)) {
+                const formObj = document.getElementById("batchForm");
+                
+                // Add hidden action input
+                const actionInput = document.createElement("input");
+                actionInput.type = "hidden";
+                actionInput.name = "action";
+                actionInput.value = actionType;
+                formObj.appendChild(actionInput);
+                
+                formObj.action = "{% url 'admin_promote_batch' %}";
+                formObj.submit();
+            }
+        }
+    }
+</script>
+{% endblock content %}

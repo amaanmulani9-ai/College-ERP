@@ -267,6 +267,7 @@ urlpatterns = [
     # --- Smart Campus (Version 3.5) ---
     path("student/id-card/", smart_views.student_id_card, name='student_id_card'),
     path("student/id-card/qr/<int:student_id>/", smart_views.generate_student_qr, name='generate_student_qr'),
+    path("staff/id-card/qr/<int:staff_id>/", smart_views.generate_staff_qr, name='generate_staff_qr'),
     
     path("staff/scanner/", smart_views.staff_scanner_desk, name='staff_scanner_desk'),
     path("staff/scanner/attendance/", smart_views.scan_attendance_qr, name='scan_attendance_qr'),
@@ -275,6 +276,12 @@ urlpatterns = [
     path("visitor/request/", smart_views.visitor_pass_request, name='visitor_pass_request'),
     path("admin/visitors/", smart_views.admin_visitor_passes, name='admin_visitor_passes'),
     path("staff/scanner/visitor/", smart_views.verify_visitor_pass, name='verify_visitor_pass'),
+    
+    # Batch Management & Print ID Cards
+    path("admin/batches/", hod_views.admin_manage_batches, name='admin_manage_batches'),
+    path("admin/batches/promote/", hod_views.admin_promote_batch, name='admin_promote_batch'),
+    path("admin/batches/print-ids/", hod_views.admin_print_batch_ids, name='admin_print_batch_ids'),
+    path("staff/id-card/<int:staff_id>/", hod_views.admin_view_staff_id_card, name='admin_view_staff_id_card'),
 
     # --- AI Suite (Version 4.0) ---
     path("student/resume-builder/", ai_views.student_resume_builder, name='student_resume_builder'),

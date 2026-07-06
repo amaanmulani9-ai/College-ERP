@@ -251,4 +251,6 @@ def seed_erp():
     print("All ERP module seed data populated successfully!")
 
 if __name__ == "__main__":
-    seed_erp()
+    from django_tenants.utils import schema_context
+    with schema_context('demo'):
+        seed_erp()

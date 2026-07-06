@@ -89,6 +89,9 @@ class Student(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=False)
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
+    batch_year = models.IntegerField(default=2022)
+    current_semester = models.IntegerField(default=1)
+    id_card_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
 
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
@@ -112,6 +115,7 @@ class IssuedBook(models.Model):
 class Staff(models.Model):
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    id_card_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
 
     def __str__(self):
         return self.admin.first_name + " " +  self.admin.last_name

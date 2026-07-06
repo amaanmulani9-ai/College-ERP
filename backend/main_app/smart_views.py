@@ -38,6 +38,21 @@ def generate_student_qr(request, student_id):
     return response
 
 @login_required
+def generate_staff_qr(request, staff_id):
+    staff = get_object_or_404(Staff, id=staff_id)
+    # Generate QR containing details
+    qr_data = f"STAFF_ID:{staff.admin.email}"
+    
+    qr = qrcode.QRCode(version=1, box_size=10, border=1)
+    qr.add_data(qr_data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="#2b2d42", back_color="white")
+    
+    response = HttpResponse(content_type="image/png")
+    img.save(response, "PNG")
+    return response
+
+@login_required
 def staff_scanner_desk(request):
     if request.user.user_type not in ['1', '2']: # HOD or Staff only
         messages.error(request, "Access Denied")

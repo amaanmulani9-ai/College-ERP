@@ -161,6 +161,14 @@
         </div>
 
         <div class="nav-item">
+            {% url 'admin_manage_batches' as admin_manage_batches %}
+            <a href="{{ admin_manage_batches }}" class="nav-link {% if admin_manage_batches == request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-cubes"></i>
+                <span class="nav-text">Manage Batches & IDs</span>
+            </a>
+        </div>
+
+        <div class="nav-item">
             {% url 'admin_manage_registrations' as admin_manage_registrations %}
             <a href="{{ admin_manage_registrations }}" class="nav-link {% if 'registrations' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-id-card"></i>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Print ID Cards - Patkar ERP</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #f5f6fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .no-print-bar {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
+
+        /* Grid for Cards */
+        .id-print-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Printable ID Card Container (Standard PVC CR80 Size Aspect) */
+        .printable-card-outer {
+            width: 100%;
+            height: 290px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1b263b 0%, #0d1b2a 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            position: relative;
+            page-break-inside: avoid;
+        }
+
+        .logo-box {
+            background: white;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-box {
+            border: 3px bg-white;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 80px;
+            height: 80px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .avatar-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-footer-box {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 10px;
+            margin-top: auto;
+        }
+
+        .qr-box {
+            background: white;
+            padding: 4px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Print Specific CSS */
+        @media print {
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+            .no-print-bar {
+                display: none;
+            }
+            .id-print-grid {
+                gap: 15px;
+            }
+            .printable-card-outer {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print-bar">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold mb-0"><i class="fas fa-print me-2 text-primary"></i>ID Cards Bulk Printing Portal</h5>
+            <div>
+                <button onclick="window.close()" class="btn btn-outline-secondary me-2">Cancel</button>
+                <button onclick="window.print()" class="btn btn-primary"><i class="fas fa-print me-1"></i>Print Now</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="id-print-grid">
+            {% for student in students %}
+            <div class="printable-card-outer p-3 d-flex flex-column justify-content-between">
+                <!-- Header -->
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="logo-box">
+                            <i class="fas fa-graduation-cap text-primary fa-lg"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-white" style="letter-spacing: 0.5px; font-size: 0.85rem;">PATKAR ERP</h6>
+                            <small class="text-white-50 text-uppercase" style="font-size: 0.55rem; letter-spacing: 0.5px;">Student ID</small>
+                        </div>
+                    </div>
+                    <!-- Semester Badge -->
+                    <span class="badge bg-primary text-white border border-white-50 small">SEM {{ student.current_semester }}</span>
+                </div>
+
+                <!-- Info Grid -->
+                <div class="row align-items-center my-2">
+                    <div class="col-3">
+                        <div class="avatar-box">
+                            <img src="{{ student.admin.profile_pic.url|default:'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="fw-bold mb-1 text-white" style="font-size: 0.95rem;">{{ student.admin.get_full_name }}</h6>
+                        <div class="text-white-50" style="font-size: 0.7rem;">Course: <strong class="text-white">{{ student.course.name }}</strong></div>
+                        <div class="text-white-50" style="font-size: 0.7rem;">Batch Year: <strong class="text-white">{{ student.batch_year }}</strong></div>
+                        <div class="text-white-50" style="font-size: 0.7rem;">ID Code: <code class="text-warning fw-bold">{{ student.id_card_code }}</code></div>
+                    </div>
+                    <div class="col-3 d-flex justify-content-center">
+                        <div class="qr-box">
+                            <img src="{% url 'generate_student_qr' student.id %}" style="width: 64px; height: 64px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer barcode -->
+                <div class="card-footer-box d-flex justify-content-between align-items-center">
+                    <div style="font-size: 0.65rem;" class="text-white-50">
+                        Academic Session: <strong class="text-white">{{ student.session }}</strong>
+                    </div>
+                    <div class="bg-white p-1 rounded-1">
+                        <svg class="barcode-elem" data-value="PAT-{{ student.id:04d }}-{{ student.session.start_year.year|default:2026 }}" style="height: 25px; width: 120px;"></svg>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- JsBarcode Library -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Generate all barcodes on page load
+            const elements = document.querySelectorAll(".barcode-elem");
+            elements.forEach(elem => {
+                const val = elem.getAttribute("data-value");
+                JsBarcode(elem, val, {
+                    format: "CODE128",
+                    width: 1,
+                    height: 25,
+                    displayValue: false,
+                    margin: 0
+                });
+            });
+        });
+    </script>
+</body>
+</html>

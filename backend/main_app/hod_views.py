@@ -1391,9 +1391,114 @@ def delete_parent(request, parent_id):
 @admin_required
 def admin_view_student_id_card(request, student_id):
     student = get_object_or_404(Student, admin_id=student_id)
+    if not student.id_card_code:
+        student.id_card_code = f"STU-{student.course.name[:3].upper() if student.course else 'GEN'}-{student.batch_year}-{student.id:04d}"
+        student.save()
     context = {
         'page_title': 'Student ID Card',
         'student': student,
         'prn_number': f"PAT-{student.id:04d}-{student.session.start_year.year if student.session else 2026}"
     }
     return render(request, "student_template/student_id_card.html", context)
+
+@login_required(login_url='/')
+@admin_required
+def admin_view_staff_id_card(request, staff_id):
+    staff = get_object_or_404(Staff, admin_id=staff_id)
+    if not staff.id_card_code:
+        staff.id_card_code = f"EMP-{staff.course.name[:3].upper() if staff.course else 'GEN'}-{staff.id:04d}"
+        staff.save()
+    context = {
+        'page_title': 'Staff ID Card',
+        'staff': staff,
+        'employee_id': f"EMP-{staff.id:04d}-{staff.admin.created_at.year}"
+    }
+    return render(request, "staff_template/staff_id_card.html", context)
+
+@login_required(login_url='/')
+@admin_required
+def admin_manage_batches(request):
+    courses = Course.objects.all()
+    sessions = Session.objects.all()
+    
+    # Get unique batch years and semesters currently in system for filtering
+    batch_years = Student.objects.values_list('batch_year', flat=True).distinct().order_by('-batch_year')
+    semesters = Student.objects.values_list('current_semester', flat=True).distinct().order_by('current_semester')
+    
+    # Handle filters
+    course_id = request.GET.get('course')
+    session_id = request.GET.get('session')
+    batch_year = request.GET.get('batch_year')
+    semester = request.GET.get('semester')
+    
+    students = Student.objects.all()
+    if course_id:
+        students = students.filter(course_id=course_id)
+    if session_id:
+        students = students.filter(session_id=session_id)
+    if batch_year:
+        students = students.filter(batch_year=batch_year)
+    if semester:
+        students = students.filter(current_semester=semester)
+        
+    context = {
+        'page_title': 'Manage Batches & ID Cards',
+        'courses': courses,
+        'sessions': sessions,
+        'batch_years': batch_years,
+        'semesters': semesters,
+        'students': students,
+        'selected_course': int(course_id) if course_id else None,
+        'selected_session': int(session_id) if session_id else None,
+        'selected_batch_year': int(batch_year) if batch_year else None,
+        'selected_semester': int(semester) if semester else None,
+    }
+    return render(request, "hod_template/manage_batches.html", context)
+
+@login_required(login_url='/')
+@admin_required
+def admin_promote_batch(request):
+    if request.method == "POST":
+        student_ids = request.POST.getlist('student_ids')
+        action = request.POST.get('action') # 'promote' or 'demote'
+        
+        if not student_ids:
+            messages.error(request, "No students selected")
+            return redirect(reverse('admin_manage_batches'))
+            
+        students = Student.objects.filter(id__in=student_ids)
+        
+        if action == 'promote':
+            for student in students:
+                student.current_semester += 1
+                student.save()
+            messages.success(request, f"Successfully promoted {students.count()} students to the next semester.")
+        elif action == 'demote':
+            for student in students:
+                if student.current_semester > 1:
+                    student.current_semester -= 1
+                    student.save()
+            messages.success(request, f"Successfully demoted {students.count()} students to the previous semester.")
+            
+    return redirect(reverse('admin_manage_batches'))
+
+@login_required(login_url='/')
+@admin_required
+def admin_print_batch_ids(request):
+    student_ids = request.GET.get('ids', '').split(',')
+    student_ids = [int(sid) for sid in student_ids if sid.isdigit()]
+    
+    students = Student.objects.filter(id__in=student_ids)
+    
+    # Pre-generate unique codes for selected students if they don't have them
+    for student in students:
+        if not student.id_card_code:
+            student.id_card_code = f"STU-{student.course.name[:3].upper() if student.course else 'GEN'}-{student.batch_year}-{student.id:04d}"
+            student.save()
+            
+    context = {
+        'page_title': 'Print ID Cards',
+        'students': students,
+        'is_batch_print': True
+    }
+    return render(request, "hod_template/print_batch_id_cards.html", context)
