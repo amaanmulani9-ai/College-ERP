@@ -238,6 +238,7 @@
             <div class="nav-submenu">
                 <a href="{% url 'manage_student' %}" class="nav-link {% if 'student/manage' in request.path %}active{% endif %}">All Students</a>
                 <a href="{% url 'add_student' %}" class="nav-link {% if 'student/add' in request.path %}active{% endif %}">Add New</a>
+                <a href="{% url 'view_online_registrations' %}" class="nav-link {% if 'registrations' in request.path %}active{% endif %}">Online Registrations</a>
                 <a href="#" class="nav-link locked">Manage Families <i class="far fa-lock lock-icon"></i></a>
                 <a href="#" class="nav-link locked">Active / Inactive <i class="far fa-lock lock-icon"></i></a>
                 <a href="#" class="nav-link">Admission Letter</a>
@@ -524,6 +525,12 @@
             <a href="{% url 'staff_add_result' %}" class="nav-link">
                 <i class="nav-icon fas fa-plus-circle"></i>
                 <span class="nav-text">Add Results</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'view_online_registrations' %}" class="nav-link {% if 'registrations' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-file-csv"></i>
+                <span class="nav-text">Online Registrations</span>
             </a>
         </div>
     {% else %}

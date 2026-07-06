@@ -22,6 +22,7 @@ from . import hod_views, staff_views, student_views, parent_views, views, chat_v
 urlpatterns = [
     path("", views.login_page, name='login_page'),
     path('offline/', views.offline, name='offline'),
+    path('student/register/', views.online_registration, name='online_registration'),
     path("get_attendance", views.get_attendance, name='get_attendance'),
     path("firebase-messaging-sw.js", views.showFirebaseJS, name='showFirebaseJS'),
     path("doLogin/", views.doLogin, name='doLogin'),
@@ -57,6 +58,8 @@ urlpatterns = [
     path("admin/settings/fees/", hod_views.admin_settings_fees, name='admin_settings_fees'),
     path("admin/settings/banks/", hod_views.admin_settings_banks, name='admin_settings_banks'),
     path("admin/settings/rules/", hod_views.admin_settings_rules, name='admin_settings_rules'),
+    path("admin/registrations/", hod_views.view_online_registrations, name='view_online_registrations'),
+    path("admin/registrations/download/<str:filename>/", hod_views.download_registration_csv, name='download_registration_csv'),
     # --- Backoffice URLs ---
     path("backoffice/home/", backoffice_views.backoffice_home, name='backoffice_home'),
     path("backoffice/admissions/", backoffice_views.backoffice_admissions, name='backoffice_admissions'),
@@ -98,6 +101,7 @@ urlpatterns = [
     path("attendance/fetch/", hod_views.get_admin_attendance,
          name='get_admin_attendance'),
     path("student/add/", hod_views.add_student, name='add_student'),
+    path("student/import/", hod_views.import_students_csv, name='import_students_csv'),
     path("subject/add/", hod_views.add_subject, name='add_subject'),
     path("staff/manage/", hod_views.manage_staff, name='manage_staff'),
     path("student/manage/", hod_views.manage_student, name='manage_student'),

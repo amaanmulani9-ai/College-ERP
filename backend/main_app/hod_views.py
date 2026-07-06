@@ -1,7 +1,16 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
 from .decorators import admin_required, staff_required, student_required
 import json
 import os
+import csv
+import io
+import time
+import random
+import string
+import mimetypes
+import datetime
+from django.conf import settings
 import requests
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
@@ -1877,11 +1886,146 @@ def admin_settings_account(request):
         account.currency = request.POST.get('currency', account.currency)
         account.currency_symbol = request.POST.get('currency_symbol', account.currency_symbol)
         account.save()
+        update_session_auth_hash(request, user)
         
         messages.success(request, 'Account settings updated successfully.')
         return redirect('admin_settings_account')
         
     return render(request, 'hod_template/settings_account.html', {'page_title': 'Account Settings', 'account': account})
+
+from django.http import HttpResponse, Http404
+
+@login_required(login_url='/')
+@admin_required
+def import_students_csv(request):
+    from .models import CustomUser, Student, Course, Session
+    import csv, io, random, string
+    
+    if request.method == "POST" and request.FILES.get('file'):
+        csv_file = request.FILES['file']
+        
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request, "This is not a valid CSV file.")
+            return redirect('add_student')
+            
+        try:
+            data_set = csv_file.read().decode('UTF-8')
+            io_string = io.StringIO(data_set)
+            next(io_string) # Skip header
+            
+            success_count = 0
+            error_count = 0
+            
+            for column in csv.reader(io_string, delimiter=',', quotechar='"'):
+                # Expected format: first_name, last_name, gender, course_id, session_id, date_of_admission, email (optional)
+                if len(column) < 6:
+                    continue
+                    
+                first_name = column[0].strip()
+                last_name = column[1].strip()
+                gender = column[2].strip()
+                course_id = column[3].strip()
+                session_id = column[4].strip()
+                date_of_admission = column[5].strip()
+                provided_email = column[6].strip() if len(column) > 6 else ""
+                
+                email = None
+                if provided_email:
+                    # Basic validation and check for existence
+                    if '@' in provided_email and not CustomUser.objects.filter(email=provided_email).exists():
+                        email = provided_email
+                
+                # Auto-generate login email if not provided or already exists
+                if not email:
+                    base_email = f"{first_name.lower()}.{last_name.lower()}"
+                    random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
+                    email = f"{base_email}.{random_string}@student.com"
+                    
+                    # Verify if email exists
+                    while CustomUser.objects.filter(email=email).exists():
+                        random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
+                        email = f"{base_email}.{random_string}@student.com"
+                    
+                password = "student"
+                
+                try:
+                    course = Course.objects.get(id=course_id)
+                    session = Session.objects.get(id=session_id)
+                    
+                    user = CustomUser.objects.create_user(
+                        email=email,
+                        password=password,
+                        first_name=first_name,
+                        last_name=last_name,
+                        gender=gender,
+                        user_type=3
+                    )
+                    
+                    student = user.student # Will be created by signal
+                    student.course = course
+                    student.session = session
+                    if date_of_admission:
+                        student.date_of_admission = date_of_admission
+                    student.save()
+                    success_count += 1
+                except Exception as e:
+                    error_count += 1
+                    
+            messages.success(request, f"Successfully imported {success_count} students. {error_count} failed.")
+        except Exception as e:
+            messages.error(request, f"Error processing file: {str(e)}")
+            
+    return redirect('add_student')
+
+@login_required(login_url='/')
+def view_online_registrations(request):
+    if request.user.user_type not in ['1', '2']:
+        messages.error(request, "You do not have permission to view this page.")
+        return redirect('login_page')
+        
+    regs_dir = os.path.join(settings.MEDIA_ROOT, 'student_registrations')
+    csv_files = []
+    
+    if os.path.exists(regs_dir):
+        for f in os.listdir(regs_dir):
+            if f.endswith('.csv'):
+                file_path = os.path.join(regs_dir, f)
+                size = os.path.getsize(file_path)
+                mtime = os.path.getmtime(file_path)
+                last_modified = datetime.fromtimestamp(mtime).strftime('%Y-%m-%d %H:%M:%S')
+                csv_files.append({
+                    'name': f,
+                    'size': f"{size / 1024:.2f} KB",
+                    'last_modified': last_modified
+                })
+    
+    csv_files.sort(key=lambda x: x['name'], reverse=True)
+    
+    # Render different base templates depending on user type
+    base_template = 'main_app/base.html' if request.user.user_type == '1' else 'staff_template/base_template.html'
+    
+    return render(request, 'hod_template/view_registrations.html', {
+        'page_title': 'Online Registrations (CSV)',
+        'csv_files': csv_files,
+        'base_template': base_template
+    })
+
+@login_required(login_url='/')
+def download_registration_csv(request, filename):
+    if request.user.user_type not in ['1', '2']:
+        raise Http404("Not found")
+        
+    regs_dir = os.path.join(settings.MEDIA_ROOT, 'student_registrations')
+    file_path = os.path.join(regs_dir, filename)
+    
+    if os.path.exists(file_path) and filename.endswith('.csv'):
+        with open(file_path, 'rb') as f:
+            mime_type, _ = mimetypes.guess_type(file_path)
+            response = HttpResponse(f, content_type=mime_type or 'text/csv')
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return response
+    else:
+        raise Http404("CSV file not found")
 
 
 # --- Staff Job Letter ---

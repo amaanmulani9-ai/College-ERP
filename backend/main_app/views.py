@@ -31,6 +31,60 @@ def login_page(request):
 def offline(request):
     return render(request, 'main_app/offline.html')
 
+import csv
+import os
+import uuid
+import datetime
+from django.conf import settings
+from django.contrib import messages
+from .models import Course, Session
+
+def online_registration(request):
+    courses = Course.objects.all()
+    sessions = Session.objects.all()
+    
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        gender = request.POST.get('gender')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        course_id = request.POST.get('course_id')
+        session_id = request.POST.get('session_id')
+        
+        # Registration date
+        date_of_admission = datetime.date.today().strftime('%Y-%m-%d')
+        
+        # Generate unique code
+        unique_code = f"REG-{uuid.uuid4().hex[:8].upper()}"
+        
+        # Save to CSV
+        regs_dir = os.path.join(settings.MEDIA_ROOT, 'student_registrations')
+        if not os.path.exists(regs_dir):
+            os.makedirs(regs_dir)
+            
+        csv_filename = os.path.join(regs_dir, f"{date_of_admission}.csv")
+        file_exists = os.path.isfile(csv_filename)
+        
+        try:
+            with open(csv_filename, mode='a', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                if not file_exists:
+                    writer.writerow(['First Name', 'Last Name', 'Gender', 'Course ID', 'Session ID', 'Date of Admission', 'Email', 'Password', 'Unique Code', 'Registration Fee'])
+                
+                # We save the data in the format expected by the import tool!
+                # Wait, the import tool expects: first_name, last_name, gender, course_id, session_id, date_of_admission, email (optional)
+                # We can append the extra fields at the end.
+                writer.writerow([first_name, last_name, gender, course_id, session_id, date_of_admission, email, password, unique_code, '0'])
+                
+            messages.success(request, f"Registration Successful! Your unique registration code is: {unique_code}")
+        except Exception as e:
+            messages.error(request, f"Error saving registration: {str(e)}")
+            
+        return redirect('online_registration')
+        
+    return render(request, 'main_app/online_registration.html', {'courses': courses, 'sessions': sessions})
+
 
 def doLogin(request, **kwargs):
     if request.method != 'POST':

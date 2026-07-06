@@ -1,0 +1,86 @@
+{% extends base_template %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-file-csv"></i> Online Student Registrations</h3>
+                    </div>
+                    <div class="card-body">
+                        {% if messages %}
+                        <div class="form-group">
+                            <div class="col-12">
+                                {% for message in messages %}
+                                {% if message.tags == "error" %}
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                {% elif message.tags == "success" %}
+                                <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 10px;">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Date / File Name</th>
+                                        <th>Size</th>
+                                        <th>Last Modified</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for f in csv_files %}
+                                    <tr>
+                                        <td>{{ f.name }}</td>
+                                        <td>{{ f.size }}</td>
+                                        <td>{{ f.last_modified }}</td>
+                                        <td>
+                                            <a href="{% url 'download_registration_csv' f.name %}" class="btn btn-success btn-sm">
+                                                <i class="fas fa-download"></i> Download CSV
+                                            </a>
+                                            {% if request.user.user_type == '1' %}
+                                            <a href="{% url 'add_student' %}" class="btn btn-primary btn-sm ml-2">
+                                                <i class="fas fa-user-plus"></i> Go to Import
+                                            </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">No online registrations found yet.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        {% if request.user.user_type == '1' %}
+                        <p class="text-muted small">
+                            <i class="fas fa-info-circle"></i> Download the CSV file and use the "Import Students" feature in the Add Student page to officially add these students to the system.
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
