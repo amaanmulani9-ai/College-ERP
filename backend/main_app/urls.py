@@ -59,6 +59,7 @@ urlpatterns = [
     path("admin/settings/banks/", hod_views.admin_settings_banks, name='admin_settings_banks'),
     path("admin/settings/rules/", hod_views.admin_settings_rules, name='admin_settings_rules'),
     path("admin/registrations/", hod_views.view_online_registrations, name='view_online_registrations'),
+    path("admin/registrations/read/<str:filename>/", hod_views.read_registration_csv, name='read_registration_csv'),
     path("admin/registrations/download/<str:filename>/", hod_views.download_registration_csv, name='download_registration_csv'),
     # --- Backoffice URLs ---
     path("backoffice/home/", backoffice_views.backoffice_home, name='backoffice_home'),

@@ -70,12 +70,13 @@ def online_registration(request):
             with open(csv_filename, mode='a', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
                 if not file_exists:
-                    writer.writerow(['First Name', 'Last Name', 'Gender', 'Course ID', 'Session ID', 'Date of Admission', 'Email', 'Password', 'Unique Code', 'Registration Fee'])
+                    writer.writerow(['First Name', 'Last Name', 'Gender', 'Course ID', 'Session ID', 'Date of Admission', 'Email', 'Password', 'Unique Code', 'Registration Fee', 'Registration Time'])
                 
                 # We save the data in the format expected by the import tool!
                 # Wait, the import tool expects: first_name, last_name, gender, course_id, session_id, date_of_admission, email (optional)
                 # We can append the extra fields at the end.
-                writer.writerow([first_name, last_name, gender, course_id, session_id, date_of_admission, email, password, unique_code, '0'])
+                registration_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                writer.writerow([first_name, last_name, gender, course_id, session_id, date_of_admission, email, password, unique_code, '0', registration_time])
                 
             messages.success(request, f"Registration Successful! Your unique registration code is: {unique_code}")
         except Exception as e:

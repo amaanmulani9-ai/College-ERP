@@ -36,7 +36,7 @@
                         {% endif %}
 
                         <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
+                            <table class="table table-bordered table-striped" style="color: inherit;">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th>Date / File Name</th>
@@ -52,8 +52,11 @@
                                         <td>{{ f.size }}</td>
                                         <td>{{ f.last_modified }}</td>
                                         <td>
-                                            <a href="{% url 'download_registration_csv' f.name %}" class="btn btn-success btn-sm">
-                                                <i class="fas fa-download"></i> Download CSV
+                                            <a href="{% url 'read_registration_csv' f.name %}" class="btn btn-info btn-sm">
+                                                <i class="fas fa-eye"></i> Open CSV
+                                            </a>
+                                            <a href="{% url 'download_registration_csv' f.name %}" class="btn btn-success btn-sm ml-2">
+                                                <i class="fas fa-download"></i> Download
                                             </a>
                                             {% if request.user.user_type == '1' %}
                                             <a href="{% url 'add_student' %}" class="btn btn-primary btn-sm ml-2">

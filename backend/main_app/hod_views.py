@@ -2011,6 +2011,41 @@ def view_online_registrations(request):
     })
 
 @login_required(login_url='/')
+def read_registration_csv(request, filename):
+    import csv
+    if request.user.user_type not in ['1', '2']:
+        messages.error(request, "You do not have permission to view this page.")
+        return redirect('login_page')
+        
+    # Securely check if the filename only contains valid chars
+    if not filename.endswith('.csv') or '/' in filename or '\\' in filename:
+        raise Http404("Invalid file")
+        
+    file_path = os.path.join(settings.MEDIA_ROOT, 'student_registrations', filename)
+    if not os.path.exists(file_path):
+        raise Http404("File not found")
+        
+    headers = []
+    rows = []
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            headers = next(reader, [])
+            for row in reader:
+                rows.append(row)
+    except Exception as e:
+        messages.error(request, f"Error reading file: {str(e)}")
+        
+    base_template = 'main_app/base.html' if request.user.user_type == '1' else 'staff_template/base_template.html'
+    return render(request, 'hod_template/read_registrations.html', {
+        'page_title': 'View CSV',
+        'filename': filename,
+        'headers': headers,
+        'rows': rows,
+        'base_template': base_template
+    })
+
+@login_required(login_url='/')
 def download_registration_csv(request, filename):
     if request.user.user_type not in ['1', '2']:
         raise Http404("Not found")
