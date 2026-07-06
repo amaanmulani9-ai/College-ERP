@@ -313,6 +313,7 @@ urlpatterns = [
     path("staff/ai-paper/", ai_views.staff_generate_paper, name='staff_generate_paper'),
     path("staff/ai-timetable/", ai_views.staff_generate_timetable, name='staff_generate_timetable'),
     path("staff/ai-grade/", ai_views.staff_ai_grade_assignment, name='staff_ai_grade_assignment'),
+    path("api/ai/format-address/", ai_views.ai_format_address, name='ai_format_address'),
     
     # --- TinyMCE Integration ---
     path("api/tinymce-jwt/", ai_views.tinymce_jwt_provider, name='tinymce_jwt_provider'),

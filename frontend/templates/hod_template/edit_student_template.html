@@ -137,6 +137,25 @@
                             {% endfor %}
                         {% endif %}
 
+                        {% if form.errors %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>Please correct the following errors:</strong>
+                                <ul class="mb-0 mt-2">
+                                    {% for field in form %}
+                                        {% if field.errors %}
+                                            <li><strong>{{ field.label }}:</strong> {{ field.errors|striptags }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endif %}
+
                         <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
 
@@ -325,8 +344,13 @@
                                     {{ form.siblings.errors }}
                                 </div>
                                 <div class="col-md-12 form-group mb-3">
-                                    <label>Address <span>*</span></label>
-                                    <textarea name="address" class="form-control" rows="3" placeholder="Student Address" required>{{ form.address.value|default:'' }}</textarea>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label class="mb-0">Address <span>*</span></label>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAIAddress" style="font-size: 11px; border-radius: 20px; padding: 2px 10px; border-color: #10ac84; color: #10ac84;">
+                                            <i class="fas fa-magic"></i> ✨ AI Format Address
+                                        </button>
+                                    </div>
+                                    <textarea name="address" id="id_address" class="form-control no-tinymce" rows="3" placeholder="Student Address" required>{{ form.address.value|default:'' }}</textarea>
                                     {{ form.address.errors }}
                                 </div>
                             </div>
@@ -468,6 +492,36 @@
             } else {
                 $("#email_avail_notice").empty();
             }
+        });
+
+        $("#btnAIAddress").click(function(){
+            var addr = $("#id_address").val();
+            if (!addr) {
+                alert("Please type some rough address details first!");
+                return;
+            }
+            var btn = $(this);
+            btn.html("<i class='fas fa-spinner fa-spin'></i> AI Formatting...").prop("disabled", true);
+            
+            $.ajax({
+                url: "{% url 'ai_format_address' %}",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ address: addr }),
+                success: function(response) {
+                    if (response.status === "success") {
+                        $("#id_address").val(response.address);
+                    } else {
+                        alert("AI error: " + response.message);
+                    }
+                },
+                error: function() {
+                    alert("Could not connect to AI service. Please try again.");
+                },
+                complete: function() {
+                    btn.html("<i class='fas fa-magic'></i> ✨ AI Format Address").prop("disabled", false);
+                }
+            });
         });
     });
 </script>

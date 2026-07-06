@@ -199,3 +199,28 @@ def tinymce_jwt_provider(request):
         return JsonResponse({'token': encoded_jwt})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt
+@login_required
+def ai_format_address(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            raw_address = data.get('address', '')
+            if not raw_address:
+                return JsonResponse({'status': 'error', 'message': 'Address text is empty'})
+            
+            system_prompt = "You are a data formatting assistant. Your job is to format and expand raw address notes into a clean, professional, multi-line postal address. Format the output with clear lines (building, street, area, city, state, postal code). Output ONLY the formatted address, nothing else."
+            prompt = f"Format this raw address: {raw_address}"
+            
+            from .ai_helper import generate_ollama_response
+            formatted_address = generate_ollama_response(prompt, system_prompt=system_prompt)
+            if not formatted_address:
+                formatted_address = raw_address.title()
+                
+            return JsonResponse({'status': 'success', 'address': formatted_address})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+            
+    return JsonResponse({'status': 'error', 'message': 'Invalid action'})

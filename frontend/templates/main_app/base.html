@@ -577,7 +577,7 @@
       document.addEventListener("DOMContentLoaded", function() {
         if(document.querySelector('textarea')) {
             tinymce.init({
-              selector: 'textarea:not(#id_address)',
+              selector: 'textarea:not(.no-tinymce)',
               menubar: false,
               plugins: 'link lists autolink',
               toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link',
