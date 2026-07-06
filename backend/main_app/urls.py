@@ -320,6 +320,7 @@ urlpatterns = [
     
     # --- Settings Tabs ---
     path("admin/settings/grading/", hod_views.admin_settings_grading, name='admin_settings_grading'),
+    path("admin/settings/rules/", hod_views.admin_settings_rules, name='admin_settings_rules'),
     path("admin/settings/theme/", hod_views.admin_settings_theme, name='admin_settings_theme'),
     path("admin/settings/account/", hod_views.admin_settings_account, name='admin_settings_account'),
     

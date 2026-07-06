@@ -993,6 +993,14 @@ class MarksGrading(models.Model):
     def __str__(self):
         return f"{self.grade} ({self.percent_from}-{self.percent_upto}%)"
 
+class FailCriteria(models.Model):
+    overall_percentage = models.IntegerField(default=40)
+    subject_percentage = models.IntegerField(default=33)
+    subject_count = models.IntegerField(default=1)
+
+    def __str__(self):
+        return f"Fail Criteria (Overall <= {self.overall_percentage}%, Subject <= {self.subject_percentage}%, Count >= {self.subject_count})"
+
 class ThemeLanguageSettings(models.Model):
     theme_placement = models.CharField(max_length=10, default='LTR')
     sidebar_background = models.CharField(max_length=20, default='Light')

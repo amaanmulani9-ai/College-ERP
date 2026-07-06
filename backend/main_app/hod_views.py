@@ -1775,7 +1775,7 @@ def feature_coming_soon(request, feature_name):
     return render(request, 'hod_template/feature_coming_soon.html', {'feature_name': display_name, 'page_title': display_name})
 
 def admin_settings_grading(request):
-    from .models import MarksGrading
+    from .models import MarksGrading, FailCriteria
     
     if request.method == 'POST':
         if 'add_grade' in request.POST:
@@ -1789,11 +1789,34 @@ def admin_settings_grading(request):
             grade_id = request.POST.get('delete_grade')
             MarksGrading.objects.filter(id=grade_id).delete()
             messages.success(request, 'Grade deleted successfully.')
+        elif 'save_scale' in request.POST:
+            grade_ids = request.POST.getlist('grade_ids')
+            for g_id in grade_ids:
+                grade_obj = MarksGrading.objects.filter(id=g_id).first()
+                if grade_obj:
+                    grade_obj.grade = request.POST.get(f'grade_{g_id}')
+                    grade_obj.percent_from = request.POST.get(f'percent_from_{g_id}')
+                    grade_obj.percent_upto = request.POST.get(f'percent_upto_{g_id}')
+                    grade_obj.status = request.POST.get(f'status_{g_id}')
+                    grade_obj.save()
+            messages.success(request, 'Grading scale updated successfully.')
+        elif 'save_criteria' in request.POST:
+            criteria, created = FailCriteria.objects.get_or_create(id=1)
+            criteria.overall_percentage = request.POST.get('overall_percentage', 40)
+            criteria.subject_percentage = request.POST.get('subject_percentage', 33)
+            criteria.subject_count = request.POST.get('subject_count', 1)
+            criteria.save()
+            messages.success(request, 'Fail Criteria saved successfully.')
             
         return redirect('admin_settings_grading')
         
     grades = MarksGrading.objects.all().order_by('-percent_from')
-    return render(request, 'hod_template/settings_grading.html', {'page_title': 'Marks Grading', 'grades': grades})
+    criteria, created = FailCriteria.objects.get_or_create(id=1)
+    return render(request, 'hod_template/settings_grading.html', {
+        'page_title': 'Marks Grading', 
+        'grades': grades,
+        'criteria': criteria
+    })
 
 def admin_settings_theme(request):
     from .models import ThemeLanguageSettings
