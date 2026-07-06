@@ -27,10 +27,10 @@
 
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #7f56da 0%, #5e3cc4 100%);
-            --secondary-gradient: linear-gradient(135deg, #3f2b96 0%, #a8c0ff 100%);
-            --neon-glow: 0 0 20px rgba(127, 86, 218, 0.4);
-            --glass-bg: rgba(255, 255, 255, 0.06);
+            --primary-wine: #6f4b64;
+            --primary-wine-hover: #855b77;
+            --primary-wine-glow: rgba(111, 75, 100, 0.4);
+            --glass-bg: rgba(18, 17, 35, 0.65);
             --glass-border: rgba(255, 255, 255, 0.12);
             --text-light: #f3f4f6;
             --text-muted: #9ca3af;
@@ -69,7 +69,7 @@
             position: absolute;
             border-radius: 50%;
             filter: blur(120px);
-            opacity: 0.35;
+            opacity: 0.3;
             animation: float 20s infinite alternate ease-in-out;
         }
 
@@ -118,19 +118,18 @@
         /* Glassmorphic Login Card */
         .login-container {
             width: 100%;
-            max-width: 460px;
+            max-width: 480px;
             z-index: 10;
             position: relative;
-            perspective: 1000px;
         }
 
         .login-card {
-            background: rgba(18, 17, 35, 0.65);
+            background: var(--glass-bg);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--glass-border);
             border-radius: 24px;
-            padding: 50px 40px;
+            padding: 45px 35px;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 
                         inset 0 1px 2px rgba(255, 255, 255, 0.1);
             transform: translateY(20px);
@@ -140,18 +139,6 @@
             overflow: hidden;
         }
 
-        /* Card glowing highlight */
-        .login-card::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 60%);
-            pointer-events: none;
-        }
-
         @keyframes slideUpFade {
             to {
                 transform: translateY(0);
@@ -159,35 +146,24 @@
             }
         }
 
-        /* Logo & Titles */
+        /* Logo & Header */
         .login-logo {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 25px;
         }
 
         .logo-icon {
-            font-size: 42px;
+            font-size: 38px;
             background: linear-gradient(45deg, #a78bfa, #f472b6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             display: inline-block;
             filter: drop-shadow(0 2px 8px rgba(167, 139, 250, 0.3));
-            animation: pulseIcon 3s infinite alternate ease-in-out;
-        }
-
-        @keyframes pulseIcon {
-            0% {
-                transform: scale(1);
-            }
-            100% {
-                transform: scale(1.06);
-                filter: drop-shadow(0 4px 15px rgba(167, 139, 250, 0.5));
-            }
         }
 
         .login-title {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             color: var(--text-light);
             margin: 0;
@@ -196,30 +172,69 @@
 
         .login-subtitle {
             color: var(--text-muted);
-            font-size: 14px;
-            margin-top: 6px;
+            font-size: 13px;
+            margin-top: 4px;
             font-weight: 400;
+        }
+
+        /* Role Selector Row styling */
+        .role-selector-title {
+            color: var(--text-light);
+            font-size: 14.5px;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .role-selector {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+        }
+
+        .btn-role {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #d1d5db;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-role:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .btn-role.active {
+            background: var(--primary-wine);
+            border-color: var(--primary-wine);
+            color: #fff;
+            box-shadow: 0 4px 12px var(--primary-wine-glow);
         }
 
         /* Form Controls */
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 22px;
         }
 
         .form-label {
             color: #d1d5db;
-            font-size: 13px;
+            font-size: 13.5px;
             font-weight: 500;
             margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            display: block;
             letter-spacing: 0.2px;
-        }
-
-        .form-label i {
-            color: #a78bfa;
-            font-size: 12px;
         }
 
         .form-control {
@@ -227,10 +242,11 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: var(--text-light) !important;
             border-radius: 12px;
-            padding: 14px 16px;
+            padding: 13px 16px;
             font-size: 14px;
             transition: all 0.25s ease;
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+            width: 100%;
         }
 
         .form-control::placeholder {
@@ -239,18 +255,41 @@
 
         .form-control:focus {
             background: rgba(255, 255, 255, 0.08);
-            border-color: #7f56da;
-            box-shadow: var(--neon-glow), inset 0 1px 2px rgba(0,0,0,0.1);
+            border-color: var(--primary-wine);
+            box-shadow: 0 0 15px var(--primary-wine-glow), inset 0 1px 2px rgba(0,0,0,0.1);
             outline: none;
         }
 
-        /* Checkbox */
+        /* Eye Icon wrapper */
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0;
+            font-size: 15px;
+            z-index: 10;
+            transition: color 0.2s ease;
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--text-light);
+        }
+
+        /* Remember Checkbox */
         .form-check {
             display: flex;
             align-items: center;
             gap: 8px;
             padding-left: 0;
-            margin-top: 4px;
         }
 
         .form-check-input {
@@ -265,9 +304,9 @@
         }
 
         .form-check-input:checked {
-            background-color: #7f56da;
-            border-color: #7f56da;
-            box-shadow: 0 0 8px rgba(127, 86, 218, 0.5);
+            background-color: var(--primary-wine);
+            border-color: var(--primary-wine);
+            box-shadow: 0 0 8px var(--primary-wine-glow);
         }
 
         .form-check-label {
@@ -277,48 +316,27 @@
             user-select: none;
         }
 
-        /* Submit Button */
+        /* Buttons & Separators */
         .btn-primary {
-            background: var(--primary-gradient);
+            background: var(--primary-wine);
             border: none;
-            padding: 14px;
+            padding: 13px;
             border-radius: 12px;
             font-weight: 600;
             font-size: 15px;
             letter-spacing: 0.3px;
             color: #fff;
-            box-shadow: 0 4px 15px rgba(94, 60, 196, 0.35);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
+            box-shadow: 0 4px 15px var(--primary-wine-glow);
+            transition: all 0.25s ease;
             width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-            transition: all 0.6s ease;
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
         }
 
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 22px rgba(94, 60, 196, 0.5), var(--neon-glow);
+            background: var(--primary-wine-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px var(--primary-wine-glow);
         }
 
-        .btn-primary:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 8px rgba(94, 60, 196, 0.3);
-        }
-
-        /* Links */
         .forgot-link {
             color: #a78bfa;
             font-size: 13.5px;
@@ -332,38 +350,45 @@
             text-shadow: 0 0 8px rgba(167, 139, 250, 0.3);
         }
 
-        /* Alerts */
+        .divider {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin: 22px 0;
+            position: relative;
+        }
+
+        .btn-passkey {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #d1d5db;
+            padding: 13px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 14.5px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+
+        .btn-passkey:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
         .alert {
             background: rgba(220, 53, 69, 0.15);
             border: 1px solid rgba(220, 53, 69, 0.3);
-            backdrop-filter: blur(10px);
             color: #fca5a5;
             border-radius: 12px;
             font-size: 13.5px;
             padding: 12px;
-            margin-bottom: 24px;
-        }
-
-        /* reCAPTCHA style tweaks */
-        .g-recaptcha {
-            display: inline-block;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            .login-card {
-                padding: 40px 24px;
-            }
-            .form-group .g-recaptcha {
-                transform: scale(0.82);
-                -webkit-transform: scale(0.82);
-                transform-origin: top center;
-                -webkit-transform-origin: top center;
-            }
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -399,59 +424,81 @@
             {% endfor %}
             {% endif %}
 
+            <!-- Login As Selector -->
+            <div class="role-selector-title">Login as</div>
+            <div class="role-selector">
+                <button type="button" class="btn-role active" id="btn-student" onclick="selectRole('student')">
+                    <i class="fas fa-graduation-cap"></i> Student
+                </button>
+                <button type="button" class="btn-role" id="btn-faculty" onclick="selectRole('faculty')">
+                    <i class="fas fa-user"></i> Faculty
+                </button>
+                <button type="button" class="btn-role" id="btn-parent" onclick="selectRole('parent')">
+                    <i class="fas fa-users"></i> Parent
+                </button>
+                <button type="button" class="btn-role" id="btn-admin" onclick="selectRole('admin')">
+                    <i class="fas fa-user-shield"></i> Admin
+                </button>
+                <button type="button" class="btn-role" id="btn-backoffice" onclick="selectRole('backoffice')">
+                    <i class="fas fa-briefcase"></i> Backoffice
+                </button>
+            </div>
+
             <!-- Login Form -->
             <form action="doLogin/" method="post" class="login-form">
                 {% csrf_token %}
 
                 <!-- Email Input -->
                 <div class="form-group">
-                    <label for="email" class="form-label">
-                        <i class="fas fa-envelope"></i> Email Address
-                    </label>
+                    <label for="email" class="form-label">Email</label>
                     <input type="email" id="email" name="email" class="form-control"
-                        placeholder="yourname@domain.com" required autocomplete="email">
+                        placeholder="Enter your student email" required autocomplete="email" value="studentone@student.com">
                 </div>
 
                 <!-- Password Input -->
                 <div class="form-group">
-                    <label for="password" class="form-label">
-                        <i class="fas fa-lock"></i> Password
-                    </label>
-                    <input type="password" id="password" name="password" class="form-control"
-                        placeholder="••••••••••••" required autocomplete="current-password">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="password" class="form-label mb-0" style="display:inline-block;">Password</label>
+                        <a href="{% url 'password_reset' %}" class="forgot-link">Reset Password</a>
+                    </div>
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" class="form-control"
+                            placeholder="Enter your password" required autocomplete="current-password" value="admin">
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword()">
+                            <i class="fas fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Google reCAPTCHA (Disabled for Local Dev) -->
-                <!--
-                <div class="form-group text-center">
-                    <div class="g-recaptcha" data-sitekey="6LfTGD4qAAAAAJLKy1TGJY7uuTh_T1cB5VikRWjF"></div>
-                </div>
-                -->
-
-                <!-- Remember & Forgot Password -->
-                <div class="form-group d-flex align-items-center justify-content-between">
+                <!-- Remember Me -->
+                <div class="form-group">
                     <div class="form-check">
                         <input type="checkbox" class="form-check-input" id="remember" name="remember" value="1">
                         <label class="form-check-label" for="remember">
                             Remember me
                         </label>
                     </div>
-                    <a href="{% url 'password_reset' %}" class="forgot-link">
-                        Forgot Password?
-                    </a>
                 </div>
 
                 <!-- Submit Button -->
                 <div class="form-group mt-4">
-                    <button type="submit" class="btn btn-primary w-100">
-                        Sign In <i class="fas fa-arrow-right ms-2"></i>
-                    </button>
+                    <button type="submit" class="btn btn-wine">Log in</button>
                 </div>
             </form>
 
+            <div class="text-center mt-3">
+                <a href="#" class="forgot-link">Don't have an account?</a>
+            </div>
+
+            <div class="divider">- or -</div>
+
+            <button type="button" class="btn-passkey">
+                <i class="fas fa-qrcode"></i> Use a Passkey
+            </button>
+
             <!-- Footer -->
-            <div class="text-center mt-5">
-                <small style="color: var(--text-muted); font-size: 11.5px;">
+            <div class="text-center mt-4">
+                <small style="color: var(--text-muted); font-size: 11px;">
                     &copy; 2026 College ERP System. Built for Excellence.
                 </small>
             </div>
@@ -463,19 +510,54 @@
     <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Interactive scaling on focus
-            const inputs = document.querySelectorAll('.form-control');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function () {
-                    this.style.transform = 'translateY(-1px)';
-                });
+        let activeRole = 'student';
 
-                input.addEventListener('blur', function () {
-                    this.style.transform = 'translateY(0)';
-                });
+        function selectRole(role) {
+            activeRole = role;
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.btn-role').forEach(btn => {
+                btn.classList.remove('active');
             });
+            
+            // Add active class to selected button
+            document.getElementById('btn-' + role).classList.add('active');
+            
+            // Update email value and placeholder
+            const emailInput = document.getElementById('email');
+            if (role === 'student') {
+                emailInput.placeholder = 'Enter your student email';
+                emailInput.value = 'studentone@student.com';
+            } else if (role === 'faculty') {
+                emailInput.placeholder = 'Enter your faculty email';
+                emailInput.value = 'staffone@staff.com';
+            } else if (role === 'parent') {
+                emailInput.placeholder = 'Enter your parent email';
+                emailInput.value = 'parentone@parent.com';
+            } else if (role === 'admin') {
+                emailInput.placeholder = 'Enter your admin email';
+                emailInput.value = 'admin@admin.com';
+            } else if (role === 'backoffice') {
+                emailInput.placeholder = 'Enter your backoffice email';
+                emailInput.value = 'backoffice@college.edu';
+            }
+        }
 
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
             // Restore/save remember me state
             const rememberCheckbox = document.getElementById('remember');
             if (localStorage.getItem('rememberMe') === 'true') {
@@ -488,5 +570,4 @@
         });
     </script>
 </body>
-
 </html>
