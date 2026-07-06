@@ -2218,3 +2218,79 @@ def print_basic_list(request):
     }
     return render(request, 'hod_template/print_basic_list.html', context)
 
+@login_required(login_url='/')
+@admin_required
+def manage_login(request):
+    """Manage Login interface showing student accounts and lock/unlock actions."""
+    students = Student.objects.select_related('admin', 'course').all()
+    courses = Course.objects.all()
+    
+    course_filter = request.GET.get('course', '')
+    search_filter = request.GET.get('search', '')
+    
+    if course_filter:
+        students = students.filter(course_id=course_filter)
+    if search_filter:
+        students = students.filter(admin__first_name__icontains=search_filter) | students.filter(admin__last_name__icontains=search_filter)
+        
+    context = {
+        'page_title': 'Student Login',
+        'students': students,
+        'courses': courses,
+        'selected_course': course_filter,
+    }
+    return render(request, 'hod_template/manage_login.html', context)
+
+
+@login_required(login_url='/')
+@admin_required
+def promote_students(request):
+    """Promote Students interface."""
+    courses = Course.objects.all()
+    
+    # Handle promotion action
+    if request.method == "POST":
+        student_ids = request.POST.getlist('student_ids')
+        target_course_id = request.POST.get('target_course')
+        
+        if not student_ids:
+            messages.error(request, "No students selected for promotion.")
+        elif not target_course_id:
+            messages.error(request, "No target class selected.")
+        else:
+            try:
+                target_course = Course.objects.get(id=target_course_id)
+                students_to_promote = Student.objects.filter(id__in=student_ids)
+                count = students_to_promote.count()
+                
+                # Update course
+                students_to_promote.update(course=target_course)
+                
+                messages.success(request, f"Successfully promoted {count} students to {target_course.name}.")
+            except Exception as e:
+                messages.error(request, f"Error promoting students: {e}")
+                
+        # Redirect back to same page keeping any GET params if needed, 
+        # but standard redirect is cleaner
+        return redirect(reverse('promote_students'))
+        
+    # GET request filtering
+    course_filter = request.GET.get('course', '')
+    search_filter = request.GET.get('search', '')
+    
+    students = Student.objects.select_related('admin', 'course').all()
+    
+    if course_filter:
+        students = students.filter(course_id=course_filter)
+    if search_filter:
+        students = students.filter(admin__first_name__icontains=search_filter) | students.filter(admin__last_name__icontains=search_filter) | students.filter(registration_no__icontains=search_filter)
+        
+    context = {
+        'page_title': 'Promote Students',
+        'students': students,
+        'courses': courses,
+        'selected_course': course_filter,
+    }
+    return render(request, 'hod_template/promote_students.html', context)
+
+

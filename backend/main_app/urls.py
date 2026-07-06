@@ -142,6 +142,8 @@ urlpatterns = [
     path("student/admission-letter/", hod_views.admission_letter, name='admission_letter'),
     path("student/id-cards/", hod_views.student_id_cards_admin, name='student_id_cards_admin'),
     path("student/print-basic-list/", hod_views.print_basic_list, name='print_basic_list'),
+    path("student/manage-login/", hod_views.manage_login, name='manage_login'),
+    path("student/promote/", hod_views.promote_students, name='promote_students'),
 
 
     # Staff

@@ -241,11 +241,11 @@
                 <a href="{% url 'view_online_registrations' %}" class="nav-link {% if 'registrations' in request.path %}active{% endif %}">Online Registrations</a>
                 <a href="#" class="nav-link locked">Manage Families <i class="far fa-lock lock-icon"></i></a>
                 <a href="#" class="nav-link locked">Active / Inactive <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link">Admission Letter</a>
+                <a href="{% url 'admission_letter' %}" class="nav-link {% if 'student/admission-letter' in request.path %}active{% endif %}">Admission Letter</a>
                 <a href="{% url 'student_id_cards_admin' %}" class="nav-link {% if 'student/id-cards' in request.path %}active{% endif %}">Student ID Cards</a>
-                <a href="#" class="nav-link">Print Basic List</a>
-                <a href="#" class="nav-link">Manage Login</a>
-                <a href="#" class="nav-link">Promote Students</a>
+                <a href="{% url 'print_basic_list' %}" class="nav-link {% if 'student/print-basic-list' in request.path %}active{% endif %}">Print Basic List</a>
+                <a href="{% url 'manage_login' %}" class="nav-link {% if 'student/manage-login' in request.path %}active{% endif %}">Manage Login</a>
+                <a href="{% url 'promote_students' %}" class="nav-link {% if 'student/promote' in request.path %}active{% endif %}">Promote Students</a>
             </div>
         </div>
 
