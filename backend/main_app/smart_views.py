@@ -14,7 +14,7 @@ from .models import CustomUser, Student, Staff, Course, Subject, Session, Attend
 
 @login_required
 def student_id_card(request):
-    student = get_object_or_404(Student, admin=request.user)
+    student = get_object_or_404(Student.objects.select_related('admin', 'course', 'session'), admin=request.user)
     context = {
         'page_title': 'Digital ID Card',
         'student': student,
@@ -24,7 +24,7 @@ def student_id_card(request):
 
 @login_required
 def staff_id_card(request):
-    staff = get_object_or_404(Staff, admin=request.user)
+    staff = get_object_or_404(Staff.objects.select_related('admin', 'course'), admin=request.user)
     if not staff.id_card_code:
         staff.id_card_code = f"EMP-{staff.course.name[:3].upper() if staff.course else 'GEN'}-{staff.id:04d}"
         staff.save()

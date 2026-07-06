@@ -1391,7 +1391,7 @@ def delete_parent(request, parent_id):
 @login_required(login_url='/')
 @admin_required
 def admin_view_student_id_card(request, student_id):
-    student = get_object_or_404(Student, admin_id=student_id)
+    student = get_object_or_404(Student.objects.select_related('admin', 'course', 'session'), admin_id=student_id)
     if not student.id_card_code:
         student.id_card_code = f"STU-{student.course.name[:3].upper() if student.course else 'GEN'}-{student.batch_year}-{student.id:04d}"
         student.save()
@@ -1405,7 +1405,7 @@ def admin_view_student_id_card(request, student_id):
 @login_required(login_url='/')
 @admin_required
 def admin_view_staff_id_card(request, staff_id):
-    staff = get_object_or_404(Staff, admin_id=staff_id)
+    staff = get_object_or_404(Staff.objects.select_related('admin', 'course'), admin_id=staff_id)
     if not staff.id_card_code:
         staff.id_card_code = f"EMP-{staff.course.name[:3].upper() if staff.course else 'GEN'}-{staff.id:04d}"
         staff.save()
@@ -1432,7 +1432,7 @@ def admin_manage_batches(request):
     batch_year = request.GET.get('batch_year')
     semester = request.GET.get('semester')
     
-    students = Student.objects.all()
+    students = Student.objects.all().select_related('admin', 'course', 'session')
     if course_id:
         students = students.filter(course_id=course_id)
     if session_id:
@@ -1489,7 +1489,7 @@ def admin_print_batch_ids(request):
     student_ids = request.GET.get('ids', '').split(',')
     student_ids = [int(sid) for sid in student_ids if sid.isdigit()]
     
-    students = Student.objects.filter(id__in=student_ids)
+    students = Student.objects.filter(id__in=student_ids).select_related('admin', 'course', 'session')
     
     # Pre-generate unique codes for selected students if they don't have them
     for student in students:
