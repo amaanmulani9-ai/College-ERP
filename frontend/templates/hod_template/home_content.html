@@ -689,8 +689,8 @@ body, .erpnext-main, .content-area { font-family: 'Poppins', sans-serif; font-si
                     {% for c in course_stats %}
                     <tr>
                         <td><strong>{{ c.name }}</strong></td>
-                        <td><span class="sk-badge" style="background:var(--sk-brand-light);color:var(--sk-brand);">{{ c.st_count }}</span></td>
-                        <td><span class="sk-badge" style="background:var(--sk-orange-bg);color:var(--sk-orange);">{{ c.sub_count }}</span></td>
+                        <td><span class="sk-badge" style="background:var(--sk-brand-light);color:var(--sk-brand);">{{ c.student_count }}</span></td>
+                        <td><span class="sk-badge" style="background:var(--sk-orange-bg);color:var(--sk-orange);">{{ c.subject_count }}</span></td>
                     </tr>
                     {% empty %}
                     <tr><td colspan="3" class="text-center py-3" style="color:var(--sk-text-muted);">No courses yet</td></tr>
