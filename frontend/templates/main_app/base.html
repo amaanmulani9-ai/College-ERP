@@ -239,19 +239,24 @@
                 const link = item.querySelector('.nav-link');
                 const submenu = item.querySelector('.nav-submenu');
                 
-                if (link && submenu) {
+                if (link) {
                     link.addEventListener('click', function(e) {
-                        e.preventDefault();
+                        if (link.getAttribute('href') === '#' || link.getAttribute('href') === 'javascript:void(0)') {
+                            e.preventDefault();
+                        }
                         
-                        // Toggle current item
-                        item.classList.toggle('open');
-                        
-                        // Close other open items
-                        navItems.forEach(otherItem => {
-                            if (otherItem !== item && otherItem.classList.contains('open')) {
-                                otherItem.classList.remove('open');
-                            }
-                        });
+                        if (submenu) {
+                            e.preventDefault();
+                            // Toggle current item
+                            item.classList.toggle('open');
+                            
+                            // Close other open items
+                            navItems.forEach(otherItem => {
+                                if (otherItem !== item && otherItem.classList.contains('open')) {
+                                    otherItem.classList.remove('open');
+                                }
+                            });
+                        }
                     });
                 }
             });

@@ -462,35 +462,3 @@
         Check our PRO version.
     </div>
 </div>
-
-<script>
-    // Submenu toggle logic matching eSkooly behavior
-    document.querySelectorAll('.nav-item.has-submenu > .nav-link').forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const parent = this.parentElement;
-            const isOpen = parent.classList.contains('open');
-            
-            // Close other submenus
-            document.querySelectorAll('.nav-item.has-submenu').forEach(sibling => {
-                if (sibling !== parent) {
-                    sibling.classList.remove('open');
-                    const submenu = sibling.querySelector('.nav-submenu');
-                    if (submenu) submenu.style.display = 'none';
-                }
-            });
-            
-            // Toggle current submenu
-            const submenu = parent.querySelector('.nav-submenu');
-            if (submenu) {
-                if (isOpen) {
-                    parent.classList.remove('open');
-                    submenu.style.display = 'none';
-                } else {
-                    parent.classList.add('open');
-                    submenu.style.display = 'block';
-                }
-            }
-        });
-    });
-</script>
