@@ -1925,3 +1925,62 @@ def admin_print_job_letter(request, staff_id):
     }
     return render(request, 'hod_template/staff_print_job_letter.html', context)
 
+
+@login_required(login_url='/')
+@admin_required
+def admission_letter(request):
+    """Search for a student and generate their admission letter."""
+    student = None
+    search_results = []
+    query = request.GET.get('q', '').strip()
+    if query:
+        search_results = Student.objects.select_related('admin', 'course').filter(
+            Q(admin__first_name__icontains=query) |
+            Q(admin__last_name__icontains=query) |
+            Q(registration_no__icontains=query)
+        )[:10]
+    student_id = request.GET.get('student_id')
+    if student_id:
+        student = get_object_or_404(Student.objects.select_related('admin', 'course', 'session'), id=student_id)
+    context = {
+        'page_title': 'Admission Letter',
+        'query': query,
+        'search_results': search_results,
+        'student': student,
+    }
+    return render(request, 'hod_template/admission_letter.html', context)
+
+
+@login_required(login_url='/')
+@admin_required
+def student_id_cards_admin(request):
+    """Multi-style Student ID Cards viewer."""
+    students = Student.objects.select_related('admin', 'course', 'session').all()
+    for s in students:
+        if not s.id_card_code:
+            s.id_card_code = f"STU-{s.course.name[:3].upper() if s.course else 'GEN'}-{s.batch_year}-{s.id:04d}"
+            s.save()
+    context = {
+        'page_title': 'Student ID Cards',
+        'students': students,
+    }
+    return render(request, 'hod_template/student_id_cards.html', context)
+
+
+@login_required(login_url='/')
+@admin_required
+def print_basic_list(request):
+    """Filterable student list with export controls."""
+    students = Student.objects.select_related('admin', 'course').all()
+    courses = Course.objects.all()
+    course_filter = request.GET.get('course', '')
+    if course_filter:
+        students = students.filter(course_id=course_filter)
+    context = {
+        'page_title': 'Print Basic List',
+        'students': students,
+        'courses': courses,
+        'selected_course': course_filter,
+    }
+    return render(request, 'hod_template/print_basic_list.html', context)
+

@@ -133,6 +133,11 @@ urlpatterns = [
     path("subject/edit/<int:subject_id>",
          hod_views.edit_subject, name='edit_subject'),
 
+    # Student Extra Pages
+    path("student/admission-letter/", hod_views.admission_letter, name='admission_letter'),
+    path("student/id-cards/", hod_views.student_id_cards_admin, name='student_id_cards_admin'),
+    path("student/print-basic-list/", hod_views.print_basic_list, name='print_basic_list'),
+
 
     # Staff
     path("staff/home/", staff_views.staff_home, name='staff_home'),
