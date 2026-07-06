@@ -481,12 +481,15 @@
             });
             
             // Toggle current submenu
-            if (isOpen) {
-                parent.classList.remove('open');
-                parent.querySelector('.nav-submenu').style.display = 'none';
-            } else {
-                parent.classList.add('open');
-                parent.querySelector('.nav-submenu').style.display = 'block';
+            const submenu = parent.querySelector('.nav-submenu');
+            if (submenu) {
+                if (isOpen) {
+                    parent.classList.remove('open');
+                    submenu.style.display = 'none';
+                } else {
+                    parent.classList.add('open');
+                    submenu.style.display = 'block';
+                }
             }
         });
     });
