@@ -10,7 +10,8 @@ class FormSettings(forms.ModelForm):
         super(FormSettings, self).__init__(*args, **kwargs)
         # Here make some changes such as:
         for field in self.visible_fields():
-            field.field.widget.attrs['class'] = 'form-control'
+            existing_class = field.field.widget.attrs.get('class', '')
+            field.field.widget.attrs['class'] = f'form-control {existing_class}'.strip()
 
 
 class CustomUserForm(FormSettings):
@@ -18,7 +19,7 @@ class CustomUserForm(FormSettings):
     gender = forms.ChoiceField(choices=[('M', 'Male'), ('F', 'Female')])
     first_name = forms.CharField(required=True)
     last_name = forms.CharField(required=True)
-    address = forms.CharField(widget=forms.Textarea, required=False)
+    address = forms.CharField(widget=forms.Textarea(attrs={'class': 'no-tinymce'}), required=False)
     password = forms.CharField(widget=forms.PasswordInput)
     widget = {
         'password': forms.PasswordInput(),
@@ -81,6 +82,9 @@ class AdminForm(CustomUserForm):
 class StaffForm(CustomUserForm):
     def __init__(self, *args, **kwargs):
         super(StaffForm, self).__init__(*args, **kwargs)
+        self.fields['last_name'].required = False
+        self.fields['password'].required = False
+        self.fields['course'].required = False
 
     class Meta(CustomUserForm.Meta):
         model = Staff

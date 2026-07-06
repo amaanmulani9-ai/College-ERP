@@ -242,7 +242,7 @@
                 <a href="#" class="nav-link locked">Manage Families <i class="far fa-lock lock-icon"></i></a>
                 <a href="#" class="nav-link locked">Active / Inactive <i class="far fa-lock lock-icon"></i></a>
                 <a href="#" class="nav-link">Admission Letter</a>
-                <a href="#" class="nav-link">Student ID Cards</a>
+                <a href="{% url 'student_id_cards_admin' %}" class="nav-link {% if 'student/id-cards' in request.path %}active{% endif %}">Student ID Cards</a>
                 <a href="#" class="nav-link">Print Basic List</a>
                 <a href="#" class="nav-link">Manage Login</a>
                 <a href="#" class="nav-link">Promote Students</a>

@@ -72,9 +72,6 @@ def online_registration(request):
                 if not file_exists:
                     writer.writerow(['First Name', 'Last Name', 'Gender', 'Course ID', 'Session ID', 'Date of Admission', 'Email', 'Password', 'Unique Code', 'Registration Fee', 'Registration Time'])
                 
-                # We save the data in the format expected by the import tool!
-                # Wait, the import tool expects: first_name, last_name, gender, course_id, session_id, date_of_admission, email (optional)
-                # We can append the extra fields at the end.
                 registration_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 writer.writerow([first_name, last_name, gender, course_id, session_id, date_of_admission, email, password, unique_code, '0', registration_time])
                 

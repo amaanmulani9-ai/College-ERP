@@ -288,34 +288,45 @@ def add_staff(request):
     if request.method == 'POST':
         if form.is_valid():
             first_name = form.cleaned_data.get('first_name')
-            last_name = form.cleaned_data.get('last_name')
+            last_name = form.cleaned_data.get('last_name') or ''
             address = form.cleaned_data.get('address')
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
-            password = form.cleaned_data.get('password')
+            password = form.cleaned_data.get('password') or 'staff123'
             course = form.cleaned_data.get('course')
             passport = request.FILES.get('profile_pic')
             fs = FileSystemStorage()
-            filename = fs.save(passport.name, passport)
-            passport_url = fs.url(filename)
+            filename = fs.save(passport.name, passport) if passport else None
+            passport_url = fs.url(filename) if filename else None
             try:
                 user = CustomUser.objects.create_user(
                     email=email, password=password, user_type=2, first_name=first_name, last_name=last_name)
                 user.gender = gender
                 user.address = address
-                user.staff.course = course
-                if passport:
-                    fs = FileSystemStorage()
-                    filename = fs.save(passport.name, passport)
-                    user.profile_pic = fs.url(filename)
+                if passport_url:
+                    user.profile_pic = passport_url
                 user.save()
+                
+                # Save additional custom fields
+                staff = user.staff
+                staff.course = course
+                staff.monthly_salary = request.POST.get('monthly_salary') or 0.00
+                staff.experience = request.POST.get('experience') or 0
+                staff.religion = request.POST.get('religion', '')
+                staff.blood_group = request.POST.get('blood_group', '')
+                doj = request.POST.get('date_of_joining')
+                if doj:
+                    staff.date_of_joining = doj
+                staff.save()
+                
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_staff'))
 
             except Exception as e:
                 messages.error(request, "Could Not Add " + str(e))
         else:
-            messages.error(request, "Please fulfil all requirements")
+            error_details = ' '.join([f"{f}: {e}" for f, e in form.errors.items()])
+            messages.error(request, f"Please fulfil all requirements. {error_details}")
 
     return render(request, 'hod_template/add_staff_template.html', context)
 
@@ -1924,6 +1935,8 @@ def import_students_csv(request):
                 first_name = column[0].strip()
                 last_name = column[1].strip()
                 gender = column[2].strip()
+                if len(gender) > 1:
+                    gender = 'M' if gender.lower() == 'male' else 'F'
                 course_id = column[3].strip()
                 session_id = column[4].strip()
                 date_of_admission = column[5].strip()
@@ -1946,7 +1959,7 @@ def import_students_csv(request):
                         random_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
                         email = f"{base_email}.{random_string}@student.com"
                     
-                password = "student"
+                password = column[7].strip() if len(column) > 7 and column[7].strip() else "student"
                 
                 try:
                     course = Course.objects.get(id=course_id)
