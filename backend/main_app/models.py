@@ -41,7 +41,7 @@ class Session(models.Model):
 
 
 class CustomUser(AbstractUser):
-    USER_TYPE = ((1, "HOD"), (2, "Staff"), (3, "Student"), (4, "Parent"), (5, "Alumni"), (6, "CompanyHR"))
+    USER_TYPE = ((1, "HOD"), (2, "Staff"), (3, "Student"), (4, "Parent"), (5, "Alumni"), (6, "CompanyHR"), (7, "Backoffice"))
     GENDER = [("M", "Male"), ("F", "Female")]
     
     
@@ -64,6 +64,16 @@ class CustomUser(AbstractUser):
 
 class Admin(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+
+
+class Backoffice(models.Model):
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    department = models.CharField(max_length=100, default="Admissions & Finance")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.admin.get_full_name() or self.admin.email
 
 
 
@@ -116,6 +126,13 @@ class Staff(models.Model):
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     id_card_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    monthly_salary = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    experience = models.PositiveIntegerField(default=0, help_text="Years of experience")
+    religion = models.CharField(max_length=50, blank=True)
+    blood_group = models.CharField(max_length=5, blank=True)
+    date_of_joining = models.DateField(null=True, blank=True)
+    picture = models.ImageField(upload_to='staff_pictures/', blank=True, null=True)
+    job_letter_password = models.CharField(max_length=128, blank=True, null=True, help_text="Temporary password for job letter display")
 
     def __str__(self):
         return self.admin.first_name + " " +  self.admin.last_name
@@ -231,22 +248,29 @@ class StudentResult(models.Model):
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        if instance.user_type == 1:
+        if instance.user_type == 1 or instance.user_type == '1':
             Admin.objects.create(admin=instance)
-        if instance.user_type == 2:
+        if instance.user_type == 2 or instance.user_type == '2':
             Staff.objects.create(admin=instance)
-        if instance.user_type == 3:
+        if instance.user_type == 3 or instance.user_type == '3':
             Student.objects.create(admin=instance)
+        if instance.user_type == 7 or instance.user_type == '7':
+            Backoffice.objects.create(admin=instance)
 
 
 @receiver(post_save, sender=CustomUser)
 def save_user_profile(sender, instance, **kwargs):
-    if instance.user_type == 1:
+    if instance.user_type == 1 or instance.user_type == '1':
         instance.admin.save()
-    if instance.user_type == 2:
+    if instance.user_type == 2 or instance.user_type == '2':
         instance.staff.save()
-    if instance.user_type == 3:
+    if instance.user_type == 3 or instance.user_type == '3':
         instance.student.save()
+    if instance.user_type == 7 or instance.user_type == '7':
+        try:
+            instance.backoffice.save()
+        except Backoffice.DoesNotExist:
+            Backoffice.objects.create(admin=instance)
         # Synchronize from CustomUser/Student to StudentRegistration
         try:
             reg, created = StudentRegistration.objects.get_or_create(student=instance.student)
@@ -585,6 +609,17 @@ class Parent(models.Model):
         return f"{self.admin.get_full_name()} (Parent of {self.student.admin.get_full_name()})"
 
 
+class FeedbackParent(models.Model):
+    parent = models.ForeignKey(Parent, on_delete=models.CASCADE)
+    feedback = models.TextField()
+    reply = models.TextField(default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Feedback from {self.parent.admin.get_full_name()}"
+
+
 # --- Version 2.0 LMS Models ---
 
 class CourseCategory(models.Model):
@@ -872,3 +907,73 @@ class OfferLetter(models.Model):
 
     def __str__(self):
         return f"Offer: {self.student} by {self.company.name}"
+
+
+# --- GENERAL SETTINGS MODELS ---
+
+class InstituteProfile(models.Model):
+    name = models.CharField(max_length=255)
+    logo = models.ImageField(upload_to='institute_logos/', blank=True, null=True)
+    phone = models.CharField(max_length=50, blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    country = models.CharField(max_length=100, blank=True, null=True)
+    target_line = models.CharField(max_length=255, blank=True, null=True)
+    
+    def __str__(self):
+        return self.name
+
+class FeeParticular(models.Model):
+    label = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    is_fixed = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.label
+
+class BankDetail(models.Model):
+    bank_name = models.CharField(max_length=255)
+    logo = models.ImageField(upload_to='bank_logos/', blank=True, null=True)
+    branch_address = models.TextField(blank=True, null=True)
+    account_number = models.CharField(max_length=100)
+    instructions = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        return self.bank_name
+
+class RulesRegulation(models.Model):
+    student_rules = models.TextField(blank=True, null=True)
+    employee_rules = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return "Rules & Regulations"
+
+class MarksGrading(models.Model):
+    grade = models.CharField(max_length=10)
+    percent_from = models.IntegerField()
+    percent_upto = models.IntegerField()
+    status = models.CharField(max_length=20, default='PASS', choices=[('PASS', 'PASS'), ('FAIL', 'FAIL')])
+
+    def __str__(self):
+        return f"{self.grade} ({self.percent_from}-{self.percent_upto}%)"
+
+class ThemeLanguageSettings(models.Model):
+    theme_placement = models.CharField(max_length=10, default='LTR')
+    sidebar_background = models.CharField(max_length=20, default='Light')
+    header_background = models.CharField(max_length=20, default='White')
+    active_item_background = models.CharField(max_length=20, default='#6c5ce7')
+    language = models.CharField(max_length=50, default='English')
+
+    def __str__(self):
+        return "Theme & Language Settings"
+
+class AccountSettings(models.Model):
+    admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='account_settings')
+    time_zone = models.CharField(max_length=100, default='Asia/Karachi')
+    currency = models.CharField(max_length=100, default='Dollars (USD)')
+    currency_symbol = models.CharField(max_length=10, default='$')
+    subscription = models.CharField(max_length=50, default='YEARLY')
+    expiry_date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Account Settings - {self.admin.email}"

@@ -27,9 +27,29 @@ def staff_home(request):
     attendance_list = Attendance.objects.filter(subject__in=subjects)
     total_attendance = attendance_list.count()
     from django.db.models import Count
+    import datetime as dt
     subjects_with_attendance = subjects.annotate(attendance_count=Count('attendance', distinct=True))
     subject_list = [subject.name for subject in subjects_with_attendance]
     attendance_list = [subject.attendance_count for subject in subjects_with_attendance]
+
+    try:
+        notifications = NotificationStaff.objects.filter(staff=staff).order_by('-created_at')[:6]
+    except Exception:
+        notifications = []
+    try:
+        recent_leaves = LeaveReportStaff.objects.filter(staff=staff).order_by('-date')[:5]
+    except Exception:
+        recent_leaves = []
+    try:
+        recent_attendance = Attendance.objects.filter(subject__in=subjects).order_by('-date')[:5]
+    except Exception:
+        recent_attendance = []
+    try:
+        today_weekday = dt.datetime.now().weekday()
+        today_lectures = Timetable.objects.filter(subject__in=subjects, day_of_week=today_weekday).select_related('subject', 'course').order_by('start_time')
+    except Exception:
+        today_lectures = []
+
     context = {
         'page_title': 'Staff Panel - ' + str(staff.admin.first_name) + ' ' + str(staff.admin.last_name[:1]) + ' (' + str(staff.course) + ')',
         'total_students': total_students,
@@ -37,7 +57,11 @@ def staff_home(request):
         'total_leave': total_leave,
         'total_subject': total_subject,
         'subject_list': subject_list,
-        'attendance_list': attendance_list
+        'attendance_list': attendance_list,
+        'notifications': notifications,
+        'recent_leaves': recent_leaves,
+        'recent_attendance': recent_attendance,
+        'today_lectures': today_lectures,
     }
     return render(request, "staff_template/erpnext_staff_home.html", context)
 

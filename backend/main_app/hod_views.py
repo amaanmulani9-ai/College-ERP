@@ -14,8 +14,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import UpdateView
 
 from .forms import *
-from .models import *
-from django.db.models import Sum
+from django.db.models import Sum, Count, Q, F, Avg
+from django.db.models.functions import TruncMonth
+import calendar
+from datetime import date, timedelta
 
 
 @login_required(login_url='/')
@@ -34,8 +36,6 @@ def admin_home(request):
         attendance_count = Attendance.objects.filter(subject=subject).count()
         subject_list.append(subject.name[:7])
         attendance_list.append(attendance_count)
-
-    from django.db.models import Count
     # Total Subjects and students in Each Course
     courses_with_counts = Course.objects.annotate(
         subject_count=Count('subject', distinct=True),
@@ -52,7 +52,6 @@ def admin_home(request):
     student_count_list_in_subject = [subject.student_count for subject in subjects_with_counts]
 
 
-    from django.db.models import Q
     # For Students
     students_with_attendance = Student.objects.annotate(
         present_count=Count('attendancereport', filter=Q(attendancereport__status=True), distinct=True),
@@ -69,13 +68,11 @@ def admin_home(request):
         student_attendance_leave_list.append(student.leave_count + student.absent_count)
         student_name_list.append(student.admin.first_name)
         
-    # --- Advanced Analytics Data ---
-    # 1. Fee Collection
+    # --- Fee Collection ---
     total_fee_collected = FeeRecord.objects.aggregate(total=Sum('amount_paid'))['total'] or 0
-    from django.db.models import F
     total_fee_pending = FeeRecord.objects.aggregate(total=Sum(F('amount') - F('amount_paid')))['total'] or 0
     
-    # 2. Pass/Fail Ratio
+    # --- Pass/Fail Ratio ---
     results = StudentResult.objects.select_related('student__admin', 'subject').all()
     pass_count = 0
     fail_count = 0
@@ -85,12 +82,7 @@ def admin_home(request):
         else:
             fail_count += 1
             
-    # 3. Monthly Enrollment Trend (mock data or real data if available)
-    # Using real data from CustomUser date_joined
-    from django.db.models import Count
-    from django.db.models.functions import TruncMonth
-    import calendar
-    
+    # --- Monthly Enrollment Trend ---
     enrollments = CustomUser.objects.filter(user_type='3').annotate(month=TruncMonth('date_joined')).values('month').annotate(count=Count('id')).order_by('month')
     months = []
     monthly_enrollments = []
@@ -99,7 +91,7 @@ def admin_home(request):
             months.append(e['month'].strftime('%b %Y'))
             monthly_enrollments.append(e['count'])
             
-    # 4. Staff Performance Analytics
+    # --- Staff Performance Analytics ---
     staff_analytics = []
     staff_with_stats = Staff.objects.select_related('admin', 'course').annotate(
         subjects_taught_count=Count('subject', distinct=True),
@@ -115,12 +107,107 @@ def admin_home(request):
             'results_published': staff.results_published_count,
         })
 
+    # ─────────── NEW DASHBOARD PANELS DATA ───────────
+
+    today = date.today()
+
+    # 1. Pending Leaves
+    pending_student_leaves = LeaveReportStudent.objects.filter(status=0).count()
+    pending_staff_leaves = LeaveReportStaff.objects.filter(status=0).count()
+
+    # 2. Pending Feedbacks (no reply yet)
+    pending_student_feedbacks = FeedbackStudent.objects.filter(reply='').count()
+    pending_staff_feedbacks = FeedbackStaff.objects.filter(reply='').count()
+    total_pending_feedbacks = pending_student_feedbacks + pending_staff_feedbacks
+
+    # 3. Pending Certificate Requests
+    try:
+        pending_certs = CertificateRequest.objects.filter(status='Pending').count()
+    except Exception:
+        pending_certs = 0
+
+    # 4. Recent Students (last 8 admissions)
+    recent_students = Student.objects.select_related(
+        'admin', 'course', 'session'
+    ).order_by('-admin__created_at')[:8]
+
+    # 5. Recent Fee Payments (last 6)
+    try:
+        recent_payments = FeePayment.objects.select_related(
+            'fee_record__student__admin'
+        ).order_by('-payment_date')[:6]
+    except Exception:
+        recent_payments = []
+
+    # 6. Today's Events & Upcoming Events
+    try:
+        today_events = CollegeEvent.objects.filter(date=today).order_by('date')
+        upcoming_events = CollegeEvent.objects.filter(date__gte=today).order_by('date')[:6]
+    except Exception:
+        today_events = []
+        upcoming_events = []
+
+    # 7. Monthly Fee Collection (last 6 months)
+    fee_months_labels = []
+    fee_months_collected = []
+    for i in range(5, -1, -1):
+        m_date = today.replace(day=1) - timedelta(days=30 * i)
+        fee_months_labels.append(m_date.strftime('%b %y'))
+        try:
+            collected = FeePayment.objects.filter(
+                payment_date__year=m_date.year,
+                payment_date__month=m_date.month
+            ).aggregate(total=Sum('amount_paid'))['total'] or 0
+        except Exception:
+            collected = 0
+        fee_months_collected.append(float(collected))
+
+    # 8. Gender Distribution
+    male_students = CustomUser.objects.filter(user_type='3', gender='M').count()
+    female_students = CustomUser.objects.filter(user_type='3', gender='F').count()
+
+    # 9. Today's Attendance Sessions
+    today_attendance_sessions = Attendance.objects.filter(date=today).count()
+
+    # 10. Total Parents
+    total_parents = Parent.objects.count()
+
+    # 12. Recent Notifications (Noticeboard / Communications)
+    try:
+        notif_students = list(NotificationStudent.objects.select_related('student__admin').order_by('-created_at')[:4])
+        notif_staff = list(NotificationStaff.objects.select_related('staff__admin').order_by('-created_at')[:4])
+        recent_notifs = []
+        for n in notif_students:
+            recent_notifs.append({
+                'recipient': f"Student: {n.student.admin.first_name} {n.student.admin.last_name}",
+                'message': n.message,
+                'created_at': n.created_at,
+                'type': 'student'
+            })
+        for n in notif_staff:
+            recent_notifs.append({
+                'recipient': f"Staff: {n.staff.admin.first_name} {n.staff.admin.last_name}",
+                'message': n.message,
+                'created_at': n.created_at,
+                'type': 'staff'
+            })
+        recent_notifs.sort(key=lambda x: getattr(x, 'created_at', None) or today, reverse=True)
+        recent_notifs = recent_notifs[:5]
+    except Exception:
+        recent_notifs = []
+
+    course_stats = courses_with_counts
+
     context = {
         'page_title': "Administrative Dashboard",
+        # core stats
         'total_students': total_students,
         'total_staff': total_staff,
         'total_course': total_course,
         'total_subject': total_subject,
+        'total_parents': total_parents,
+        'total_attendance': total_attendance,
+        # chart data
         'subject_list': subject_list,
         'attendance_list': attendance_list,
         'student_attendance_present_list': student_attendance_present_list,
@@ -136,7 +223,23 @@ def admin_home(request):
         "fail_count": fail_count,
         "enrollment_months": json.dumps(months),
         "enrollment_counts": json.dumps(monthly_enrollments),
-        "staff_analytics": staff_analytics
+        "staff_analytics": staff_analytics,
+        # Action & Activity Lists
+        "pending_student_leaves": pending_student_leaves,
+        "pending_staff_leaves": pending_staff_leaves,
+        "total_pending_feedbacks": total_pending_feedbacks,
+        "pending_certs": pending_certs,
+        "recent_students": recent_students,
+        "recent_payments": recent_payments,
+        "today_events": today_events,
+        "upcoming_events": upcoming_events,
+        "course_stats": course_stats,
+        "fee_months_labels": json.dumps(fee_months_labels),
+        "fee_months_collected": json.dumps(fee_months_collected),
+        "male_students": male_students,
+        "female_students": female_students,
+        "today_attendance_sessions": today_attendance_sessions,
+        "recent_notifs": recent_notifs,
     }
     return render(request, 'hod_template/home_content.html', context)
 
@@ -254,7 +357,8 @@ def add_course(request):
     form = CourseForm(request.POST or None)
     context = {
         'form': form,
-        'page_title': 'Add Course'
+        'page_title': 'Add Course',
+        'teacher_count': Staff.objects.count()
     }
     if request.method == 'POST':
         if form.is_valid():
@@ -317,8 +421,10 @@ def manage_staff(request):
 @admin_required
 def manage_student(request):
     students = CustomUser.objects.filter(user_type=3)
+    courses  = Course.objects.all()
     context = {
         'students': students,
+        'courses':  courses,
         'page_title': 'Manage Students'
     }
     return render(request, "hod_template/manage_student.html", context)
@@ -1503,3 +1609,185 @@ def admin_print_batch_ids(request):
         'is_batch_print': True
     }
     return render(request, "hod_template/print_batch_id_cards.html", context)
+
+
+def admin_settings_profile(request):
+    from .models import InstituteProfile
+    profile = InstituteProfile.objects.first()
+    if request.method == 'POST':
+        if not profile:
+            profile = InstituteProfile()
+        profile.name = request.POST.get('name')
+        profile.phone = request.POST.get('phone')
+        profile.website = request.POST.get('website')
+        profile.address = request.POST.get('address')
+        profile.country = request.POST.get('country')
+        profile.target_line = request.POST.get('target_line')
+        if 'logo' in request.FILES:
+            profile.logo = request.FILES.get('logo')
+        profile.save()
+        messages.success(request, 'Institute profile updated successfully')
+        return redirect('admin_settings_profile')
+    return render(request, 'hod_template/settings_profile.html', {'page_title': 'Institute Profile', 'profile': profile})
+
+def admin_settings_fees(request):
+    from .models import FeeParticular
+    if request.method == 'POST':
+        if 'add_fee' in request.POST:
+            label = request.POST.get('label')
+            amount = request.POST.get('amount')
+            is_fixed = request.POST.get('is_fixed') == 'on'
+            FeeParticular.objects.create(label=label, amount=amount, is_fixed=is_fixed)
+            messages.success(request, 'Fee particular added successfully')
+        elif 'delete_fee' in request.POST:
+            fee_id = request.POST.get('fee_id')
+            FeeParticular.objects.filter(id=fee_id).delete()
+            messages.success(request, 'Fee particular deleted successfully')
+        return redirect('admin_settings_fees')
+    fees = FeeParticular.objects.all()
+    return render(request, 'hod_template/settings_fees.html', {'page_title': 'Fee Particulars', 'fees': fees})
+
+def admin_settings_banks(request):
+    from .models import BankDetail
+    if request.method == 'POST':
+        if 'add_bank' in request.POST:
+            bank_name = request.POST.get('bank_name')
+            branch_address = request.POST.get('branch_address')
+            account_number = request.POST.get('account_number')
+            instructions = request.POST.get('instructions')
+            bank = BankDetail(bank_name=bank_name, branch_address=branch_address, account_number=account_number, instructions=instructions)
+            if 'logo' in request.FILES:
+                bank.logo = request.FILES.get('logo')
+            bank.save()
+            messages.success(request, 'Bank details added successfully')
+        elif 'delete_bank' in request.POST:
+            bank_id = request.POST.get('bank_id')
+            BankDetail.objects.filter(id=bank_id).delete()
+            messages.success(request, 'Bank details deleted successfully')
+        return redirect('admin_settings_banks')
+    banks = BankDetail.objects.all()
+    return render(request, 'hod_template/settings_banks.html', {'page_title': 'Bank Details', 'banks': banks})
+
+def admin_settings_rules(request):
+    from .models import RulesRegulation
+    rules = RulesRegulation.objects.first()
+    if request.method == 'POST':
+        if not rules:
+            rules = RulesRegulation()
+        rules.student_rules = request.POST.get('student_rules')
+        rules.employee_rules = request.POST.get('employee_rules')
+        rules.save()
+        messages.success(request, 'Rules & Regulations updated successfully')
+        return redirect('admin_settings_rules')
+    return render(request, 'hod_template/settings_rules.html', {'page_title': 'Rules & Regulations', 'rules': rules})
+
+def feature_coming_soon(request, feature_name):
+    # Decode feature name for display (e.g., replace hyphens with spaces and title case)
+    display_name = feature_name.replace('-', ' ').title()
+    return render(request, 'hod_template/feature_coming_soon.html', {'feature_name': display_name, 'page_title': display_name})
+
+def admin_settings_grading(request):
+    from .models import MarksGrading
+    
+    if request.method == 'POST':
+        if 'add_grade' in request.POST:
+            grade = request.POST.get('grade')
+            percent_from = request.POST.get('percent_from')
+            percent_upto = request.POST.get('percent_upto')
+            status = request.POST.get('status')
+            MarksGrading.objects.create(grade=grade, percent_from=percent_from, percent_upto=percent_upto, status=status)
+            messages.success(request, 'Grade added successfully.')
+        elif 'delete_grade' in request.POST:
+            grade_id = request.POST.get('delete_grade')
+            MarksGrading.objects.filter(id=grade_id).delete()
+            messages.success(request, 'Grade deleted successfully.')
+            
+        return redirect('admin_settings_grading')
+        
+    grades = MarksGrading.objects.all().order_by('-percent_from')
+    return render(request, 'hod_template/settings_grading.html', {'page_title': 'Marks Grading', 'grades': grades})
+
+def admin_settings_theme(request):
+    from .models import ThemeLanguageSettings
+    theme, created = ThemeLanguageSettings.objects.get_or_create(id=1)
+    
+    if request.method == 'POST':
+        theme.theme_placement = request.POST.get('theme_placement', theme.theme_placement)
+        theme.sidebar_background = request.POST.get('sidebar_background', theme.sidebar_background)
+        theme.header_background = request.POST.get('header_background', theme.header_background)
+        theme.active_item_background = request.POST.get('active_item_background', theme.active_item_background)
+        theme.language = request.POST.get('language', theme.language)
+        theme.save()
+        messages.success(request, 'Theme & Language settings saved.')
+        return redirect('admin_settings_theme')
+        
+    return render(request, 'hod_template/settings_theme.html', {'page_title': 'Theme & Language', 'theme': theme})
+
+def admin_settings_account(request):
+    from .models import AccountSettings, CustomUser
+    account, created = AccountSettings.objects.get_or_create(admin=request.user)
+    
+    if request.method == 'POST':
+        # Update user details
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        if email:
+            request.user.email = email
+            request.user.save()
+        if password and password != '********':
+            request.user.set_password(password)
+            request.user.save()
+            
+        # Update account settings
+        account.time_zone = request.POST.get('time_zone', account.time_zone)
+        account.currency = request.POST.get('currency', account.currency)
+        account.currency_symbol = request.POST.get('currency_symbol', account.currency_symbol)
+        account.save()
+        
+        messages.success(request, 'Account settings updated successfully.')
+        return redirect('admin_settings_account')
+        
+    return render(request, 'hod_template/settings_account.html', {'page_title': 'Account Settings', 'account': account})
+
+
+# --- Staff Job Letter ---
+
+@login_required(login_url='/')
+@admin_required
+def admin_job_letter(request):
+    """Listing page showing all staff with a 'Print Job Letter' button."""
+    from .models import RulesRegulation
+    all_staff = Staff.objects.select_related('admin', 'course').all()
+    context = {
+        'page_title': 'Staff Job Letters',
+        'all_staff': all_staff,
+    }
+    return render(request, 'hod_template/staff_job_letter.html', context)
+
+
+@login_required(login_url='/')
+@admin_required
+def admin_print_job_letter(request, staff_id):
+    """Renders the printable job letter for a specific staff member."""
+    from .models import RulesRegulation
+    staff = get_object_or_404(Staff, id=staff_id)
+    rules_obj = RulesRegulation.objects.first()
+    employee_rules = rules_obj.employee_rules if rules_obj and rules_obj.employee_rules else (
+        "1. Employees must adhere to all institutional policies and procedures at all times.\n"
+        "2. Punctuality and regular attendance are mandatory; unauthorized leave will be treated as misconduct.\n"
+        "3. All staff are expected to maintain professional conduct and decorum within the campus premises.\n"
+        "4. Confidential information about students, staff, and institution shall not be disclosed to any third party.\n"
+        "5. Staff must participate in all academic and administrative activities assigned by the management.\n"
+        "6. Any grievance or complaint must be reported through proper channels to the HOD or Principal.\n"
+        "7. Use of mobile phones during class hours or official meetings is strictly prohibited.\n"
+        "8. Staff are responsible for maintaining cleanliness and discipline in their respective areas.\n"
+        "9. Any damage to institutional property will be recovered from the concerned employee.\n"
+        "10. This letter of appointment is subject to review and renewal as per institutional policy."
+    )
+    context = {
+        'staff': staff,
+        'employee_rules': employee_rules,
+        'site_url': request.build_absolute_uri('/'),
+    }
+    return render(request, 'hod_template/staff_print_job_letter.html', context)
+

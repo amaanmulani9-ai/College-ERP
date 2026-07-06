@@ -1,244 +1,551 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
 
-{% block page_title %}Staff Dashboard{% endblock page_title %}
+{% block page_title %}Staff Dashboard - eSkooly Portal{% endblock page_title %}
 
 {% block breadcrumb %}
-    <li class="breadcrumb-item active">Staff Dashboard</li>
+    <li class="breadcrumb-item active">Staff Portal</li>
 {% endblock breadcrumb %}
 
 {% block content %}
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon primary">
-                <i class="fas fa-user-graduate"></i>
-            </div>
-            <div class="stat-number primary">{{ total_students }}</div>
-            <p class="stat-label">Total Students</p>
-        </div>
+<style>
+    /* eSkooly Staff Dashboard Design Tokens & Scoped Styles */
+    :root {
+        --sk-brand: #673de5;
+        --sk-brand-light: rgba(103, 61, 229, 0.1);
+        --sk-green: #28a745;
+        --sk-green-bg: rgba(40, 167, 69, 0.1);
+        --sk-yellow: #ffc107;
+        --sk-yellow-bg: rgba(255, 193, 7, 0.15);
+        --sk-orange: #fd7e14;
+        --sk-orange-bg: rgba(253, 126, 20, 0.1);
+        --sk-red: #dc3545;
+        --sk-red-bg: rgba(220, 53, 69, 0.1);
+        --sk-blue: #17a2b8;
+        --sk-blue-bg: rgba(23, 162, 184, 0.1);
+        --sk-purple: #6f42c1;
+        --sk-purple-bg: rgba(111, 66, 193, 0.1);
+        --sk-border: #eaeaea;
+        --sk-text-main: #222222;
+        --sk-text-muted: #666666;
+        --sk-shadow: 0 4px 12px rgba(0,0,0,0.04);
+        --sk-radius: 12px;
+    }
+    
+    body.dark-mode {
+        --sk-border: #333333;
+        --sk-text-main: #e0e0e0;
+        --sk-text-muted: #999999;
+        --sk-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
 
-        <div class="stat-card">
-            <div class="stat-icon success">
-                <i class="fas fa-calendar-check"></i>
-            </div>
-            <div class="stat-number success">{{ total_attendance }}</div>
-            <p class="stat-label">Total Attendance Taken</p>
-        </div>
+    .sk-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    .sk-stat-card {
+        background: var(--bg-card, #ffffff);
+        border: 1px solid var(--sk-border);
+        border-radius: var(--sk-radius);
+        padding: 20px;
+        box-shadow: var(--sk-shadow);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .sk-stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(103, 61, 229, 0.12);
+    }
+    .sk-stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+    .sk-stat-info {
+        display: flex;
+        flex-direction: column;
+    }
+    .sk-stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--sk-text-main);
+        line-height: 1.2;
+    }
+    .sk-stat-label {
+        font-size: 13px;
+        color: var(--sk-text-muted);
+        margin-top: 4px;
+        font-weight: 500;
+    }
 
-        <div class="stat-card">
-            <div class="stat-icon warning">
-                <i class="fas fa-calendar-times"></i>
-            </div>
-            <div class="stat-number warning">{{ total_leave }}</div>
-            <p class="stat-label">Total Leave Applied</p>
-        </div>
+    .sk-card {
+        background: var(--bg-card, #ffffff);
+        border: 1px solid var(--sk-border);
+        border-radius: var(--sk-radius);
+        box-shadow: var(--sk-shadow);
+        margin-bottom: 24px;
+        overflow: hidden;
+    }
+    .sk-card-head {
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--sk-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .sk-card-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--sk-text-main);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .sk-card-body {
+        padding: 22px;
+    }
+    
+    .quick-action-btn {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+        height: 100%;
+    }
+    .quick-action-btn:hover {
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+    .qa-primary { background: var(--sk-brand-light); color: var(--sk-brand); border-color: rgba(103,61,229,0.2); }
+    .qa-primary:hover { background: var(--sk-brand); color: #fff; }
+    .qa-success { background: var(--sk-green-bg); color: var(--sk-green); border-color: rgba(40,167,69,0.2); }
+    .qa-success:hover { background: var(--sk-green); color: #fff; }
+    .qa-warning { background: var(--sk-yellow-bg); color: #d39e00; border-color: rgba(255,193,7,0.3); }
+    .qa-warning:hover { background: #d39e00; color: #fff; }
+    .qa-info { background: var(--sk-blue-bg); color: var(--sk-blue); border-color: rgba(23,162,184,0.2); }
+    .qa-info:hover { background: var(--sk-blue); color: #fff; }
 
-        <div class="stat-card">
-            <div class="stat-icon danger">
-                <i class="fas fa-book"></i>
+    .sk-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .sk-table th {
+        background: rgba(0,0,0,0.02);
+        padding: 12px 18px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--sk-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid var(--sk-border);
+        text-align: left;
+    }
+    .sk-table td {
+        padding: 14px 18px;
+        font-size: 14px;
+        color: var(--sk-text-main);
+        border-bottom: 1px solid var(--sk-border);
+        vertical-align: middle;
+    }
+    .sk-table tr:last-child td { border-bottom: none; }
+    .sk-table tr:hover { background: rgba(0,0,0,0.015); }
+
+    .notif-item {
+        padding: 14px 0;
+        border-bottom: 1px solid var(--sk-border);
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+    }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--sk-brand-light);
+        color: var(--sk-brand);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 14px;
+    }
+    .notif-content { flex-grow: 1; }
+    .notif-text { font-size: 13px; color: var(--sk-text-main); line-height: 1.4; font-weight: 500; }
+    .notif-time { font-size: 11px; color: var(--sk-text-muted); margin-top: 4px; }
+</style>
+
+<!-- ═══════════ ROW 1: QUICK ACTIONS DESK ═══════════ -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3 mb-md-0">
+        <a href="{% url 'staff_take_attendance' %}" class="quick-action-btn qa-primary">
+            <i class="fas fa-user-check" style="font-size:22px;"></i>
+            <div>
+                <div>Take Attendance</div>
+                <div style="font-size:11px;opacity:0.8;font-weight:400;">Log daily sessions</div>
             </div>
-            <div class="stat-number danger">{{ total_subject }}</div>
-            <p class="stat-label">Total Subjects</p>
+        </a>
+    </div>
+    <div class="col-md-3 mb-3 mb-md-0">
+        <a href="{% url 'staff_add_result' %}" class="quick-action-btn qa-success">
+            <i class="fas fa-award" style="font-size:22px;"></i>
+            <div>
+                <div>Add Results</div>
+                <div style="font-size:11px;opacity:0.8;font-weight:400;">Publish grades</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 mb-3 mb-md-0">
+        <a href="{% url 'staff_apply_leave' %}" class="quick-action-btn qa-warning">
+            <i class="fas fa-calendar-plus" style="font-size:22px;"></i>
+            <div>
+                <div>Apply for Leave</div>
+                <div style="font-size:11px;opacity:0.8;font-weight:400;">Submit time-off</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3">
+        <a href="{% url 'add_book' %}" class="quick-action-btn qa-info">
+            <i class="fas fa-book-reader" style="font-size:22px;"></i>
+            <div>
+                <div>Add Library Books</div>
+                <div style="font-size:11px;opacity:0.8;font-weight:400;">Manage resources</div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- ═══════════ ROW 2: STATS CARDS ═══════════ -->
+<div class="sk-stat-grid">
+    <div class="sk-stat-card">
+        <div class="sk-stat-icon" style="background:var(--sk-brand-light);color:var(--sk-brand);">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+        <div class="sk-stat-info">
+            <div class="sk-stat-value">{{ total_students }}</div>
+            <div class="sk-stat-label">Total Assigned Students</div>
         </div>
     </div>
 
-    <!-- Charts Section -->
-    <div class="row">
-        <!-- Attendance vs Leave Chart -->
-        <div class="col-lg-6">
-            <div class="erpnext-card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-pie me-2"></i>
-                        Attendance vs Leave Overview
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <canvas id="pieChart" style="height: 300px;"></canvas>
-                </div>
-            </div>
+    <div class="sk-stat-card">
+        <div class="sk-stat-icon" style="background:var(--sk-green-bg);color:var(--sk-green);">
+            <i class="fas fa-calendar-check"></i>
         </div>
+        <div class="sk-stat-info">
+            <div class="sk-stat-value">{{ total_attendance }}</div>
+            <div class="sk-stat-label">Attendance Sessions</div>
+        </div>
+    </div>
 
-        <!-- Subject-wise Attendance Chart -->
-        <div class="col-lg-6">
-            <div class="erpnext-card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-bar me-2"></i>
-                        Subject-wise Attendance
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <canvas id="barChart" style="height: 300px;"></canvas>
-                </div>
+    <div class="sk-stat-card">
+        <div class="sk-stat-icon" style="background:var(--sk-yellow-bg);color:#d39e00;">
+            <i class="fas fa-calendar-times"></i>
+        </div>
+        <div class="sk-stat-info">
+            <div class="sk-stat-value">{{ total_leave }}</div>
+            <div class="sk-stat-label">Leave Applications</div>
+        </div>
+    </div>
+
+    <div class="sk-stat-card">
+        <div class="sk-stat-icon" style="background:var(--sk-blue-bg);color:var(--sk-blue);">
+            <i class="fas fa-book"></i>
+        </div>
+        <div class="sk-stat-info">
+            <div class="sk-stat-value">{{ total_subject }}</div>
+            <div class="sk-stat-label">Assigned Subjects</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ ROW 3: CHARTS ═══════════ -->
+<div class="row">
+    <!-- Attendance vs Leave Chart -->
+    <div class="col-lg-6">
+        <div class="sk-card">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-chart-pie" style="color:var(--sk-brand)"></i> Attendance vs Leave Overview</h3>
+            </div>
+            <div class="sk-card-body">
+                <canvas id="pieChart" style="height: 280px;"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- Event Calendar & Notice Board -->
-    <div class="row mt-2">
-        <div class="col-12">
-            <div class="erpnext-card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-calendar-alt me-2"></i> Notice Board & Event Calendar
-                    </h3>
+    <!-- Subject-wise Attendance Chart -->
+    <div class="col-lg-6">
+        <div class="sk-card">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-chart-bar" style="color:var(--sk-blue)"></i> Subject-wise Attendance Taken</h3>
+            </div>
+            <div class="sk-card-body">
+                <canvas id="barChart" style="height: 280px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ ROW 4: TODAY'S LECTURES & RECENT NOTIFICATIONS ═══════════ -->
+<div class="row">
+    <!-- Today's Lectures -->
+    <div class="col-lg-7">
+        <div class="sk-card h-100">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-chalkboard-teacher" style="color:var(--sk-green)"></i> Today's Assigned Lectures</h3>
+                <a href="{% url 'staff_take_attendance' %}" style="font-size:11px;color:var(--sk-brand);font-weight:600;text-decoration:none;">Take Attendance &rarr;</a>
+            </div>
+            <div class="sk-card-body p-0">
+                {% if today_lectures %}
+                <table class="sk-table">
+                    <thead><tr><th>Time</th><th>Subject</th><th>Course / Dept</th><th>Action</th></tr></thead>
+                    <tbody>
+                    {% for l in today_lectures %}
+                    <tr>
+                        <td style="font-weight:600;color:var(--sk-brand);">{{ l.start_time|time:"h:i A" }} - {{ l.end_time|time:"h:i A" }}</td>
+                        <td><strong>{{ l.subject.name }}</strong></td>
+                        <td>{{ l.course.name }}</td>
+                        <td>
+                            <a href="{% url 'staff_take_attendance' %}" class="btn btn-sm btn-outline-primary" style="font-size:11px;padding:3px 8px;border-radius:6px;">Log</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-calendar-check" style="font-size:32px;color:#ddd;"></i>
+                    <p style="font-size:12px;color:var(--sk-text-muted);margin-top:8px;">No lectures scheduled for today in the timetable.</p>
                 </div>
-                <div class="card-body">
-                    <div id="calendar" style="min-height: 450px;"></div>
-                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="row mt-2">
-        <div class="col-12">
-            <div class="erpnext-card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-bolt me-2"></i>
-                        Quick Actions
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'staff_take_attendance' %}" class="btn btn-primary btn-sm mt-2 w-100">
-                                <i class="fas fa-check-circle mb-2"></i><br>
-                                Take Attendance
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'staff_add_result' %}" class="btn btn-success btn-sm mt-2 w-100">
-                                <i class="fas fa-plus-circle mb-2"></i><br>
-                                Add Result
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'staff_apply_leave' %}" class="btn btn-warning btn-sm mt-2 w-100">
-                                <i class="fas fa-calendar-plus mb-2"></i><br>
-                                Apply for Leave
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'add_book' %}" class="btn btn-secondary btn-sm mt-2 w-100">
-                                <i class="fas fa-book-open mb-2"></i><br>
-                                Add Books
-                            </a>
+    <!-- Notice Board -->
+    <div class="col-lg-5 mt-4 mt-lg-0">
+        <div class="sk-card h-100">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-bell" style="color:var(--sk-orange)"></i> Recent Noticeboard Circulars</h3>
+                <a href="{% url 'staff_notify' %}" style="font-size:11px;color:var(--sk-brand);font-weight:600;text-decoration:none;">All Notices</a>
+            </div>
+            <div class="sk-card-body">
+                {% if notifications %}
+                    {% for n in notifications %}
+                    <div class="notif-item">
+                        <div class="notif-icon"><i class="fas fa-bullhorn"></i></div>
+                        <div class="notif-content">
+                            <div class="notif-text">{{ n.message }}</div>
+                            <div class="notif-time">{{ n.created_at|date:"d M Y, h:i A" }}</div>
                         </div>
                     </div>
-                </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-bell-slash" style="font-size:32px;color:#ddd;"></i>
+                        <p style="font-size:12px;color:var(--sk-text-muted);margin-top:8px;">No new staff circulars or notices.</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
+</div>
+
+<!-- ═══════════ ROW 5: RECENT ATTENDANCE & LEAVES ═══════════ -->
+<div class="row mt-4">
+    <div class="col-lg-6">
+        <div class="sk-card">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-history" style="color:var(--sk-purple)"></i> Recent Attendance Logged</h3>
+                <a href="{% url 'staff_update_attendance' %}" style="font-size:11px;color:var(--sk-brand);font-weight:600;text-decoration:none;">Update Attendance &rarr;</a>
+            </div>
+            <div class="sk-card-body p-0">
+                {% if recent_attendance %}
+                <table class="sk-table">
+                    <thead><tr><th>Date</th><th>Subject</th><th>Session</th></tr></thead>
+                    <tbody>
+                    {% for a in recent_attendance %}
+                    <tr>
+                        <td style="font-weight:600;">{{ a.date|date:"d M Y" }}</td>
+                        <td><span style="color:var(--sk-brand);font-weight:600;">{{ a.subject.name }}</span></td>
+                        <td>{{ a.session.start_year }} - {{ a.session.end_year }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-4">
+                    <p style="font-size:12px;color:var(--sk-text-muted);margin:0;">No attendance records logged yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mt-4 mt-lg-0">
+        <div class="sk-card">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-calendar-minus" style="color:#d39e00"></i> My Leave History</h3>
+                <a href="{% url 'staff_apply_leave' %}" style="font-size:11px;color:var(--sk-brand);font-weight:600;text-decoration:none;">Apply New &rarr;</a>
+            </div>
+            <div class="sk-card-body p-0">
+                {% if recent_leaves %}
+                <table class="sk-table">
+                    <thead><tr><th>Date</th><th>Message</th><th>Status</th></tr></thead>
+                    <tbody>
+                    {% for l in recent_leaves %}
+                    <tr>
+                        <td style="font-weight:600;white-space:nowrap;">{{ l.date }}</td>
+                        <td>{{ l.message|truncatewords:6 }}</td>
+                        <td>
+                            {% if l.status == 1 %}
+                                <span class="badge bg-success" style="font-size:11px;padding:5px 10px;">Approved</span>
+                            {% elif l.status == 2 %}
+                                <span class="badge bg-danger" style="font-size:11px;padding:5px 10px;">Rejected</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark" style="font-size:11px;padding:5px 10px;">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-4">
+                    <p style="font-size:12px;color:var(--sk-text-muted);margin:0;">No leave applications submitted.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ ROW 6: ACADEMIC CALENDAR ═══════════ -->
+<div class="row mt-4 mb-4">
+    <div class="col-12">
+        <div class="sk-card">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-calendar-alt" style="color:var(--sk-brand)"></i> Institutional Academic Calendar</h3>
+            </div>
+            <div class="sk-card-body">
+                <div id="calendar" style="min-height: 450px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
 
 {% block custom_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize chart instances and creators arrays
         window.chartInstances = window.chartInstances || [];
-
-        // Chart.js Configuration
-        Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
+        Chart.defaults.font.family = 'Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif';
         
-        // Set initial colors based on current theme
         const isDarkMode = document.body.classList.contains('dark-mode');
-        const textColor = isDarkMode ? '#e0e0e0' : '#262626';
+        const textColor = isDarkMode ? '#e0e0e0' : '#222222';
         Chart.defaults.color = textColor;
         
-        // ERPNext-style color palette using CSS variables
         const colors = {
-            primary: '#5e64ff',
-            success: '#28a745',
-            warning: '#ffc107',
-            danger: '#dc3545',
-            info: '#17a2b8',
+            brand: '#673de5',
+            green: '#28a745',
+            yellow: '#ffc107',
+            red: '#dc3545',
+            blue: '#17a2b8',
+            purple: '#6f42c1',
             light: '#f8f9fc',
-            dark: '#262626'
+            dark: '#222222'
         };
 
         // Donut Chart
-        const pieCtx = document.getElementById('pieChart').getContext('2d');
-        const pieChart = new Chart(pieCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Attendance Taken', 'Leave Days'],
-                datasets: [{
-                    data: [{{ total_attendance }}, {{ total_leave }}],
-                    backgroundColor: [colors.success, colors.warning],
-                    borderWidth: 0,
-                    cutout: '65%'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true,
-                            color: textColor
+        const pieEl = document.getElementById('pieChart');
+        if (pieEl) {
+            const pieCtx = pieEl.getContext('2d');
+            const pieChart = new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Attendance Taken', 'Leave Days'],
+                    datasets: [{
+                        data: [{{ total_attendance }}, {{ total_leave }}],
+                        backgroundColor: [colors.green, colors.yellow],
+                        borderWidth: 0,
+                        cutout: '70%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                color: textColor,
+                                font: { size: 12, family: 'Poppins' }
+                            }
                         }
                     }
                 }
-            }
-        });
-        window.chartInstances.push(pieChart);
+            });
+            window.chartInstances.push(pieChart);
+        }
 
         // Bar Chart
-        const barCtx = document.getElementById('barChart').getContext('2d');
-        const barChart = new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: {{ subject_list|safe }},
-                datasets: [{
-                    label: 'Attendance Count',
-                    data: {{ attendance_list }},
-                    backgroundColor: colors.info,
-                    borderRadius: 4,
-                    borderSkipped: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
+        const barEl = document.getElementById('barChart');
+        if (barEl) {
+            const barCtx = barEl.getContext('2d');
+            const barChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ subject_list|safe }},
+                    datasets: [{
+                        label: 'Sessions Taken',
+                        data: {{ attendance_list }},
+                        backgroundColor: colors.brand,
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: isDarkMode ? '#404040' : '#f1f3f4'
-                        },
-                        ticks: {
-                            color: textColor
-                        }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
                     },
-                    x: {
-                        grid: {
-                            display: false
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: isDarkMode ? '#333333' : '#eaeaea' },
+                            ticks: { color: textColor, font: { family: 'Poppins' } }
                         },
-                        ticks: {
-                            color: textColor
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: textColor, font: { family: 'Poppins' } }
                         }
                     }
                 }
-            }
-        });
-        window.chartInstances.push(barChart);
+            });
+            window.chartInstances.push(barChart);
+        }
 
-        // -------------
-        //- CALENDAR -
+        // Academic Calendar
         const calendarEl = document.getElementById('calendar');
-        if (calendarEl) {
+        if (calendarEl && typeof FullCalendar !== 'undefined') {
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 headerToolbar: {
@@ -248,46 +555,21 @@
                 },
                 themeSystem: 'standard',
                 events: [
-                    {
-                        title: 'Midterm Exams (HOD Scheduled)',
-                        start: '2026-07-10',
-                        end: '2026-07-15',
-                        color: colors.danger
-                    },
-                    {
-                        title: 'Staff Meeting: Syllabus Review',
-                        start: '2026-07-02',
-                        color: colors.primary
-                    },
-                    {
-                        title: 'Grade Submission Deadline',
-                        start: '2026-07-25',
-                        color: colors.warning
-                    },
-                    {
-                        title: 'Guest Lecture: Cloud Computing',
-                        start: '2026-07-18',
-                        color: colors.info
-                    }
+                    { title: 'Midterm Exams (Scheduled)', start: '2026-07-10', end: '2026-07-15', color: colors.red },
+                    { title: 'Staff Meeting: Syllabus Review', start: '2026-07-02', color: colors.brand },
+                    { title: 'Grade Submission Deadline', start: '2026-07-25', color: colors.yellow },
+                    { title: 'Guest Lecture: Cloud Computing', start: '2026-07-18', color: colors.blue }
                 ],
                 eventClick: function(info) {
-                    alert('Event: ' + info.event.title + '\nDescription: Staff Academic Calendar Event');
+                    alert('Event: ' + info.event.title + '\nDescription: Academic Calendar Notice');
                 }
             });
             calendar.render();
             
-            // Re-size calendar on changes
-            window.addEventListener('resize', function() {
-                calendar.updateSize();
-            });
-            
+            window.addEventListener('resize', () => calendar.updateSize());
             const themeSwitch = document.getElementById('theme-switch');
             if (themeSwitch) {
-                themeSwitch.addEventListener('change', function() {
-                    setTimeout(function() {
-                        calendar.updateSize();
-                    }, 100);
-                });
+                themeSwitch.addEventListener('change', () => setTimeout(() => calendar.updateSize(), 100));
             }
         }
     });

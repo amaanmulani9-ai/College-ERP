@@ -1,0 +1,213 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    .sk-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+        margin-bottom: 25px;
+    }
+    .sk-breadcrumb-bar {
+        background: #fff;
+        padding: 15px 25px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .sk-breadcrumb-title {
+        color: #6c5ce7;
+        font-weight: 600;
+        font-size: 16px;
+        margin-right: 15px;
+    }
+    .sk-breadcrumb-path {
+        color: #b2bec3;
+        font-size: 13px;
+    }
+    .sk-settings-nav {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    .sk-nav-btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        color: #2d3436;
+        background: #fff;
+        text-decoration: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    }
+    .sk-nav-btn.active {
+        background: #6c5ce7;
+        color: #fff;
+    }
+    .sk-card-title {
+        color: #2d3436;
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .sk-card-subtitle {
+        color: #b2bec3;
+        font-size: 13px;
+        margin-bottom: 25px;
+        margin-left: 30px;
+    }
+    .sk-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+    }
+    .sk-table th {
+        color: #4a235a;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 10px 15px;
+        text-align: left;
+        background: #f8f9fa;
+    }
+    .sk-table td {
+        padding: 5px 15px;
+    }
+    .sk-input {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #f1f2f6;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #2d3436;
+    }
+    .sk-delete-btn {
+        background: #ffeeee;
+        color: #ff7675;
+        border: none;
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    .sk-add-btn {
+        background: #f8f9fa;
+        color: #6c5ce7;
+        border: 1px solid #f1f2f6;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .sk-save-btn {
+        background: #6c5ce7;
+        color: #fff;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-title"><i class="fas fa-cog"></i> General Settings</div>
+            <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right" style="font-size:10px;margin-right:10px;"></i> Exam Grading</div>
+        </div>
+        
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Nav Buttons -->
+        <div class="sk-settings-nav">
+            <a href="#" class="sk-nav-btn active"><i class="fas fa-chart-bar"></i> Marks Grading</a>
+            <a href="#" class="sk-nav-btn"><i class="fas fa-exclamation-triangle"></i> Fail Criteria</a>
+        </div>
+
+        <div class="sk-card">
+            <div class="sk-card-title"><i class="fas fa-chart-bar" style="color:#6c5ce7;"></i> Customize Grading Scale</div>
+            <div class="sk-card-subtitle">Define grade ranges and pass/fail status for student reports.</div>
+            
+            <table class="sk-table">
+                <thead>
+                    <tr>
+                        <th style="border-radius: 8px 0 0 8px;">GRADE</th>
+                        <th>% FROM</th>
+                        <th>% UPTO</th>
+                        <th>STATUS</th>
+                        <th style="border-radius: 0 8px 8px 0; width: 60px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for grade in grades %}
+                    <tr>
+                        <td><input type="text" class="sk-input" value="{{ grade.grade }}" readonly></td>
+                        <td><input type="text" class="sk-input" value="{{ grade.percent_from }}" readonly></td>
+                        <td><input type="text" class="sk-input" value="{{ grade.percent_upto }}" readonly></td>
+                        <td><input type="text" class="sk-input" value="{{ grade.status }}" readonly></td>
+                        <td>
+                            <form method="POST" style="margin:0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="delete_grade" value="{{ grade.id }}">
+                                <button type="submit" class="sk-delete-btn"><i class="fas fa-trash-alt"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center" style="padding: 20px; color: #b2bec3;">No grades defined yet.</td>
+                    </tr>
+                    {% endfor %}
+                    
+                    <!-- Add New Row -->
+                    <tr>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <td><input type="text" name="grade" class="sk-input" placeholder="e.g. A+" required></td>
+                            <td><input type="number" name="percent_from" class="sk-input" placeholder="80" required></td>
+                            <td><input type="number" name="percent_upto" class="sk-input" placeholder="100" required></td>
+                            <td>
+                                <select name="status" class="sk-input" style="height: 44px;">
+                                    <option value="PASS">PASS</option>
+                                    <option value="FAIL">FAIL</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button type="submit" name="add_grade" class="sk-add-btn" style="width: 100%; border:none; background:#e8f8f5; color:#27ae60;"><i class="fas fa-check"></i></button>
+                            </td>
+                        </form>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+                <button class="sk-add-btn"><i class="fas fa-plus"></i> Add Grade</button>
+                <button class="sk-save-btn"><i class="fas fa-check"></i> Save Grading Scale</button>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock content %}

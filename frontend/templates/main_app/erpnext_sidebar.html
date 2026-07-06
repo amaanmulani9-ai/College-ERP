@@ -1,909 +1,493 @@
 {% load static i18n %}
+<style>
+    /* eSkooly Sidebar specific overrides */
+    .erpnext-sidebar {
+        background-color: #ffffff;
+        border-right: 1px solid #e0e6ed;
+        font-family: 'Poppins', sans-serif;
+    }
+    .sidebar-header {
+        display: none; /* Hide old profile header */
+    }
+    .eskooly-sidebar-top {
+        padding: 20px 24px 10px;
+    }
+    .eskooly-menu-label {
+        font-size: 11px;
+        color: #8a98ac;
+        text-transform: uppercase;
+        font-weight: 500;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+    }
+    .eskooly-search {
+        position: relative;
+        margin-bottom: 15px;
+    }
+    .eskooly-search input {
+        width: 100%;
+        border: none;
+        background: transparent;
+        border-bottom: 1px solid #e0e6ed;
+        padding: 5px 0 5px 20px;
+        font-size: 13px;
+        color: #555;
+        outline: none;
+    }
+    .eskooly-search input::placeholder {
+        color: #a0a9b6;
+    }
+    .eskooly-search i {
+        position: absolute;
+        left: 0;
+        top: 8px;
+        font-size: 12px;
+        color: #a0a9b6;
+    }
+    
+    .nav-section {
+        padding: 0 10px;
+    }
+    .nav-item {
+        margin: 0;
+    }
+    .nav-link {
+        padding: 10px 14px;
+        color: #647081;
+        font-size: 14px;
+        font-weight: 400;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s;
+        border-radius: 4px;
+        text-decoration: none !important;
+    }
+    .nav-icon {
+        width: 28px;
+        font-size: 16px;
+        color: #8a98ac;
+        text-align: left;
+    }
+    .nav-text {
+        flex: 1;
+    }
+    .nav-arrow {
+        font-size: 12px;
+        color: #8a98ac;
+        font-weight: 400;
+    }
+    /* Override arrow to be a plus/minus */
+    .nav-item.has-submenu > .nav-link .nav-arrow::before {
+        content: "\f068"; /* FontAwesome minus if open, plus if closed */
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+    }
+    .nav-item.has-submenu > .nav-link .nav-arrow::before {
+        content: "\f067"; /* default to plus */
+    }
+    .nav-item.has-submenu.open > .nav-link .nav-arrow::before {
+        content: "\f068"; /* minus when open */
+    }
+    
+    .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #4b6bfb;
+    }
+    .nav-link:hover .nav-icon {
+        color: #4b6bfb;
+    }
+    
+    .nav-link.active {
+        background-color: #f8f9fa;
+        color: #4b6bfb;
+        font-weight: 500;
+    }
+    .nav-link.active .nav-icon {
+        color: #4b6bfb;
+    }
 
-<!-- Sidebar Header -->
-<div class="sidebar-header">
-    <div class="sidebar-user">
-        <img src="{{ request.user.profile_pic}}" alt="User Avatar" class="sidebar-user-avatar" id="sidebar-avatar" onerror="showDefaultAvatar()">
-        <i class="fas fa-user-circle sidebar-default-avatar" id="default-avatar" style="display: none;"></i>
-        <div class="sidebar-user-info">
-            <h6>{{ user.get_full_name|default:user.username }}</h6>
-            <small>
-                {% if user.user_type == '1' %}
-                    Administrator | UID: ADM-{{ user.id|stringformat:"04d" }}
-                {% elif user.user_type == '2' %}
-                    Staff Member | UID: EMP-{{ user.id|stringformat:"04d" }}
-                {% else %}
-                    Student | Roll No: STU-{{ user.id|stringformat:"04d" }}
-                {% endif %}
-            </small>
-        </div>
+    /* Submenu styling matching eSkooly */
+    .nav-submenu {
+        background-color: #ffffff;
+        position: relative;
+        margin-left: 28px;
+        padding-left: 0;
+        border-left: 1px solid #e0e8ff; /* Clean light blue track line */
+        margin-bottom: 8px;
+        margin-top: 4px;
+        display: none;
+    }
+    .nav-item.open .nav-submenu {
+        display: block;
+    }
+    .nav-submenu .nav-link {
+        padding: 8px 16px 8px 24px;
+        font-size: 13px;
+        color: #647081;
+        background: transparent !important;
+        border-radius: 0;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .nav-submenu .nav-link:hover {
+        color: #4b6bfb;
+    }
+    .nav-submenu .nav-link.active {
+        color: #4b6bfb;
+        font-weight: 500;
+    }
+    /* Active dot indicator on the track line */
+    .nav-submenu .nav-link.active::before {
+        content: '';
+        position: absolute;
+        left: -4.5px; /* Center 8px dot on the 1px track line */
+        top: 50%;
+        transform: translateY(-50%);
+        width: 8px;
+        height: 8px;
+        background-color: #4b6bfb;
+        border-radius: 50%;
+        z-index: 2;
+    }
+    /* Lock icon for pro features */
+    .lock-icon {
+        color: #ff7675;
+        font-size: 14px;
+        margin-left: auto;
+    }
+    .nav-submenu .nav-link.locked {
+        color: #a0a9b6 !important;
+        cursor: not-allowed;
+    }
+</style>
+
+<div class="eskooly-sidebar-top">
+    <div class="eskooly-menu-label">menu</div>
+    <div class="eskooly-search">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search menu...">
     </div>
 </div>
 
-<!-- Navigation Menu -->
 <div class="nav-section">
     {% if user.user_type == '1' %}
-        <!-- Admin Navigation -->
-        <h6 class="nav-section-title">Main</h6>
-        
+        <!-- Admin Dashboard -->
         <div class="nav-item">
-            {% url 'admin_home' as admin_home %}
-            <a href="{{ admin_home }}" class="nav-link {% if admin_home == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-tachometer-alt"></i>
-                <span class="nav-text">{% trans "Dashboard" %}</span>
+            <a href="{% url 'admin_home' %}" class="nav-link {% if request.path == '/admin/home/' %}active{% endif %}">
+                <i class="nav-icon fas fa-chart-pie"></i>
+                <span class="nav-text">Dashboard</span>
             </a>
         </div>
         
-        <div class="nav-item">
-            {% url 'admin_view_profile' as admin_view_profile %}
-            <a href="{{ admin_view_profile }}" class="nav-link {% if admin_view_profile == request.path %}active{% endif %}">
-                <i class="fas fa-user-circle"></i>
-                <span class="nav-text">{% trans "Profile" %}</span>
+        <!-- General Settings -->
+        <div class="nav-item has-submenu {% if 'settings' in request.path %}open{% endif %}">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-cog"></i>
+                <span class="nav-text">General Settings</span>
+                <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="{% url 'admin_settings_profile' %}" class="nav-link {% if 'settings/profile' in request.path %}active{% endif %}">Institute Profile</a>
+                <a href="{% url 'admin_settings_fees' %}" class="nav-link {% if 'settings/fees' in request.path %}active{% endif %}">Fees Particulars</a>
+                <a href="#" class="nav-link locked">Fees Structure <i class="far fa-lock lock-icon"></i></a>
+                <a href="#" class="nav-link locked">Discount Type <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'admin_settings_banks' %}" class="nav-link {% if 'settings/banks' in request.path %}active{% endif %}">Accounts For Fees Invoice</a>
+                <a href="{% url 'admin_settings_rules' %}" class="nav-link {% if 'settings/rules' in request.path %}active{% endif %}">Rules & Regulations</a>
+                <a href="{% url 'admin_settings_grading' %}" class="nav-link {% if 'settings/grading' in request.path %}active{% endif %}">Marks Grading</a>
+                <a href="{% url 'admin_settings_theme' %}" class="nav-link {% if 'settings/theme' in request.path %}active{% endif %}">Theme & Language</a>
+                <a href="{% url 'admin_settings_account' %}" class="nav-link {% if 'settings/account' in request.path %}active{% endif %}">Account Settings</a>
+                <a href="{% url 'logout_user' %}" class="nav-link">Log out</a>
+            </div>
         </div>
 
-        <h6 class="nav-section-title">Academic Management</h6>
-        
+        <!-- Classes -->
         <div class="nav-item has-submenu {% if 'course' in request.path %}open{% endif %}">
             <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-graduation-cap"></i>
-                <span class="nav-text">{% trans "Courses" %}</span>
-                <i class="nav-arrow fas fa-chevron-right"></i>
+                <i class="nav-icon fas fa-chalkboard"></i>
+                <span class="nav-text">Classes</span>
+                <i class="nav-arrow"></i>
             </a>
             <div class="nav-submenu">
-                <div class="nav-item">
-                    {% url 'add_course' as add_course %}
-                    <a href="{{ add_course }}" class="nav-link {% if add_course == request.path %}active{% endif %}">
-                        <span class="nav-text">Add Course</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'manage_course' as manage_course %}
-                    <a href="{{ manage_course }}" class="nav-link {% if manage_course == request.path or 'edit_course' in request.path %}active{% endif %}">
-                        <span class="nav-text">Manage Courses</span>
-                    </a>
-                </div>
+                <a href="{% url 'manage_course' %}" class="nav-link {% if 'course/manage' in request.path %}active{% endif %}">All Classes</a>
+                <a href="{% url 'add_course' %}" class="nav-link {% if 'course/add' in request.path %}active{% endif %}">New Class</a>
             </div>
         </div>
 
+        <!-- Subjects -->
         <div class="nav-item has-submenu {% if 'subject' in request.path %}open{% endif %}">
             <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-book"></i>
-                <span class="nav-text">{% trans "Subjects" %}</span>
-                <i class="nav-arrow fas fa-chevron-right"></i>
+                <i class="nav-icon fas fa-book-open"></i>
+                <span class="nav-text">Subjects</span>
+                <i class="nav-arrow"></i>
             </a>
             <div class="nav-submenu">
-                <div class="nav-item">
-                    {% url 'add_subject' as add_subject %}
-                    <a href="{{ add_subject }}" class="nav-link {% if add_subject == request.path %}active{% endif %}">
-                        <span class="nav-text">Add Subject</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'manage_subject' as manage_subject %}
-                    <a href="{{ manage_subject }}" class="nav-link {% if manage_subject == request.path or 'edit_subject' in request.path %}active{% endif %}">
-                        <span class="nav-text">Manage Subjects</span>
-                    </a>
-                </div>
+                <a href="{% url 'manage_subject' %}" class="nav-link {% if 'subject/manage' in request.path %}active{% endif %}">Classes With Subjects</a>
+                <a href="{% url 'add_subject' %}" class="nav-link {% if 'subject/add' in request.path %}active{% endif %}">Assign Subjects</a>
             </div>
         </div>
 
-        <div class="nav-item has-submenu {% if 'session' in request.path %}open{% endif %}">
+        <!-- Students -->
+        <div class="nav-item has-submenu {% if 'student' in request.path %}open{% endif %}">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-user-graduate"></i>
+                <span class="nav-text">Students</span>
+                <i class="nav-arrow"></i>
+            </a>
+            <div class="nav-submenu">
+                <a href="{% url 'manage_student' %}" class="nav-link {% if 'student/manage' in request.path %}active{% endif %}">All Students</a>
+                <a href="{% url 'add_student' %}" class="nav-link {% if 'student/add' in request.path %}active{% endif %}">Add New</a>
+                <a href="#" class="nav-link locked">Manage Families <i class="far fa-lock lock-icon"></i></a>
+                <a href="#" class="nav-link locked">Active / Inactive <i class="far fa-lock lock-icon"></i></a>
+                <a href="#" class="nav-link">Admission Letter</a>
+                <a href="#" class="nav-link">Student ID Cards</a>
+                <a href="#" class="nav-link">Print Basic List</a>
+                <a href="#" class="nav-link">Manage Login</a>
+                <a href="#" class="nav-link">Promote Students</a>
+            </div>
+        </div>
+
+        <!-- Employees -->
+        <div class="nav-item has-submenu {% if 'staff' in request.path %}open{% endif %}">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-user-tie"></i>
+                <span class="nav-text">Employees</span>
+                <i class="nav-arrow"></i>
+            </a>
+            <div class="nav-submenu">
+                <a href="{% url 'manage_staff' %}" class="nav-link {% if 'staff/manage' in request.path %}active{% endif %}">All Employees</a>
+                <a href="{% url 'add_staff' %}" class="nav-link {% if 'staff/add' in request.path %}active{% endif %}">Add New</a>
+                <a href="#" class="nav-link locked">Staff ID Cards <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'admin_job_letter' %}" class="nav-link {% if 'staff/job-letter' in request.path %}active{% endif %}">Job Letter</a>
+                <a href="#" class="nav-link">Manage Login</a>
+            </div>
+        </div>
+
+        <!-- Accounts -->
+        <div class="nav-item has-submenu">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-calculator"></i>
+                <span class="nav-text">Accounts</span>
+                <i class="nav-arrow"></i>
+            </a>
+        </div>
+
+        <!-- Fees -->
+        <div class="nav-item has-submenu">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-money-bill-wave"></i>
+                <span class="nav-text">Fees</span>
+                <i class="nav-arrow"></i>
+            </a>
+        </div>
+
+        <!-- Salary -->
+        <div class="nav-item has-submenu">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-hand-holding-usd"></i>
+                <span class="nav-text">Salary</span>
+                <i class="nav-arrow"></i>
+            </a>
+        </div>
+
+        <!-- Attendance -->
+        <div class="nav-item has-submenu">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-user-check"></i>
+                <span class="nav-text">Attendance</span>
+                <i class="nav-arrow"></i>
+            </a>
+        </div>
+
+        <!-- Timetable -->
+        <div class="nav-item has-submenu">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-calendar-alt"></i>
-                <span class="nav-text">{% trans "Sessions" %}</span>
-                <i class="nav-arrow fas fa-chevron-right"></i>
+                <span class="nav-text">Timetable</span>
+                <i class="nav-arrow"></i>
             </a>
-            <div class="nav-submenu">
-                <div class="nav-item">
-                    {% url 'add_session' as add_session %}
-                    <a href="{{ add_session }}" class="nav-link {% if add_session == request.path %}active{% endif %}">
-                        <span class="nav-text">Add Session</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'manage_session' as manage_session %}
-                    <a href="{{ manage_session }}" class="nav-link {% if manage_session == request.path or 'edit_session' in request.path %}active{% endif %}">
-                        <span class="nav-text">Manage Sessions</span>
-                    </a>
-                </div>
-            </div>
         </div>
 
+        <!-- Homework -->
+        <div class="nav-item has-submenu">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-tasks"></i>
+                <span class="nav-text">Homework</span>
+                <i class="nav-arrow"></i>
+            </a>
+        </div>
+
+        <!-- Behaviour & Skills -->
+        <div class="nav-item has-submenu">
+            <a href="#" class="nav-link">
+                <i class="nav-icon far fa-eye"></i>
+                <span class="nav-text">Behaviour & Skills</span>
+                <i class="nav-arrow"></i>
+            </a>
+        </div>
+
+        <!-- Online Store & POS -->
+        <div class="nav-item has-submenu">
+            <a href="#" class="nav-link text-primary">
+                <i class="nav-icon fas fa-shopping-cart text-primary"></i>
+                <span class="nav-text">Online Store & POS</span>
+                <i class="nav-arrow"></i>
+            </a>
+        </div>
+
+        <!-- WhatsApp -->
         <div class="nav-item">
-            {% url 'admin_manage_fees' as admin_manage_fees %}
-            <a href="{{ admin_manage_fees }}" class="nav-link {% if 'admin/fees' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                <span class="nav-text">Manage Fees</span>
+            <a href="#" class="nav-link" style="color: #a0a9b6;">
+                <i class="nav-icon fab fa-whatsapp"></i>
+                <span class="nav-text">WhatsApp</span>
+                <i class="fas fa-lock lock-icon" style="color:#ff7675;"></i>
             </a>
         </div>
 
-        <h6 class="nav-section-title">User Management</h6>
+        <!-- Messaging -->
+        <div class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="nav-icon far fa-comment-dots"></i>
+                <span class="nav-text">Messaging</span>
+            </a>
+        </div>
+
+        <!-- SMS Services -->
+        <div class="nav-item has-submenu">
+            <a href="#" class="nav-link">
+                <i class="nav-icon far fa-envelope"></i>
+                <span class="nav-text">SMS Services</span>
+                <i class="nav-arrow"></i>
+            </a>
+        </div>
+
+        <!-- Live Class -->
+        <div class="nav-item">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-video"></i>
+                <span class="nav-text">Live Class</span>
+            </a>
+        </div>
+
+        <!-- Question Paper -->
+        <div class="nav-item has-submenu">
+            <a href="#" class="nav-link">
+                <i class="nav-icon far fa-file-alt"></i>
+                <span class="nav-text">Question Paper</span>
+                <i class="nav-arrow"></i>
+            </a>
+        </div>
+
+        <!-- Exams -->
+        <div class="nav-item has-submenu">
+            <a href="#" class="nav-link">
+                <i class="nav-icon far fa-edit"></i>
+                <span class="nav-text">Exams</span>
+                <i class="nav-arrow"></i>
+            </a>
+        </div>
+
+        <!-- Class Tests -->
+        <div class="nav-item has-submenu">
+            <a href="#" class="nav-link">
+                <i class="nav-icon far fa-file-alt"></i>
+                <span class="nav-text">Class Tests</span>
+                <i class="nav-arrow"></i>
+            </a>
+        </div>
+
+        <!-- Reports -->
+        <div class="nav-item has-submenu">
+            <a href="#" class="nav-link">
+                <i class="nav-icon far fa-chart-bar"></i>
+                <span class="nav-text">Reports</span>
+                <i class="nav-arrow"></i>
+            </a>
+        </div>
+
+        <!-- Certificates -->
+        <div class="nav-item has-submenu">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-medal"></i>
+                <span class="nav-text">Certificates</span>
+                <i class="nav-arrow"></i>
+            </a>
+        </div>
         
+    {% elif user.user_type == '2' %}
+        <!-- Basic Staff Fallback -->
         <div class="nav-item">
-            {% url 'add_staff' as add_staff %}
-            <a href="{{ add_staff }}" class="nav-link {% if add_staff == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-user-plus"></i>
-                <span class="nav-text">Add Staff</span>
+            <a href="{% url 'staff_home' %}" class="nav-link {% if request.path == '/staff/home/' %}active{% endif %}">
+                <i class="nav-icon fas fa-chart-pie"></i>
+                <span class="nav-text">Dashboard</span>
             </a>
         </div>
-
         <div class="nav-item">
-            {% url 'manage_staff' as manage_staff %}
-            <a href="{{ manage_staff }}" class="nav-link {% if manage_staff == request.path or 'edit_staff' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-users-cog"></i>
-                <span class="nav-text">Manage Staff</span>
+            <a href="{% url 'staff_take_attendance' %}" class="nav-link">
+                <i class="nav-icon fas fa-check-circle"></i>
+                <span class="nav-text">Attendance</span>
             </a>
         </div>
-
         <div class="nav-item">
-            {% url 'add_student' as add_student %}
-            <a href="{{ add_student }}" class="nav-link {% if add_student == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-user-graduate"></i>
-                <span class="nav-text">Add Student</span>
+            <a href="{% url 'staff_add_result' %}" class="nav-link">
+                <i class="nav-icon fas fa-plus-circle"></i>
+                <span class="nav-text">Add Results</span>
             </a>
         </div>
-
+    {% else %}
+        <!-- Basic Student Fallback -->
         <div class="nav-item">
-            {% url 'add_parent' as add_parent %}
-            <a href="{{ add_parent }}" class="nav-link {% if add_parent == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-user-friends"></i>
-                <span class="nav-text">{% trans "Add Parent" %}</span>
+            <a href="{% url 'student_home' %}" class="nav-link {% if request.path == '/student/home/' %}active{% endif %}">
+                <i class="nav-icon fas fa-chart-pie"></i>
+                <span class="nav-text">Dashboard</span>
             </a>
         </div>
-
         <div class="nav-item">
-            {% url 'manage_student' as manage_student %}
-            <a href="{{ manage_student }}" class="nav-link {% if manage_student == request.path or 'edit_student' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-users"></i>
-                <span class="nav-text">Manage Students</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'admin_manage_batches' as admin_manage_batches %}
-            <a href="{{ admin_manage_batches }}" class="nav-link {% if admin_manage_batches == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-cubes"></i>
-                <span class="nav-text">Manage Batches & IDs</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'admin_manage_registrations' as admin_manage_registrations %}
-            <a href="{{ admin_manage_registrations }}" class="nav-link {% if 'registrations' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-id-card"></i>
-                <span class="nav-text">Student Registrations</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'admin_visitor_passes' as admin_visitor_passes %}
-            <a href="{{ admin_visitor_passes }}" class="nav-link {% if 'visitors' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-id-badge"></i>
-                <span class="nav-text">Visitor Passes</span>
-            </a>
-        </div>
-
-        <h6 class="nav-section-title">Communication</h6>
-        
-        <div class="nav-item">
-            {% url 'chat_home' as chat_home %}
-            <a href="{{ chat_home }}" class="nav-link {% if chat_home == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-comments"></i>
-                <span class="nav-text">Messenger</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'announcements_board' as announcements_board %}
-            <a href="{{ announcements_board }}" class="nav-link {% if announcements_board == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-bullhorn"></i>
-                <span class="nav-text">Announcements Board</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'admin_notify_staff' as admin_notify_staff %}
-            <a href="{{ admin_notify_staff }}" class="nav-link {% if admin_notify_staff == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-bell"></i>
-                <span class="nav-text">Notify Staff</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'admin_notify_student' as admin_notify_student %}
-            <a href="{{ admin_notify_student }}" class="nav-link {% if admin_notify_student == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-bullhorn"></i>
-                <span class="nav-text">Notify Students</span>
-            </a>
-        </div>
-
-        <h6 class="nav-section-title">Reports & Analytics</h6>
-        
-        <div class="nav-item">
-            {% url 'admin_analytics' as admin_analytics %}
-            <a href="{{ admin_analytics }}" class="nav-link {% if admin_analytics == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-chart-bar"></i>
-                <span class="nav-text">Analytics Dashboard</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'admin_finance_dashboard' as admin_finance_dashboard %}
-            <a href="{{ admin_finance_dashboard }}" class="nav-link {% if admin_finance_dashboard == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-wallet"></i>
-                <span class="nav-text">Finance Dashboard</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'admin_view_attendance' as admin_view_attendance %}
-            <a href="{{ admin_view_attendance }}" class="nav-link {% if admin_view_attendance == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-chart-line"></i>
+            <a href="{% url 'student_view_attendance' %}" class="nav-link">
+                <i class="nav-icon fas fa-calendar-check"></i>
                 <span class="nav-text">View Attendance</span>
             </a>
         </div>
-
         <div class="nav-item">
-            {% url 'student_feedback_message' as student_feedback_message %}
-            <a href="{{ student_feedback_message }}" class="nav-link {% if student_feedback_message == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-comments"></i>
-                <span class="nav-text">Student Feedback</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'staff_feedback_message' as staff_feedback_message %}
-            <a href="{{ staff_feedback_message }}" class="nav-link {% if staff_feedback_message == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-comment-dots"></i>
-                <span class="nav-text">Staff Feedback</span>
-            </a>
-        </div>
-
-        <h6 class="nav-section-title">Leave Management</h6>
-        
-        <div class="nav-item">
-            {% url 'view_staff_leave' as view_staff_leave %}
-            <a href="{{ view_staff_leave }}" class="nav-link {% if view_staff_leave == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-calendar-check"></i>
-                <span class="nav-text">Staff Leave</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'view_student_leave' as view_student_leave %}
-            <a href="{{ view_student_leave }}" class="nav-link {% if view_student_leave == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-calendar-times"></i>
-                <span class="nav-text">Student Leave</span>
-            </a>
-        </div>
-
-        <h6 class="nav-section-title">AI Operations</h6>
-        
-        <div class="nav-item">
-            {% url 'staff_generate_paper' as staff_generate_paper %}
-            <a href="{{ staff_generate_paper }}" class="nav-link {% if staff_generate_paper == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-file-invoice"></i>
-                <span class="nav-text">AI Exam Paper Gen</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'staff_generate_timetable' as staff_generate_timetable %}
-            <a href="{{ staff_generate_timetable }}" class="nav-link {% if staff_generate_timetable == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-calendar-alt"></i>
-                <span class="nav-text">AI Timetable Gen</span>
-            </a>
-        </div>
-
-    {% elif user.user_type == '2' %}
-        <!-- Staff Navigation -->
-        <h6 class="nav-section-title">Main</h6>
-        
-        <div class="nav-item">
-            {% url 'staff_home' as staff_home %}
-            <a href="{{ staff_home }}" class="nav-link {% if staff_home == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-tachometer-alt"></i>
-                <span class="nav-text">Dashboard</span>
-            </a>
-        </div>
-        
-        <div class="nav-item">
-            {% url 'staff_view_profile' as staff_view_profile %}
-            <a href="{{ staff_view_profile }}" class="nav-link {% if staff_view_profile == request.path %}active{% endif %}">
-                <i class="fas fa-user-circle"></i>
-                <span class="nav-text">Profile</span>
-            </a>
-        </div>
-        
-        <div class="nav-item">
-            {% url 'staff_id_card' as staff_id_card_url %}
-            <a href="{{ staff_id_card_url }}" class="nav-link {% if staff_id_card_url == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-id-card"></i>
-                <span class="nav-text">Digital ID Card</span>
-            </a>
-        </div>
-
-        <h6 class="nav-section-title">Academic Management</h6>
-        
-        <div class="nav-item">
-            {% url 'staff_add_result' as staff_add_result %}
-            <a href="{{ staff_add_result }}" class="nav-link {% if staff_add_result == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-plus-circle"></i>
-                <span class="nav-text">Add Result</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'edit_student_result' as edit_student_result %}
-            <a href="{{ edit_student_result }}" class="nav-link {% if edit_student_result == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-edit"></i>
-                <span class="nav-text">Edit Results</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'staff_manage_registrations' as staff_manage_registrations %}
-            <a href="{{ staff_manage_registrations }}" class="nav-link {% if 'registrations' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-id-card"></i>
-                <span class="nav-text">Student Registrations</span>
-            </a>
-        </div>
-
-        <h6 class="nav-section-title">Attendance</h6>
-        
-        <div class="nav-item">
-            {% url 'staff_take_attendance' as staff_take_attendance %}
-            <a href="{{ staff_take_attendance }}" class="nav-link {% if staff_take_attendance == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-check-circle"></i>
-                <span class="nav-text">Take Attendance</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'staff_update_attendance' as staff_update_attendance %}
-            <a href="{{ staff_update_attendance }}" class="nav-link {% if staff_update_attendance == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-calendar-edit"></i>
-                <span class="nav-text">Update Attendance</span>
-            </a>
-        </div>
-
-        <h6 class="nav-section-title">LMS (E-Learning)</h6>
-        
-        <div class="nav-item">
-            {% url 'staff_lms_home' as staff_lms_home %}
-            <a href="{{ staff_lms_home }}" class="nav-link {% if 'lms' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-laptop-code"></i>
-                <span class="nav-text">LMS Dashboard</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'staff_live_classes' as staff_live_classes %}
-            <a href="{{ staff_live_classes }}" class="nav-link {% if 'live_classes' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-video"></i>
-                <span class="nav-text">Live Classrooms</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'staff_scanner_desk' as staff_scanner_desk %}
-            <a href="{{ staff_scanner_desk }}" class="nav-link {% if 'scanner' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-qrcode"></i>
-                <span class="nav-text">Smart Scan Desk</span>
-            </a>
-        </div>
-
-        <h6 class="nav-section-title">AI Tools</h6>
-        
-        <div class="nav-item">
-            {% url 'staff_generate_paper' as staff_generate_paper %}
-            <a href="{{ staff_generate_paper }}" class="nav-link {% if staff_generate_paper == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-file-invoice"></i>
-                <span class="nav-text">AI Exam Paper Gen</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'staff_generate_timetable' as staff_generate_timetable %}
-            <a href="{{ staff_generate_timetable }}" class="nav-link {% if staff_generate_timetable == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-calendar-alt"></i>
-                <span class="nav-text">AI Timetable Gen</span>
-            </a>
-        </div>
-
-        <h6 class="nav-section-title">Library & Resources</h6>
-        
-        <div class="nav-item">
-            {% url 'add_book' as add_book %}
-            <a href="{{ add_book }}" class="nav-link {% if add_book == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-book-open"></i>
-                <span class="nav-text">Add Books</span>
-            </a>
-        </div>
-
-        <h6 class="nav-section-title">Communication</h6>
-        
-        <div class="nav-item">
-            {% url 'chat_home' as chat_home %}
-            <a href="{{ chat_home }}" class="nav-link {% if chat_home == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-comments"></i>
-                <span class="nav-text">Messenger</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'announcements_board' as announcements_board %}
-            <a href="{{ announcements_board }}" class="nav-link {% if announcements_board == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-bullhorn"></i>
-                <span class="nav-text">Announcements Board</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'discussion_board' as discussion_board %}
-            <a href="{{ discussion_board }}" class="nav-link {% if discussion_board == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-comments"></i>
-                <span class="nav-text">Discussion Board</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'staff_view_notification' as staff_view_notification %}
-            <a href="{{ staff_view_notification }}" class="nav-link {% if staff_view_notification == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-bell"></i>
-                <span class="nav-text">Notifications</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'staff_apply_leave' as staff_apply_leave %}
-            <a href="{{ staff_apply_leave }}" class="nav-link {% if staff_apply_leave == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-calendar-plus"></i>
-                <span class="nav-text">Apply for Leave</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'staff_feedback' as staff_feedback %}
-            <a href="{{ staff_feedback }}" class="nav-link {% if staff_feedback == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-comment-alt"></i>
-                <span class="nav-text">Feedback</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'staff_events_calendar' as staff_events_calendar %}
-            <a href="{{ staff_events_calendar }}" class="nav-link {% if 'events' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-calendar-day"></i>
-                <span class="nav-text">Event Calendar</span>
-            </a>
-        </div>
-
-    {% elif user.user_type == '3' %}
-        <!-- Student Navigation -->
-        <h6 class="nav-section-title">Main Portal</h6>
-        
-        <div class="nav-item">
-            {% url 'student_home' as student_home %}
-            <a href="{{ student_home }}" class="nav-link {% if student_home == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-tachometer-alt"></i>
-                <span class="nav-text">Dashboard</span>
-            </a>
-        </div>
-        
-        <div class="nav-item">
-            {% url 'chat_home' as chat_home %}
-            <a href="{{ chat_home }}" class="nav-link {% if chat_home == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-comments"></i>
-                <span class="nav-text">Messenger</span>
-            </a>
-        </div>
-        
-        <div class="nav-item">
-            {% url 'student_view_profile' as student_view_profile %}
-            <a href="{{ student_view_profile }}" class="nav-link {% if student_view_profile == request.path %}active{% endif %}">
-                <i class="fas fa-user-circle"></i>
-                <span class="nav-text">Profile</span>
-            </a>
-        </div>
-
-        <h6 class="nav-section-title">E-Learning (LMS)</h6>
-        
-        <div class="nav-item">
-            {% url 'student_finances' as student_finances %}
-            <a href="{{ student_finances }}" class="nav-link {% if student_finances == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                <span class="nav-text">My Finances</span>
-            </a>
-        </div>
-        
-        <div class="nav-item">
-            {% url 'student_lms_home' as student_lms_home %}
-            <a href="{{ student_lms_home }}" class="nav-link {% if 'lms' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-laptop-code"></i>
-                <span class="nav-text">LMS Portal</span>
-            </a>
-        </div>
-
-        <div class="nav-item has-submenu {% if 'attendance' in request.path or 'timetable' in request.path %}open{% endif %}">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-calendar-check"></i>
-                <span class="nav-text">Attendance</span>
-                <i class="nav-arrow fas fa-chevron-right"></i>
-            </a>
-            <div class="nav-submenu">
-                <div class="nav-item">
-                    {% url 'student_live_classes' as student_live_classes %}
-                    <a href="{{ student_live_classes }}" class="nav-link {% if student_live_classes == request.path %}active{% endif %}">
-                        <span class="nav-text">Online Classes</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'student_view_attendance' as student_view_attendance %}
-                    <a href="{{ student_view_attendance }}" class="nav-link {% if student_view_attendance == request.path %}active{% endif %}">
-                        <span class="nav-text">Class Attendance</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'student_timetable' as student_timetable %}
-                    <a href="{{ student_timetable }}" class="nav-link {% if student_timetable == request.path %}active{% endif %}">
-                        <span class="nav-text">Class Time Table</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="{% url 'student_view_attendance' %}" class="nav-link">
-                        <span class="nav-text">Attendance Datewise Details</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="nav-item has-submenu {% if 'hall-ticket' in request.path or 'result' in request.path %}open{% endif %}">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-file-signature"></i>
-                <span class="nav-text">Examination</span>
-                <i class="nav-arrow fas fa-chevron-right"></i>
-            </a>
-            <div class="nav-submenu">
-                <div class="nav-item">
-                    {% url 'student_hall_ticket' as student_hall_ticket %}
-                    <a href="{{ student_hall_ticket }}" class="nav-link {% if student_hall_ticket == request.path %}active{% endif %}">
-                        <span class="nav-text">Exam Time Table/ Hall Ticket</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'student_view_result' as student_view_result %}
-                    <a href="{{ student_view_result }}" class="nav-link {% if student_view_result == request.path %}active{% endif %}">
-                        <span class="nav-text">Online Exam Result</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('Exam Application form is currently closed.')">
-                        <span class="nav-text">Exam Application</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('Junior College Examination portal is not active.')">
-                        <span class="nav-text">JR Examination</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('ATKT Subject application is closed.')">
-                        <span class="nav-text">Apply For ATKT Exam Subject</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('Value Added Course registrations are closed.')">
-                        <span class="nav-text">Apply For Value Added Course</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('Extra Credit Course registration is closed.')">
-                        <span class="nav-text">Apply For Extra Credit Course</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('Revaluation application is closed.')">
-                        <span class="nav-text">Apply For Revaluation</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('Photocopy application is closed.')">
-                        <span class="nav-text">Apply For Photocopy</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('Photocopy & Revaluation Print is closed.')">
-                        <span class="nav-text">Photocopy & Revaluation Print</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="{% url 'student_view_result' %}" class="nav-link">
-                        <span class="nav-text">Internal/External Exam</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('No Extra Credit Certificate Report available.')">
-                        <span class="nav-text">Extra Credit Subject Certificate Report</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="nav-item has-submenu {% if 'certificates' in request.path %}open{% endif %}">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-cogs"></i>
-                <span class="nav-text">Student Services</span>
-                <i class="nav-arrow fas fa-chevron-right"></i>
-            </a>
-            <div class="nav-submenu">
-                <div class="nav-item">
-                    {% url 'student_resume_builder' as student_resume_builder %}
-                    <a href="{{ student_resume_builder }}" class="nav-link {% if student_resume_builder == request.path %}active{% endif %}">
-                        <span class="nav-text">AI Resume Builder</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'student_ai_quiz' as student_ai_quiz %}
-                    <a href="{{ student_ai_quiz }}" class="nav-link {% if student_ai_quiz == request.path %}active{% endif %}">
-                        <span class="nav-text">AI Practice Quizzes</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'student_id_card' as student_id_card %}
-                    <a href="{{ student_id_card }}" class="nav-link {% if student_id_card == request.path %}active{% endif %}">
-                        <span class="nav-text">Digital ID Card</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'student_certificates' as student_certificates %}
-                    <a href="{{ student_certificates }}" class="nav-link {% if student_certificates == request.path %}active{% endif %}">
-                        <span class="nav-text">Certificate</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="{% url 'student_certificates' %}" class="nav-link">
-                        <span class="nav-text">Bonafied</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('Railway Concession Form is not available in digital mode.')">
-                        <span class="nav-text">Railway Concession Form</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'student_feedback' as student_feedback %}
-                    <a href="{{ student_feedback }}" class="nav-link">
-                        <span class="nav-text">Grievance</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('Scholarship Details entry is closed.')">
-                        <span class="nav-text">Scholarship Details Entry</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('No Dues Certificate Report is not generated.')">
-                        <span class="nav-text">No Dues Certificate Report</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('PhD Information portal is not active for undergraduate profiles.')">
-                        <span class="nav-text">PhD Information</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('Application Reprint is not available.')">
-                        <span class="nav-text">Application Reprint</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('Student Eligibility Report is not generated.')">
-                        <span class="nav-text">Student Eligibility Report</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="nav-item">
-            <a href="#" class="nav-link" onclick="alert('Hostel Room allocation is closed for this semester.')">
-                <i class="nav-icon fas fa-hotel"></i>
-                <span class="nav-text">Apply For Hostel</span>
-            </a>
-        </div>
-
-        <div class="nav-item has-submenu {% if 'payable-fees' in request.path %}open{% endif %}">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                <span class="nav-text">Fees Receipt</span>
-                <i class="nav-arrow fas fa-chevron-right"></i>
-            </a>
-            <div class="nav-submenu">
-                <div class="nav-item">
-                    <a href="{% url 'student_payable_fees' %}" class="nav-link">
-                        <span class="nav-text">Receipt Print</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('Requerying transaction status...')">
-                        <span class="nav-text">Requery</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="alert('No Social Hostel Receipt found.')">
-                        <span class="nav-text">Soc. Hostel Receipt Print</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="nav-item">
-            {% url 'student_feedback' as student_feedback %}
-            <a href="{{ student_feedback }}" class="nav-link {% if student_feedback == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-comment-dots"></i>
-                <span class="nav-text">Feedback</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            <a href="#" class="nav-link" onclick="alert('Even Course Subject Allocation is not active.')">
-                <i class="nav-icon fas fa-book"></i>
-                <span class="nav-text">Even Course Subject</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            <a href="#" class="nav-link bg-light text-muted" style="pointer-events: none;">
-                <i class="nav-icon fas fa-times-circle"></i>
-                <span class="nav-text">Registration Closed</span>
-            </a>
-        </div>
-
-        <div class="nav-item has-submenu {% if 'registration' in request.path %}open{% endif %}">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-user-plus"></i>
-                <span class="nav-text">Online Registration</span>
-                <i class="nav-arrow fas fa-chevron-right"></i>
-            </a>
-            <div class="nav-submenu">
-                <div class="nav-item">
-                    {% url 'student_reg_personal' as reg_personal %}
-                    <a href="{{ reg_personal }}" class="nav-link {% if reg_personal == request.path %}active{% endif %}">
-                        <span class="nav-text">Personal</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'student_reg_address' as reg_address %}
-                    <a href="{{ reg_address }}" class="nav-link {% if reg_address == request.path %}active{% endif %}">
-                        <span class="nav-text">Address</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'student_reg_photo' as reg_photo %}
-                    <a href="{{ reg_photo }}" class="nav-link {% if reg_photo == request.path %}active{% endif %}">
-                        <span class="nav-text">Photo/Sign</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'student_reg_documents' as reg_docs %}
-                    <a href="{{ reg_docs }}" class="nav-link {% if reg_docs == request.path %}active{% endif %}">
-                        <span class="nav-text">Documents</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'student_reg_confirm' as reg_confirm %}
-                    <a href="{{ reg_confirm }}" class="nav-link {% if reg_confirm == request.path %}active{% endif %}">
-                        <span class="nav-text">Confirm</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    {% url 'student_reg_print' as reg_print %}
-                    <a href="{{ reg_print }}" class="nav-link {% if reg_print == request.path %}active{% endif %}">
-                        <span class="nav-text">Application Print</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="nav-item">
-            {% url 'student_payable_fees' as student_payable_fees %}
-            <a href="{{ student_payable_fees }}" class="nav-link {% if student_payable_fees == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-credit-card"></i>
-                <span class="nav-text">Payable Fees</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'student_report_card' as student_report_card %}
-            <a href="{{ student_report_card }}" class="nav-link {% if 'report-card' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-file-alt"></i>
-                <span class="nav-text">Report Card</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'student_events_calendar' as student_events_calendar %}
-            <a href="{{ student_events_calendar }}" class="nav-link {% if 'events' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-calendar-day"></i>
-                <span class="nav-text">Event Calendar</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            {% url 'student_view_profile' as student_view_profile %}
-            <a href="{{ student_view_profile }}" class="nav-link">
-                <i class="nav-icon fas fa-key"></i>
-                <span class="nav-text">Reset Password</span>
-            </a>
-        </div>
-    {% elif user.user_type == '4' %}
-        <!-- Parent Navigation -->
-        <h6 class="nav-section-title">{% trans "Parent Dashboard" %}</h6>
-        
-        <div class="nav-item">
-            {% url 'parent_home' as parent_home %}
-            <a href="{{ parent_home }}" class="nav-link {% if parent_home == request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-home"></i>
-                <span class="nav-text">{% trans "Home" %}</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-chart-line"></i>
-                <span class="nav-text">{% trans "Child Progress" %}</span>
-            </a>
-        </div>
-
-        <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-clipboard-check"></i>
-                <span class="nav-text">{% trans "Attendance" %}</span>
-            </a>
-        </div>
-        
-        <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-file-alt"></i>
-                <span class="nav-text">{% trans "Exam Results" %}</span>
-            </a>
-        </div>
-
-        <h6 class="nav-section-title">Settings</h6>
-        <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-key"></i>
-                <span class="nav-text">{% trans "Reset Password" %}</span>
+            <a href="{% url 'student_view_result' %}" class="nav-link">
+                <i class="nav-icon fas fa-poll"></i>
+                <span class="nav-text">View Results</span>
             </a>
         </div>
     {% endif %}
-
-    <div class="nav-item mt-auto pt-3 border-top">
-        <a href="{% url 'logout_user' %}" class="nav-link text-danger font-weight-bold">
-            <i class="nav-icon fas fa-sign-out-alt"></i>
-            <span class="nav-text">Logout</span>
-        </a>
+    
+    <div style="padding: 20px; font-size: 11px; color: #a0a9b6; text-align: center; border-top: 1px solid #e0e6ed; margin-top: 20px;">
+        Need More Advance?<br>
+        Check our PRO version.
     </div>
 </div>
 
 <script>
-function showDefaultAvatar() {
-    // Hide the broken image
-    document.getElementById('sidebar-avatar').style.display = 'none';
-    // Show the default FontAwesome icon
-    document.getElementById('default-avatar').style.display = 'inline-block';
-}
-
-// Also check if profile_pic is empty or null and show default avatar
-document.addEventListener('DOMContentLoaded', function() {
-    const avatar = document.getElementById('sidebar-avatar');
-    const defaultAvatar = document.getElementById('default-avatar');
-    
-    // Check if src is empty, null, or just whitespace
-    if (!avatar.src || avatar.src.trim() === '' || avatar.src === window.location.href) {
-        avatar.style.display = 'none';
-        defaultAvatar.style.display = 'inline-block';
-    }
-});
+    // Submenu toggle logic matching eSkooly behavior
+    document.querySelectorAll('.nav-item.has-submenu > .nav-link').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const parent = this.parentElement;
+            const isOpen = parent.classList.contains('open');
+            
+            // Close other submenus
+            document.querySelectorAll('.nav-item.has-submenu').forEach(sibling => {
+                if (sibling !== parent) {
+                    sibling.classList.remove('open');
+                    const submenu = sibling.querySelector('.nav-submenu');
+                    if (submenu) submenu.style.display = 'none';
+                }
+            });
+            
+            // Toggle current submenu
+            if (isOpen) {
+                parent.classList.remove('open');
+                parent.querySelector('.nav-submenu').style.display = 'none';
+            } else {
+                parent.classList.add('open');
+                parent.querySelector('.nav-submenu').style.display = 'block';
+            }
+        });
+    });
 </script>

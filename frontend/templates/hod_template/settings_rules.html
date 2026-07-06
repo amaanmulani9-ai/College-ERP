@@ -1,0 +1,34 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Rules & Regulations</h3>
+            </div>
+            <form role="form" method="POST">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Student Rules & Regulations</label>
+                        <textarea class="form-control" name="student_rules" rows="10">{{ rules.student_rules|default:'' }}</textarea>
+                        <small class="form-text text-muted">These rules will be displayed on the student dashboard or portal.</small>
+                    </div>
+                    <hr>
+                    <div class="form-group">
+                        <label>Employee / Staff Rules</label>
+                        <textarea class="form-control" name="employee_rules" rows="10">{{ rules.employee_rules|default:'' }}</textarea>
+                        <small class="form-text text-muted">These rules will be displayed on the staff dashboard.</small>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Save Rules</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -37,7 +37,7 @@
     }
 
     .esk-header-banner {
-        background: linear-gradient(135deg, var(--color-surface-strong) 0%, #4f26b5 100%);
+        background: linear-gradient(135deg, #1f1c2e 0%, var(--color-surface-strong) 100%);
         border-radius: var(--radius-2xl);
         padding: 24px 32px;
         color: var(--color-text-secondary);
@@ -50,13 +50,13 @@
         gap: 16px;
     }
 
-    .esk-student-info h2 {
+    .esk-header-info h2 {
         font-size: 24px;
         font-weight: 700;
         margin: 0 0 4px 0;
     }
 
-    .esk-student-info p {
+    .esk-header-info p {
         font-size: 14px;
         margin: 0;
         opacity: 0.9;
@@ -136,8 +136,9 @@
     .icon-green { background: rgba(16, 185, 129, 0.12); color: var(--color-status-success); }
     .icon-amber { background: rgba(245, 158, 11, 0.12); color: var(--color-status-warning); }
     .icon-red { background: rgba(239, 68, 68, 0.12); color: var(--color-status-error); }
+    .icon-blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
 
-    /* Content Cards & Tables */
+    /* Panels & Tables */
     .esk-panel {
         background: var(--color-surface-card);
         border-radius: var(--radius-2xl);
@@ -241,13 +242,13 @@
         
         <!-- Hero Banner -->
         <div class="esk-header-banner">
-            <div class="esk-student-info">
-                <h2>{{ student.admin.get_full_name }}</h2>
-                <p><i class="fas fa-graduation-cap mr-1"></i> Course: {{ student.course.name }} &bull; Session: {{ student.session.start_year }} - {{ student.session.end_year }}</p>
+            <div class="esk-header-info">
+                <h2>Backoffice Operations Control Center</h2>
+                <p><i class="fas fa-briefcase mr-1"></i> Welcome back, {{ request.user.get_full_name|default:request.user.username }} &bull; Department: Administration &amp; Operations</p>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <span class="esk-badge-pill"><i class="fas fa-id-badge"></i> Roll ID: STU-{{ student.id|stringformat:"04d" }}</span>
-                <span class="esk-badge-pill"><i class="fas fa-user-check"></i> Active Student</span>
+                <a href="{% url 'backoffice_admissions' %}" class="esk-badge-pill text-white" style="text-decoration: none;"><i class="fas fa-user-plus"></i> New Admission</a>
+                <a href="{% url 'backoffice_fees' %}" class="esk-badge-pill text-white" style="text-decoration: none;"><i class="fas fa-file-invoice-dollar"></i> Fee Desk</a>
             </div>
         </div>
 
@@ -255,61 +256,59 @@
         <div class="esk-kpi-grid">
             <div class="esk-stat-card">
                 <div>
-                    <div class="esk-stat-label">Attendance Rate</div>
-                    <h3 class="esk-stat-val">{{ attendance_pct }}%</h3>
-                    <small class="text-muted">{{ attendance_present }} Present / {{ attendance_absent }} Absent</small>
+                    <div class="esk-stat-label">Total Enrollment</div>
+                    <h3 class="esk-stat-val">{{ total_students }}</h3>
+                    <small class="text-success"><i class="fas fa-arrow-up"></i> +{{ new_students_month }} New this month</small>
+                </div>
+                <div class="esk-stat-icon icon-blue">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+            </div>
+
+            <div class="esk-stat-card">
+                <div>
+                    <div class="esk-stat-label">Fee Collection Rate</div>
+                    <h3 class="esk-stat-val">{{ paid_pct }}%</h3>
+                    <small class="text-muted">Collected: ${{ total_fees_collected|floatformat:0 }} / ${{ total_fees_expected|floatformat:0 }}</small>
                 </div>
                 <div class="esk-stat-icon icon-green">
-                    <i class="fas fa-check-double"></i>
+                    <i class="fas fa-money-check-alt"></i>
                 </div>
             </div>
 
             <div class="esk-stat-card">
                 <div>
-                    <div class="esk-stat-label">Fee Balance Due</div>
-                    <h3 class="esk-stat-val {% if total_due > 0 %}text-danger{% else %}text-success{% endif %}">
-                        ${{ total_due|floatformat:2 }}
-                    </h3>
-                    <small class="text-muted">Total Paid: ${{ total_paid|floatformat:2 }}</small>
-                </div>
-                <div class="esk-stat-icon {% if total_due > 0 %}icon-red{% else %}icon-green{% endif %}">
-                    <i class="fas fa-file-invoice-dollar"></i>
-                </div>
-            </div>
-
-            <div class="esk-stat-card">
-                <div>
-                    <div class="esk-stat-label">Published Results</div>
-                    <h3 class="esk-stat-val">{{ results|length }}</h3>
-                    <small class="text-muted">Offline Subjects Graded</small>
-                </div>
-                <div class="esk-stat-icon icon-purple">
-                    <i class="fas fa-award"></i>
-                </div>
-            </div>
-
-            <div class="esk-stat-card">
-                <div>
-                    <div class="esk-stat-label">Today's Classes</div>
-                    <h3 class="esk-stat-val">{{ todays_timetable|length }}</h3>
-                    <small class="text-muted">Scheduled Today</small>
+                    <div class="esk-stat-label">Pending Certificates</div>
+                    <h3 class="esk-stat-val {% if total_cert_pending > 0 %}text-warning{% endif %}">{{ total_cert_pending }}</h3>
+                    <small class="text-muted">{{ total_cert_approved }} Approved overall</small>
                 </div>
                 <div class="esk-stat-icon icon-amber">
-                    <i class="fas fa-clock"></i>
+                    <i class="fas fa-certificate"></i>
+                </div>
+            </div>
+
+            <div class="esk-stat-card">
+                <div>
+                    <div class="esk-stat-label">Pending Leave Requests</div>
+                    <h3 class="esk-stat-val {% if pending_student_leaves > 0 or pending_staff_leaves > 0 %}text-danger{% endif %}">{{ pending_student_leaves|add:pending_staff_leaves }}</h3>
+                    <small class="text-muted">{{ pending_staff_leaves }} Staff / {{ pending_student_leaves }} Student</small>
+                </div>
+                <div class="esk-stat-icon icon-red">
+                    <i class="fas fa-calendar-alt"></i>
                 </div>
             </div>
         </div>
 
-        <!-- Charts & Timetable Section -->
+        <!-- Charts Section -->
         <div class="row">
             <div class="col-lg-7">
                 <div class="esk-panel">
                     <div class="esk-panel-header">
-                        <h3 class="esk-panel-title"><i class="fas fa-chart-bar text-primary"></i> Academic Progress Overview</h3>
-                        <a href="{% url 'parent_results' %}" class="esk-btn-primary">View Full Report <i class="fas fa-arrow-right"></i></a>
+                        <h3 class="esk-panel-title"><i class="fas fa-chart-line text-success"></i> Fee Collection Revenue (Last 6 Months)</h3>
+                        <a href="{% url 'backoffice_fees' %}" class="esk-btn-primary">Fee Reports <i class="fas fa-arrow-right"></i></a>
                     </div>
                     <div>
-                        <canvas id="academicProgressChart" style="min-height: 280px; height: 280px; max-height: 280px; width: 100%;"></canvas>
+                        <canvas id="feeRevenueChart" style="min-height: 280px; height: 280px; max-height: 280px; width: 100%;"></canvas>
                     </div>
                 </div>
             </div>
@@ -317,73 +316,45 @@
             <div class="col-lg-5">
                 <div class="esk-panel">
                     <div class="esk-panel-header">
-                        <h3 class="esk-panel-title"><i class="fas fa-calendar-day text-warning"></i> Today's Timetable</h3>
-                        <a href="{% url 'parent_timetable' %}" class="esk-btn-primary">Full Schedule</a>
+                        <h3 class="esk-panel-title"><i class="fas fa-chart-pie text-primary"></i> Course Enrollment Distribution</h3>
                     </div>
-                    <div class="table-responsive">
-                        <table class="esk-table">
-                            <thead>
-                                <tr>
-                                    <th>Time</th>
-                                    <th>Subject</th>
-                                    <th>Room</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for slot in todays_timetable %}
-                                <tr>
-                                    <td><span class="badge badge-light px-2 py-1" style="font-size: 12px;">{{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}</span></td>
-                                    <td class="font-weight-bold">{{ slot.subject.name }}</td>
-                                    <td>{{ slot.room_number|default:"Classroom 1" }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="3">
-                                        <div class="esk-empty-state">
-                                            <i class="fas fa-calendar-times"></i>
-                                            <p>No lectures scheduled for today.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div>
+                        <canvas id="courseEnrollmentChart" style="min-height: 280px; height: 280px; max-height: 280px; width: 100%;"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Detailed Tables Section -->
+        <!-- Recent Transactions & Certificate Requests -->
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-lg-6">
                 <div class="esk-panel">
                     <div class="esk-panel-header">
-                        <h3 class="esk-panel-title"><i class="fas fa-book text-success"></i> Subject Test & Exam Scores</h3>
+                        <h3 class="esk-panel-title"><i class="fas fa-receipt text-success"></i> Recent Fee Transactions</h3>
+                        <a href="{% url 'backoffice_fees' %}" class="esk-btn-primary">All Payments</a>
                     </div>
                     <div class="table-responsive">
                         <table class="esk-table">
                             <thead>
                                 <tr>
-                                    <th>Subject</th>
-                                    <th>Test Marks</th>
-                                    <th>Exam Marks</th>
-                                    <th>Total</th>
+                                    <th>Student</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for r in results %}
+                                {% for payment in recent_payments %}
                                 <tr>
-                                    <td class="font-weight-bold">{{ r.subject.name }}</td>
-                                    <td><span class="badge badge-info px-2 py-1">{{ r.test }}</span></td>
-                                    <td><span class="badge badge-primary px-2 py-1">{{ r.exam }}</span></td>
-                                    <td class="font-weight-bold text-success">{{ r.test|add:r.exam }}</td>
+                                    <td class="font-weight-bold">{{ payment.fee_record.student.admin.get_full_name }}</td>
+                                    <td><span class="badge badge-success px-2 py-1">${{ payment.amount_paid|floatformat:2 }}</span></td>
+                                    <td class="text-muted">{{ payment.payment_date|date:"M d, Y" }}</td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="4">
+                                    <td colspan="3">
                                         <div class="esk-empty-state">
-                                            <i class="fas fa-folder-open"></i>
-                                            <p>No offline subject grades recorded yet.</p>
+                                            <i class="fas fa-file-invoice-dollar"></i>
+                                            <p>No recent fee collections logged.</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -394,37 +365,36 @@
                 </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-lg-6">
                 <div class="esk-panel">
                     <div class="esk-panel-header">
-                        <h3 class="esk-panel-title"><i class="fas fa-laptop-code text-info"></i> Recent Online Exam Scores</h3>
+                        <h3 class="esk-panel-title"><i class="fas fa-certificate text-warning"></i> Pending Certificate Issuance Desk</h3>
+                        <a href="{% url 'backoffice_certificates' %}" class="esk-btn-primary">Manage Desk</a>
                     </div>
                     <div class="table-responsive">
                         <table class="esk-table">
                             <thead>
                                 <tr>
-                                    <th>Exam Title</th>
-                                    <th>Score</th>
-                                    <th>Date</th>
+                                    <th>Student</th>
+                                    <th>Type</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for res in online_results %}
+                                {% for cert in pending_certificates %}
                                 <tr>
-                                    <td class="font-weight-bold">{{ res.exam.title }}</td>
+                                    <td class="font-weight-bold">{{ cert.student.admin.get_full_name }}</td>
+                                    <td><span class="badge badge-info px-2 py-1">{{ cert.certificate_type }}</span></td>
                                     <td>
-                                        <span class="badge badge-success px-2 py-1" style="font-size: 13px;">
-                                            {{ res.score }} / {{ res.total_marks }}
-                                        </span>
+                                        <a href="{% url 'backoffice_certificates' %}" class="btn btn-sm btn-outline-primary" style="border-radius: var(--radius-sm);">Review</a>
                                     </td>
-                                    <td class="text-muted">{{ res.submitted_at|date:"M d, Y" }}</td>
                                 </tr>
                                 {% empty %}
                                 <tr>
                                     <td colspan="3">
                                         <div class="esk-empty-state">
-                                            <i class="fas fa-laptop"></i>
-                                            <p>No online exam records found.</p>
+                                            <i class="fas fa-check-circle text-success"></i>
+                                            <p>All certificate requests have been processed!</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -439,60 +409,74 @@
     </div>
 </section>
 
-<!-- Chart.js Script for Academic Progress -->
+<!-- Chart.js Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     try {
-        var labels = JSON.parse('{{ chart_labels|safe }}');
-        var testData = JSON.parse('{{ chart_test|safe }}');
-        var examData = JSON.parse('{{ chart_exam|safe }}');
-        
-        var ctx = document.getElementById('academicProgressChart');
-        if (ctx && labels.length > 0) {
-            new Chart(ctx, {
-                type: 'bar',
+        // Fee Revenue Chart
+        var monthLabels = JSON.parse('{{ months_labels|safe }}');
+        var monthData = JSON.parse('{{ months_collected|safe }}');
+        var feeCtx = document.getElementById('feeRevenueChart');
+        if (feeCtx && monthLabels.length > 0) {
+            new Chart(feeCtx, {
+                type: 'line',
                 data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            label: 'Test Marks',
-                            backgroundColor: '#10b981',
-                            borderColor: '#10b981',
-                            data: testData,
-                            borderRadius: 6
-                        },
-                        {
-                            label: 'Exam Marks',
-                            backgroundColor: '#673de5',
-                            borderColor: '#673de5',
-                            data: examData,
-                            borderRadius: 6
-                        }
-                    ]
+                    labels: monthLabels,
+                    datasets: [{
+                        label: 'Fee Collected ($)',
+                        data: monthData,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#10b981',
+                        pointRadius: 4
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(0,0,0,0.05)' }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
+                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        x: { grid: { display: false } }
                     },
-                    plugins: {
-                        legend: { position: 'top' }
-                    }
+                    plugins: { legend: { display: false } }
                 }
             });
-        } else if (ctx) {
-            ctx.parentNode.innerHTML = '<div class="esk-empty-state"><i class="fas fa-chart-bar"></i><p>Not enough graded subjects to generate chart yet.</p></div>';
+        }
+
+        // Course Enrollment Doughnut Chart
+        var courseLabels = JSON.parse('{{ course_labels|safe }}');
+        var courseData = JSON.parse('{{ course_counts|safe }}');
+        var courseCtx = document.getElementById('courseEnrollmentChart');
+        if (courseCtx && courseLabels.length > 0) {
+            new Chart(courseCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: courseLabels,
+                    datasets: [{
+                        data: courseData,
+                        backgroundColor: [
+                            '#673de5', '#10b981', '#f59e0b', '#3b82f6', '#ec4899', '#8b5cf6'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' }
+                    },
+                    cutout: '65%'
+                }
+            });
         }
     } catch(e) {
-        console.error("Chart loading error:", e);
+        console.error("Backoffice chart error:", e);
     }
 });
 </script>

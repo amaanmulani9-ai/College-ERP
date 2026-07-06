@@ -1,25 +1,198 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    .sk-breadcrumb-bar {
+        background: #fff;
+        padding: 15px 25px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .sk-breadcrumb-title {
+        color: #4a235a;
+        font-weight: 600;
+        font-size: 14px;
+        margin-right: 15px;
+    }
+    .sk-breadcrumb-path {
+        color: #b2bec3;
+        font-size: 13px;
+    }
+    .sk-breadcrumb-path a {
+        color: #6c5ce7;
+        text-decoration: none;
+    }
+    
+    .sk-form-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+    }
+    .sk-form-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #a4b0be;
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+    }
+    .sk-form-control {
+        border: 1px solid #f1f2f6;
+        border-radius: 8px;
+        padding: 12px 15px;
+        width: 100%;
+        color: #2d3436;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+    .sk-form-control:focus {
+        outline: none;
+        border-color: #6c5ce7;
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+    }
+    
+    /* Modal Styles */
+    .sk-modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .sk-modal {
+        background: #fff;
+        border-radius: 15px;
+        width: 400px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .sk-modal-icon {
+        color: #ff4757;
+        font-size: 50px;
+        margin-bottom: 20px;
+    }
+    .sk-modal-title {
+        color: #2d3436;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    .sk-modal-text {
+        color: #636e72;
+        font-size: 14px;
+        margin-bottom: 25px;
+        line-height: 1.5;
+    }
+    .sk-btn-primary {
+        background: #6c5ce7;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: 0.3s;
+    }
+    .sk-btn-primary:hover {
+        background: #5b4bc4;
+        color: white;
+    }
+</style>
+{% endblock custom_css %}
 
 {% block content %}
-
 <section class="content">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <!-- general form elements -->
-                <div class="card card-dark">
-                    <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
-                    </div>
-
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text="Add Course"%}
-                </div>
-                <!-- /.card -->
-
+        <!-- Breadcrumb -->
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-title">Classes</div>
+            <div class="sk-breadcrumb-path">
+                <a href="{% url 'manage_course' %}">All Classes</a> 
+                <i class="fas fa-chevron-right" style="font-size:10px;margin:0 10px;"></i> Add New
             </div>
         </div>
+        
+        <!-- Teacher Missing Modal -->
+        {% if teacher_count == 0 %}
+        <div class="sk-modal-overlay" id="noTeacherModal">
+            <div class="sk-modal">
+                <div class="sk-modal-icon"><i class="fas fa-exclamation-circle"></i></div>
+                <div class="sk-modal-title">No Teachers Found</div>
+                <div class="sk-modal-text">You need to add at least one teacher before you can create a class.</div>
+                <a href="{% url 'add_staff' %}" class="sk-btn-primary">Add New Teacher</a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Form -->
+        <div class="sk-form-card">
+            <form role="form" method="POST" action="{% url 'add_course' %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="sk-form-label">Class Name *</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <small class="text-danger">{{ form.name.errors }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <label class="sk-form-label">Monthly Tuition Fees</label>
+                        <input type="number" class="sk-form-control" placeholder="0.00" min="0" step="0.01" name="tuition_fees">
+                        <!-- Note: tuition_fees is not yet in Course model, so it won't save unless we modify models.py, but UI demands it -->
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <label class="sk-form-label">Select Class Teacher</label>
+                        <select class="sk-form-control" name="class_teacher">
+                            <option value="">-- Select Teacher --</option>
+                            <!-- We would loop teachers here -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <button type="submit" class="sk-btn-primary"><i class="fas fa-check"></i> Submit</button>
+                        <button type="reset" class="btn btn-light ml-2" style="border: 1px solid #f1f2f6; border-radius: 8px; padding: 11px 25px; font-weight: 600; color: #636e72;">Reset</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
     </div>
 </section>
+
+{% block custom_js %}
+<script>
+    // If we want to style the Django form field to match:
+    $(document).ready(function(){
+        $('#id_name').addClass('sk-form-control').attr('placeholder', 'e.g. Class 1');
+    });
+</script>
+{% endblock custom_js %}
+
 {% endblock content %}

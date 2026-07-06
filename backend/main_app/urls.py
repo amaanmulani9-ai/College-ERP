@@ -17,7 +17,7 @@ from django.urls import path
 
 from main_app.EditResultView import EditResultView
 
-from . import hod_views, staff_views, student_views, parent_views, views, chat_views, smart_views, ai_views, analytics_views, mobile_api_views, finance_views, placement_views
+from . import hod_views, staff_views, student_views, parent_views, views, chat_views, smart_views, ai_views, analytics_views, mobile_api_views, finance_views, placement_views, backoffice_views
 
 urlpatterns = [
     path("", views.login_page, name='login_page'),
@@ -46,6 +46,26 @@ urlpatterns = [
     path("alumni/portal/", placement_views.alumni_portal, name='alumni_portal'),
     path("company/dashboard/", placement_views.company_hr_dashboard, name='company_hr_dashboard'),
     path("parent/home/", parent_views.parent_home, name='parent_home'),
+    path("parent/attendance/", parent_views.parent_attendance_detail, name='parent_attendance'),
+    path("parent/fees/", parent_views.parent_fee_view, name='parent_fees'),
+    path("parent/results/", parent_views.parent_results_view, name='parent_results'),
+    path("parent/timetable/", parent_views.parent_timetable, name='parent_timetable'),
+    path("parent/feedback/", parent_views.parent_feedback, name='parent_feedback'),
+    path("parent/profile/", parent_views.parent_profile, name='parent_profile'),
+    # --- Settings URLs ---
+    path("admin/settings/profile/", hod_views.admin_settings_profile, name='admin_settings_profile'),
+    path("admin/settings/fees/", hod_views.admin_settings_fees, name='admin_settings_fees'),
+    path("admin/settings/banks/", hod_views.admin_settings_banks, name='admin_settings_banks'),
+    path("admin/settings/rules/", hod_views.admin_settings_rules, name='admin_settings_rules'),
+    # --- Backoffice URLs ---
+    path("backoffice/home/", backoffice_views.backoffice_home, name='backoffice_home'),
+    path("backoffice/admissions/", backoffice_views.backoffice_admissions, name='backoffice_admissions'),
+    path("backoffice/fees/", backoffice_views.backoffice_fees, name='backoffice_fees'),
+    path("backoffice/certificates/", backoffice_views.backoffice_certificates, name='backoffice_certificates'),
+    path("backoffice/certificates/<int:cert_id>/update/", backoffice_views.backoffice_update_certificate, name='backoffice_update_certificate'),
+    path("backoffice/leaves/", backoffice_views.backoffice_leaves, name='backoffice_leaves'),
+    path("backoffice/reports/", backoffice_views.backoffice_reports, name='backoffice_reports'),
+    path("backoffice/profile/", backoffice_views.backoffice_profile, name='backoffice_profile'),
     path("admin/export_staff_analytics/", hod_views.export_staff_analytics, name='export_staff_analytics'),
     path("staff/add", hod_views.add_staff, name='add_staff'),
     path("parent/add", hod_views.add_parent, name='add_parent'),
@@ -294,5 +314,17 @@ urlpatterns = [
     
     # --- TinyMCE Integration ---
     path("api/tinymce-jwt/", ai_views.tinymce_jwt_provider, name='tinymce_jwt_provider'),
+    
+    # --- Settings Tabs ---
+    path("admin/settings/grading/", hod_views.admin_settings_grading, name='admin_settings_grading'),
+    path("admin/settings/theme/", hod_views.admin_settings_theme, name='admin_settings_theme'),
+    path("admin/settings/account/", hod_views.admin_settings_account, name='admin_settings_account'),
+    
+    # --- Generic Feature Coming Soon Route ---
+    path("feature/<str:feature_name>/", hod_views.feature_coming_soon, name='feature_coming_soon'),
+
+    # --- Staff Job Letter ---
+    path("admin/staff/job-letter/", hod_views.admin_job_letter, name='admin_job_letter'),
+    path("admin/staff/job-letter/print/<int:staff_id>/", hod_views.admin_print_job_letter, name='admin_print_job_letter'),
 ]
 

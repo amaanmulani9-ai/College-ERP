@@ -22,9 +22,11 @@ def login_page(request):
             return redirect(reverse("staff_home"))
         elif request.user.user_type == '4':
             return redirect(reverse("parent_home"))
+        elif request.user.user_type == '7':
+            return redirect(reverse("backoffice_home"))
         else:
             return redirect(reverse("student_home"))
-    return render(request, 'main_app/login.html')
+    return render(request, 'main_app/erpnext_login.html')
 
 def offline(request):
     return render(request, 'main_app/offline.html')
@@ -95,6 +97,8 @@ def doLogin(request, **kwargs):
                     return redirect(reverse("parent_home"))
                 elif user.user_type == '3':
                     return redirect(reverse("student_home"))
+                elif user.user_type == '7':
+                    return redirect(reverse("backoffice_home"))
                 else:
                     messages.error(request, "Invalid user type.")
                     return redirect(reverse('login'))

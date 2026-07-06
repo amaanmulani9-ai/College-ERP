@@ -1,0 +1,74 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-5">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Add Bank Details</h3>
+            </div>
+            <form role="form" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Bank Name</label>
+                        <input type="text" class="form-control" name="bank_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Bank Logo</label>
+                        <input type="file" class="form-control-file" name="logo" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label>Branch Address</label>
+                        <textarea class="form-control" name="branch_address" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Account Number (IBAN/SWIFT)</label>
+                        <input type="text" class="form-control" name="account_number" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Instructions</label>
+                        <textarea class="form-control" name="instructions" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="submit" name="add_bank" class="btn btn-primary">Save Bank Details</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="card card-info">
+            <div class="card-header">
+                <h3 class="card-title">Configured Banks</h3>
+            </div>
+            <div class="card-body">
+                {% for bank in banks %}
+                <div class="border p-3 mb-3 rounded">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">
+                            {% if bank.logo %}
+                            <img src="{{ bank.logo.url }}" alt="Logo" style="height: 30px; margin-right: 10px;">
+                            {% endif %}
+                            {{ bank.bank_name }}
+                        </h5>
+                        <form method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="bank_id" value="{{ bank.id }}">
+                            <button type="submit" name="delete_bank" class="btn btn-danger btn-sm" onclick="return confirm('Delete this bank account?');"><i class="fas fa-trash"></i> Delete</button>
+                        </form>
+                    </div>
+                    <p class="mb-1"><strong>Account:</strong> {{ bank.account_number }}</p>
+                    <p class="mb-1"><strong>Branch:</strong> {{ bank.branch_address }}</p>
+                    <p class="mb-0 text-muted"><small><strong>Instructions:</strong> {{ bank.instructions }}</small></p>
+                </div>
+                {% empty %}
+                <p class="text-center">No bank accounts configured.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
