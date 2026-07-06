@@ -29,84 +29,111 @@
         gap: 25px;
     }
     .sk-subject-card {
-        width: 340px;
+        width: 320px;
         background: #fff;
         border-radius: 12px;
-        box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+        box-shadow: 0 2px 15px rgba(0,0,0,0.05);
         padding: 25px;
         position: relative;
+        transition: 0.3s;
+        border-left: 4px solid transparent;
+        display: flex;
+        flex-direction: column;
+    }
+    .sk-subject-card:hover {
+        border-left-color: #6c5ce7;
     }
     .sk-subject-card-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 18px;
+        margin-bottom: 25px;
     }
     .sk-subject-card-name {
         font-weight: 700;
         font-size: 18px;
-        color: #2d3436;
+        color: #4a235a;
     }
-    .sk-subject-card-edit {
-        color: #6c5ce7;
-        font-size: 14px;
-        cursor: pointer;
-        text-decoration: none;
-    }
-    .sk-subject-card-edit:hover { color: #5530c5; }
-    .sk-subject-stats {
+    
+    .sk-subjects-count {
         display: flex;
-        gap: 20px;
+        align-items: center;
+        gap: 15px;
         margin-bottom: 20px;
     }
-    .sk-subject-stat-num {
-        font-size: 26px;
-        font-weight: 800;
-        color: #2d3436;
-        line-height: 1;
-    }
-    .sk-subject-stat-label {
-        font-size: 10px;
-        font-weight: 700;
-        color: #b2bec3;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    /* Subject circles */
-    .sk-subject-circles {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 18px;
-    }
-    .sk-subject-circle-wrap {
-        text-align: center;
-    }
-    .sk-subject-circle {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        border: 5px solid #e8e0ff;
-        border-top-color: #6c5ce7;
+    .sk-subjects-icon {
+        width: 45px;
+        height: 45px;
+        background: #f1f2f6;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-weight: 800;
-        font-size: 16px;
         color: #6c5ce7;
-        margin: 0 auto 6px;
+        font-size: 20px;
     }
-    .sk-subject-circle-label {
-        font-size: 11px;
+    .sk-subjects-text {
+        display: flex;
+        flex-direction: column;
+    }
+    .sk-subjects-number {
+        font-weight: 700;
+        font-size: 24px;
+        color: #2d3436;
+        line-height: 1;
+    }
+    .sk-subjects-label {
+        font-size: 10px;
+        color: #a4b0be;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .sk-update-btn {
+        background: #0984e3;
+        color: #fff;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 20px;
+        width: max-content;
+    }
+    .sk-update-btn:hover {
+        background: #074b83;
+        color: #fff;
+    }
+
+    .sk-subject-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border-top: 1px solid #f1f2f6;
+        padding-top: 15px;
+    }
+    .sk-subject-item {
+        font-size: 13px;
         color: #636e72;
-        font-weight: 500;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
     }
+    .sk-subject-item i {
+        font-size: 8px;
+        color: #b2bec3;
+        margin-right: 10px;
+    }
+
     /* Add card */
     .sk-add-card {
-        width: 340px;
-        height: 220px;
+        width: 320px;
         border: 2px dashed #a29bfe;
         border-radius: 12px;
-        background: rgba(108, 92, 231, 0.02);
+        background: #fff;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -114,30 +141,29 @@
         cursor: pointer;
         text-decoration: none;
         transition: 0.3s;
+        min-height: 350px;
     }
     .sk-add-card:hover {
-        background: rgba(108, 92, 231, 0.05);
-        border-color: #6c5ce7;
-        text-decoration: none;
+        background: rgba(108, 92, 231, 0.02);
     }
     .sk-add-icon {
         background: #6c5ce7;
         color: white;
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 26px;
-        margin-bottom: 15px;
-        box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
+        font-size: 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
     }
     .sk-add-title {
         color: #2d3436;
         font-weight: 700;
-        font-size: 15px;
-        margin-bottom: 4px;
+        font-size: 16px;
+        margin-bottom: 5px;
     }
     .sk-add-subtitle {
         color: #a4b0be;
@@ -152,7 +178,7 @@
         <!-- Breadcrumb -->
         <div class="sk-breadcrumb-bar">
             <div class="sk-breadcrumb-title"><i class="fas fa-book-open" style="margin-right:8px;"></i> Subjects</div>
-            <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right" style="font-size:10px;margin-right:10px;"></i> Classes With Subjects</div>
+            <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right" style="font-size:10px;margin-right:10px;color:#b2bec3;"></i> Classes With Subjects</div>
         </div>
 
         <!-- Messages -->
@@ -172,31 +198,27 @@
             <div class="sk-subject-card">
                 <div class="sk-subject-card-header">
                     <div class="sk-subject-card-name">{{ group.course.name }}</div>
-                    <a href="{% url 'edit_course' group.course.id %}" class="sk-subject-card-edit" title="Edit Class">
-                        <i class="fas fa-pen"></i>
-                    </a>
                 </div>
-                <div class="sk-subject-stats">
-                    <div>
-                        <div class="sk-subject-stat-num">{{ group.count }}</div>
-                        <div class="sk-subject-stat-label">Subjects</div>
-                    </div>
-                    <div>
-                        <div class="sk-subject-stat-num">{{ group.total_marks }}</div>
-                        <div class="sk-subject-stat-label">Total Marks</div>
+                
+                <div class="sk-subjects-count">
+                    <div class="sk-subjects-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="sk-subjects-text">
+                        <div class="sk-subjects-number">{{ group.count }}</div>
+                        <div class="sk-subjects-label">SUBJECTS</div>
                     </div>
                 </div>
-                <div class="sk-subject-circles">
+
+                <a href="{% url 'edit_subject' group.course.id %}" class="sk-update-btn">Update Subjects</a>
+                
+                <ul class="sk-subject-list">
                     {% for subject in group.subjects %}
-                    <div class="sk-subject-circle-wrap">
-                        <div class="sk-subject-circle">100</div>
-                        <div class="sk-subject-circle-label">{{ subject.name }}</div>
-                    </div>
+                    <li class="sk-subject-item"><i class="fas fa-circle"></i> {{ subject.name }} ({{ subject.marks }} Marks)</li>
                     {% endfor %}
-                </div>
+                </ul>
             </div>
             {% endfor %}
 
+            <!-- Add Card -->
             <a href="{% url 'add_subject' %}" class="sk-add-card">
                 <div class="sk-add-icon"><i class="fas fa-plus"></i></div>
                 <div class="sk-add-title">Assign Subjects</div>

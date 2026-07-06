@@ -135,7 +135,7 @@ urlpatterns = [
          hod_views.edit_parent, name='edit_parent'),
     path("course/edit/<int:course_id>",
          hod_views.edit_course, name='edit_course'),
-    path("subject/edit/<int:subject_id>",
+    path("subject/edit/<int:course_id>",
          hod_views.edit_subject, name='edit_subject'),
 
     # Student Extra Pages

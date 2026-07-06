@@ -79,6 +79,8 @@ class Backoffice(models.Model):
 
 class Course(models.Model):
     name = models.CharField(max_length=120)
+    monthly_fees = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    class_teacher = models.ForeignKey('Staff', on_delete=models.SET_NULL, null=True, blank=True, related_name='class_teacher_of')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -176,6 +178,7 @@ class Staff(models.Model):
 
 class Subject(models.Model):
     name = models.CharField(max_length=120)
+    marks = models.IntegerField(default=100)
     staff = models.ForeignKey(Staff,on_delete=models.CASCADE,)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)

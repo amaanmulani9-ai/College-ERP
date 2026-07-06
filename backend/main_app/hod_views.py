@@ -423,9 +423,13 @@ def add_course(request):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
+            monthly_fees = form.cleaned_data.get('monthly_fees')
+            class_teacher = form.cleaned_data.get('class_teacher')
             try:
                 course = Course()
                 course.name = name
+                course.monthly_fees = monthly_fees
+                course.class_teacher = class_teacher
                 course.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_course'))
@@ -439,30 +443,34 @@ def add_course(request):
 @login_required(login_url='/')
 @admin_required
 def add_subject(request):
-    form = SubjectForm(request.POST or None)
+    courses = Course.objects.all()
+    teachers = Staff.objects.select_related('admin').all()
     context = {
-        'form': form,
+        'courses': courses,
+        'teachers': teachers,
         'page_title': 'Add Subject'
     }
     if request.method == 'POST':
-        if form.is_valid():
-            name = form.cleaned_data.get('name')
-            course = form.cleaned_data.get('course')
-            staff = form.cleaned_data.get('staff')
-            try:
-                subject = Subject()
-                subject.name = name
-                subject.staff = staff
-                subject.course = course
-                subject.save()
-                messages.success(request, "Successfully Added")
-                return redirect(reverse('add_subject'))
-
-            except Exception as e:
-                messages.error(request, "Could Not Add " + str(e))
-        else:
-            messages.error(request, "Fill Form Properly")
-
+        course_id = request.POST.get('course')
+        subject_names = request.POST.getlist('subject_name[]')
+        marks_list = request.POST.getlist('marks[]')
+        staff_ids = request.POST.getlist('staff[]')
+        
+        try:
+            course = Course.objects.get(id=course_id)
+            for i in range(len(subject_names)):
+                name = subject_names[i]
+                marks = int(marks_list[i]) if i < len(marks_list) and marks_list[i].isdigit() else 100
+                staff_id = staff_ids[i] if i < len(staff_ids) else None
+                if name and staff_id:
+                    staff = Staff.objects.get(id=staff_id)
+                    Subject.objects.create(name=name, marks=marks, staff=staff, course=course)
+            
+            messages.success(request, "Successfully Added Subjects")
+            return redirect(reverse('manage_subject'))
+        except Exception as e:
+            messages.error(request, f"Could Not Add: {str(e)}")
+            
     return render(request, 'hod_template/add_subject_template.html', context)
 
 
@@ -500,6 +508,14 @@ def manage_course(request):
         girls=Count('student', filter=Q(student__admin__gender='F')),
         na=Count('student', filter=~Q(student__admin__gender__in=['M', 'F']))
     )
+    for course in courses:
+        total = course.total_students
+        if total > 0:
+            course.boys_pct = int(round((course.boys / total) * 100))
+            course.girls_pct = int(round((course.girls / total) * 100))
+            course.na_pct = int(round((course.na / total) * 100))
+        else:
+            course.boys_pct = course.girls_pct = course.na_pct = 0
     context = {
         'courses': courses,
         'page_title': 'Manage Courses'
@@ -523,9 +539,9 @@ def manage_subject(request):
             }
         courses_dict[course.id]['subjects'].append(subject)
         courses_dict[course.id]['count'] += 1
-    # Calculate total marks (count * 100)
+    # Calculate total marks
     for data in courses_dict.values():
-        data['total_marks'] = data['count'] * 100
+        data['total_marks'] = sum(s.marks for s in data['subjects'])
     course_groups = list(courses_dict.values())
     context = {
         'subjects': subjects,
@@ -692,14 +708,19 @@ def edit_course(request, course_id):
     context = {
         'form': form,
         'course_id': course_id,
-        'page_title': 'Edit Course'
+        'page_title': 'Edit Course',
+        'teachers': Staff.objects.select_related('admin').all()
     }
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
+            monthly_fees = form.cleaned_data.get('monthly_fees')
+            class_teacher = form.cleaned_data.get('class_teacher')
             try:
                 course = Course.objects.get(id=course_id)
                 course.name = name
+                course.monthly_fees = monthly_fees
+                course.class_teacher = class_teacher
                 course.save()
                 messages.success(request, "Successfully Updated")
             except Exception as e:
@@ -712,31 +733,51 @@ def edit_course(request, course_id):
 
 @login_required(login_url='/')
 @admin_required
-def edit_subject(request, subject_id):
-    instance = get_object_or_404(Subject, id=subject_id)
-    form = SubjectForm(request.POST or None, instance=instance)
+def edit_subject(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    subjects = Subject.objects.filter(course=course)
+    teachers = Staff.objects.select_related('admin').all()
     context = {
-        'form': form,
-        'subject_id': subject_id,
-        'page_title': 'Edit Subject'
+        'course': course,
+        'subjects': subjects,
+        'teachers': teachers,
+        'page_title': f'Update Subjects - {course.name}'
     }
     if request.method == 'POST':
-        if form.is_valid():
-            name = form.cleaned_data.get('name')
-            course = form.cleaned_data.get('course')
-            staff = form.cleaned_data.get('staff')
-            try:
-                subject = Subject.objects.get(id=subject_id)
-                subject.name = name
-                subject.staff = staff
-                subject.course = course
-                subject.save()
-                messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_subject', args=[subject_id]))
-            except Exception as e:
-                messages.error(request, "Could Not Add " + str(e))
-        else:
-            messages.error(request, "Fill Form Properly")
+        subject_names = request.POST.getlist('subject_name[]')
+        marks_list = request.POST.getlist('marks[]')
+        staff_ids = request.POST.getlist('staff[]')
+        subject_ids = request.POST.getlist('subject_id[]')
+        
+        try:
+            # We can delete existing subjects that are no longer present
+            existing_ids = [int(id) for id in subject_ids if id]
+            Subject.objects.filter(course=course).exclude(id__in=existing_ids).delete()
+            
+            for i in range(len(subject_names)):
+                name = subject_names[i]
+                marks = int(marks_list[i]) if i < len(marks_list) and marks_list[i].isdigit() else 100
+                staff_id = staff_ids[i] if i < len(staff_ids) else None
+                s_id = subject_ids[i] if i < len(subject_ids) else None
+                
+                if name and staff_id:
+                    staff = Staff.objects.get(id=staff_id)
+                    if s_id:
+                        # Update existing
+                        subject = Subject.objects.get(id=s_id)
+                        subject.name = name
+                        subject.marks = marks
+                        subject.staff = staff
+                        subject.save()
+                    else:
+                        # Create new
+                        Subject.objects.create(name=name, marks=marks, staff=staff, course=course)
+                        
+            messages.success(request, "Successfully Updated Subjects")
+            return redirect(reverse('manage_subject'))
+        except Exception as e:
+            messages.error(request, f"Could Not Update: {str(e)}")
+
     return render(request, 'hod_template/edit_subject_template.html', context)
 
 

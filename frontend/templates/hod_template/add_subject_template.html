@@ -1,25 +1,224 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    .sk-breadcrumb-bar {
+        background: #fff;
+        padding: 15px 25px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .sk-breadcrumb-title {
+        color: #4a235a;
+        font-weight: 600;
+        font-size: 14px;
+        margin-right: 15px;
+    }
+    .sk-breadcrumb-path {
+        color: #b2bec3;
+        font-size: 13px;
+    }
+    .sk-form-container {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+        padding: 30px;
+    }
+    .sk-form-title {
+        color: #2d3436;
+        font-weight: 700;
+        font-size: 20px;
+        margin-bottom: 25px;
+    }
+    .sk-form-group {
+        margin-bottom: 20px;
+    }
+    .sk-form-label {
+        display: block;
+        color: #636e72;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    .sk-form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #dfe6e9;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #2d3436;
+        transition: 0.3s;
+        background: #fdfdfd;
+    }
+    .sk-form-control:focus {
+        border-color: #6c5ce7;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+    }
+    .sk-subject-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        align-items: flex-end;
+    }
+    .sk-subject-row > div {
+        flex: 1;
+    }
+    .sk-btn-primary {
+        background: #6c5ce7;
+        color: #fff;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.3s;
+        width: 100%;
+    }
+    .sk-btn-primary:hover {
+        background: #5530c5;
+    }
+    .sk-btn-action {
+        padding: 10px 15px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: 0.3s;
+    }
+    .sk-btn-add {
+        background: #e8e0ff;
+        color: #6c5ce7;
+    }
+    .sk-btn-add:hover {
+        background: #d4c4fb;
+    }
+    .sk-btn-remove {
+        background: #ffeaa7;
+        color: #d63031;
+    }
+    .sk-btn-remove:hover {
+        background: #fcdc75;
+    }
+    .sk-actions-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock custom_css %}
 
 {% block content %}
-
 <section class="content">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <!-- general form elements -->
-                <div class="card card-dark">
-                    <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
-                    </div>
+        <!-- Breadcrumb -->
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-title"><i class="fas fa-book-open" style="margin-right:8px;"></i> Subjects</div>
+            <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right" style="font-size:10px;margin-right:10px;color:#b2bec3;"></i> Assign Subjects</div>
+        </div>
 
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text="Add Subject"%}
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <!-- /.card -->
+            {% endfor %}
+        {% endif %}
 
-            </div>
+        <div class="sk-form-container">
+            <h2 class="sk-form-title">Assign Subjects to Class</h2>
+            <form method="POST" action="{% url 'add_subject' %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="sk-form-group">
+                            <label class="sk-form-label">Select Class</label>
+                            <select class="sk-form-control" name="course" required>
+                                <option value="">-- Select Class --</option>
+                                {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="subjects-container">
+                    <div class="sk-subject-row">
+                        <div>
+                            <label class="sk-form-label">Subject Name</label>
+                            <input type="text" class="sk-form-control" name="subject_name[]" placeholder="Enter Subject Name" required>
+                        </div>
+                        <div>
+                            <label class="sk-form-label">Marks</label>
+                            <input type="number" class="sk-form-control" name="marks[]" placeholder="e.g 100" required>
+                        </div>
+                        <div>
+                            <label class="sk-form-label">Select Teacher</label>
+                            <select class="sk-form-control" name="staff[]" required>
+                                <option value="">-- Select Teacher --</option>
+                                {% for teacher in teachers %}
+                                <option value="{{ teacher.id }}">{{ teacher.admin.first_name }} {{ teacher.admin.last_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sk-actions-row">
+                    <button type="button" class="sk-btn-action sk-btn-add" id="add-row-btn">+ Add Subject</button>
+                    <button type="button" class="sk-btn-action sk-btn-remove" id="remove-row-btn" style="display:none;">- Remove Last</button>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <button type="submit" class="sk-btn-primary">Assign Subjects</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </section>
 {% endblock content %}
+
+{% block custom_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const addBtn = document.getElementById('add-row-btn');
+        const removeBtn = document.getElementById('remove-row-btn');
+        const container = document.getElementById('subjects-container');
+        const template = container.firstElementChild.cloneNode(true);
+        
+        // Clear inputs in template
+        const inputs = template.querySelectorAll('input');
+        inputs.forEach(input => input.value = '');
+        const selects = template.querySelectorAll('select');
+        selects.forEach(select => select.value = '');
+
+        addBtn.addEventListener('click', function() {
+            container.appendChild(template.cloneNode(true));
+            removeBtn.style.display = 'inline-block';
+        });
+
+        removeBtn.addEventListener('click', function() {
+            if (container.children.length > 1) {
+                container.removeChild(container.lastElementChild);
+            }
+            if (container.children.length === 1) {
+                removeBtn.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock custom_js %}
