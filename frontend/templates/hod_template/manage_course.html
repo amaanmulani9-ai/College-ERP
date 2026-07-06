@@ -64,7 +64,6 @@
         color: #a4b0be;
         font-size: 12px;
     }
-    
     .sk-class-card {
         width: 300px;
         background: #fff;
@@ -77,6 +76,33 @@
         display: flex;
         flex-wrap: wrap;
         gap: 25px;
+    }
+    /* Gender circles */
+    .circle-progress-wrap {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+    .circle-progress {
+        text-align: center;
+    }
+    .circle-box {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: 5px solid #f1f2f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        color: #6c5ce7;
+        margin: 0 auto 8px;
+    }
+    .circle-label {
+        font-size: 11px;
+        color: #747d8c;
     }
 </style>
 {% endblock custom_css %}
@@ -111,12 +137,32 @@
             
             {% for course in courses %}
             <div class="sk-class-card">
-                <div style="font-weight: bold; color: #4a235a; font-size: 18px; margin-bottom: 10px;">{{ course.name }}</div>
-                <div style="color: #636e72; font-size: 13px; margin-bottom: 20px;">Created on: {{ course.created_at|date:"M d, Y" }}</div>
-                
+                <!-- Gender distribution circles -->
+                <div class="circle-progress-wrap">
+                    <div class="circle-progress">
+                        <div class="circle-box" style="border-top-color:#6c5ce7; color:#6c5ce7;">
+                            {% if course.total_students %}{% widthratio course.boys course.total_students 100 %}{% else %}0{% endif %}%
+                        </div>
+                        <div class="circle-label">Boys</div>
+                    </div>
+                    <div class="circle-progress">
+                        <div class="circle-box" style="border-top-color:#ff7675; color:#ff7675;">
+                            {% if course.total_students %}{% widthratio course.girls course.total_students 100 %}{% else %}0{% endif %}%
+                        </div>
+                        <div class="circle-label">Girls</div>
+                    </div>
+                    <div class="circle-progress">
+                        <div class="circle-box" style="border-top-color:#a29bfe; color:#a29bfe;">
+                            {% if course.total_students %}{% widthratio course.na course.total_students 100 %}{% else %}0{% endif %}%
+                        </div>
+                        <div class="circle-label">N/A</div>
+                    </div>
+                </div>
+                <div style="font-weight: bold; color: #4a235a; font-size: 18px; margin-top: 10px; margin-bottom: 5px;">{{ course.name }}</div>
+                <div style="color: #636e72; font-size: 13px; margin-bottom: 10px;">Created on: {{ course.created_at|date:"M d, Y" }}</div>
                 <div style="display: flex; gap: 10px; border-top: 1px solid #f1f2f6; padding-top: 15px;">
-                    <a href="{% url 'edit_course' course.id %}" class="btn btn-sm btn-info" style="flex: 1;"><i class="fas fa-edit"></i> Edit</a>
-                    <a href="{% url 'delete_course' course.id %}" class="btn btn-sm btn-danger" style="flex: 1;"><i class="fas fa-trash"></i> Delete</a>
+                    <a href="{% url 'edit_course' course.id %}" class="btn btn-sm btn-info" style="flex: 1;"> <i class="fas fa-edit"></i> Edit</a>
+                    <a href="{% url 'delete_course' course.id %}" class="btn btn-sm btn-danger" style="flex: 1;"> <i class="fas fa-trash"></i> Delete</a>
                 </div>
             </div>
             {% endfor %}

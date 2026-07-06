@@ -472,7 +472,13 @@ def manage_student(request):
 @login_required(login_url='/')
 @admin_required
 def manage_course(request):
-    courses = Course.objects.all()
+    # Annotate each course with total students and gender distribution
+    courses = Course.objects.all().annotate(
+        total_students=Count('student'),
+        boys=Count('student', filter=Q(student__admin__gender='M')),
+        girls=Count('student', filter=Q(student__admin__gender='F')),
+        na=Count('student', filter=~Q(student__admin__gender__in=['M', 'F']))
+    )
     context = {
         'courses': courses,
         'page_title': 'Manage Courses'
@@ -483,9 +489,26 @@ def manage_course(request):
 @login_required(login_url='/')
 @admin_required
 def manage_subject(request):
-    subjects = Subject.objects.all()
+    subjects = Subject.objects.select_related('course', 'staff').all()
+    # Group subjects by course for card layout
+    courses_dict = {}
+    for subject in subjects:
+        course = subject.course
+        if course.id not in courses_dict:
+            courses_dict[course.id] = {
+                'course': course,
+                'subjects': [],
+                'count': 0,
+            }
+        courses_dict[course.id]['subjects'].append(subject)
+        courses_dict[course.id]['count'] += 1
+    # Calculate total marks (count * 100)
+    for data in courses_dict.values():
+        data['total_marks'] = data['count'] * 100
+    course_groups = list(courses_dict.values())
     context = {
         'subjects': subjects,
+        'course_groups': course_groups,
         'page_title': 'Manage Subjects'
     }
     return render(request, "hod_template/manage_subject.html", context)
