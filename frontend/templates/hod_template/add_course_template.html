@@ -169,7 +169,9 @@
                         <label class="sk-form-label">Select Class Teacher</label>
                         <select class="sk-form-control" name="class_teacher">
                             <option value="">-- Select Teacher --</option>
-                            <!-- We would loop teachers here -->
+                            {% for teacher in teachers %}
+                                <option value="{{ teacher.id }}">{{ teacher.admin.first_name }} {{ teacher.admin.last_name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>

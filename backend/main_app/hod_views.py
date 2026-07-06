@@ -417,7 +417,8 @@ def add_course(request):
     context = {
         'form': form,
         'page_title': 'Add Course',
-        'teacher_count': Staff.objects.count()
+        'teacher_count': Staff.objects.count(),
+        'teachers': Staff.objects.select_related('admin').all()
     }
     if request.method == 'POST':
         if form.is_valid():
