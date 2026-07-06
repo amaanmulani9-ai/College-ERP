@@ -629,6 +629,19 @@ def edit_student(request, student_id):
 
 @login_required(login_url='/')
 @admin_required
+def admin_view_student_report(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+    subjects = Subject.objects.filter(course=student.course)
+    context = {
+        'student': student,
+        'subjects': subjects,
+        'page_title': 'Student Report'
+    }
+    return render(request, "hod_template/student_report_template.html", context)
+
+
+@login_required(login_url='/')
+@admin_required
 def edit_course(request, course_id):
     instance = get_object_or_404(Course, id=course_id)
     form = CourseForm(request.POST or None, instance=instance)

@@ -286,6 +286,10 @@ body, .erpnext-main { font-family: 'Poppins', sans-serif; }
 
         <!-- Actions -->
         <div class="sk-stu-actions">
+            <a href="{% url 'admin_view_student_report' student.student.id %}"
+               class="sk-action-btn sk-btn-id" title="View Profile" style="background: rgba(103,61,229,.10); color: #673de5;">
+                <i class="fas fa-eye"></i>
+            </a>
             <a href="{% url 'edit_student' student.student.id %}"
                class="sk-action-btn sk-btn-edit" title="Edit Student">
                 <i class="fas fa-pen"></i>

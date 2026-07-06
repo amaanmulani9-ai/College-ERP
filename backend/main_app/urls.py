@@ -124,6 +124,8 @@ urlpatterns = [
          hod_views.delete_parent, name='delete_parent'),
     path("student/edit/<int:student_id>",
          hod_views.edit_student, name='edit_student'),
+    path("student/report/<int:student_id>/",
+         hod_views.admin_view_student_report, name='admin_view_student_report'),
     path("parent/edit/<int:parent_id>",
          hod_views.edit_parent, name='edit_parent'),
     path("course/edit/<int:course_id>",
