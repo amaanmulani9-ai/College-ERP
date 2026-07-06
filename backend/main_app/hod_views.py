@@ -326,28 +326,67 @@ def add_student(request):
             password = student_form.cleaned_data.get('password')
             course = student_form.cleaned_data.get('course')
             session = student_form.cleaned_data.get('session')
-            passport = request.FILES['profile_pic']
-            fs = FileSystemStorage()
-            filename = fs.save(passport.name, passport)
-            passport_url = fs.url(filename)
+            passport = request.FILES.get('profile_pic')
             try:
                 user = CustomUser.objects.create_user(
                     email=email, password=password, user_type=3, first_name=first_name, last_name=last_name)
                 user.gender = gender
                 user.address = address
-                user.student.session = session
-                user.student.course = course
                 if passport:
                     fs = FileSystemStorage()
                     filename = fs.save(passport.name, passport)
                     user.profile_pic = fs.url(filename)
                 user.save()
+
+                # Map new fields to Student profile
+                student = user.student
+                student.session = session
+                student.course = course
+                
+                # eSkooly student admission fields
+                student.registration_no = student_form.cleaned_data.get('registration_no')
+                student.discount_in_fee = student_form.cleaned_data.get('discount_in_fee') or 0
+                student.mobile = student_form.cleaned_data.get('mobile')
+                student.dob = student_form.cleaned_data.get('dob')
+                student.cnic = student_form.cleaned_data.get('cnic')
+                student.orphan = student_form.cleaned_data.get('orphan') or 'No'
+                student.cast = student_form.cleaned_data.get('cast')
+                student.osc = student_form.cleaned_data.get('osc') or 'No'
+                student.identification_mark = student_form.cleaned_data.get('identification_mark')
+                student.previous_school = student_form.cleaned_data.get('previous_school')
+                student.religion = student_form.cleaned_data.get('religion')
+                student.blood_group = student_form.cleaned_data.get('blood_group')
+                student.previous_roll_no = student_form.cleaned_data.get('previous_roll_no')
+                student.disease = student_form.cleaned_data.get('disease')
+                student.additional_note = student_form.cleaned_data.get('additional_note')
+                student.siblings = student_form.cleaned_data.get('siblings') or 0
+                
+                # Father/Guardian Details
+                student.father_name = student_form.cleaned_data.get('father_name')
+                student.father_nic = student_form.cleaned_data.get('father_nic')
+                student.father_occupation = student_form.cleaned_data.get('father_occupation')
+                student.father_education = student_form.cleaned_data.get('father_education')
+                student.father_mobile = student_form.cleaned_data.get('father_mobile')
+                student.father_profession = student_form.cleaned_data.get('father_profession')
+                student.father_income = student_form.cleaned_data.get('father_income')
+                
+                # Mother Details
+                student.mother_name = student_form.cleaned_data.get('mother_name')
+                student.mother_nic = student_form.cleaned_data.get('mother_nic')
+                student.mother_occupation = student_form.cleaned_data.get('mother_occupation')
+                student.mother_education = student_form.cleaned_data.get('mother_education')
+                student.mother_mobile = student_form.cleaned_data.get('mother_mobile')
+                student.mother_profession = student_form.cleaned_data.get('mother_profession')
+                student.mother_income = student_form.cleaned_data.get('mother_income')
+                
+                student.save()
+
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_student'))
             except Exception as e:
                 messages.error(request, "Could Not Add: " + str(e))
         else:
-            messages.error(request, "Could Not Add: ")
+            messages.error(request, "Could Not Add: Form is invalid")
     return render(request, 'hod_template/add_student_template.html', context)
 
 
@@ -516,7 +555,6 @@ def edit_student(request, student_id):
             first_name = form.cleaned_data.get('first_name')
             last_name = form.cleaned_data.get('last_name')
             address = form.cleaned_data.get('address')
-            username = form.cleaned_data.get('username')
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password') or None
@@ -530,17 +568,54 @@ def edit_student(request, student_id):
                     filename = fs.save(passport.name, passport)
                     passport_url = fs.url(filename)
                     user.profile_pic = passport_url
-                user.username = username
                 user.email = email
                 if password != None:
                     user.set_password(password)
                 user.first_name = first_name
                 user.last_name = last_name
-                student.session = session
                 user.gender = gender
                 user.address = address
-                student.course = course
                 user.save()
+
+                student.session = session
+                student.course = course
+                
+                # eSkooly student admission fields
+                student.registration_no = form.cleaned_data.get('registration_no')
+                student.discount_in_fee = form.cleaned_data.get('discount_in_fee') or 0
+                student.mobile = form.cleaned_data.get('mobile')
+                student.dob = form.cleaned_data.get('dob')
+                student.cnic = form.cleaned_data.get('cnic')
+                student.orphan = form.cleaned_data.get('orphan') or 'No'
+                student.cast = form.cleaned_data.get('cast')
+                student.osc = form.cleaned_data.get('osc') or 'No'
+                student.identification_mark = form.cleaned_data.get('identification_mark')
+                student.previous_school = form.cleaned_data.get('previous_school')
+                student.religion = form.cleaned_data.get('religion')
+                student.blood_group = form.cleaned_data.get('blood_group')
+                student.previous_roll_no = form.cleaned_data.get('previous_roll_no')
+                student.disease = form.cleaned_data.get('disease')
+                student.additional_note = form.cleaned_data.get('additional_note')
+                student.siblings = form.cleaned_data.get('siblings') or 0
+                
+                # Father/Guardian Details
+                student.father_name = form.cleaned_data.get('father_name')
+                student.father_nic = form.cleaned_data.get('father_nic')
+                student.father_occupation = form.cleaned_data.get('father_occupation')
+                student.father_education = form.cleaned_data.get('father_education')
+                student.father_mobile = form.cleaned_data.get('father_mobile')
+                student.father_profession = form.cleaned_data.get('father_profession')
+                student.father_income = form.cleaned_data.get('father_income')
+                
+                # Mother Details
+                student.mother_name = form.cleaned_data.get('mother_name')
+                student.mother_nic = form.cleaned_data.get('mother_nic')
+                student.mother_occupation = form.cleaned_data.get('mother_occupation')
+                student.mother_education = form.cleaned_data.get('mother_education')
+                student.mother_mobile = form.cleaned_data.get('mother_mobile')
+                student.mother_profession = form.cleaned_data.get('mother_profession')
+                student.mother_income = form.cleaned_data.get('mother_income')
+
                 student.save()
                 messages.success(request, "Successfully Updated")
                 return redirect(reverse('edit_student', args=[student_id]))

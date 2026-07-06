@@ -103,6 +103,42 @@ class Student(models.Model):
     current_semester = models.IntegerField(default=1)
     id_card_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
 
+    # eSkooly student admission fields
+    registration_no = models.CharField(max_length=50, blank=True, null=True)
+    discount_in_fee = models.IntegerField(default=0, blank=True, null=True)
+    mobile = models.CharField(max_length=20, blank=True, null=True)
+    dob = models.DateField(blank=True, null=True)
+    cnic = models.CharField(max_length=50, blank=True, null=True)
+    orphan = models.CharField(max_length=10, choices=[('Yes', 'Yes'), ('No', 'No')], default='No', blank=True, null=True)
+    cast = models.CharField(max_length=50, blank=True, null=True)
+    osc = models.CharField(max_length=10, choices=[('Yes', 'Yes'), ('No', 'No')], default='No', blank=True, null=True)
+    identification_mark = models.CharField(max_length=150, blank=True, null=True)
+    previous_school = models.CharField(max_length=150, blank=True, null=True)
+    religion = models.CharField(max_length=50, blank=True, null=True)
+    blood_group = models.CharField(max_length=5, blank=True, null=True)
+    previous_roll_no = models.CharField(max_length=50, blank=True, null=True)
+    disease = models.CharField(max_length=150, blank=True, null=True)
+    additional_note = models.TextField(blank=True, null=True)
+    siblings = models.IntegerField(default=0, blank=True, null=True)
+    
+    # Father/Guardian Details
+    father_name = models.CharField(max_length=150, blank=True, null=True)
+    father_nic = models.CharField(max_length=50, blank=True, null=True)
+    father_occupation = models.CharField(max_length=100, blank=True, null=True)
+    father_education = models.CharField(max_length=100, blank=True, null=True)
+    father_mobile = models.CharField(max_length=20, blank=True, null=True)
+    father_profession = models.CharField(max_length=100, blank=True, null=True)
+    father_income = models.CharField(max_length=50, blank=True, null=True)
+    
+    # Mother Details
+    mother_name = models.CharField(max_length=150, blank=True, null=True)
+    mother_nic = models.CharField(max_length=50, blank=True, null=True)
+    mother_occupation = models.CharField(max_length=100, blank=True, null=True)
+    mother_education = models.CharField(max_length=100, blank=True, null=True)
+    mother_mobile = models.CharField(max_length=20, blank=True, null=True)
+    mother_profession = models.CharField(max_length=100, blank=True, null=True)
+    mother_income = models.CharField(max_length=50, blank=True, null=True)
+
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
 
