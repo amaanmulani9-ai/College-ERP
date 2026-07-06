@@ -315,6 +315,14 @@
                 <span class="nav-text">Profile</span>
             </a>
         </div>
+        
+        <div class="nav-item">
+            {% url 'staff_id_card' as staff_id_card_url %}
+            <a href="{{ staff_id_card_url }}" class="nav-link {% if staff_id_card_url == request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-id-card"></i>
+                <span class="nav-text">Digital ID Card</span>
+            </a>
+        </div>
 
         <h6 class="nav-section-title">Academic Management</h6>
         

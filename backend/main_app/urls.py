@@ -266,6 +266,7 @@ urlpatterns = [
 
     # --- Smart Campus (Version 3.5) ---
     path("student/id-card/", smart_views.student_id_card, name='student_id_card'),
+    path("staff/id-card/", smart_views.staff_id_card, name='staff_id_card'),
     path("student/id-card/qr/<int:student_id>/", smart_views.generate_student_qr, name='generate_student_qr'),
     path("staff/id-card/qr/<int:staff_id>/", smart_views.generate_staff_qr, name='generate_staff_qr'),
     

@@ -23,6 +23,19 @@ def student_id_card(request):
     return render(request, "student_template/student_id_card.html", context)
 
 @login_required
+def staff_id_card(request):
+    staff = get_object_or_404(Staff, admin=request.user)
+    if not staff.id_card_code:
+        staff.id_card_code = f"EMP-{staff.course.name[:3].upper() if staff.course else 'GEN'}-{staff.id:04d}"
+        staff.save()
+    context = {
+        'page_title': 'Digital ID Card',
+        'staff': staff,
+        'employee_id': f"EMP-{staff.id:04d}-{staff.admin.created_at.year}"
+    }
+    return render(request, "staff_template/staff_id_card.html", context)
+
+@login_required
 def generate_student_qr(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     # Generate QR containing details
