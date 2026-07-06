@@ -72,7 +72,8 @@ def admin_home(request):
     # --- Advanced Analytics Data ---
     # 1. Fee Collection
     total_fee_collected = FeeRecord.objects.aggregate(total=Sum('amount_paid'))['total'] or 0
-    total_fee_pending = FeeRecord.objects.aggregate(total=Sum('balance'))['total'] or 0
+    from django.db.models import F
+    total_fee_pending = FeeRecord.objects.aggregate(total=Sum(F('amount') - F('amount_paid')))['total'] or 0
     
     # 2. Pass/Fail Ratio
     results = StudentResult.objects.select_related('student__admin', 'subject').all()
