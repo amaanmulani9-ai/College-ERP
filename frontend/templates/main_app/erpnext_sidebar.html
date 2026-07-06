@@ -265,21 +265,34 @@
         </div>
 
         <!-- Accounts -->
-        <div class="nav-item has-submenu">
+        <div class="nav-item has-submenu {% if 'finance' in request.path %}open{% endif %}">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-calculator"></i>
                 <span class="nav-text">Accounts</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="{% url 'admin_finance_dashboard' %}" class="nav-link {% if 'finance' in request.path %}active{% endif %}">Income & Expense</a>
+                <a href="#" class="nav-link locked">Chart of Accounts <i class="far fa-lock lock-icon"></i></a>
+                <a href="#" class="nav-link locked">Ledger Book <i class="far fa-lock lock-icon"></i></a>
+            </div>
         </div>
 
         <!-- Fees -->
-        <div class="nav-item has-submenu">
+        <div class="nav-item has-submenu {% if 'fees' in request.path %}open{% endif %}">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-money-bill-wave"></i>
                 <span class="nav-text">Fees</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="{% url 'admin_add_fee' %}" class="nav-link {% if 'fees/add' in request.path %}active{% endif %}">Generate Fees Invoice</a>
+                <a href="{% url 'admin_manage_fees' %}" class="nav-link {% if 'fees' in request.path and 'add' not in request.path %}active{% endif %}">Collect Fees</a>
+                <a href="#" class="nav-link">Fees Paid Slip</a>
+                <a href="#" class="nav-link">Fees Defaulters</a>
+                <a href="#" class="nav-link locked">Fees Report <i class="far fa-lock lock-icon"></i></a>
+                <a href="#" class="nav-link locked">Delete Fees <i class="far fa-lock lock-icon"></i></a>
+            </div>
         </div>
 
         <!-- Salary -->
@@ -289,24 +302,45 @@
                 <span class="nav-text">Salary</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="#" class="nav-link">Pay Salary</a>
+                <a href="#" class="nav-link">Salary Paid Slip</a>
+                <a href="#" class="nav-link locked">Salary Sheet <i class="far fa-lock lock-icon"></i></a>
+                <a href="#" class="nav-link locked">Salary Report <i class="far fa-lock lock-icon"></i></a>
+            </div>
         </div>
 
         <!-- Attendance -->
-        <div class="nav-item has-submenu">
+        <div class="nav-item has-submenu {% if 'attendance' in request.path %}open{% endif %}">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-user-check"></i>
                 <span class="nav-text">Attendance</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="{% url 'admin_view_attendance' %}" class="nav-link {% if 'attendance/view' in request.path %}active{% endif %}">Students Attendance</a>
+                <a href="#" class="nav-link">Employees Attendance</a>
+                <a href="#" class="nav-link">Class wise Report</a>
+                <a href="#" class="nav-link">Students Attendance Report</a>
+                <a href="#" class="nav-link">Employees Attendance Report</a>
+            </div>
         </div>
 
         <!-- Timetable -->
-        <div class="nav-item has-submenu">
+        <div class="nav-item has-submenu {% if 'timetable' in request.path %}open{% endif %}">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-calendar-alt"></i>
                 <span class="nav-text">Timetable</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="#" class="nav-link locked">Weekdays <i class="far fa-lock lock-icon"></i></a>
+                <a href="#" class="nav-link locked">Time Periods <i class="far fa-lock lock-icon"></i></a>
+                <a href="#" class="nav-link locked">Class Rooms <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'admin_manage_timetable' %}" class="nav-link {% if 'timetable' in request.path %}active{% endif %}">Create Timetable</a>
+                <a href="#" class="nav-link locked">Generate For Class <i class="far fa-lock lock-icon"></i></a>
+                <a href="#" class="nav-link locked">Generate For Teacher <i class="far fa-lock lock-icon"></i></a>
+            </div>
         </div>
 
         <!-- Homework -->
@@ -316,6 +350,10 @@
                 <span class="nav-text">Homework</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="#" class="nav-link">Add Homework</a>
+                <a href="#" class="nav-link">Manage Homework</a>
+            </div>
         </div>
 
         <!-- Behaviour & Skills -->
@@ -325,6 +363,11 @@
                 <span class="nav-text">Behaviour & Skills</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="#" class="nav-link">Add Behaviour</a>
+                <a href="#" class="nav-link">Behaviour Report</a>
+                <a href="#" class="nav-link locked">Skills Assessment <i class="far fa-lock lock-icon"></i></a>
+            </div>
         </div>
 
         <!-- Online Store & POS -->
@@ -334,6 +377,11 @@
                 <span class="nav-text">Online Store & POS</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="#" class="nav-link">Manage Products</a>
+                <a href="#" class="nav-link">POS Terminal</a>
+                <a href="#" class="nav-link locked">Sales Report <i class="far fa-lock lock-icon"></i></a>
+            </div>
         </div>
 
         <!-- WhatsApp -->
@@ -360,6 +408,11 @@
                 <span class="nav-text">SMS Services</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="#" class="nav-link">Send SMS</a>
+                <a href="#" class="nav-link">SMS Templates</a>
+                <a href="#" class="nav-link locked">SMS Reports <i class="far fa-lock lock-icon"></i></a>
+            </div>
         </div>
 
         <!-- Live Class -->
@@ -377,6 +430,10 @@
                 <span class="nav-text">Question Paper</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="#" class="nav-link">Create Paper</a>
+                <a href="#" class="nav-link">Questions Bank</a>
+            </div>
         </div>
 
         <!-- Exams -->
@@ -386,6 +443,11 @@
                 <span class="nav-text">Exams</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="#" class="nav-link">Manage Exams</a>
+                <a href="#" class="nav-link">Exam Marks</a>
+                <a href="#" class="nav-link locked">Admit Cards <i class="far fa-lock lock-icon"></i></a>
+            </div>
         </div>
 
         <!-- Class Tests -->
@@ -395,6 +457,10 @@
                 <span class="nav-text">Class Tests</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="#" class="nav-link">Add Test</a>
+                <a href="#" class="nav-link">Test Marks</a>
+            </div>
         </div>
 
         <!-- Reports -->
@@ -404,6 +470,11 @@
                 <span class="nav-text">Reports</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="#" class="nav-link">Student Reports</a>
+                <a href="#" class="nav-link">Finance Reports</a>
+                <a href="#" class="nav-link locked">Attendance Summary <i class="far fa-lock lock-icon"></i></a>
+            </div>
         </div>
 
         <!-- Certificates -->
@@ -413,6 +484,10 @@
                 <span class="nav-text">Certificates</span>
                 <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="#" class="nav-link">Generate Certificate</a>
+                <a href="#" class="nav-link">Student Certificates</a>
+            </div>
         </div>
         
     {% elif user.user_type == '2' %}
