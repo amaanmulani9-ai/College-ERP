@@ -1975,7 +1975,7 @@ def admin_settings_account(request):
         
     return render(request, 'hod_template/settings_account.html', {'page_title': 'Account Settings', 'account': account})
 
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 
 @login_required(login_url='/')
 @admin_required
@@ -2346,3 +2346,309 @@ def promote_students(request):
         'search_query': search_filter
     }
     return render(request, 'hod_template/promote_students.html', context)
+
+@login_required(login_url='/')
+@admin_required
+def update_student_login(request):
+    if request.method == "POST":
+        student_id = request.POST.get('student_id')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        try:
+            student = Student.objects.get(id=student_id)
+            user = student.admin
+            user.email = username
+            if password:
+                user.set_password(password)
+            user.save()
+            return JsonResponse({'status': 'success', 'message': 'Credentials updated successfully'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+@login_required(login_url='/')
+@admin_required
+def send_student_login_sms(request):
+    if request.method == "POST":
+        student_id = request.POST.get('student_id')
+        try:
+            student = Student.objects.get(id=student_id)
+            # Dummy logic for sending SMS/Email
+            # In a real app, integrate Twilio or SMTP here
+            return JsonResponse({'status': 'success', 'message': f'Login credentials sent to {student.admin.email}'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+
+
+# --- ADMINISTRATION VIEWS ---
+
+@login_required(login_url='/')
+@admin_required
+def manage_queries(request):
+    from .models import AdmissionQuery
+    queries = AdmissionQuery.objects.all().order_by('-query_date')
+    if request.method == "POST":
+        name = request.POST.get('name')
+        phone = request.POST.get('phone')
+        email = request.POST.get('email')
+        source = request.POST.get('source')
+        AdmissionQuery.objects.create(name=name, phone=phone, email=email, source=source)
+        messages.success(request, "Query added successfully.")
+        return redirect(reverse('manage_queries'))
+    context = {'page_title': 'Admission Queries', 'queries': queries}
+    return render(request, 'hod_template/manage_queries.html', context)
+
+@login_required(login_url='/')
+@admin_required
+def manage_complaints(request):
+    from .models import Complaint
+    complaints = Complaint.objects.all().order_by('-date')
+    if request.method == "POST":
+        complaint_by = request.POST.get('complaint_by')
+        complainer_name = request.POST.get('complainer_name')
+        complaint_type = request.POST.get('complaint_type')
+        description = request.POST.get('description')
+        Complaint.objects.create(complaint_by=complaint_by, complainer_name=complainer_name, complaint_type=complaint_type, description=description)
+        messages.success(request, "Complaint added successfully.")
+        return redirect(reverse('manage_complaints'))
+    context = {'page_title': 'Complaints', 'complaints': complaints, 'complaint_by_choices': Complaint.COMPLAINT_BY_CHOICES}
+    return render(request, 'hod_template/manage_complaints.html', context)
+
+@login_required(login_url='/')
+@admin_required
+def manage_postal(request):
+    from .models import PostalReceive, PostalDispatch
+    receives = PostalReceive.objects.all().order_by('-date')
+    dispatches = PostalDispatch.objects.all().order_by('-date')
+    if request.method == "POST":
+        postal_type = request.POST.get('postal_type')
+        from_title = request.POST.get('from_title')
+        to_title = request.POST.get('to_title')
+        reference_no = request.POST.get('reference_no')
+        if postal_type == 'Receive':
+            PostalReceive.objects.create(from_title=from_title, to_title=to_title, reference_no=reference_no)
+            messages.success(request, "Postal Receive added successfully.")
+        else:
+            PostalDispatch.objects.create(from_title=from_title, to_title=to_title, reference_no=reference_no)
+            messages.success(request, "Postal Dispatch added successfully.")
+        return redirect(reverse('manage_postal'))
+    context = {'page_title': 'Postal Records', 'receives': receives, 'dispatches': dispatches}
+    return render(request, 'hod_template/manage_postal.html', context)
+
+@login_required(login_url='/')
+@admin_required
+def manage_call_logs(request):
+    from .models import PhoneCallLog
+    logs = PhoneCallLog.objects.all().order_by('-date')
+    if request.method == "POST":
+        name = request.POST.get('name')
+        phone = request.POST.get('phone')
+        call_type = request.POST.get('call_type')
+        PhoneCallLog.objects.create(name=name, phone=phone, call_type=call_type)
+        messages.success(request, "Call Log added successfully.")
+        return redirect(reverse('manage_call_logs'))
+    context = {'page_title': 'Phone Call Logs', 'logs': logs, 'call_type_choices': PhoneCallLog.CALL_TYPE_CHOICES}
+    return render(request, 'hod_template/manage_call_logs.html', context)
+
+
+# --- BEHAVIOUR VIEWS ---
+
+@login_required(login_url='/')
+@admin_required
+def manage_incidents(request):
+    from .models import Incident
+    incidents = Incident.objects.all()
+    if request.method == "POST":
+        title = request.POST.get('title')
+        point = request.POST.get('point')
+        is_negative = request.POST.get('is_negative') == 'on'
+        Incident.objects.create(title=title, point=point, is_negative=is_negative)
+        messages.success(request, "Incident added successfully.")
+        return redirect(reverse('manage_incidents'))
+    context = {'page_title': 'Incidents / Behaviours', 'incidents': incidents}
+    return render(request, 'hod_template/manage_incidents.html', context)
+
+@login_required(login_url='/')
+@admin_required
+def student_behaviour_records(request):
+    from .models import StudentBehaviourRecord, Incident, Student
+    records = StudentBehaviourRecord.objects.all().order_by('-date')
+    students = Student.objects.all()
+    incidents = Incident.objects.all()
+    if request.method == "POST":
+        student_id = request.POST.get('student')
+        incident_id = request.POST.get('incident')
+        comment = request.POST.get('comment')
+        StudentBehaviourRecord.objects.create(student_id=student_id, incident_id=incident_id, comment=comment)
+        messages.success(request, "Student Behaviour Record added successfully.")
+        return redirect(reverse('student_behaviour_records'))
+    context = {'page_title': 'Student Behaviour Records', 'records': records, 'students': students, 'incidents': incidents}
+    return render(request, 'hod_template/student_behaviour_records.html', context)
+
+
+# --- CERTIFICATE VIEWS ---
+
+@login_required(login_url='/')
+@admin_required
+def manage_certificate_templates(request):
+    from .models import CertificateTemplate
+    templates = CertificateTemplate.objects.all()
+    if request.method == "POST":
+        title = request.POST.get('title')
+        applicable_for = request.POST.get('applicable_for')
+        body_text = request.POST.get('body_text')
+        CertificateTemplate.objects.create(title=title, applicable_for=applicable_for, body_text=body_text)
+        messages.success(request, "Certificate Template added successfully.")
+        return redirect(reverse('manage_certificate_templates'))
+    
+    context = {'page_title': 'Certificate Templates', 'templates': templates}
+    return render(request, 'hod_template/manage_certificate_templates.html', context)
+
+@login_required(login_url='/')
+@admin_required
+def admin_account_settings(request):
+    return render(request, "hod_template/account_settings.html", {'page_title': 'Account Settings'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_institute_profile(request):
+    return render(request, "hod_template/institute_profile.html", {'page_title': 'Institute Profile'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_settings_fees_structure(request):
+    return render(request, "hod_template/fees_structure.html", {'page_title': 'Fees Structure'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_settings_discount_type(request):
+    return render(request, "hod_template/discount_type.html", {'page_title': 'Discount Type'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_settings_banks(request):
+    return render(request, "hod_template/bank_details.html", {'page_title': 'Fee Challan Details'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_student_report(request, student_id=None):
+    return render(request, "hod_template/student_report.html", {'page_title': 'Student Report'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_messaging(request):
+    return render(request, "hod_template/messaging.html", {'page_title': 'Messaging'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_homework(request):
+    return render(request, "hod_template/homework.html", {'page_title': 'Homework'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_live_class(request):
+    return render(request, "hod_template/live_class.html", {'page_title': 'Live Class'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_create_exam(request):
+    return render(request, "hod_template/create_exam.html", {'page_title': 'Create New Exam'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_update_exam_marks(request):
+    return render(request, "hod_template/update_exam_marks.html", {'page_title': 'Add/update Exam Marks'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_result_card(request):
+    return render(request, "hod_template/result_card.html", {'page_title': 'Result Card'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_test_marks(request):
+    return render(request, "hod_template/test_marks.html", {'page_title': 'Add/Update Test Marks'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_test_results(request):
+    return render(request, "hod_template/test_results.html", {'page_title': 'Test Results & Reports'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_students_info_report(request):
+    return render(request, "hod_template/students_info_report.html", {'page_title': 'Students info report'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_certificates(request):
+    return render(request, "hod_template/certificates.html", {'page_title': 'Certificates'})
+
+
+@login_required(login_url='/')
+@admin_required
+def admin_collect_fees(request):
+    return render(request, "hod_template/collect_fees.html", {'page_title': 'Collect Fees'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_fees_paid_slip(request):
+    return render(request, "hod_template/fees_paid_slip.html", {'page_title': 'Fees Paid Receipt'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_fees_defaulters(request):
+    return render(request, "hod_template/fees_defaulters.html", {'page_title': 'Fees Defaulters'})
+@login_required(login_url='/')
+@admin_required
+def admin_pay_salary(request):
+    return render(request, "hod_template/pay_salary.html", {'page_title': 'Pay Salary'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_salary_slip(request):
+    return render(request, "hod_template/salary_slip.html", {'page_title': 'Salary Slip'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_students_attendance(request):
+    return render(request, "hod_template/students_attendance.html", {'page_title': 'Mark or update Student Attendance'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_employees_attendance(request):
+    return render(request, "hod_template/employees_attendance.html", {'page_title': 'Mark or Update Employees Attendance'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_classwise_report(request):
+    return render(request, "hod_template/classwise_report.html", {'page_title': 'Classwise Report'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_students_attendance_report(request):
+    return render(request, "hod_template/students_attendance_report.html", {'page_title': 'Students Attendance Record'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_employees_attendance_report(request):
+    return render(request, "hod_template/employees_attendance_report.html", {'page_title': 'Employees Attendance Record'})
+
+@login_required(login_url='/')
+@admin_required
+def admin_staff_login_credentials(request):
+    """Staff Login Credentials interface (matches eSkooly UI)"""
+    staffs = Staff.objects.select_related('admin', 'course').all()
+    
+    # Mock roles for UI demonstration since the Staff model doesn't explicitly store role types like Principal/Teacher
+    roles = ['Teacher', 'Principal', 'Management Staff']
+    for idx, staff in enumerate(staffs):
+        staff.mock_role = roles[idx % len(roles)]
+        
+    context = {
+        'page_title': 'Staff Login Credentials',
+        'staffs': staffs
+    }
+    return render(request, 'hod_template/manage_staff_login.html', context)

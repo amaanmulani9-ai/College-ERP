@@ -176,3 +176,30 @@ def admin_finance_dashboard(request):
         'students': students
     }
     return render(request, 'hod_template/finance_dashboard.html', context)
+
+
+# --- Accounts UI Mock Views ---
+
+def chart_of_accounts(request):
+    """ View for the Chart of Accounts """
+    if not request.user.is_authenticated or request.user.user_type != '1':
+        return redirect('login_page')
+    return render(request, 'hod_template/chart_of_accounts.html', {})
+
+def add_income(request):
+    """ View for the Add Income form """
+    if not request.user.is_authenticated or request.user.user_type != '1':
+        return redirect('login_page')
+    return render(request, 'hod_template/add_income.html', {})
+
+def add_expense(request):
+    """ View for the Add Expense form """
+    if not request.user.is_authenticated or request.user.user_type != '1':
+        return redirect('login_page')
+    return render(request, 'hod_template/add_expense.html', {})
+
+def account_statement(request):
+    """ View for the Account Statement dashboard """
+    if not request.user.is_authenticated or request.user.user_type != '1':
+        return redirect('login_page')
+    return render(request, 'hod_template/account_statement.html', {})

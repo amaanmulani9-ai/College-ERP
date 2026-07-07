@@ -1,0 +1,75 @@
+{% extends 'hod_template/base_template.html' %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Add Admission Query</h3>
+                    </div>
+                    <form role="form" method="POST" action="{% url 'manage_queries' %}">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="text" class="form-control" name="phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" class="form-control" name="email">
+                            </div>
+                            <div class="form-group">
+                                <label>Source</label>
+                                <input type="text" class="form-control" name="source" placeholder="Website, Walk-in, Advert...">
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Add Query</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Admission Queries</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Source</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for q in queries %}
+                                <tr>
+                                    <td>{{ q.id }}</td>
+                                    <td>{{ q.name }}</td>
+                                    <td>{{ q.phone }}</td>
+                                    <td>{{ q.source }}</td>
+                                    <td>{{ q.status }}</td>
+                                    <td>{{ q.query_date }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="6" class="text-center">No queries found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}

@@ -6,7 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.decorators.csrf import csrf_exempt
 
-from .EmailBackend import EmailBackend
+
 from .models import Attendance, Session, Subject, NotificationStudent, NotificationStaff
 from django.contrib.auth.decorators import login_required
 from .analytics_helper import log_analytics_event
@@ -24,6 +24,8 @@ def login_page(request):
             return redirect(reverse("parent_home"))
         elif request.user.user_type == '7':
             return redirect(reverse("backoffice_home"))
+        elif request.user.user_type == '8':
+            return redirect(reverse("super_admin_dashboard"))
         else:
             return redirect(reverse("student_home"))
     return render(request, 'main_app/erpnext_login.html')
@@ -122,9 +124,15 @@ def doLogin(request, **kwargs):
         
         #Authenticate
         try:
-            user = EmailBackend.authenticate(request, username=request.POST.get('email'), password=request.POST.get('password'))
+            email = request.POST.get('email', '')
+            password = request.POST.get('password', '')
+            if email:
+                email = email.strip()
+            
+            user = authenticate(request, username=email, password=password)
+            
             if user is not None:
-                login(request, user, backend='main_app.EmailBackend.EmailBackend')
+                login(request, user)
                 
                 # Log login to MongoDB Analytics
                 log_analytics_event("user_login", {
@@ -153,6 +161,8 @@ def doLogin(request, **kwargs):
                     return redirect(reverse("student_home"))
                 elif user.user_type == '7':
                     return redirect(reverse("backoffice_home"))
+                elif user.user_type == '8':
+                    return redirect(reverse("super_admin_dashboard"))
                 else:
                     messages.error(request, "Invalid user type.")
                     return redirect(reverse('login'))

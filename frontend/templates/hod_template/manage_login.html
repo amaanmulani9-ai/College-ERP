@@ -1,208 +1,193 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{ page_title }}{% endblock page_title %}
+{% block page_title %}Manage Login Credentials{% endblock page_title %}
 
 {% block custom_css %}
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
-*, *::before, *::after { box-sizing: border-box; }
-body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; }
+/* eSkooly Login Credentials Styling */
+body { background-color: #f8f9fa; font-family: 'Poppins', sans-serif; }
 
-.sk-breadcrumb-bar {
-    background: #fff; padding: 15px 25px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+/* Filter Section */
+.sk-filter-wrapper {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 25px; flex-wrap: wrap; gap: 15px;
 }
-.sk-breadcrumb-left { display: flex; align-items: center; gap: 8px; }
-.sk-breadcrumb-title { color: #4a235a; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-.sk-breadcrumb-path { color: #b2bec3; font-size: 13px; }
-.sk-reload-btn {
-    color: #6c5ce7; font-size: 13px; font-weight: 600; text-decoration: none;
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 14px; border: 1px solid rgba(103,61,229,.2); border-radius: 8px;
-    transition: all 0.15s;
+.sk-filter-group { display: flex; flex-direction: column; gap: 8px; }
+.sk-filter-label { font-size: 11px; font-weight: 700; color: #a4b0be; text-transform: uppercase; letter-spacing: 0.5px; }
+.sk-input-field, .sk-select-field {
+    border: 1px solid #f1f2f6; border-radius: 8px; padding: 10px 15px; font-size: 13px; color: #2d3436;
+    outline: none; min-width: 250px; background: #fff; transition: 0.2s; font-family: 'Poppins', sans-serif;
 }
-.sk-reload-btn:hover { background: rgba(108,92,231,0.08); text-decoration: none; color: #6c5ce7; }
+.sk-input-field:focus, .sk-select-field:focus { border-color: #6c5ce7; box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1); }
+.sk-search-icon-wrapper { position: relative; }
+.sk-search-icon-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #b2bec3; font-size: 12px; }
+.sk-search-icon-wrapper input { padding-left: 35px; }
 
-/* Filter Row */
-.sk-filter-row {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+/* Top Actions */
+.sk-top-actions { display: flex; gap: 10px; }
+.sk-stat-pill {
+    background: #f8f7ff; color: #6c5ce7; border: 1px solid rgba(108,92,231,0.1);
+    padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px; text-decoration: none;
 }
-.sk-filter-left { display: flex; gap: 15px; }
-.sk-filter-group { display: flex; flex-direction: column; gap: 6px; }
-.sk-filter-label {
-    font-size: 10px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.5px; color: #999;
-}
-.sk-filter-select {
-    padding: 10px 36px 10px 14px;
-    border: 1.5px solid #e8e0ff; border-radius: 10px;
-    font-family: 'Poppins', sans-serif; font-size: 13px; color: #2d3436;
-    background: #fff; outline: none; min-width: 240px;
-    appearance: none; cursor: pointer;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    transition: border-color 0.2s;
-}
-.sk-filter-select:focus { border-color: #6c5ce7; }
+.sk-stat-pill.green { background: #e5f8f5; color: #00b894; border-color: rgba(0,184,148,0.1); }
 
-.sk-search-wrapper {
-    position: relative;
-    display: flex; align-items: center;
-}
-.sk-search-input {
-    padding: 10px 14px 10px 40px;
-    border: 1.5px solid #e8e0ff; border-radius: 10px;
-    font-family: 'Poppins', sans-serif; font-size: 13px;
-    width: 280px; outline: none; transition: border-color 0.2s;
-}
-.sk-search-input:focus { border-color: #6c5ce7; }
-.sk-search-icon {
-    position: absolute; left: 14px; color: #b2bec3; font-size: 13px;
-}
-
-/* Table Card */
+/* Main Card & Table */
 .sk-table-card {
     background: #fff; border-radius: 12px; padding: 25px;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.03); margin-bottom: 25px;
 }
-.sk-table-title {
-    font-size: 16px; font-weight: 700; color: #2d3436;
-    margin-bottom: 18px;
-    display: flex; align-items: center; gap: 8px;
-}
+.sk-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.sk-card-title { font-size: 15px; font-weight: 700; color: #4a235a; display: flex; align-items: center; gap: 8px; }
 
-/* Table styling */
+.sk-table-actions { display: flex; gap: 8px; margin-bottom: 15px; }
+.sk-action-pill {
+    background: #6c5ce7; color: #fff; border: none; padding: 6px 14px;
+    border-radius: 15px; font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.2s;
+}
+.sk-action-pill.dark { background: #2d3436; }
+.sk-action-pill:hover { opacity: 0.9; }
+
+.sk-search-box { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #636e72; }
+.sk-search-box input { border: 1px solid #f1f2f6; border-radius: 6px; padding: 6px 10px; outline: none; }
+
 table.sk-table { width: 100%; border-collapse: collapse; }
 table.sk-table thead th {
-    background: #f8f7ff; color: #4a235a;
-    font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.5px;
-    border-bottom: 2px solid #e8e0ff;
-    padding: 12px 10px; text-align: left;
+    background: #f8f9fa; color: #2d3436; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; padding: 12px 15px; text-align: left; border-bottom: 1px solid #f1f2f6;
 }
 table.sk-table tbody td {
-    font-size: 13px; color: #2d3436;
-    padding: 12px 10px; border-bottom: 1px solid #f1f2f6;
-    vertical-align: middle;
+    padding: 15px; border-bottom: 1px solid #f1f2f6; font-size: 13px; color: #2d3436; font-weight: 500; vertical-align: middle;
 }
-table.sk-table tbody tr:hover { background: rgba(108,92,231,0.03); }
+table.sk-table tbody tr:hover { background: #fdfcff; }
 
-/* Switch Toggle */
-.sk-switch {
-    position: relative; display: inline-block; width: 44px; height: 22px;
+.sk-copy-box {
+    display: inline-flex; align-items: center; justify-content: space-between;
+    border: 1px solid #6c5ce7; border-radius: 20px; padding: 6px 15px; min-width: 180px;
+    color: #4a235a; font-size: 12px; background: #fff; position: relative;
 }
-.sk-switch input { opacity: 0; width: 0; height: 0; }
-.sk-slider {
-    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ccc; transition: .4s; border-radius: 22px;
+.sk-copy-box i.icon-left {
+    position: absolute; left: -10px; top: -10px; background: #fff; color: #6c5ce7;
+    width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    border: 1px solid #6c5ce7; font-size: 10px;
 }
-.sk-slider:before {
-    position: absolute; content: ""; height: 16px; width: 16px;
-    left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;
-}
-input:checked + .sk-slider { background-color: #00b894; }
-input:checked + .sk-slider:before { transform: translateX(22px); }
+.sk-copy-box i.icon-right { color: #2d3436; cursor: pointer; font-size: 13px; }
+.sk-copy-box i.icon-eye { color: #2d3436; cursor: pointer; font-size: 13px; margin-right: 5px; }
+
+.sk-row-actions { display: flex; gap: 10px; justify-content: center; }
+.sk-row-actions i { color: #a4b0be; font-size: 16px; cursor: pointer; transition: 0.2s; }
+.sk-row-actions i:hover { color: #6c5ce7; }
 </style>
 {% endblock custom_css %}
 
 {% block content %}
-<section class="content">
+<section class="content" style="padding: 10px;">
     <div class="container-fluid">
-        <!-- Breadcrumb -->
-        <div class="sk-breadcrumb-bar">
-            <div class="sk-breadcrumb-left">
-                <div class="sk-breadcrumb-title"><i class="fas fa-user-graduate" style="color:#6c5ce7;"></i> Students</div>
-                <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right" style="font-size:10px;margin:0 10px;"></i> Student Login</div>
-            </div>
-            <a href="{% url 'manage_login' %}" class="sk-reload-btn"><i class="fas fa-sync-alt"></i> Reload</a>
-        </div>
-
-        <!-- Filter Row -->
-        <div class="sk-filter-row">
-            <div class="sk-filter-left">
+        <!-- Top Filter & Stats -->
+        <div class="sk-filter-wrapper">
+            <div style="display:flex; gap:20px;">
                 <div class="sk-filter-group">
-                    <div class="sk-filter-label">Filter By Class</div>
-                    <form id="classFilterForm" method="GET">
-                        {% if request.GET.search %}
-                        <input type="hidden" name="search" value="{{ request.GET.search }}">
-                        {% endif %}
-                        <select class="sk-filter-select" id="classFilter" name="course" onchange="document.getElementById('classFilterForm').submit()">
-                            <option value="">-- Select a class --</option>
-                            {% for course in courses %}
-                            <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"d" %}selected{% endif %}>{{ course.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </form>
+                    <span class="sk-filter-label">Search Employee</span>
+                    <div class="sk-search-icon-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="sk-input-field" placeholder="Type employee name...">
+                    </div>
+                </div>
+                <div class="sk-filter-group">
+                    <span class="sk-filter-label">Filter By Role</span>
+                    <select class="sk-select-field">
+                        <option>-- Select role --</option>
+                    </select>
                 </div>
             </div>
-            <div class="sk-search-wrapper">
-                <form method="GET" id="searchForm">
-                    {% if selected_course %}
-                    <input type="hidden" name="course" value="{{ selected_course }}">
-                    {% endif %}
-                    <i class="fas fa-search sk-search-icon"></i>
-                    <input type="text" class="sk-search-input" name="search" placeholder="Search by name..." value="{{ request.GET.search|default:'' }}">
-                </form>
+            
+            <div class="sk-top-actions">
+                <a href="#" class="sk-stat-pill"><i class="far fa-user"></i> {{ students|length }} Employees</a>
+                <a href="#" class="sk-stat-pill green"><i class="fas fa-users"></i> All Roles</a>
+                <a href="#" class="sk-stat-pill"><i class="fas fa-sync-alt"></i> Show All</a>
             </div>
         </div>
 
-        <!-- Table Card -->
+        <!-- Main Table Card -->
         <div class="sk-table-card">
-            <div class="sk-table-title"><i class="fas fa-list-alt" style="color:#6c5ce7;"></i> Manage Student Logins</div>
-            <table class="sk-table">
-                <thead>
-                    <tr>
-                        <th>Sr</th>
-                        <th>Registration No</th>
-                        <th>Student Name</th>
-                        <th>Class</th>
-                        <th>Username</th>
-                        <th>Password</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for student in students %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ student.registration_no|default:"—" }}</td>
-                        <td>{{ student.admin.first_name }} {{ student.admin.last_name }}</td>
-                        <td>{{ student.course.name|default:"—" }}</td>
-                        <td>{{ student.admin.email }}</td>
-                        <td>••••••••</td>
-                        <td>
-                            <label class="sk-switch">
-                                <input type="checkbox" checked onchange="toggleLock(this)">
-                                <span class="sk-slider"></span>
-                            </label>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" style="text-align:center; padding:30px; color:#b2bec3;">No students found</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="sk-card-header">
+                <div class="sk-card-title"><i class="fas fa-list-ul" style="color:#6c5ce7;"></i> Staff Login Credentials</div>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap;">
+                <div class="sk-table-actions">
+                    <button class="sk-action-pill">Copy</button>
+                    <button class="sk-action-pill">CSV</button>
+                    <button class="sk-action-pill">Excel</button>
+                    <button class="sk-action-pill">PDF</button>
+                    <button class="sk-action-pill">Print</button>
+                    <button class="sk-action-pill dark">Column visibility ▼</button>
+                </div>
+                <div class="sk-search-box">
+                    Search: <input type="text">
+                </div>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table class="sk-table">
+                    <thead>
+                        <tr>
+                            <th>ID ↑↓</th>
+                            <th>STAFF NAME ↑↓</th>
+                            <th>ROLE ↑↓</th>
+                            <th>USERNAME ↑↓</th>
+                            <th>PASSWORD ↑↓</th>
+                            <th style="text-align:center;">ACTIONS ↑↓</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ student.admin.id|stringformat:"06d" }}</td>
+                            <td>{{ student.admin.first_name }} {{ student.admin.last_name }}</td>
+                            <td>Student</td>
+                            <td>
+                                <div class="sk-copy-box">
+                                    <i class="far fa-user icon-left"></i>
+                                    <span>{{ student.admin.email }}</span>
+                                    <i class="far fa-copy icon-right" title="Copy"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="sk-copy-box">
+                                    <i class="fas fa-lock icon-left"></i>
+                                    <span>••••••••••••</span>
+                                    <div>
+                                        <i class="far fa-eye icon-eye" title="Show"></i>
+                                        <i class="far fa-copy icon-right" title="Copy"></i>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="sk-row-actions">
+                                    <i class="fas fa-save" title="Save"></i>
+                                    <i class="fas fa-envelope" title="Email"></i>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding:30px; color:#b2bec3;">No records found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; font-size:13px; color:#636e72;">
+                <div>Showing 1 to {{ students|length }} of {{ students|length }} entries</div>
+                <div style="display:flex; gap:5px;">
+                    <button style="border:1px solid #f1f2f6; background:#fff; padding:5px 12px; border-radius:4px; cursor:pointer;">Previous</button>
+                    <button style="border:none; background:#6c5ce7; color:#fff; padding:5px 12px; border-radius:4px; cursor:pointer;">1</button>
+                    <button style="border:1px solid #f1f2f6; background:#fff; padding:5px 12px; border-radius:4px; cursor:pointer;">Next</button>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 {% endblock content %}
-
-{% block custom_js %}
-<script>
-function toggleLock(checkbox) {
-    if (checkbox.checked) {
-        // Unlock action
-        console.log("Unlocked");
-    } else {
-        // Lock action
-        console.log("Locked");
-    }
-}
-</script>
-{% endblock custom_js %}

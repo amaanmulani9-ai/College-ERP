@@ -299,6 +299,7 @@ def create_user_profile(sender, instance, created, **kwargs):
             Backoffice.objects.create(admin=instance)
 
 
+
 @receiver(post_save, sender=CustomUser)
 def save_user_profile(sender, instance, **kwargs):
     if instance.user_type == 1 or instance.user_type == '1':
@@ -312,6 +313,7 @@ def save_user_profile(sender, instance, **kwargs):
             instance.backoffice.save()
         except Backoffice.DoesNotExist:
             Backoffice.objects.create(admin=instance)
+
         # Synchronize from CustomUser/Student to StudentRegistration
         try:
             reg, created = StudentRegistration.objects.get_or_create(student=instance.student)
@@ -1036,3 +1038,123 @@ class AccountSettings(models.Model):
 
     def __str__(self):
         return f"Account Settings - {self.admin.email}"
+
+
+# --- ADMINISTRATION MODULE MODELS ---
+
+class AdmissionQuery(models.Model):
+    STATUS_CHOICES = [
+        ('Active', 'Active'),
+        ('Inactive', 'Inactive'),
+    ]
+    name = models.CharField(max_length=150)
+    phone = models.CharField(max_length=20)
+    email = models.EmailField(blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    query_date = models.DateField(auto_now_add=True)
+    follow_up_date = models.DateField(blank=True, null=True)
+    source = models.CharField(max_length=100, blank=True, null=True) # e.g., Walk-in, Website, Advert
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='Active')
+    
+    def __str__(self):
+        return f"Query from {self.name} ({self.status})"
+
+class Complaint(models.Model):
+    COMPLAINT_BY_CHOICES = [
+        ('Student', 'Student'),
+        ('Parent', 'Parent'),
+        ('Staff', 'Staff'),
+    ]
+    complaint_by = models.CharField(max_length=50, choices=COMPLAINT_BY_CHOICES)
+    complainer_name = models.CharField(max_length=150)
+    complaint_type = models.CharField(max_length=100) # e.g., Academic, Facilities
+    source = models.CharField(max_length=100, blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    date = models.DateField(auto_now_add=True)
+    description = models.TextField()
+    action_taken = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        return f"Complaint by {self.complainer_name} - {self.complaint_type}"
+
+class PostalReceive(models.Model):
+    from_title = models.CharField(max_length=150)
+    reference_no = models.CharField(max_length=100, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    to_title = models.CharField(max_length=150, blank=True, null=True)
+    date = models.DateField(auto_now_add=True)
+    document = models.FileField(upload_to='postal_records/receive/', blank=True, null=True)
+    
+    def __str__(self):
+        return f"Postal Receive from {self.from_title}"
+
+class PostalDispatch(models.Model):
+    to_title = models.CharField(max_length=150)
+    reference_no = models.CharField(max_length=100, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    from_title = models.CharField(max_length=150, blank=True, null=True)
+    date = models.DateField(auto_now_add=True)
+    document = models.FileField(upload_to='postal_records/dispatch/', blank=True, null=True)
+    
+    def __str__(self):
+        return f"Postal Dispatch to {self.to_title}"
+
+class PhoneCallLog(models.Model):
+    CALL_TYPE_CHOICES = [
+        ('Incoming', 'Incoming'),
+        ('Outgoing', 'Outgoing'),
+    ]
+    name = models.CharField(max_length=150)
+    phone = models.CharField(max_length=20)
+    date = models.DateField(auto_now_add=True)
+    follow_up_date = models.DateField(blank=True, null=True)
+    call_duration = models.CharField(max_length=50, blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    call_type = models.CharField(max_length=20, choices=CALL_TYPE_CHOICES, default='Incoming')
+    
+    def __str__(self):
+        return f"{self.call_type} Call with {self.name}"
+
+
+# --- STUDENT BEHAVIOUR & INCIDENT MODELS ---
+
+class Incident(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    point = models.IntegerField(default=0) # E.g. +5 for good, -2 for bad
+    is_negative = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return f"{self.title} ({self.point} pts)"
+
+class StudentBehaviourRecord(models.Model):
+    student = models.ForeignKey('Student', on_delete=models.CASCADE, related_name='behaviour_records')
+    incident = models.ForeignKey(Incident, on_delete=models.CASCADE)
+    assigned_by = models.ForeignKey('Staff', on_delete=models.SET_NULL, null=True, blank=True)
+    comment = models.TextField(blank=True, null=True)
+    date = models.DateField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Record for {self.student.admin.get_full_name()} - {self.incident.title}"
+
+
+# --- DYNAMIC CERTIFICATE GENERATOR MODELS ---
+
+class CertificateTemplate(models.Model):
+    title = models.CharField(max_length=200)
+    applicable_for = models.CharField(max_length=50, choices=[('Student', 'Student'), ('Staff', 'Staff')])
+    header_left_text = models.CharField(max_length=255, blank=True, null=True)
+    body_text = models.TextField(help_text="Use variables like [name], [course], [dob], etc.")
+    footer_left_text = models.CharField(max_length=255, blank=True, null=True)
+    footer_center_text = models.CharField(max_length=255, blank=True, null=True)
+    footer_right_text = models.CharField(max_length=255, blank=True, null=True)
+    background_image = models.ImageField(upload_to='certificate_templates/backgrounds/', blank=True, null=True)
+    signature_image = models.ImageField(upload_to='certificate_templates/signatures/', blank=True, null=True)
+    logo_image = models.ImageField(upload_to='certificate_templates/logos/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.title

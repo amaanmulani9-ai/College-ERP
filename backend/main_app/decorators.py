@@ -6,6 +6,7 @@ def is_admin(user):
         return True
     raise PermissionDenied
 
+
 def is_staff(user):
     if user.is_authenticated and str(getattr(user, 'user_type', '')) == '2':
         return True
@@ -45,3 +46,4 @@ def student_required(function=None, login_url='/login/'):
     if function:
         return actual_decorator(function)
     return actual_decorator
+

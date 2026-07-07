@@ -39,6 +39,10 @@ urlpatterns = [
     path("api/finance/razorpay/checkout/", finance_views.razorpay_checkout, name='razorpay_checkout'),
     path("api/finance/razorpay/webhook/", finance_views.razorpay_webhook, name='razorpay_webhook'),
     path("admin/finance/", finance_views.admin_finance_dashboard, name='admin_finance_dashboard'),
+    path("admin/accounts/chart/", finance_views.chart_of_accounts, name='chart_of_accounts'),
+    path("admin/accounts/income/add/", finance_views.add_income, name='add_income'),
+    path("admin/accounts/expense/add/", finance_views.add_expense, name='add_expense'),
+    path("admin/accounts/statement/", finance_views.account_statement, name='account_statement'),
     path("admin/finance/gst_report/", finance_views.generate_gst_report, name='generate_gst_report'),
     path("student/placement/", placement_views.student_placement_dashboard, name='student_placement_dashboard'),
     path("api/placement/resume/save/", placement_views.save_json_resume, name='save_json_resume'),
@@ -143,6 +147,9 @@ urlpatterns = [
     path("student/id-cards/", hod_views.student_id_cards_admin, name='student_id_cards_admin'),
     path("student/print-basic-list/", hod_views.print_basic_list, name='print_basic_list'),
     path("student/manage-login/", hod_views.manage_login, name='manage_login'),
+    path("student/report/<int:student_id>/", hod_views.admin_student_report, name='admin_student_report'),
+    path("student/update-login/", hod_views.update_student_login, name='update_student_login'),
+    path("student/send-login-sms/", hod_views.send_student_login_sms, name='send_student_login_sms'),
     path("student/promote/", hod_views.promote_students, name='promote_students'),
 
 
@@ -244,10 +251,57 @@ urlpatterns = [
     path("admin/certificates/", hod_views.admin_manage_certificates, name='admin_manage_certificates'),
     path("admin/certificates/approve/<int:req_id>/", hod_views.admin_approve_certificate, name='admin_approve_certificate'),
     path("admin/certificates/reject/<int:req_id>/", hod_views.admin_reject_certificate, name='admin_reject_certificate'),
-    path("admin/fees/", hod_views.admin_manage_fees, name='admin_manage_fees'),
+    path("admin/fees/manage/", hod_views.admin_manage_fees, name='admin_manage_fees'),
+    path("admin/fees/collect/", hod_views.admin_collect_fees, name='admin_collect_fees'),
+    path("admin/fees/paid-slip/", hod_views.admin_fees_paid_slip, name='admin_fees_paid_slip'),
+    path("admin/fees/defaulters/", hod_views.admin_fees_defaulters, name='admin_fees_defaulters'),
     path("admin/fees/add/", hod_views.admin_add_fee, name='admin_add_fee'),
     path("admin/fees/edit/<int:fee_id>/", hod_views.admin_edit_fee, name='admin_edit_fee'),
     path("admin/fees/print/<int:fee_id>/", hod_views.admin_print_fee, name='admin_print_fee'),
+    
+    # Salary
+    path("admin/salary/pay/", hod_views.admin_pay_salary, name='admin_pay_salary'),
+    path("admin/salary/slip/", hod_views.admin_salary_slip, name='admin_salary_slip'),
+    
+    # Attendance
+    path("admin/attendance/students/", hod_views.admin_students_attendance, name='admin_students_attendance'),
+    path("admin/attendance/employees/", hod_views.admin_employees_attendance, name='admin_employees_attendance'),
+    path("admin/attendance/report/classwise/", hod_views.admin_classwise_report, name='admin_classwise_report'),
+    path("admin/attendance/report/students/", hod_views.admin_students_attendance_report, name='admin_students_attendance_report'),
+    path("admin/attendance/report/employees/", hod_views.admin_employees_attendance_report, name='admin_employees_attendance_report'),
+
+    # Homework
+    path("admin/homework/", hod_views.admin_homework, name='admin_homework'),
+    
+    # Live Class
+    path("admin/live-class/", hod_views.admin_live_class, name='admin_live_class'),
+    
+    # Exams
+    path("admin/exams/create/", hod_views.admin_create_exam, name='admin_create_exam'),
+    path("admin/exams/update-marks/", hod_views.admin_update_exam_marks, name='admin_update_exam_marks'),
+    path("admin/exams/result-card/", hod_views.admin_result_card, name='admin_result_card'),
+
+    # Class Tests
+    path("admin/class-tests/marks/", hod_views.admin_test_marks, name='admin_test_marks'),
+    path("admin/class-tests/results/", hod_views.admin_test_results, name='admin_test_results'),
+
+    # Reports
+    path("admin/reports/students-info/", hod_views.admin_students_info_report, name='admin_students_info_report'),
+
+    # Certificates
+    path("admin/certificates/generate/", hod_views.admin_certificates, name='admin_certificates'),
+
+    # General Settings
+    path("admin/settings/account/", hod_views.admin_account_settings, name='admin_settings_account'),
+    path("admin/settings/profile/", hod_views.admin_institute_profile, name='admin_settings_profile'),
+    path("admin/settings/fees-structure/", hod_views.admin_settings_fees_structure, name='admin_settings_fees_structure'),
+    path("admin/settings/discount-type/", hod_views.admin_settings_discount_type, name='admin_settings_discount_type'),
+    path("admin/settings/banks/", hod_views.admin_settings_banks, name='admin_settings_banks'),
+
+    # Messaging
+    path("admin/messaging/", hod_views.admin_messaging, name='admin_messaging'),
+
+    path("admin/staff/login-credentials/", hod_views.admin_staff_login_credentials, name='admin_staff_login_credentials'),
     path("admin/timetable/", hod_views.admin_manage_timetable, name='admin_manage_timetable'),
     path("admin/timetable/add/", hod_views.admin_add_timetable_slot, name='admin_add_timetable_slot'),
     path("admin/registrations/", hod_views.admin_manage_registrations, name='admin_manage_registrations'),
@@ -342,5 +396,20 @@ urlpatterns = [
     # --- Staff Job Letter ---
     path("admin/staff/job-letter/", hod_views.admin_job_letter, name='admin_job_letter'),
     path("admin/staff/job-letter/print/<int:staff_id>/", hod_views.admin_print_job_letter, name='admin_print_job_letter'),
-]
+    path("admin/staff/login-credentials/", hod_views.admin_staff_login_credentials, name='admin_staff_login_credentials'),
 
+    # --- Administration Features ---
+    path("admin/manage_queries/", hod_views.manage_queries, name='manage_queries'),
+    path("admin/manage_complaints/", hod_views.manage_complaints, name='manage_complaints'),
+    path("admin/manage_postal/", hod_views.manage_postal, name='manage_postal'),
+    path("admin/manage_call_logs/", hod_views.manage_call_logs, name='manage_call_logs'),
+
+    # --- Behaviour/Incidents Features ---
+    path("admin/manage_incidents/", hod_views.manage_incidents, name='manage_incidents'),
+    path("admin/student_behaviour_records/", hod_views.student_behaviour_records, name='student_behaviour_records'),
+
+    # --- Certificate Templates ---
+    path("admin/manage_certificate_templates/", hod_views.manage_certificate_templates, name='manage_certificate_templates'),
+
+
+]
