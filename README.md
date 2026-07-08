@@ -1,6 +1,7 @@
 <div align="center">
 
 # 🎓 College ERP System 🚀
+
 **A Next-Generation Multi-Tenant SaaS Enterprise Resource Planning Solution for Educational Institutions**
 
 [![Python Version](https://img.shields.io/badge/Python-3.8+-blue.svg?style=for-the-badge&logo=python)](https://www.python.org/)
@@ -18,9 +19,9 @@
 
 ## 🌟 Overview
 
-**College ERP** is a full-stack educational management system built using Python and the Django framework. It bridges the gap between Administration, Staff, Students, and Parents by providing real-time data synchronization, dynamic dashboards, and automated workflows.
+**College ERP** is a full-stack educational management system designed for multi-college SaaS deployments. It bridges the gap between Administration, Staff, Students, and Parents by providing real-time data synchronization, dynamic dashboards, and automated workflows.
 
-Built with scale in mind, the platform utilizes schema-level database isolation (`django-tenants`) to securely partition client data. It features a modern, responsive glassmorphic UI, installable progressive web app (PWA) support, direct mobile API integration, and an integrated AI suite for generating materials and scheduling.
+Built on Django and PostgreSQL, the platform utilizes schema-level database isolation to securely partition institutional records while offering premium web interfaces, offline PWA access, mobile API sync, and an integrated AI Suite for academic automation.
 
 ---
 
@@ -63,19 +64,21 @@ graph TD
 ```
 
 ### Component Details
-*   **NGINX**: Reverse proxy handling security headers, caching static assets, and routing requests.
-*   **Keycloak**: OpenID Connect (OIDC) Single Sign-On provider mapping user groups to ERP roles.
-*   **PostgreSQL 15**: Primary database utilizing schema partitions via `django-tenants` for SaaS isolation.
-*   **Redis**: In-memory storage acting as Celery's task queue broker and the Django cache repository.
-*   **Ollama**: Hosts local open-weight LLMs (e.g., Llama 3, Mistral) for drafting timetables and exam papers.
-*   **ChromaDB**: Native vector database used for local embedding retrieval to support AI operations.
-*   **MinIO**: Secure S3-compatible file storage for student files, document uploads, and dynamic certificate assets.
+
+* **NGINX**: Reverse proxy handling security headers, caching static assets, and routing requests.
+* **Keycloak**: OpenID Connect (OIDC) Single Sign-On provider mapping user groups to ERP roles.
+* **PostgreSQL 15**: Primary database utilizing schema partitions via `django-tenants` for SaaS isolation.
+* **Redis**: In-memory storage acting as Celery's task queue broker and the Django cache repository.
+* **Ollama**: Hosts local open-weight LLMs (e.g. Llama 3, Mistral) for drafting timetables and exam papers.
+* **ChromaDB**: Native vector database used for local embedding retrieval to support AI operations.
+* **MinIO**: Secure S3-compatible file storage for student files, document uploads, and dynamic certificate assets.
 
 ---
 
 ## ⚙️ Backend Multi-Tenancy & Data Model
 
 ### Shared-Model Schema Isolation
+
 Institutional data is isolated at the database schema level using `django-tenants`:
 
 ```
@@ -98,6 +101,7 @@ PostgreSQL Database
 When a request arrives, `TenantMainMiddleware` extracts the active hostname, queries domain mappings in the `public` schema, and switches the active PostgreSQL search path to the matching client schema dynamically.
 
 ### Core Data Models
+
 Inside each tenant schema, relations are structured as follows:
 
 ```mermaid
@@ -125,12 +129,12 @@ erDiagram
     PlacementDrive ||--o{ PlacementRegistration : "offers"
 ```
 
-*   **CustomUser** ([models.py](file:///c:/Users/Amaan/OneDrive/Desktop/College-ERP-main/College-ERP-main/backend/main_app/models.py#L48-L68)): Core user authentication model extending `AbstractUser`. Uses the email address for logins. Matches role permissions using `user_type`.
-*   **Student** ([models.py](file:///c:/Users/Amaan/OneDrive/Desktop/College-ERP-main/College-ERP-main/backend/main_app/models.py#L108-L215)): Profiles containing unique enrollment codes, batch years, semesters, and digital ID card codes.
-*   **Staff** ([models.py](file:///c:/Users/Amaan/OneDrive/Desktop/College-ERP-main/College-ERP-main/backend/main_app/models.py#L233-L248)): Employee records, linking to departments and salary slips.
-*   **Subject & Course** ([models.py](file:///c:/Users/Amaan/OneDrive/Desktop/College-ERP-main/College-ERP-main/backend/main_app/models.py#L85-L97)): Holds program configurations, monthly fees, semesters constraints, and teaching assignments.
-*   **FeeRecord & FeePayment** ([models.py](file:///c:/Users/Amaan/OneDrive/Desktop/College-ERP-main/College-ERP-main/backend/main_app/models.py#L447-L480)): Billed items, invoices, balances, and payment gateway logs.
-*   **LiveClass** ([models.py](file:///c:/Users/Amaan/OneDrive/Desktop/College-ERP-main/College-ERP-main/backend/main_app/models.py#L845-L870)): Virtual class scheduling linked with Jitsi Meet rooms.
+* **CustomUser** ([models.py](file:///c:/Users/Amaan/OneDrive/Desktop/College-ERP-main/College-ERP-main/backend/main_app/models.py#L48-L68)): Core user authentication model extending `AbstractUser`. Uses the email address for logins. Matches role permissions using `user_type`.
+* **Student** ([models.py](file:///c:/Users/Amaan/OneDrive/Desktop/College-ERP-main/College-ERP-main/backend/main_app/models.py#L108-L215)): Profiles containing unique enrollment codes, batch years, semesters, and digital ID card codes.
+* **Staff** ([models.py](file:///c:/Users/Amaan/OneDrive/Desktop/College-ERP-main/College-ERP-main/backend/main_app/models.py#L233-L248)): Employee records, linking to departments and salary slips.
+* **Subject & Course** ([models.py](file:///c:/Users/Amaan/OneDrive/Desktop/College-ERP-main/College-ERP-main/backend/main_app/models.py#L85-L97)): Holds program configurations, monthly fees, semesters constraints, and teaching assignments.
+* **FeeRecord & FeePayment** ([models.py](file:///c:/Users/Amaan/OneDrive/Desktop/College-ERP-main/College-ERP-main/backend/main_app/models.py#L447-L480)): Billed items, invoices, balances, and payment gateway logs.
+* **LiveClass** ([models.py](file:///c:/Users/Amaan/OneDrive/Desktop/College-ERP-main/College-ERP-main/backend/main_app/models.py#L845-L870)): Virtual class scheduling linked with Jitsi Meet rooms.
 
 ---
 
@@ -139,6 +143,7 @@ erDiagram
 The user interface uses Django templates populated dynamically, styled with Bootstrap, Custom Vanilla CSS, and client-side interactive libraries.
 
 ### Template Hierarchy
+
 ```
 frontend/templates/
 ├── main_app/                # General layouts (base.html, login.html, erpnext_sidebar.html)
@@ -151,16 +156,18 @@ frontend/templates/
 ```
 
 ### Key Frontend Integrations
-*   **JsBarcode**: Generates dynamic CODE128 barcodes from student/staff identifiers on flippable ID cards.
-*   **HTML5-QRcode**: Webcam-based scanner integration for verifying QR attendance or library transactions.
-*   **Chart.js**: Visual stats engine displaying analytics dashboards, class progress, and student attendance metrics.
-*   **AdminLTE**: UI layout skeleton, sidebar components, and custom admin forms styling.
+
+* **JsBarcode**: Generates dynamic CODE128 barcodes from student/staff identifiers on flippable ID cards.
+* **HTML5-QRcode**: Webcam-based scanner integration for verifying QR attendance or library transactions.
+* **Chart.js**: Visual stats engine displaying analytics dashboards, class progress, and student attendance metrics.
+* **AdminLTE**: UI layout skeleton, sidebar components, and custom admin forms styling.
 
 ---
 
 ## 🔄 Detailed Logic Connection Flowcharts
 
 ### A. Student QR Attendance Flow
+
 How a student scans their digital ID card QR code at the teacher's scanner terminal to mark attendance:
 
 ```mermaid
@@ -188,6 +195,7 @@ sequenceDiagram
 ```
 
 ### B. AI Exam Paper Generation Flow
+
 How teachers generate exam questions using local AI inference:
 
 ```mermaid
@@ -216,6 +224,7 @@ sequenceDiagram
 An automated backend audit shows the following template-to-view statuses:
 
 ### Live & Verified Pages
+
 The core modules are fully covered by SQLite test suites running under Python 3.14.3.
 
 | Path | View Handler | Template Rendered | Role Access | Status |
@@ -233,6 +242,7 @@ The core modules are fully covered by SQLite test suites running under Python 3.
 | `/chat/` | `chat_views.chat_home` | `main_app/chat.html` | All authenticated | **LIVE** |
 
 ### Pending & Template-Missing Pages
+
 The template audit reveals several view endpoints that are registered in `urls.py` but currently lack active html files or contain unresolved mock definitions:
 
 | Unresolved Endpoint | Registered View | Target Template | Issue | Status |
@@ -258,17 +268,20 @@ The template audit reveals several view endpoints that are registered in `urls.p
 Follow these steps to get a local copy up and running on your machine.
 
 ### Prerequisites
+
 Make sure you have [Python 3.8+](https://www.python.org/downloads/) installed on your system.
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/amaanmulani9-ai/College-ERP.git
    cd College-ERP
    ```
 
 2. **Create a virtual environment (Recommended)**
+
    ```bash
    python -m venv venv
    # Activate on Windows:
@@ -278,22 +291,26 @@ Make sure you have [Python 3.8+](https://www.python.org/downloads/) installed on
    ```
 
 3. **Install dependencies**
+
    ```bash
    pip install -r backend/requirements.txt
    ```
 
 4. **Apply database migrations**
+
    ```bash
    python manage.py makemigrations
    python manage.py migrate
    ```
 
 5. **Create a Superuser (Admin Account)**
+
    ```bash
    python manage.py createsuperuser
    ```
 
 6. **Run the development server**
+
    ```bash
    python manage.py runserver
    ```
@@ -302,7 +319,9 @@ Make sure you have [Python 3.8+](https://www.python.org/downloads/) installed on
    Open your browser and navigate to `http://localhost:8000`.
 
 ### Running Tests
+
 To execute the automated Django test suites in a local development environment:
+
 ```powershell
 # Set python path and execute pytest
 $env:PYTHONPATH="backend"
