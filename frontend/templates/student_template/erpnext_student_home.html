@@ -7,7 +7,7 @@
 <style>
     :root {
         --eskooly-bg: #f4f6f9;
-        --eskooly-primary: #4b6bfb;
+        --eskooly-primary: #0f5f6c;
         --eskooly-text: #555;
         --eskooly-light-text: #a0a9b6;
         --card-shadow: 0 0 10px rgba(0,0,0,0.05);
@@ -417,7 +417,7 @@
                     </div>
                 </a>
                 <a href="{% url 'student_assignments' %}" class="launchpad-item">
-                    <div class="launchpad-icon" style="background: linear-gradient(135deg, #4b6bfb, #00bcd4);"><i class="fas fa-tasks"></i></div>
+                    <div class="launchpad-icon" style="background: linear-gradient(135deg, #0f5f6c, #c99746);"><i class="fas fa-tasks"></i></div>
                     <div class="launchpad-text">
                         <strong>Assignments</strong>
                         <span>{{ assignment_count|default:"0" }} course tasks available</span>
@@ -613,7 +613,7 @@
                                         <div style="font-weight:600; font-size:14px; color:#333;">{{ lecture.subject.name }}</div>
                                         <div style="font-size:12px; color:#a0a9b6;">{{ lecture.subject.staff }}</div>
                                     </div>
-                                    <div style="font-size:12px; color:#4b6bfb; font-weight:500;">
+                                    <div style="font-size:12px; color:#0f5f6c; font-weight:500;">
                                         {{ lecture.start_time|time:"H:i" }}
                                     </div>
                                 </div>

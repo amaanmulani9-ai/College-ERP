@@ -53,14 +53,16 @@
     }
     .nav-link {
         padding: 10px 14px;
-        color: #647081;
+        color: #53686d;
         font-size: 14px;
         font-weight: 400;
         display: flex;
         align-items: center;
-        transition: all 0.2s;
-        border-radius: 4px;
+        transition: color 180ms ease, background 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+        border-radius: 8px;
         text-decoration: none !important;
+        position: relative;
+        overflow: hidden;
     }
     .nav-link[data-search], .nav-link .nav-text {
         white-space: nowrap;
@@ -70,8 +72,9 @@
     .nav-icon {
         width: 28px;
         font-size: 16px;
-        color: #8a98ac;
+        color: #7a8f93;
         text-align: left;
+        transition: color 180ms ease, transform 180ms ease;
     }
     .nav-text {
         flex: 1;
@@ -95,20 +98,24 @@
     }
     
     .nav-link:hover {
-        background-color: #f8f9fa;
-        color: #4b6bfb;
+        background: linear-gradient(135deg, rgba(15,95,108,.10), rgba(201,151,70,.14));
+        color: #083f49;
+        transform: translateX(4px);
+        box-shadow: 0 10px 24px rgba(15,95,108,.08);
     }
     .nav-link:hover .nav-icon {
-        color: #4b6bfb;
+        color: #c99746;
+        transform: scale(1.08);
     }
     
     .nav-link.active {
-        background-color: #f8f9fa;
-        color: #4b6bfb;
-        font-weight: 500;
+        background: linear-gradient(135deg, rgba(15,95,108,.13), rgba(201,151,70,.18));
+        color: #083f49;
+        font-weight: 700;
+        box-shadow: inset 3px 0 0 #c99746, 0 10px 24px rgba(15,95,108,.08);
     }
     .nav-link.active .nav-icon {
-        color: #4b6bfb;
+        color: #c99746;
     }
 
     /* Submenu styling matching eSkooly */
@@ -121,6 +128,7 @@
         margin-bottom: 8px;
         margin-top: 4px;
         display: none;
+        animation: submenuSlide 220ms ease both;
     }
     .nav-item.open .nav-submenu {
         display: block;
@@ -137,10 +145,10 @@
         justify-content: space-between;
     }
     .nav-submenu .nav-link:hover {
-        color: #4b6bfb;
+        color: #0f5f6c;
     }
     .nav-submenu .nav-link.active {
-        color: #4b6bfb;
+        color: #0f5f6c;
         font-weight: 500;
     }
     /* Active dot indicator on the track line */
@@ -152,7 +160,7 @@
         transform: translateY(-50%);
         width: 8px;
         height: 8px;
-        background-color: #4b6bfb;
+        background-color: #c99746;
         border-radius: 50%;
         z-index: 2;
     }
@@ -168,6 +176,18 @@
     }
     .sidebar-filter-match {
         display: none !important;
+    }
+    @keyframes submenuSlide {
+        from { opacity: 0; transform: translateY(-6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .nav-link,
+        .nav-icon,
+        .nav-submenu {
+            animation: none !important;
+            transition: none !important;
+        }
     }
 </style>
 

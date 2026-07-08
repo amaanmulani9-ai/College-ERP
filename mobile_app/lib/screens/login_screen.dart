@@ -72,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const Icon(Icons.school, size: 80, color: Colors.indigo),
               const SizedBox(height: 24),
               const Text(
-                'College ERP',
+                'CAMPUS PRO ERP',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.indigo),
               ),

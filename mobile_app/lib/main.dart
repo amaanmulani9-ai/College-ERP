@@ -35,7 +35,7 @@ class CollegeERPApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'College ERP',
+      title: 'CAMPUS PRO ERP',
       theme: ThemeData(
         primarySwatch: Colors.indigo,
         visualDensity: VisualDensity.adaptivePlatformDensity,

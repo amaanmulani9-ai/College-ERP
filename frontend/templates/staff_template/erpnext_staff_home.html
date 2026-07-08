@@ -1,7 +1,7 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
 
-{% block page_title %}Staff Dashboard - Amaan ERP{% endblock page_title %}
+{% block page_title %}Staff Dashboard - CAMPUS PRO ERP{% endblock page_title %}
 
 {% block breadcrumb %}
     <li class="breadcrumb-item active">Staff Portal</li>
@@ -11,8 +11,8 @@
 <style>
     /* eSkooly Staff Dashboard Design Tokens & Scoped Styles */
     :root {
-        --sk-brand: #673de5;
-        --sk-brand-light: rgba(103, 61, 229, 0.1);
+        --sk-brand: #0f5f6c;
+        --sk-brand-light: rgba(15, 95, 108, 0.1);
         --sk-green: #28a745;
         --sk-green-bg: rgba(40, 167, 69, 0.1);
         --sk-yellow: #ffc107;
@@ -58,7 +58,7 @@
     }
     .sk-stat-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(103, 61, 229, 0.12);
+        box-shadow: 0 8px 20px rgba(15, 95, 108, 0.14);
     }
     .sk-stat-icon {
         width: 52px;
@@ -461,7 +461,7 @@
         Chart.defaults.color = textColor;
         
         const colors = {
-            brand: '#673de5',
+            brand: '#0f5f6c',
             green: '#28a745',
             yellow: '#ffc107',
             red: '#dc3545',
