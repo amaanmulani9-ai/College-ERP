@@ -273,12 +273,37 @@ body, .erpnext-main, .content-area { font-family: 'Poppins', sans-serif; font-si
 .section-head { font-size: 11px; font-weight: 700; color: var(--sk-text-meta);
                 text-transform: uppercase; letter-spacing: .6px; margin: 4px 0 14px; }
 
+.command-strip {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 22px;
+}
+.command-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: var(--r-xl);
+    background: var(--sk-white);
+    color: var(--sk-text-primary);
+    text-decoration: none;
+    box-shadow: var(--shadow-1);
+    transition: transform var(--dur-fast), box-shadow var(--dur-fast), border-color var(--dur-fast);
+    border: 1px solid rgba(0,0,0,.04);
+}
+.dark-mode .command-chip { background: #1e1e30; border-color: rgba(255,255,255,.05); }
+.command-chip:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
+.command-chip i { font-size: 16px; color: var(--sk-brand); width: 18px; text-align: center; }
+.command-chip span { font-size: 12px; font-weight: 600; }
+
 /* ── Responsive ── */
 @media (max-width:768px) {
     .wb { flex-direction: column; align-items: flex-start; }
     .wb-actions { display: none; }
     .hero-grid { grid-template-columns: repeat(2, 1fr); }
     .quick-grid { grid-template-columns: repeat(3, 1fr); }
+    .command-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 </style>
 {% endblock custom_css %}
@@ -301,6 +326,15 @@ body, .erpnext-main, .content-area { font-family: 'Poppins', sans-serif; font-si
         <a href="{% url 'admin_analytics' %}"      class="wb-btn"><i class="fas fa-chart-line"></i> Analytics</a>
         <a href="{% url 'admin_finance_dashboard' %}" class="wb-btn"><i class="fas fa-coins"></i> Finance</a>
     </div>
+</div>
+
+<div class="command-strip">
+    <a href="{% url 'manage_student' %}" class="command-chip"><i class="fas fa-user-graduate"></i><span>Students</span></a>
+    <a href="{% url 'manage_staff' %}" class="command-chip"><i class="fas fa-user-tie"></i><span>Staff</span></a>
+    <a href="{% url 'manage_course' %}" class="command-chip"><i class="fas fa-layer-group"></i><span>Classes</span></a>
+    <a href="{% url 'admin_verification_center' %}" class="command-chip"><i class="fas fa-shield-alt"></i><span>Verification</span></a>
+    <a href="{% url 'admin_analytics' %}" class="command-chip"><i class="fas fa-chart-line"></i><span>Reports</span></a>
+    <a href="{% url 'admin_finance_dashboard' %}" class="command-chip"><i class="fas fa-coins"></i><span>Finance</span></a>
 </div>
 
 <!-- ═══════════ HERO STAT CARDS ═══════════ -->

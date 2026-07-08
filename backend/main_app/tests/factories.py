@@ -2,7 +2,9 @@ import factory
 from main_app.models import CustomUser, Course, Session, Student, Staff, Subject
 from django.utils import timezone
 from datetime import datetime, date
+from django.db.models.signals import post_save
 
+@factory.django.mute_signals(post_save)
 class CustomUserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = CustomUser
@@ -12,6 +14,8 @@ class CustomUserFactory(factory.django.DjangoModelFactory):
     last_name = factory.Faker('last_name')
     password = factory.PostGenerationMethodCall('set_password', 'testpass123')
     user_type = '3' # Default to student
+    gender = 'M'
+    address = factory.Faker('address')
 
 class CourseFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -26,6 +30,7 @@ class SessionFactory(factory.django.DjangoModelFactory):
     start_year = factory.LazyFunction(lambda: date(datetime.now().year, 1, 1))
     end_year = factory.LazyFunction(lambda: date(datetime.now().year + 1, 1, 1))
 
+@factory.django.mute_signals(post_save)
 class StudentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Student
@@ -33,17 +38,14 @@ class StudentFactory(factory.django.DjangoModelFactory):
     admin = factory.SubFactory(CustomUserFactory, user_type='3')
     course = factory.SubFactory(CourseFactory)
     session = factory.SubFactory(SessionFactory)
-    gender = "Male"
-    address = factory.Faker('address')
 
+@factory.django.mute_signals(post_save)
 class StaffFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Staff
     
     admin = factory.SubFactory(CustomUserFactory, user_type='2')
     course = factory.SubFactory(CourseFactory)
-    gender = "Female"
-    address = factory.Faker('address')
 
 class SubjectFactory(factory.django.DjangoModelFactory):
     class Meta:

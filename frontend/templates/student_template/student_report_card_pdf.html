@@ -138,13 +138,19 @@
             <td class="label">Student Name:</td>
             <td class="value">{{ student.admin.get_full_name }}</td>
             <td class="label">Enrollment No:</td>
-            <td class="value">PAT/2026/{{ student.id|stringformat:"04d" }}</td>
+            <td class="value">{{ student.unique_student_code|default:student.id_card_code|default:student.id }}</td>
         </tr>
         <tr>
             <td class="label">Course:</td>
             <td class="value">{{ student.course.name }}</td>
             <td class="label">Academic Batch:</td>
-            <td class="value">{{ student.session }}</td>
+            <td class="value">{{ student.academic_year_label }}</td>
+        </tr>
+        <tr>
+            <td class="label">Semester:</td>
+            <td class="value">Sem {{ student.current_semester }}</td>
+            <td class="label">Verification:</td>
+            <td class="value">{{ student.verification_status }}</td>
         </tr>
     </table>
 
@@ -189,7 +195,8 @@
         <h3>ACADEMIC SUMMARY</h3>
         <div class="summary-stats">
             Total Marks Obtained: {{ total_marks }} / {{ max_marks }} <br><br>
-            Percentage: {{ percentage|floatformat:2 }}%
+            Percentage: {{ percentage|floatformat:2 }}% <br><br>
+            Report Generated For: {{ student.admin.get_full_name }} | {{ student.course.name }} | {{ student.academic_year_label }}
         </div>
     </div>
 

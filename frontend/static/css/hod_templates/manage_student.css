@@ -1,0 +1,231 @@
+
+/* ── Design Tokens ── */
+:root {
+    --sk-brand:        #673de5;
+    --sk-brand-light:  rgba(103,61,229,.10);
+    --sk-text-primary: #222;
+    --sk-text-muted:   #666;
+    --sk-text-meta:    #999;
+    --sk-surface:      #f3f3f3;
+    --sk-white:        #fff;
+    --sk-green:  #22c55e; --sk-green-bg:  rgba(34,197,94,.10);
+    --sk-red:    #ef4444; --sk-red-bg:    rgba(239,68,68,.10);
+    --sk-blue:   #3b82f6; --sk-blue-bg:   rgba(59,130,246,.10);
+    --sk-orange: #f97316; --sk-orange-bg: rgba(249,115,22,.10);
+    --r-lg:10px; --r-xl:14px;
+    --shadow: 0 1px 4px rgba(4,26,55,.12);
+    --dur: 150ms;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body, .erpnext-main { font-family: 'Poppins', sans-serif; }
+
+/* ── Breadcrumb ── */
+.sk-breadcrumb-bar {
+    background: #fff;
+    padding: 15px 25px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+.sk-breadcrumb-left {
+    display: flex; align-items: center; gap: 8px;
+}
+.sk-breadcrumb-title {
+    color: #4a235a;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex; align-items: center; gap: 8px;
+}
+.sk-breadcrumb-path {
+    color: #b2bec3;
+    font-size: 13px;
+}
+.sk-reload-btn {
+    color: var(--sk-brand);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid rgba(103,61,229,.2);
+    border-radius: var(--r-lg);
+    transition: all var(--dur);
+}
+.sk-reload-btn:hover { background: var(--sk-brand-light); text-decoration: none; color: var(--sk-brand); }
+
+/* ── Search Toolbar ── */
+.sk-toolbar {
+    background: var(--sk-white);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.sk-search-group {
+    flex: 1; min-width: 200px;
+}
+.sk-search-group label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--sk-text-meta);
+    margin-bottom: 6px;
+}
+.sk-search-group input,
+.sk-search-group select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid rgba(0,0,0,.10);
+    border-radius: var(--r-lg);
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    background: var(--sk-surface);
+    color: var(--sk-text-primary);
+    outline: none;
+    transition: border-color var(--dur);
+}
+.sk-search-group input:focus,
+.sk-search-group select:focus { border-color: var(--sk-brand); }
+.sk-search-group input::placeholder { color: var(--sk-text-meta); }
+
+.sk-btn-add {
+    background: var(--sk-brand); color: #fff; border: none;
+    border-radius: var(--r-lg); padding: 9px 18px;
+    font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 7px; text-decoration: none;
+    cursor: pointer; transition: background var(--dur), transform var(--dur);
+    white-space: nowrap; align-self: flex-end;
+}
+.sk-btn-add:hover { background: #5530c5; color: #fff; transform: translateY(-1px); text-decoration: none; }
+
+/* ── Student Card Grid ── */
+.sk-student-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+}
+.sk-student-card {
+    width: 200px;
+    background: var(--sk-white);
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+    padding: 25px 15px 18px;
+    text-align: center;
+    transition: box-shadow var(--dur), transform var(--dur);
+}
+.sk-student-card:hover {
+    box-shadow: 0 6px 24px rgba(103,61,229,.15);
+    transform: translateY(-2px);
+}
+
+/* Avatar */
+.sk-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    object-fit: cover; border: 3px solid rgba(103,61,229,.15);
+    margin: 0 auto 12px;
+    display: block;
+}
+.sk-avatar-placeholder {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--sk-brand), #a855f7);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 24px; font-weight: 700;
+    margin: 0 auto 12px;
+}
+
+/* Name & Reg */
+.sk-stu-name {
+    font-size: 14px; font-weight: 600; color: var(--sk-text-primary);
+    margin: 0 0 2px;
+}
+.sk-stu-reg {
+    font-size: 12px; color: var(--sk-text-meta);
+    margin: 0 0 15px;
+}
+
+/* Round Action Buttons */
+.sk-stu-actions {
+    display: flex; justify-content: center; gap: 10px;
+}
+.sk-action-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; font-size: 13px;
+    border: none; cursor: pointer;
+    transition: opacity var(--dur), transform var(--dur);
+}
+.sk-action-btn:hover { opacity: .8; transform: scale(1.12); text-decoration: none; }
+.sk-btn-view   { background: var(--sk-green-bg);  color: var(--sk-green); }
+.sk-btn-edit   { background: var(--sk-blue-bg);   color: var(--sk-blue); }
+.sk-btn-delete { background: var(--sk-red-bg);    color: var(--sk-red); }
+
+/* ── Add New Student Card ── */
+.sk-add-card {
+    width: 200px;
+    height: 240px;
+    border: 2px dashed #a29bfe;
+    border-radius: 12px;
+    background: rgba(108, 92, 231, 0.02);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.sk-add-card:hover {
+    background: rgba(108, 92, 231, 0.05);
+    border-color: #6c5ce7;
+    text-decoration: none;
+}
+.sk-add-icon {
+    background: #6c5ce7;
+    color: white;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
+}
+.sk-add-title {
+    color: #2d3436;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+.sk-add-subtitle {
+    color: #a4b0be;
+    font-size: 11px;
+}
+
+/* ── Empty State ── */
+.sk-empty {
+    text-align: center; padding: 60px 20px;
+    background: var(--sk-white); border-radius: var(--r-xl); box-shadow: var(--shadow);
+}
+.sk-empty i { font-size: 48px; color: #ddd; margin-bottom: 14px; }
+.sk-empty h5 { font-size: 15px; font-weight: 600; color: var(--sk-text-muted); margin: 0 0 6px; }
+.sk-empty p  { font-size: 12px; color: var(--sk-text-meta); margin: 0 0 16px; }
+
+/* ── Section Label ── */
+.sk-section-lbl {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .7px; color: var(--sk-text-meta);
+    padding: 6px 0 10px; margin: 0;
+}
+
+@media (max-width: 576px) {
+    .sk-student-card { width: 100%; }
+    .sk-add-card { width: 100%; }
+}

@@ -10,6 +10,8 @@ DATABASES = {
 
 # Remove tenant middleware since SQLite does not support PostgreSQL schemas
 MIDDLEWARE = [m for m in MIDDLEWARE if 'django_tenants' not in m]
+INSTALLED_APPS = [app for app in INSTALLED_APPS if app != 'django_tenants']
+DATABASE_ROUTERS = []
 
 # Disable migrations for speed
 class DisableMigrations:

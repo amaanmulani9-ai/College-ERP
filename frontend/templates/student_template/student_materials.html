@@ -4,6 +4,16 @@
 
 {% block content %}
 <div class="container-fluid">
+    <div class="card erpnext-card mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h4 class="mb-1"><i class="fas fa-folder-open text-info"></i> Downloads & Study Materials Hub</h4>
+                <p class="text-muted mb-0 small">Download lecture notes, handouts, and subject material published by your teachers.</p>
+            </div>
+            <span class="badge bg-info">{{ materials|length }} files</span>
+        </div>
+    </div>
+
     <div class="card erpnext-card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0"><i class="fas fa-folder-open text-info"></i> Downloads & Study Materials Hub</h5>
@@ -37,7 +47,7 @@
             <div class="text-center py-5">
                 <i class="fas fa-folder fa-3x text-muted mb-3"></i>
                 <h5>No Study Materials Available</h5>
-                <p class="text-muted">Your teachers have not uploaded any downloadable study materials or notes yet.</p>
+                <p class="text-muted mb-0">Your teachers have not uploaded any downloadable study materials or notes yet.</p>
             </div>
             {% endif %}
         </div>

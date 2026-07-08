@@ -145,7 +145,11 @@ body { background-color: #f8f9fa; font-family: 'Poppins', sans-serif; }
                 <img src="{% static 'image/default-avatar.png' %}" onerror="this.src='https://ui-avatars.com/api/?name={{staff.first_name}}+{{staff.last_name}}&background=f8f7ff&color=6c5ce7'" alt="Default" class="sk-emp-img">
                 {% endif %}
                 <div class="sk-emp-name emp-name-text">{{ staff.first_name }} {{ staff.last_name }}</div>
-                <div class="sk-emp-role emp-role-text">Teacher</div> <!-- Using Teacher as default designation -->
+                <div class="sk-emp-role emp-role-text">{{ staff.course.name|default:"Staff Member" }}</div>
+                <div style="font-size:11px;color:#7f8c8d;margin-bottom:12px;line-height:1.5;">
+                    <div><code>{{ staff.id_card_code|default:"ID code pending" }}</code></div>
+                    <div>{{ staff.date_of_joining|date:"d M Y"|default:"Joining date not set" }}</div>
+                </div>
                 
                 <div class="sk-emp-actions">
                     <a href="{% url 'admin_view_staff_id_card' staff.id %}" class="sk-action-btn view" title="View ID Card" target="_blank"><i class="fas fa-search"></i></a>

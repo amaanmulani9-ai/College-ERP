@@ -1,8 +1,10 @@
 import os
+import re
 import requests
 from django.core.mail import send_mail
 from django.conf import settings
 from dotenv import load_dotenv
+from urllib.parse import quote
 
 # Load env variables
 load_dotenv()
@@ -111,6 +113,29 @@ def send_fcm_push(fcm_token, title, body_text):
     except Exception as e:
         print(f"[FCM PUSH] Error: {str(e)}")
     return False
+
+def normalize_whatsapp_number(number, default_country_code="91"):
+    """
+    Normalize a phone number for WhatsApp deep links.
+    Returns digits only, with a default country code for 10-digit Indian numbers.
+    """
+    if not number:
+        return ""
+    digits = re.sub(r"\D", "", str(number))
+    if len(digits) == 10:
+        digits = f"{default_country_code}{digits}"
+    if digits.startswith("00"):
+        digits = digits[2:]
+    return digits
+
+def build_whatsapp_link(number, message):
+    """
+    Build a wa.me deep link that opens WhatsApp with a prefilled message.
+    """
+    digits = normalize_whatsapp_number(number)
+    if not digits:
+        return ""
+    return f"https://wa.me/{digits}?text={quote(message or '')}"
 
 # --- Aliases for consistent imports across the codebase ---
 send_email_notification = send_email_brevo

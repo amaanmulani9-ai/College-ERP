@@ -62,6 +62,11 @@
         border-radius: 4px;
         text-decoration: none !important;
     }
+    .nav-link[data-search], .nav-link .nav-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
     .nav-icon {
         width: 28px;
         font-size: 16px;
@@ -161,6 +166,9 @@
         color: #a0a9b6 !important;
         cursor: not-allowed;
     }
+    .sidebar-filter-match {
+        display: none !important;
+    }
 </style>
 
 <div class="eskooly-sidebar-top">
@@ -179,6 +187,25 @@
                 <i class="nav-icon fas fa-chart-pie"></i>
                 <span class="nav-text">Dashboard</span>
             </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'pro_modules_dashboard' %}" class="nav-link {% if request.path == '/admin/pro-modules/' %}active{% endif %}">
+                <i class="nav-icon fas fa-layer-group"></i>
+                <span class="nav-text">Pro Modules</span>
+            </a>
+        </div>
+        <div class="nav-item has-submenu {% if '/admin/library/' in request.path %}open{% endif %}">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-book-reader"></i>
+                <span class="nav-text">Library</span>
+                <i class="nav-arrow"></i>
+            </a>
+            <div class="nav-submenu">
+                <a href="{% url 'admin_library_overview' %}" class="nav-link {% if request.path == '/admin/library/' %}active{% endif %}">Overview</a>
+                <a href="{% url 'admin_library_catalog' %}" class="nav-link {% if 'library/catalog' in request.path %}active{% endif %}">Book Catalog</a>
+                <a href="{% url 'admin_library_issue' %}" class="nav-link {% if 'library/issue' in request.path %}active{% endif %}">Issue Desk</a>
+                <a href="{% url 'admin_library_overdue' %}" class="nav-link {% if 'library/overdue' in request.path %}active{% endif %}">Overdue Report</a>
+            </div>
         </div>
         
         <!-- General Settings -->
@@ -239,8 +266,8 @@
                 <a href="{% url 'manage_student' %}" class="nav-link {% if 'student/manage' in request.path %}active{% endif %}">All Students</a>
                 <a href="{% url 'add_student' %}" class="nav-link {% if 'student/add' in request.path %}active{% endif %}">Add New</a>
                 <a href="{% url 'view_online_registrations' %}" class="nav-link {% if 'registrations' in request.path %}active{% endif %}">Online Registrations</a>
-                <a href="#" class="nav-link locked">Manage Families <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Active / Inactive <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'manage_parent' %}" class="nav-link {% if 'parent/manage' in request.path %}active{% endif %}">Manage Families</a>
+                <a href="{% url 'manage_student' %}" class="nav-link {% if 'student/manage' in request.path %}active{% endif %}">Active / Inactive</a>
                 <a href="{% url 'admission_letter' %}" class="nav-link {% if 'student/admission-letter' in request.path %}active{% endif %}">Admission Letter</a>
                 <a href="{% url 'student_id_cards_admin' %}" class="nav-link {% if 'student/id-cards' in request.path %}active{% endif %}">Student ID Cards</a>
                 <a href="{% url 'print_basic_list' %}" class="nav-link {% if 'student/print-basic-list' in request.path %}active{% endif %}">Print Basic List</a>
@@ -259,7 +286,7 @@
             <div class="nav-submenu">
                 <a href="{% url 'manage_staff' %}" class="nav-link {% if 'staff/manage' in request.path %}active{% endif %}">All Employees</a>
                 <a href="{% url 'add_staff' %}" class="nav-link {% if 'staff/add' in request.path %}active{% endif %}">Add New</a>
-                <a href="#" class="nav-link locked">Staff ID Cards <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'admin_staff_id_cards' %}" class="nav-link">Staff ID Cards</a>
                 <a href="{% url 'admin_job_letter' %}" class="nav-link {% if 'staff/job-letter' in request.path %}active{% endif %}">Job Letter</a>
                 <a href="{% url 'admin_staff_login_credentials' %}" class="nav-link {% if 'staff/login' in request.path %}active{% endif %}">Manage Login</a>
             </div>
@@ -292,8 +319,8 @@
                 <a href="{% url 'admin_collect_fees' %}" class="nav-link {% if 'fees/collect' in request.path %}active{% endif %}">Collect Fees</a>
                 <a href="{% url 'admin_fees_paid_slip' %}" class="nav-link {% if 'fees/paid-slip' in request.path %}active{% endif %}">Fees Paid Slip</a>
                 <a href="{% url 'admin_fees_defaulters' %}" class="nav-link {% if 'fees/defaulters' in request.path %}active{% endif %}">Fees Defaulters</a>
-                <a href="#" class="nav-link locked">Fees Report <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Delete Fees <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'admin_analytics' %}" class="nav-link {% if 'analytics' in request.path %}active{% endif %}">Fees Report</a>
+                <a href="{% url 'admin_settings_fees' %}" class="nav-link">Delete Fees</a>
             </div>
         </div>
 
@@ -307,8 +334,8 @@
             <div class="nav-submenu">
                 <a href="{% url 'admin_pay_salary' %}" class="nav-link {% if 'salary/pay' in request.path %}active{% endif %}">Pay Salary</a>
                 <a href="{% url 'admin_salary_slip' %}" class="nav-link {% if 'salary/slip' in request.path %}active{% endif %}">Salary Paid Slip</a>
-                <a href="#" class="nav-link locked">Salary Sheet <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Salary Report <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'admin_salary_slip' %}" class="nav-link {% if 'salary/slip' in request.path %}active{% endif %}">Salary Sheet</a>
+                <a href="{% url 'admin_pay_salary' %}" class="nav-link {% if 'salary/pay' in request.path %}active{% endif %}">Salary Report</a>
             </div>
         </div>
 
@@ -336,12 +363,12 @@
                 <i class="nav-arrow"></i>
             </a>
             <div class="nav-submenu">
-                <a href="#" class="nav-link locked">Weekdays <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Time Periods <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Class Rooms <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'admin_manage_timetable' %}" class="nav-link {% if 'timetable' in request.path %}active{% endif %}">Weekdays</a>
+                <a href="{% url 'admin_manage_timetable' %}" class="nav-link {% if 'timetable' in request.path %}active{% endif %}">Time Periods</a>
+                <a href="{% url 'admin_manage_timetable' %}" class="nav-link {% if 'timetable' in request.path %}active{% endif %}">Class Rooms</a>
                 <a href="{% url 'admin_manage_timetable' %}" class="nav-link {% if 'timetable' in request.path %}active{% endif %}">Create Timetable</a>
-                <a href="#" class="nav-link locked">Generate For Class <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Generate For Teacher <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'admin_manage_timetable' %}" class="nav-link {% if 'timetable' in request.path %}active{% endif %}">Generate For Class</a>
+                <a href="{% url 'admin_manage_timetable' %}" class="nav-link {% if 'timetable' in request.path %}active{% endif %}">Generate For Teacher</a>
             </div>
         </div>
 
@@ -365,11 +392,11 @@
                 <i class="nav-arrow"></i>
             </a>
             <div class="nav-submenu">
-                <a href="#" class="nav-link locked">Rate Behaviours <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Rate Skills <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Observations <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Affective Domain Rating Report <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Psychomotor Domain Rating Report <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'manage_incidents' %}" class="nav-link {% if 'manage_incidents' in request.path %}active{% endif %}">Rate Behaviours</a>
+                <a href="{% url 'student_behaviour_records' %}" class="nav-link {% if 'student_behaviour_records' in request.path %}active{% endif %}">Rate Skills</a>
+                <a href="{% url 'student_behaviour_records' %}" class="nav-link {% if 'student_behaviour_records' in request.path %}active{% endif %}">Observations</a>
+                <a href="{% url 'student_behaviour_records' %}" class="nav-link {% if 'student_behaviour_records' in request.path %}active{% endif %}">Affective Domain Rating Report</a>
+                <a href="{% url 'student_behaviour_records' %}" class="nav-link {% if 'student_behaviour_records' in request.path %}active{% endif %}">Psychomotor Domain Rating Report</a>
             </div>
         </div>
 
@@ -381,21 +408,20 @@
                 <i class="nav-arrow"></i>
             </a>
             <div class="nav-submenu">
-                <a href="#" class="nav-link locked">Store Analytics <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Product Catagories <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Product Tax <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Products <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">New Order <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">All Orders <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'feature_coming_soon' 'store-analytics' %}" class="nav-link">Store Analytics</a>
+                <a href="{% url 'feature_coming_soon' 'product-categories' %}" class="nav-link">Product Catagories</a>
+                <a href="{% url 'feature_coming_soon' 'product-tax' %}" class="nav-link">Product Tax</a>
+                <a href="{% url 'feature_coming_soon' 'products' %}" class="nav-link">Products</a>
+                <a href="{% url 'feature_coming_soon' 'new-order' %}" class="nav-link">New Order</a>
+                <a href="{% url 'feature_coming_soon' 'all-orders' %}" class="nav-link">All Orders</a>
             </div>
         </div>
 
         <!-- WhatsApp -->
         <div class="nav-item">
-            <a href="#" class="nav-link" style="color: #a0a9b6;">
+            <a href="{% url 'whatsapp_center' %}" class="nav-link" style="color: #25D366;">
                 <i class="nav-icon fab fa-whatsapp"></i>
                 <span class="nav-text">WhatsApp</span>
-                <i class="fas fa-lock lock-icon" style="color:#ff7675;"></i>
             </a>
         </div>
 
@@ -415,9 +441,9 @@
                 <i class="nav-arrow"></i>
             </a>
             <div class="nav-submenu">
-                <a href="#" class="nav-link">Free SMS Gateway</a>
-                <a href="#" class="nav-link locked">Branded SMS <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">SMS Templates <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'admin_messaging' %}" class="nav-link">Free SMS Gateway</a>
+                <a href="{% url 'admin_messaging' %}" class="nav-link">Branded SMS</a>
+                <a href="{% url 'admin_messaging' %}" class="nav-link">SMS Templates</a>
             </div>
         </div>
 
@@ -437,9 +463,9 @@
                 <i class="nav-arrow"></i>
             </a>
             <div class="nav-submenu">
-                <a href="#" class="nav-link locked">Subject Chapters <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Question Bank <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Create Question Paper <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'staff_lms_home' %}" class="nav-link">Subject Chapters</a>
+                <a href="{% url 'admin_question_bank' %}" class="nav-link">Question Bank</a>
+                <a href="{% url 'staff_generate_paper' %}" class="nav-link">Create Question Paper</a>
             </div>
         </div>
 
@@ -454,10 +480,10 @@
                 <a href="{% url 'admin_create_exam' %}" class="nav-link {% if 'exams/create' in request.path %}active{% endif %}">Create New Exam</a>
                 <a href="{% url 'admin_update_exam_marks' %}" class="nav-link {% if 'exams/update-marks' in request.path %}active{% endif %}">Add / update Exam Marks</a>
                 <a href="{% url 'admin_result_card' %}" class="nav-link {% if 'exams/result-card' in request.path %}active{% endif %}">Result Card</a>
-                <a href="#" class="nav-link locked">Result Sheet <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Exam Schedule <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Date Sheet <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Blank Award List <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'admin_result_sheet' %}" class="nav-link">Result Sheet</a>
+                <a href="{% url 'admin_exam_schedule' %}" class="nav-link">Exam Schedule</a>
+                <a href="{% url 'admin_date_sheet' %}" class="nav-link">Date Sheet</a>
+                <a href="{% url 'admin_blank_award_list' %}" class="nav-link">Blank Award List</a>
             </div>
         </div>
 
@@ -482,15 +508,15 @@
                 <i class="nav-arrow"></i>
             </a>
             <div class="nav-submenu">
-                <a href="#" class="nav-link">Students report Card</a>
+                <a href="{% url 'admin_students_info_report' %}" class="nav-link">Students Report Card</a>
                 <a href="{% url 'admin_students_info_report' %}" class="nav-link {% if 'reports/students-info' in request.path %}active{% endif %}">Students info report</a>
-                <a href="#" class="nav-link">Parents info report</a>
-                <a href="#" class="nav-link locked">Students Monthly Attendance Report <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Staff Monthly Attendance Report <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Fee Collection Report <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Student Progress Report <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Accounts Report <i class="far fa-lock lock-icon"></i></a>
-                <a href="#" class="nav-link locked">Customised Reports <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'manage_parent' %}" class="nav-link {% if 'parent/manage' in request.path %}active{% endif %}">Parents info report</a>
+                <a href="{% url 'admin_students_attendance_report' %}" class="nav-link {% if 'attendance/report/students' in request.path %}active{% endif %}">Students Monthly Attendance Report</a>
+                <a href="{% url 'admin_employees_attendance_report' %}" class="nav-link {% if 'attendance/report/employees' in request.path %}active{% endif %}">Staff Monthly Attendance Report</a>
+                <a href="{% url 'admin_finance_dashboard' %}" class="nav-link {% if 'finance' in request.path %}active{% endif %}">Fee Collection Report</a>
+                <a href="{% url 'admin_students_info_report' %}" class="nav-link {% if 'reports/students-info' in request.path %}active{% endif %}">Student Progress Report</a>
+                <a href="{% url 'account_statement' %}" class="nav-link {% if 'accounts/statement' in request.path %}active{% endif %}">Accounts Report</a>
+                <a href="{% url 'admin_analytics' %}" class="nav-link {% if 'analytics' in request.path %}active{% endif %}">Customised Reports</a>
             </div>
         </div>
 
@@ -503,7 +529,9 @@
             </a>
             <div class="nav-submenu">
                 <a href="{% url 'admin_certificates' %}" class="nav-link {% if 'certificates' in request.path %}active{% endif %}">Generate Certificate</a>
-                <a href="#" class="nav-link locked">Certificate Templates <i class="far fa-lock lock-icon"></i></a>
+                <a href="{% url 'manage_certificate_templates' %}" class="nav-link {% if 'manage_certificate_templates' in request.path %}active{% endif %}">Certificate Templates</a>
+                <a href="{% url 'backoffice_certificates' %}" class="nav-link">Certificate Requests</a>
+                <a href="{% url 'backoffice_reports' %}" class="nav-link">Certificate Reports</a>
             </div>
         </div>
         
@@ -534,23 +562,99 @@
             </a>
         </div>
     {% else %}
-        <!-- Basic Student Fallback -->
+        <!-- Student Sidebar (eSkooly Style) -->
+        
+        <!-- Search Menu Input -->
+        <div style="padding: 15px 15px 5px 15px;">
+            <div style="position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 15px; top: 12px; color: #a0a9b6; font-size: 14px;"></i>
+                <input type="text" placeholder="Search menu..." style="width: 100%; padding: 10px 10px 10px 38px; border-radius: 8px; border: 1px solid #e0e6ed; background: #fff; font-size: 13.5px; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+            </div>
+        </div>
+
         <div class="nav-item">
             <a href="{% url 'student_home' %}" class="nav-link {% if request.path == '/student/home/' %}active{% endif %}">
-                <i class="nav-icon fas fa-chart-pie"></i>
+                <i class="nav-icon fas fa-th-large"></i>
                 <span class="nav-text">Dashboard</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{% url 'student_view_attendance' %}" class="nav-link">
+            <a href="{% url 'student_admission_letter' %}" class="nav-link {% if 'admission' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-id-badge"></i>
+                <span class="nav-text">Admission Letter</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_fee_slip' %}" class="nav-link {% if 'fee-slip' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-receipt"></i>
+                <span class="nav-text">Paid Fee Recipt</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_timetable' %}" class="nav-link {% if 'timetable' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-calendar-alt"></i>
+                <span class="nav-text">My Timetable</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_report_card' %}" class="nav-link {% if 'report-card' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-clipboard-list"></i>
+                <span class="nav-text">My Report Card</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_test_results' %}" class="nav-link {% if 'test' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-chart-pie"></i>
+                <span class="nav-text">Test Results</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_view_result' %}" class="nav-link {% if 'result' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-pen"></i>
+                <span class="nav-text">Exam Result</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_homework' %}" class="nav-link {% if 'homework' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-book"></i>
+                <span class="nav-text">Home Assignments</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_online_store' %}" class="nav-link {% if 'store' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-shopping-cart"></i>
+                <span class="nav-text">Online Store</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'chat_home' %}" class="nav-link {% if 'chat' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-comment-dots"></i>
+                <span class="nav-text">Messaging</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_live_classes' %}" class="nav-link {% if 'live_class' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-video"></i>
+                <span class="nav-text">Live Class</span>
+            </a>
+        </div>
+        <!-- Keeping View Attendance since it's a real feature they have -->
+        <div class="nav-item">
+            <a href="{% url 'student_view_attendance' %}" class="nav-link {% if 'attendance' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-calendar-check"></i>
                 <span class="nav-text">View Attendance</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{% url 'student_view_result' %}" class="nav-link">
-                <i class="nav-icon fas fa-poll"></i>
-                <span class="nav-text">View Results</span>
+            <a href="{% url 'student_view_profile' %}" class="nav-link {% if 'profile' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-cog"></i>
+                <span class="nav-text">Account Settings</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'logout_user' %}" class="nav-link">
+                <i class="nav-icon fas fa-lock"></i>
+                <span class="nav-text">Log out</span>
             </a>
         </div>
     {% endif %}

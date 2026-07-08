@@ -22,11 +22,11 @@ class TestStudentModel:
         assert student.admin.user_type == '3'
         assert student.course is not None
         assert student.session is not None
-        assert str(student.admin) == student.admin.email
+        assert str(student.admin) == f"{student.admin.first_name} {student.admin.last_name}".strip()
 
 class TestStaffModel:
     def test_staff_creation(self):
         staff = StaffFactory()
         assert staff.admin.user_type == '2'
         assert staff.course is not None
-        assert str(staff.admin) == staff.admin.email
+        assert str(staff.admin) == f"{staff.admin.first_name} {staff.admin.last_name}".strip()

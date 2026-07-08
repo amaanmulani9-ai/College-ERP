@@ -2,6 +2,22 @@ import pytest
 from django.utils import timezone
 from main_app.models import CustomUser
 
+# Monkey patch Django's BaseContext copy to support Python 3.14+
+try:
+    from django.template.context import BaseContext
+    import copy
+
+    def _base_context_copy(self):
+        duplicate = self.__class__.__new__(self.__class__)
+        for k, v in self.__dict__.items():
+            setattr(duplicate, k, copy.copy(v))
+        duplicate.dicts = self.dicts[:]
+        return duplicate
+
+    BaseContext.__copy__ = _base_context_copy
+except ImportError:
+    pass
+
 @pytest.fixture(autouse=True)
 def timezone_settings(settings):
     """Ensure consistent timezone."""

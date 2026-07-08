@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from .decorators import admin_required, staff_required, student_required
 import json
 import math
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
@@ -11,6 +11,7 @@ from django.shortcuts import (HttpResponseRedirect, get_object_or_404,
                               redirect, render)
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 
 from .forms import *
 from .models import *
@@ -88,6 +89,23 @@ def student_home(request):
     # 3. Placement Drives Count
     active_drives = PlacementDrive.objects.filter(status='Active').count()
 
+    # 4. Learning hub counts
+    live_classes_qs = LiveClass.objects.filter(subject__course=student.course).select_related('subject', 'staff', 'staff__admin').order_by('-scheduled_at')
+    now = timezone.now()
+    live_now = 0
+    upcoming_live_classes = []
+    for live_class in live_classes_qs:
+        end_time = live_class.scheduled_at + timedelta(minutes=live_class.duration_minutes)
+        if live_class.is_active and live_class.scheduled_at <= now <= end_time:
+            live_now += 1
+        if live_class.scheduled_at >= now and len(upcoming_live_classes) < 4:
+            upcoming_live_classes.append(live_class)
+
+    assignment_count = Assignment.objects.filter(subject__course=student.course).count()
+    material_count = StudyMaterial.objects.filter(subject__course=student.course).count()
+    certificate_count = CertificateRequest.objects.filter(student=student).count()
+    fee_pending_count = fee_records.filter(status__in=['Unpaid', 'Partial']).count()
+
     context = {
         'total_attendance': total_attendance,
         'percent_present': percent_present,
@@ -104,6 +122,12 @@ def student_home(request):
         'result_test_scores': result_test_scores,
         'notifications': notifications,
         'today_lectures': today_lectures,
+        'live_now': live_now,
+        'upcoming_live_classes': upcoming_live_classes,
+        'assignment_count': assignment_count,
+        'material_count': material_count,
+        'certificate_count': certificate_count,
+        'fee_pending_count': fee_pending_count,
         'pending_fees': pending_fees,
         'active_drives': active_drives,
         'page_title': 'Student Dashboard',
@@ -272,16 +296,127 @@ def student_view_notification(request):
 @student_required
 def student_view_result(request):
     student = get_object_or_404(Student, admin=request.user)
-    results = StudentResult.objects.filter(student=student)
+    subjects = Subject.objects.filter(course=student.course)
+    results = StudentResult.objects.filter(student=student).select_related('subject')
+    result_map = {r.subject_id: r for r in results}
+    
+    # Build per-subject rows
+    result_rows = []
+    total_obtained = 0
+    total_max = 0
+    for subject in subjects:
+        r = result_map.get(subject.id)
+        obtained = (r.test + r.exam) if r else 0
+        max_marks = subject.marks
+        pct = round((obtained / max_marks * 100), 1) if max_marks > 0 else 0
+        if pct >= 90: grade = 'A+'
+        elif pct >= 75: grade = 'A'
+        elif pct >= 60: grade = 'B'
+        elif pct >= 45: grade = 'C'
+        elif pct >= 33: grade = 'D'
+        else: grade = 'F'
+        result_rows.append({'subject': subject, 'test': r.test if r else '-', 'exam': r.exam if r else '-',
+                             'obtained': obtained, 'max_marks': max_marks, 'pct': pct, 'grade': grade,
+                             'has_result': bool(r)})
+        total_obtained += obtained
+        total_max += max_marks
+    
+    overall_pct = round((total_obtained / total_max * 100), 1) if total_max > 0 else 0
     context = {
-        'results': results,
-        'page_title': "View Results"
+        'student': student,
+        'result_rows': result_rows,
+        'total_obtained': total_obtained,
+        'total_max': total_max,
+        'overall_pct': overall_pct,
+        'has_any_result': results.exists(),
+        'page_title': "Exam Result"
     }
     return render(request, "student_template/student_view_result.html", context)
 
 @login_required(login_url='/')
 @student_required
 def student_report_card(request):
+    student = get_object_or_404(Student, admin=request.user)
+    subjects = Subject.objects.filter(course=student.course)
+    results = StudentResult.objects.filter(student=student).select_related('subject')
+    result_map = {r.subject_id: r for r in results}
+    
+    # Attendance stats
+    total_attendance = AttendanceReport.objects.filter(student=student).count()
+    present_attendance = AttendanceReport.objects.filter(student=student, status=True).count()
+    attendance_pct = round((present_attendance / total_attendance * 100), 1) if total_attendance > 0 else 0
+    
+    # Per-subject result rows
+    result_rows = []
+    total_obtained = 0
+    total_max = 0
+    for subject in subjects:
+        r = result_map.get(subject.id)
+        test_marks = r.test if r else 0
+        exam_marks = r.exam if r else 0
+        obtained = test_marks + exam_marks
+        max_marks = subject.marks
+        pct = round((obtained / max_marks * 100), 1) if max_marks > 0 else 0
+        if pct >= 90: grade = 'A+'
+        elif pct >= 75: grade = 'A'
+        elif pct >= 60: grade = 'B'
+        elif pct >= 45: grade = 'C'
+        elif pct >= 33: grade = 'D'
+        else: grade = 'F'
+        result_rows.append({'subject': subject, 'test': test_marks, 'exam': exam_marks,
+                             'obtained': obtained, 'max_marks': max_marks, 'pct': pct, 'grade': grade})
+        total_obtained += obtained
+        total_max += max_marks
+    
+    overall_pct = round((total_obtained / total_max * 100), 1) if total_max > 0 else 0
+    if overall_pct >= 90: overall_grade = 'A+'
+    elif overall_pct >= 75: overall_grade = 'A'
+    elif overall_pct >= 60: overall_grade = 'B'
+    elif overall_pct >= 45: overall_grade = 'C'
+    elif overall_pct >= 33: overall_grade = 'D'
+    else: overall_grade = 'F'
+    overall_status = 'PASS' if overall_pct >= 33 else 'FAIL'
+    
+    # Ranking among classmates
+    classmates = Student.objects.filter(course=student.course)
+    class_scores = []
+    for cm in classmates:
+        cm_results = StudentResult.objects.filter(student=cm)
+        cm_obtained = sum(r.test + r.exam for r in cm_results)
+        cm_max = sum(r.subject.marks for r in cm_results)
+        cm_pct = (cm_obtained / cm_max * 100) if cm_max > 0 else 0
+        class_scores.append(cm_pct)
+    class_scores.sort(reverse=True)
+    rank = class_scores.index(overall_pct) + 1 if overall_pct in class_scores else len(class_scores)
+    class_strength = len(class_scores)
+    class_avg = round(sum(class_scores) / len(class_scores), 1) if class_scores else 0
+    max_avg = round(max(class_scores), 1) if class_scores else 0
+    min_avg = round(min(class_scores), 1) if class_scores else 0
+    
+    context = {
+        'student': student,
+        'result_rows': result_rows,
+        'total_obtained': total_obtained,
+        'total_max': total_max,
+        'overall_pct': overall_pct,
+        'overall_grade': overall_grade,
+        'overall_status': overall_status,
+        'attendance_pct': attendance_pct,
+        'rank': rank,
+        'class_strength': class_strength,
+        'class_avg': class_avg,
+        'max_avg': max_avg,
+        'min_avg': min_avg,
+        'academic_year': student.academic_year_label,
+        'semester_progress': student.semester_progress,
+        'page_title': "Report Card"
+    }
+    return render(request, 'student_template/student_report_card.html', context)
+
+
+@login_required(login_url='/')
+@student_required
+def student_report_card_pdf(request):
     import io
     from xhtml2pdf import pisa
     from django.template.loader import get_template
@@ -289,35 +424,26 @@ def student_report_card(request):
 
     student = get_object_or_404(Student, admin=request.user)
     results = StudentResult.objects.filter(student=student)
-    
-    # Calculate overall stats
-    total_marks = 0
-    max_marks = 0
-    for r in results:
-        total_marks += (r.test + r.exam)
-        max_marks += 100
-        
+    total_marks = sum(r.test + r.exam for r in results)
+    max_marks = sum(r.subject.marks for r in results)
     percentage = (total_marks / max_marks * 100) if max_marks > 0 else 0
-    
     context = {
         'student': student,
         'results': results,
         'total_marks': total_marks,
         'max_marks': max_marks,
         'percentage': percentage,
+        'academic_year': student.academic_year_label,
+        'semester_progress': student.semester_progress,
         'page_title': "Report Card"
     }
-    
-    template_path = 'student_template/student_report_card_pdf.html'
-    template = get_template(template_path)
+    template = get_template('student_template/student_report_card_pdf.html')
     html = template.render(context)
-    
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="report_card_{student.admin.first_name}.pdf"'
-    
     pisa_status = pisa.CreatePDF(html, dest=response)
     if pisa_status.err:
-       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+        return HttpResponse('Error generating PDF')
     return response
 
 
@@ -400,22 +526,28 @@ def borrow_book(request, isbn):
 @student_required
 def student_timetable(request):
     student = get_object_or_404(Student, admin=request.user)
-    slots = Timetable.objects.filter(course=student.course).select_related('subject', 'subject__staff', 'subject__staff__admin').order_by('day_of_week', 'start_time')
-    
-    # Group slots by day (0 to 5) for easier rendering in a grid
+    slots = Timetable.objects.filter(course=student.course).select_related(
+        'subject', 'subject__staff', 'subject__staff__admin'
+    ).order_by('day_of_week', 'start_time')
     timetable_by_day = {i: [] for i in range(6)}
     for slot in slots:
         timetable_by_day[slot.day_of_week].append(slot)
-        
-    day_names = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-    
+    day_names = [(0,'Monday'),(1,'Tuesday'),(2,'Wednesday'),(3,'Thursday'),(4,'Friday'),(5,'Saturday')]
+    school_days = sum(1 for v in timetable_by_day.values() if v)
+    total_periods = slots.count()
+    total_subjects = Subject.objects.filter(course=student.course).count()
     context = {
+        'student': student,
         'timetable_by_day': timetable_by_day,
+        'timetable_list': list(slots),
         'day_names': day_names,
-        'page_title': "Class Timetable"
+        'school_days': school_days,
+        'total_periods': total_periods,
+        'total_subjects': total_subjects,
+        'timetable_has_data': total_periods > 0,
+        'page_title': 'My Timetable',
     }
-    return render(request, "student_template/student_timetable.html", context)
-
+    return render(request, 'student_template/student_timetable.html', context)
 
 @login_required(login_url='/')
 @student_required
@@ -564,7 +696,11 @@ def student_certificates(request):
     requests = CertificateRequest.objects.filter(student=student).order_by('-created_at')
     
     context = {
+        'student': student,
         'requests': requests,
+        'approved_count': requests.filter(status='Approved').count(),
+        'pending_count': requests.filter(status='Pending').count(),
+        'rejected_count': requests.filter(status='Rejected').count(),
         'page_title': "Certificates Portal"
     }
     return render(request, "student_template/student_certificates.html", context)
@@ -1104,12 +1240,33 @@ def student_lms_home(request):
     courses = VideoCourse.objects.filter(subject__course=student.course).order_by('-created_at')
     assignments = Assignment.objects.filter(subject__course=student.course).order_by('-due_date')
     materials = StudyMaterial.objects.filter(subject__course=student.course).order_by('-created_at')
+    live_classes = LiveClass.objects.filter(subject__course=student.course).select_related('subject', 'staff').order_by('-scheduled_at')
+    now = timezone.now()
+    live_now = []
+    upcoming_live = []
+    for live_class in live_classes:
+        end_time = live_class.scheduled_at + timedelta(minutes=live_class.duration_minutes)
+        live_class.ends_at = end_time
+        live_class.is_live_now = live_class.is_active and live_class.scheduled_at <= now <= end_time
+        live_class.is_upcoming = live_class.scheduled_at > now
+        live_class.starts_in_minutes = max(0, int((live_class.scheduled_at - now).total_seconds() // 60)) if live_class.is_upcoming else 0
+        if live_class.is_live_now:
+            live_now.append(live_class)
+        elif live_class.is_upcoming:
+            upcoming_live.append(live_class)
     
     context = {
         'page_title': 'Learning Management System (LMS)',
         'courses': courses,
         'assignments': assignments,
         'materials': materials,
+        'courses_count': courses.count(),
+        'assignments_count': assignments.count(),
+        'materials_count': materials.count(),
+        'live_now_count': len(live_now),
+        'upcoming_live_count': len(upcoming_live),
+        'live_now': live_now,
+        'upcoming_live': upcoming_live[:4],
     }
     return render(request, "student_template/student_lms_home.html", context)
 
@@ -1172,12 +1329,14 @@ def student_assignments(request):
     # Get student's submissions mapped by assignment id
     submissions = AssignmentSubmission.objects.filter(student=student).select_related('assignment', 'student__admin')
     submitted_assignment_ids = submissions.values_list('assignment_id', flat=True)
+    pending_assignment_count = assignments.exclude(id__in=submitted_assignment_ids).count()
     
     context = {
         'page_title': 'My Assignments',
         'assignments': assignments,
         'submissions': {sub.assignment_id: sub for sub in submissions},
         'submitted_assignment_ids': list(submitted_assignment_ids),
+        'pending_assignment_count': pending_assignment_count,
     }
     return render(request, "student_template/student_assignments.html", context)
 
@@ -1230,10 +1389,34 @@ def student_materials(request):
 @student_required
 def student_live_classes(request):
     student = get_object_or_404(Student, admin=request.user)
-    live_classes = LiveClass.objects.filter(subject__course=student.course).order_by('-scheduled_at')
+    now = timezone.now()
+    live_classes = LiveClass.objects.filter(subject__course=student.course).select_related(
+        'subject', 'staff', 'staff__admin'
+    ).order_by('-scheduled_at')
+
+    live_now = []
+    upcoming = []
+    past = []
+    for live_class in live_classes:
+        end_time = live_class.scheduled_at + timedelta(minutes=live_class.duration_minutes)
+        live_class.ends_at = end_time
+        live_class.is_live_now = live_class.is_active and live_class.scheduled_at <= now <= end_time
+        live_class.is_upcoming = live_class.scheduled_at > now
+        live_class.starts_in_minutes = max(0, int((live_class.scheduled_at - now).total_seconds() // 60)) if live_class.is_upcoming else 0
+        if live_class.is_active and live_class.scheduled_at <= now <= end_time:
+            live_now.append(live_class)
+        elif live_class.scheduled_at > now:
+            upcoming.append(live_class)
+        else:
+            past.append(live_class)
+
     context = {
         'page_title': 'Live Virtual Classrooms',
         'live_classes': live_classes,
+        'live_now': live_now,
+        'upcoming_classes': upcoming,
+        'past_classes': past,
+        'live_total': live_classes.count(),
     }
     return render(request, "student_template/student_live_classes.html", context)
 
@@ -1279,3 +1462,202 @@ def student_leave_live_class(request, class_id):
     messages.success(request, f"You left the live class '{live_class.title}'.")
     return redirect(reverse('student_live_classes'))
 
+
+@login_required(login_url='/')
+@student_required
+def student_admission_letter(request):
+    student = get_object_or_404(Student, admin=request.user)
+    context = {
+        'page_title': 'Admission Letter',
+        'student': student
+    }
+    return render(request, 'student_template/admission_letter.html', context)
+
+@login_required(login_url='/')
+@student_required
+def student_fee_slip(request):
+    student = get_object_or_404(Student, admin=request.user)
+    context = {
+        'page_title': 'Fee Slip',
+        'student': student
+    }
+    return render(request, 'student_template/fee_slip.html', context)
+
+@login_required(login_url='/')
+@student_required
+def student_view_course(request, course_id):
+    student = get_object_or_404(Student, admin=request.user)
+    course = get_object_or_404(VideoCourse, id=course_id, subject__course=student.course)
+    lessons = course.lessons.all().order_by('order')
+    
+    # Get completed lesson IDs for this student
+    completed_lesson_ids = CourseProgress.objects.filter(
+        student=student, lesson__in=lessons, is_completed=True
+    ).values_list('lesson_id', flat=True)
+    
+    context = {
+        'page_title': course.title,
+        'course': course,
+        'lessons': lessons,
+        'completed_lesson_ids': list(completed_lesson_ids),
+    }
+    return render(request, "student_template/student_view_course.html", context)
+
+@login_required(login_url='/')
+@student_required
+def student_watch_lesson(request, lesson_id):
+    student = get_object_or_404(Student, admin=request.user)
+    lesson = get_object_or_404(VideoLesson, id=lesson_id, course__subject__course=student.course)
+    course = lesson.course
+    lessons = course.lessons.all().order_by('order')
+    
+    # Mark completion or get progress
+    progress, created = CourseProgress.objects.get_or_create(student=student, lesson=lesson)
+    if request.method == 'POST':
+        progress.is_completed = True
+        progress.save()
+        messages.success(request, f"Lesson '{lesson.title}' marked as completed!")
+        return redirect(reverse('student_watch_lesson', args=[lesson.id]))
+        
+    completed_lesson_ids = CourseProgress.objects.filter(
+        student=student, lesson__in=lessons, is_completed=True
+    ).values_list('lesson_id', flat=True)
+    
+    context = {
+        'page_title': f"{lesson.title} - {course.title}",
+        'lesson': lesson,
+        'course': course,
+        'lessons': lessons,
+        'is_completed': progress.is_completed,
+        'completed_lesson_ids': list(completed_lesson_ids),
+    }
+    return render(request, "student_template/student_watch_lesson.html", context)
+
+@login_required(login_url='/')
+@student_required
+def student_join_live_class(request, class_id):
+    student = get_object_or_404(Student, admin=request.user)
+    live_class = get_object_or_404(LiveClass, id=class_id, subject__course=student.course)
+    
+    from django.utils import timezone
+    attendance, created = LiveClassAttendance.objects.get_or_create(
+        live_class=live_class,
+        student=student,
+        defaults={'joined_at': timezone.now()}
+    )
+    if not created:
+        attendance.joined_at = timezone.now()
+        attendance.left_at = None
+        attendance.save()
+        
+    context = {
+        'page_title': f"Join: {live_class.title}",
+        'live_class': live_class,
+        'student': student,
+    }
+    return render(request, "student_template/student_join_live_class.html", context)
+
+
+@login_required(login_url='/')
+@student_required
+def student_leave_live_class(request, class_id):
+    student = get_object_or_404(Student, admin=request.user)
+    live_class = get_object_or_404(LiveClass, id=class_id, subject__course=student.course)
+    
+    from django.utils import timezone
+    LiveClassAttendance.objects.filter(
+        live_class=live_class,
+        student=student,
+        left_at__isnull=True
+    ).update(left_at=timezone.now())
+    
+    messages.success(request, f"You left the live class '{live_class.title}'.")
+    return redirect(reverse('student_live_classes'))
+
+
+@login_required(login_url='/')
+@student_required
+def student_admission_letter(request):
+    student = get_object_or_404(Student, admin=request.user)
+    context = {
+        'page_title': 'Admission Letter',
+        'student': student
+    }
+    return render(request, 'student_template/admission_letter.html', context)
+
+@login_required(login_url='/')
+@student_required
+def student_fee_slip(request):
+    student = get_object_or_404(Student, admin=request.user)
+    fee_records = FeeRecord.objects.filter(student=student).order_by('due_date')
+    total_pending = sum(r.amount - r.amount_paid for r in fee_records if r.status != 'Paid')
+    context = {
+        'page_title': 'Paid Fee Slip',
+        'student': student,
+        'fee_records': fee_records,
+        'total_pending': total_pending,
+        'has_records': fee_records.exists(),
+    }
+    return render(request, 'student_template/fee_slip.html', context)
+
+
+@login_required(login_url='/')
+@student_required
+def student_homework(request):
+    student = get_object_or_404(Student, admin=request.user)
+    subjects = Subject.objects.filter(course=student.course)
+    context = {
+        'page_title': 'Homework / Home Assignments',
+        'student': student,
+        'subjects': subjects,
+    }
+    return render(request, 'student_template/student_homework.html', context)
+
+@login_required(login_url='/')
+@student_required
+def student_test_results(request):
+    student = get_object_or_404(Student, admin=request.user)
+    subjects = Subject.objects.filter(course=student.course)
+    results = StudentResult.objects.filter(student=student).select_related('subject')
+    result_map = {r.subject_id: r for r in results}
+
+    rows = []
+    total_obtained = 0
+    total_max = 0
+    for subject in subjects:
+        r = result_map.get(subject.id)
+        test_marks = r.test if r else 0
+        max_marks = subject.marks
+        pct = round((test_marks / max_marks * 100), 1) if max_marks > 0 else 0
+        rows.append({
+            'subject': subject,
+            'test_marks': test_marks,
+            'max_marks': max_marks,
+            'pct': pct,
+        })
+        total_obtained += test_marks
+        total_max += max_marks
+
+    overall_pct = round((total_obtained / total_max * 100), 1) if total_max > 0 else 0
+
+    context = {
+        'page_title': 'Class Test Report',
+        'student': student,
+        'rows': rows,
+        'total_obtained': total_obtained,
+        'total_max': total_max,
+        'overall_pct': overall_pct,
+        'has_results': results.exists(),
+    }
+    return render(request, 'student_template/student_test_results.html', context)
+
+
+@login_required(login_url='/')
+@student_required
+def student_online_store(request):
+    student = get_object_or_404(Student, admin=request.user)
+    context = {
+        'page_title': 'Online Store',
+        'student': student
+    }
+    return render(request, 'student_template/student_online_store.html', context)

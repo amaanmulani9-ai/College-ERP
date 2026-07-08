@@ -1,4 +1,5 @@
 import json
+from datetime import date
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -6,8 +7,9 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from .models import CustomUser, Student, Staff, Course, ChatMessage, NotificationStudent, NotificationStaff
-from .communication_helper import send_email_brevo, send_sms_twilio, send_fcm_push
+from django.utils import timezone
+from .models import CustomUser, Student, Staff, Parent, Course, Session, Timetable, LiveClass, FeeRecord, ChatMessage, NotificationStudent, NotificationStaff
+from .communication_helper import send_email_brevo, send_sms_twilio, send_fcm_push, build_whatsapp_link, normalize_whatsapp_number
 
 @login_required
 def chat_home(request):
@@ -127,6 +129,216 @@ def announcements_board(request):
         'courses': Course.objects.all(),
     }
     return render(request, "hod_template/announcements.html", context)
+
+
+def _first_phone(*values):
+    for value in values:
+        phone = normalize_whatsapp_number(value)
+        if phone:
+            return phone
+    return ""
+
+
+def _student_phone(student):
+    parent_phone = ""
+    parent = Parent.objects.filter(student=student, mobile_number__isnull=False).exclude(mobile_number="").first()
+    if parent:
+        parent_phone = parent.mobile_number
+    return _first_phone(student.mobile, parent_phone)
+
+
+def _staff_phone(staff):
+    return _first_phone(staff.mobile_number)
+
+
+def _student_message(student, template_key, body, links):
+    course_name = student.course.name if student.course else "your course"
+    if template_key == "live_class":
+        return f"{body}\n\nCourse: {course_name}\nLive classes: {links['live_classes']}"
+    if template_key == "timetable":
+        return f"{body}\n\nCourse: {course_name}\nTimetable: {links['timetable']}"
+    if template_key == "report_link":
+        return f"{body}\n\nCourse: {course_name}\nReport card: {links['report_card']}"
+    if template_key == "payment_link":
+        return f"{body}\n\nCourse: {course_name}\nFee payment: {links['payment']}"
+    return body
+
+
+def _staff_message(staff, template_key, body, links):
+    course_name = staff.course.name if staff.course else "your department"
+    if template_key == "timetable":
+        return f"{body}\n\nCourse: {course_name}\nTimetable: {links['staff_timetable']}"
+    if template_key == "live_class":
+        return f"{body}\n\nCourse: {course_name}\nLive classes: {links['live_classes']}"
+    return body
+
+
+@login_required
+def whatsapp_center(request):
+    current_user = request.user
+    user_type = str(getattr(current_user, 'user_type', ''))
+    can_target_students = user_type in ['1', '2']
+    can_target_staff = user_type in ['1', '2']
+    can_target_self_course = user_type in ['2', '3']
+
+    courses = Course.objects.all().order_by('name')
+    sessions = Session.objects.all().order_by('-start_year')
+    live_classes = LiveClass.objects.select_related('subject', 'subject__course').order_by('-scheduled_at')[:50]
+    pending_fees = FeeRecord.objects.filter(status__in=['Unpaid', 'Partial']).select_related('student__admin', 'student__course').order_by('due_date')[:80]
+
+    generated_links = []
+    audience = request.POST.get('audience', request.GET.get('audience', ''))
+    template_key = request.POST.get('template_key', request.GET.get('template', 'custom'))
+    message_body = (request.POST.get('message') or '').strip()
+    course_id = request.POST.get('course', request.GET.get('course'))
+    session_id = request.POST.get('session', request.GET.get('session'))
+    batch_year = request.POST.get('batch_year', request.GET.get('batch_year'))
+    semester = request.POST.get('semester', request.GET.get('semester'))
+    live_class_id = request.POST.get('live_class', request.GET.get('live_class'))
+    specific_numbers = request.POST.get('specific_numbers', request.GET.get('specific_numbers', ''))
+
+    selected_course = Course.objects.filter(id=course_id).first() if course_id else None
+    selected_session = Session.objects.filter(id=session_id).first() if session_id else None
+    selected_live_class = LiveClass.objects.select_related('subject', 'subject__course', 'staff', 'staff__admin').filter(id=live_class_id).first() if live_class_id else None
+    now = timezone.now()
+
+    if request.method == 'GET' and not message_body:
+        default_messages = {
+            'live_class': 'Please join the live class on time and keep your camera/mic ready.',
+            'timetable': 'Your updated timetable is now available in the portal.',
+            'report_link': 'Your report card is ready. Please review it from the portal.',
+            'payment_link': 'Your payment link is ready. Please clear dues before the deadline.',
+            'event_notice': 'Please read this important notice carefully.',
+        }
+        message_body = default_messages.get(template_key, '')
+
+    if request.method == 'POST':
+        if template_key == 'live_class' and selected_live_class:
+            course_name = selected_live_class.subject.course.name if selected_live_class.subject and selected_live_class.subject.course else "your course"
+            message_body = message_body or (
+                f"Live class alert for {course_name}: {selected_live_class.title} starts at "
+                f"{selected_live_class.scheduled_at.strftime('%d %b %Y, %I:%M %p')}."
+            )
+        elif template_key == 'timetable':
+            message_body = message_body or "Your updated timetable is ready."
+        elif template_key == 'report_link':
+            message_body = message_body or "Your report card is ready. Please open the link below."
+        elif template_key == 'payment_link':
+            message_body = message_body or "Your fee statement is ready. Please check the link below."
+        elif template_key == 'event_notice':
+            message_body = message_body or "Please check this important notice from the college."
+
+        student_qs = Student.objects.select_related('admin', 'course', 'session').all()
+        staff_qs = Staff.objects.select_related('admin', 'course').all()
+        parent_qs = Parent.objects.select_related('admin', 'student', 'student__course').all()
+
+        if audience == 'all_students' and can_target_students:
+            recipients = student_qs
+        elif audience == 'course_students' and can_target_students and selected_course:
+            recipients = student_qs.filter(course=selected_course)
+        elif audience == 'batch_students' and can_target_students and batch_year:
+            recipients = student_qs.filter(batch_year=batch_year)
+        elif audience == 'semester_students' and can_target_students and semester:
+            recipients = student_qs.filter(current_semester=semester)
+        elif audience == 'previous_year_students' and can_target_students:
+            recipients = student_qs.filter(batch_year__lt=now.year)
+        elif audience == 'live_class_students' and can_target_students and selected_live_class:
+            recipients = student_qs.filter(course=selected_live_class.subject.course)
+        elif audience == 'all_staff' and can_target_staff:
+            recipients = staff_qs
+        elif audience == 'course_staff' and can_target_self_course and selected_course:
+            recipients = staff_qs.filter(course=selected_course)
+        elif audience == 'parents' and can_target_students:
+            recipients = parent_qs
+        elif audience == 'specific_numbers':
+            recipients = []
+        else:
+            recipients = []
+
+        recipient_count = 0
+        if audience == 'specific_numbers':
+            numbers = [item.strip() for item in specific_numbers.replace('\n', ',').split(',') if item.strip()]
+            for number in numbers:
+                link = build_whatsapp_link(number, message_body)
+                if link:
+                    generated_links.append({
+                        'name': number,
+                        'role': 'Custom',
+                        'phone': normalize_whatsapp_number(number),
+                        'message': message_body,
+                        'link': link,
+                    })
+            recipient_count = len(generated_links)
+        else:
+            for recipient in recipients:
+                if isinstance(recipient, Student):
+                    phone = _student_phone(recipient)
+                    portal_links = {
+                        'live_classes': request.build_absolute_uri(reverse('student_live_classes')),
+                        'timetable': request.build_absolute_uri(reverse('student_timetable')),
+                        'report_card': request.build_absolute_uri(reverse('student_report_card')),
+                        'payment': request.build_absolute_uri(reverse('student_payable_fees')),
+                        'staff_timetable': request.build_absolute_uri(reverse('staff_view_timetable')),
+                    }
+                    text = _student_message(recipient, template_key, message_body, portal_links)
+                    name = recipient.admin.get_full_name() or recipient.admin.email
+                    role = 'Student'
+                elif isinstance(recipient, Staff):
+                    phone = _staff_phone(recipient)
+                    portal_links = {
+                        'live_classes': request.build_absolute_uri(reverse('student_live_classes')),
+                        'timetable': request.build_absolute_uri(reverse('staff_view_timetable')),
+                        'report_card': request.build_absolute_uri(reverse('admin_home')),
+                        'payment': request.build_absolute_uri(reverse('admin_finance_dashboard')),
+                        'staff_timetable': request.build_absolute_uri(reverse('staff_view_timetable')),
+                    }
+                    text = _staff_message(recipient, template_key, message_body, portal_links)
+                    name = recipient.admin.get_full_name() or recipient.admin.email
+                    role = 'Staff'
+                else:
+                    phone = _first_phone(recipient.mobile_number)
+                    text = message_body
+                    name = recipient.admin.get_full_name() or recipient.admin.email
+                    role = 'Parent'
+
+                if not phone:
+                    continue
+                generated_links.append({
+                    'name': name,
+                    'role': role,
+                    'phone': phone,
+                    'message': text,
+                    'link': build_whatsapp_link(phone, text),
+                })
+            recipient_count = len(generated_links)
+
+        if recipient_count:
+            messages.success(request, f"Prepared {recipient_count} WhatsApp chat link(s). Open each chat to send the message.")
+        else:
+            messages.warning(request, "No WhatsApp-ready recipients were found. Check numbers, course, batch, and audience filters.")
+
+    context = {
+        'page_title': 'WhatsApp Command Center',
+        'courses': courses,
+        'sessions': sessions,
+        'live_classes': live_classes,
+        'pending_fees': pending_fees,
+        'generated_links': generated_links,
+        'selected_course': selected_course,
+        'selected_session': selected_session,
+        'selected_live_class': selected_live_class,
+        'template_key': template_key,
+        'audience': audience,
+        'message_body': message_body,
+        'can_target_students': can_target_students,
+        'can_target_staff': can_target_staff,
+        'can_target_self_course': can_target_self_course,
+        'student_count': Student.objects.exclude(mobile__isnull=True).exclude(mobile__exact='').count(),
+        'staff_count': Staff.objects.exclude(mobile_number__isnull=True).exclude(mobile_number__exact='').count(),
+        'parent_count': Parent.objects.exclude(mobile_number__isnull=True).exclude(mobile_number__exact='').count(),
+        'today': now,
+    }
+    return render(request, "hod_template/whatsapp_center.html", context)
 
 @login_required
 def post_announcement(request):

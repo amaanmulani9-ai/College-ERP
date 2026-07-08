@@ -1,0 +1,162 @@
+
+    /* eSkooly Sidebar specific overrides */
+    .erpnext-sidebar {
+        background-color: #ffffff;
+        border-right: 1px solid #e0e6ed;
+        font-family: 'Poppins', sans-serif;
+    }
+    .sidebar-header {
+        display: none; /* Hide old profile header */
+    }
+    .eskooly-sidebar-top {
+        padding: 20px 24px 10px;
+    }
+    .eskooly-menu-label {
+        font-size: 11px;
+        color: #8a98ac;
+        text-transform: uppercase;
+        font-weight: 500;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+    }
+    .eskooly-search {
+        position: relative;
+        margin-bottom: 15px;
+    }
+    .eskooly-search input {
+        width: 100%;
+        border: none;
+        background: transparent;
+        border-bottom: 1px solid #e0e6ed;
+        padding: 5px 0 5px 20px;
+        font-size: 13px;
+        color: #555;
+        outline: none;
+    }
+    .eskooly-search input::placeholder {
+        color: #a0a9b6;
+    }
+    .eskooly-search i {
+        position: absolute;
+        left: 0;
+        top: 8px;
+        font-size: 12px;
+        color: #a0a9b6;
+    }
+    
+    .nav-section {
+        padding: 0 10px;
+    }
+    .nav-item {
+        margin: 0;
+    }
+    .nav-link {
+        padding: 10px 14px;
+        color: #647081;
+        font-size: 14px;
+        font-weight: 400;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s;
+        border-radius: 4px;
+        text-decoration: none !important;
+    }
+    .nav-icon {
+        width: 28px;
+        font-size: 16px;
+        color: #8a98ac;
+        text-align: left;
+    }
+    .nav-text {
+        flex: 1;
+    }
+    .nav-arrow {
+        font-size: 12px;
+        color: #8a98ac;
+        font-weight: 400;
+    }
+    /* Override arrow to be a plus/minus */
+    .nav-item.has-submenu > .nav-link .nav-arrow::before {
+        content: "\f068"; /* FontAwesome minus if open, plus if closed */
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+    }
+    .nav-item.has-submenu > .nav-link .nav-arrow::before {
+        content: "\f067"; /* default to plus */
+    }
+    .nav-item.has-submenu.open > .nav-link .nav-arrow::before {
+        content: "\f068"; /* minus when open */
+    }
+    
+    .nav-link:hover {
+        background-color: #f8f9fa;
+        color: #4b6bfb;
+    }
+    .nav-link:hover .nav-icon {
+        color: #4b6bfb;
+    }
+    
+    .nav-link.active {
+        background-color: #f8f9fa;
+        color: #4b6bfb;
+        font-weight: 500;
+    }
+    .nav-link.active .nav-icon {
+        color: #4b6bfb;
+    }
+
+    /* Submenu styling matching eSkooly */
+    .nav-submenu {
+        background-color: #ffffff;
+        position: relative;
+        margin-left: 28px;
+        padding-left: 0;
+        border-left: 1px solid #e0e8ff; /* Clean light blue track line */
+        margin-bottom: 8px;
+        margin-top: 4px;
+        display: none;
+    }
+    .nav-item.open .nav-submenu {
+        display: block;
+    }
+    .nav-submenu .nav-link {
+        padding: 8px 16px 8px 24px;
+        font-size: 13px;
+        color: #647081;
+        background: transparent !important;
+        border-radius: 0;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .nav-submenu .nav-link:hover {
+        color: #4b6bfb;
+    }
+    .nav-submenu .nav-link.active {
+        color: #4b6bfb;
+        font-weight: 500;
+    }
+    /* Active dot indicator on the track line */
+    .nav-submenu .nav-link.active::before {
+        content: '';
+        position: absolute;
+        left: -4.5px; /* Center 8px dot on the 1px track line */
+        top: 50%;
+        transform: translateY(-50%);
+        width: 8px;
+        height: 8px;
+        background-color: #4b6bfb;
+        border-radius: 50%;
+        z-index: 2;
+    }
+    /* Lock icon for pro features */
+    .lock-icon {
+        color: #ff7675;
+        font-size: 14px;
+        margin-left: auto;
+    }
+    .nav-submenu .nav-link. {
+        color: #a0a9b6 !important;
+        cursor: not-allowed;
+    }

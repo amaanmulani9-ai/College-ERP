@@ -1,0 +1,198 @@
+{% extends 'main_app/base.html' %}
+
+{% block page_title %}Pro Modules{% endblock page_title %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Pro Modules</li>
+{% endblock breadcrumb %}
+
+{% block custom_css %}
+<style>
+.pro-shell {
+    font-family: 'Poppins', sans-serif;
+}
+.pro-hero {
+    background: #ffffff;
+    border: 1px solid #edf0f4;
+    border-radius: 8px;
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 8px 22px rgba(16, 24, 40, .05);
+}
+.pro-hero h2 {
+    margin: 0 0 5px;
+    font-size: 22px;
+    font-weight: 800;
+    color: #202533;
+}
+.pro-hero p {
+    margin: 0;
+    color: #697386;
+    font-size: 13px;
+}
+.pro-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: #edf7ff;
+    color: #0769b3;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.pro-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 16px;
+}
+.pro-card {
+    background: #fff;
+    border: 1px solid #edf0f4;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 22px rgba(16, 24, 40, .05);
+}
+.pro-card-top {
+    padding: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    border-bottom: 1px solid #f0f2f5;
+}
+.pro-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex: 0 0 auto;
+}
+.pro-card h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: #202533;
+}
+.pro-card p {
+    margin: 5px 0 0;
+    color: #697386;
+    font-size: 12px;
+    line-height: 1.55;
+}
+.pro-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-bottom: 1px solid #f0f2f5;
+}
+.pro-metric {
+    padding: 14px 12px;
+    border-right: 1px solid #f0f2f5;
+}
+.pro-metric:last-child {
+    border-right: 0;
+}
+.pro-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: #202533;
+    line-height: 1;
+}
+.pro-label {
+    margin-top: 5px;
+    font-size: 10px;
+    color: #7a8495;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 700;
+}
+.pro-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 14px;
+}
+.pro-link {
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 9px 11px;
+    border-radius: 6px;
+    background: #f8fafc;
+    color: #334155;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+}
+.pro-link:hover {
+    background: #eef2ff;
+    color: #4f46e5;
+    text-decoration: none;
+}
+.tone-green .pro-icon { background: #eafaf1; color: #16a34a; }
+.tone-blue .pro-icon { background: #eff6ff; color: #2563eb; }
+.tone-orange .pro-icon { background: #fff7ed; color: #f97316; }
+.tone-purple .pro-icon { background: #f5f3ff; color: #7c3aed; }
+.tone-teal .pro-icon { background: #ecfeff; color: #0891b2; }
+.tone-red .pro-icon { background: #fef2f2; color: #dc2626; }
+@media (max-width: 768px) {
+    .pro-hero { align-items: flex-start; flex-direction: column; }
+    .pro-grid { grid-template-columns: 1fr; }
+    .pro-links { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="pro-shell">
+    <div class="pro-hero">
+        <div>
+            <h2>eSkooly Pro-style module center</h2>
+            <p>Role dashboards, live counters, and shortcuts for the Pro features you want to bring into this ERP.</p>
+        </div>
+        <div class="pro-hero-badge">
+            <i class="fas fa-layer-group"></i>
+            {{ pro_modules|length }} role workspaces
+        </div>
+    </div>
+
+    <div class="pro-grid">
+        {% for module in pro_modules %}
+        <section class="pro-card tone-{{ module.tone }}">
+            <div class="pro-card-top">
+                <div class="pro-icon"><i class="{{ module.icon }}"></i></div>
+                <div>
+                    <h3>{{ module.role }}</h3>
+                    <p>{{ module.summary }}</p>
+                </div>
+            </div>
+            <div class="pro-metrics">
+                {% for metric in module.metrics %}
+                <div class="pro-metric">
+                    <div class="pro-value">{{ metric.value|floatformat:0 }}</div>
+                    <div class="pro-label">{{ metric.label }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="pro-links">
+                {% for link in module.links %}
+                <a href="{{ link.url }}" class="pro-link">
+                    <span>{{ link.label }}</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

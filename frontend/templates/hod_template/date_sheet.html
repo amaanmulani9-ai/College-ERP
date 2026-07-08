@@ -1,0 +1,41 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+{% block content %}
+<div class="container-fluid py-3">
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <h3 class="mb-1">Date Sheet</h3>
+                <div class="text-muted small">Printable exam dates sourced from your event calendar.</div>
+            </div>
+            <button class="btn btn-outline-primary btn-sm" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                        <tr>
+                            <td><strong>{{ event.date|date:"d M Y" }}</strong></td>
+                            <td>{{ event.title }}</td>
+                            <td>{{ event.description|default:"-" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="3" class="text-center text-muted py-5">No exam dates available.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}

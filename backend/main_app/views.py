@@ -2,9 +2,12 @@ import json
 import requests
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse, JsonResponse
+from django.core.cache import cache
+from django.db import connection
+from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.http import url_has_allowed_host_and_scheme
 
 
 from .models import Attendance, Session, Subject, NotificationStudent, NotificationStaff
@@ -13,25 +16,73 @@ from .analytics_helper import log_analytics_event
 
 # Create your views here.
 
+LOGIN_REDIRECT_ROUTES = {
+    "1": "admin_home",
+    "2": "staff_home",
+    "3": "student_home",
+    "4": "parent_home",
+    "5": "alumni_portal",
+    "6": "company_hr_dashboard",
+    "7": "backoffice_home",
+    "8": "super_admin_dashboard",
+}
+
+
+def _safe_next_url(request):
+    next_url = (request.POST.get("next") or request.GET.get("next") or "").strip()
+    if not next_url:
+        return ""
+    if url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return ""
+
+
+def _redirect_for_user(user):
+    route_name = LOGIN_REDIRECT_ROUTES.get(str(getattr(user, "user_type", "")))
+    if route_name:
+        return redirect(reverse(route_name))
+    return redirect(reverse("login_page"))
+
 
 def login_page(request):
     if request.user.is_authenticated:
-        if request.user.user_type == '1':
-            return redirect(reverse("admin_home"))
-        elif request.user.user_type == '2':
-            return redirect(reverse("staff_home"))
-        elif request.user.user_type == '4':
-            return redirect(reverse("parent_home"))
-        elif request.user.user_type == '7':
-            return redirect(reverse("backoffice_home"))
-        elif request.user.user_type == '8':
-            return redirect(reverse("super_admin_dashboard"))
-        else:
-            return redirect(reverse("student_home"))
-    return render(request, 'main_app/erpnext_login.html')
+        next_url = _safe_next_url(request)
+        if next_url:
+            return redirect(next_url)
+        return _redirect_for_user(request.user)
+    return render(request, 'main_app/erpnext_login.html', {'next_url': _safe_next_url(request)})
 
 def offline(request):
     return render(request, 'main_app/offline.html')
+
+
+def health_check(request):
+    checks = {
+        'database': False,
+        'cache': False,
+    }
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT 1')
+            cursor.fetchone()
+        checks['database'] = True
+    except Exception:
+        pass
+
+    try:
+        cache_key = 'health_check'
+        cache.set(cache_key, 'ok', timeout=10)
+        checks['cache'] = cache.get(cache_key) == 'ok'
+    except Exception:
+        pass
+
+    status_code = 200 if all(checks.values()) else 503
+    return JsonResponse({'status': 'ok' if status_code == 200 else 'degraded', 'checks': checks}, status=status_code)
 
 import csv
 import os
@@ -55,7 +106,7 @@ def online_registration(request):
         session_id = request.POST.get('session_id')
         
         # Registration date
-        date_of_admission = datetime.date.today().strftime('%Y-%m-%d')
+        admission_date = datetime.date.today().strftime('%Y-%m-%d')
         
         # Generate unique code
         unique_code = f"REG-{uuid.uuid4().hex[:8].upper()}"
@@ -65,19 +116,19 @@ def online_registration(request):
         if not os.path.exists(regs_dir):
             os.makedirs(regs_dir)
             
-        csv_filename = os.path.join(regs_dir, f"{date_of_admission}.csv")
+        csv_filename = os.path.join(regs_dir, f"{admission_date}.csv")
         file_exists = os.path.isfile(csv_filename)
         
         try:
             with open(csv_filename, mode='a', newline='', encoding='utf-8') as f:
                 writer = csv.writer(f)
                 if not file_exists:
-                    writer.writerow(['First Name', 'Last Name', 'Gender', 'Course ID', 'Session ID', 'Date of Admission', 'Email', 'Password', 'Unique Code', 'Registration Fee', 'Registration Time'])
+                    writer.writerow(['First Name', 'Last Name', 'Gender', 'Course ID', 'Session ID', 'Admission Date', 'Email', 'Password', 'Unique Code', 'Registration Fee', 'Registration Time'])
                 
                 registration_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 from django.contrib.auth.hashers import make_password
                 hashed_password = make_password(password)
-                writer.writerow([first_name, last_name, gender, course_id, session_id, date_of_admission, email, hashed_password, unique_code, '0', registration_time])
+                writer.writerow([first_name, last_name, gender, course_id, session_id, admission_date, email, hashed_password, unique_code, '0', registration_time])
                 
             messages.success(request, f"Registration Successful! Your unique registration code is: {unique_code}")
         except Exception as e:
@@ -90,90 +141,74 @@ def online_registration(request):
 
 def doLogin(request, **kwargs):
     if request.method != 'POST':
-        return HttpResponse("<h4>Denied</h4>")
-    else:
-        # Google recaptcha
-        from django.conf import settings
-        captcha_token = request.POST.get('g-recaptcha-response')
-        captcha_url = "https://www.google.com/recaptcha/api/siteverify"
-        captcha_key = getattr(settings, 'RECAPTCHA_PRIVATE_KEY', None)
-        
-        if not captcha_key:
-            # Bypass CAPTCHA check if no private key is configured (local/dev mode)
-            pass
-        else:
-            data = {
-                'secret': captcha_key,
-                'response': captcha_token
-            }
-            # Make request
-            try:
-                captcha_server = requests.post(url=captcha_url, data=data, timeout=10)
-                result = captcha_server.json()
-                if result.get("success", False):
-                    # recaptcha was successful
-                    pass
-                else:
-                    messages.error(request, "Invalid reCAPTCHA. Please try again.")
-                    return redirect(reverse('login'))
-            except Exception as e:
-                messages.error(request, "Error validating reCAPTCHA. Please try again later.")
-                import logging
-                logging.getLogger(__name__).error(f"ReCAPTCHA error: {e}")
-                return redirect(reverse('login'))
-        
-        #Authenticate
+        return HttpResponseNotAllowed(["POST"])
+
+    from django.conf import settings
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    captcha_token = request.POST.get('g-recaptcha-response')
+    captcha_url = "https://www.google.com/recaptcha/api/siteverify"
+    captcha_key = getattr(settings, 'RECAPTCHA_PRIVATE_KEY', None)
+
+    if captcha_key:
+        data = {
+            'secret': captcha_key,
+            'response': captcha_token
+        }
         try:
-            email = request.POST.get('email', '')
-            password = request.POST.get('password', '')
-            if email:
-                email = email.strip()
-            
-            user = authenticate(request, username=email, password=password)
-            
-            if user is not None:
-                login(request, user)
-                
-                # Log login to MongoDB Analytics
-                log_analytics_event("user_login", {
-                    "user_id": user.id,
-                    "email": user.email,
-                    "user_type": user.user_type
-                })
-                
-                # Handle "Remember Me" functionality
-                remember_me = request.POST.get('remember')
-                if remember_me:
-                    # Set session to expire when browser closes = False
-                    # Session will last for 30 days
-                    request.session.set_expiry(30 * 24 * 60 * 60)  # 30 days in seconds
-                else:
-                    # Set session to expire when browser closes
-                    request.session.set_expiry(0)
-                
-                if user.user_type == '1':
-                    return redirect(reverse("admin_home"))
-                elif user.user_type == '2':
-                    return redirect(reverse("staff_home"))
-                elif user.user_type == '4':
-                    return redirect(reverse("parent_home"))
-                elif user.user_type == '3':
-                    return redirect(reverse("student_home"))
-                elif user.user_type == '7':
-                    return redirect(reverse("backoffice_home"))
-                elif user.user_type == '8':
-                    return redirect(reverse("super_admin_dashboard"))
-                else:
-                    messages.error(request, "Invalid user type.")
-                    return redirect(reverse('login'))
-            else:
-                messages.error(request, "Invalid details")
-                return redirect("/")
+            captcha_server = requests.post(url=captcha_url, data=data, timeout=10)
+            result = captcha_server.json()
+            if not result.get("success", False):
+                messages.error(request, "Verification failed. Please try again.")
+                return redirect(reverse('login_page'))
         except Exception as e:
-            messages.error(request, "Error processing login. Please try again.")
-            import logging
-            logging.getLogger(__name__).error(f"Login error: {e}")
-            return redirect(reverse('login'))
+            logger.exception("ReCAPTCHA validation error: %s", e)
+            messages.error(request, "Verification service is unavailable right now.")
+            return redirect(reverse('login_page'))
+
+    try:
+        email = (request.POST.get('email', '') or '').strip().lower()
+        password = request.POST.get('password', '')
+
+        if not email or not password:
+            messages.error(request, "Please enter your email and password.")
+            return redirect(reverse('login_page'))
+
+        user = authenticate(request, username=email, password=password)
+        if user is None:
+            messages.error(request, "Invalid email or password.")
+            return redirect(reverse('login_page'))
+
+        if not getattr(user, "is_active", True):
+            messages.error(request, "This account is disabled. Please contact the administrator.")
+            return redirect(reverse('login_page'))
+
+        login(request, user)
+
+        remember_me = request.POST.get('remember') in {'1', 'true', 'True', 'on'}
+        request.session.set_expiry(30 * 24 * 60 * 60 if remember_me else 0)
+        request.session["login_role"] = str(getattr(user, "user_type", ""))
+
+        try:
+            log_analytics_event("user_login", {
+                "user_id": user.id,
+                "email": user.email,
+                "user_type": user.user_type,
+                "remember_me": remember_me,
+            })
+        except Exception as analytics_error:
+            logger.warning("Login analytics failed: %s", analytics_error)
+
+        next_url = _safe_next_url(request)
+        if next_url:
+            return redirect(next_url)
+        return _redirect_for_user(user)
+    except Exception as e:
+        logger.exception("Login error: %s", e)
+        messages.error(request, "We could not sign you in right now. Please try again.")
+        return redirect(reverse('login_page'))
 
 
 

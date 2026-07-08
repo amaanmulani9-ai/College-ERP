@@ -1,0 +1,54 @@
+
+body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; }
+.sk-breadcrumb-bar {
+    background: #fff; padding: 15px 25px; border-radius: 8px;
+    display: flex; align-items: center; margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+.sk-breadcrumb-title { color: #4a235a; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.sk-breadcrumb-path { color: #b2bec3; font-size: 13px; margin-left: 10px; }
+.sk-breadcrumb-path i { font-size:10px; margin:0 8px; }
+
+.sk-card {
+    background: #fff; border-radius: 12px; padding: 30px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.03); margin-bottom: 25px;
+}
+.sk-card-title {
+    font-size: 16px; font-weight: 700; color: #1e272e; margin-bottom: 25px;
+    display: flex; align-items: center; gap: 10px;
+}
+.sk-card-title i { color: #6c5ce7; }
+
+/* Form styles */
+.sk-form-group { margin-bottom: 20px; }
+.sk-form-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; color: #a4b0be;
+    margin-bottom: 8px; display: block; letter-spacing: 0.5px;
+}
+.sk-form-label span.req { color: #ff4757; }
+.sk-form-control {
+    width: 100%; border: 1px solid #f1f2f6; border-radius: 8px;
+    padding: 12px 15px; font-size: 14px; color: #2d3436; outline: none; transition: 0.2s;
+    font-family: 'Poppins', sans-serif; background: #fff;
+}
+.sk-form-control:focus { border-color: #6c5ce7; box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1); }
+.sk-btn-primary {
+    background: #6c5ce7; color: #fff; border: none; padding: 12px 25px;
+    border-radius: 8px; font-weight: 600; font-size: 14px; transition: 0.2s;
+    cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0 auto;
+}
+.sk-btn-primary:hover { background: #5f27cd; }
+
+/* Table styles */
+table.sk-table { width: 100%; border-collapse: collapse; }
+table.sk-table thead th {
+    background: #f8f7ff; color: #4a235a; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; padding: 12px 15px; text-align: left;
+    border-bottom: 2px solid #e8e0ff;
+}
+table.sk-table tbody td {
+    padding: 15px; border-bottom: 1px solid #f1f2f6; font-size: 13px; color: #2d3436;
+}
+.sk-empty-state { text-align: center; padding: 50px 20px; color: #b2bec3; }
+.sk-empty-state i { font-size: 32px; margin-bottom: 15px; color: #dfe6e9; }
+.sk-empty-state p { font-size: 13px; margin: 0; }

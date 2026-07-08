@@ -21,6 +21,7 @@ from . import hod_views, staff_views, student_views, parent_views, views, chat_v
 
 urlpatterns = [
     path("", views.login_page, name='login_page'),
+    path("healthz/", views.health_check, name='health_check'),
     path('offline/', views.offline, name='offline'),
     path('student/register/', views.online_registration, name='online_registration'),
     path("get_attendance", views.get_attendance, name='get_attendance'),
@@ -28,6 +29,11 @@ urlpatterns = [
     path("doLogin/", views.doLogin, name='doLogin'),
     path("logout_user/", views.logout_user, name='logout_user'),
     path("admin/home/", hod_views.admin_home, name='admin_home'),
+    path("admin/pro-modules/", hod_views.pro_modules_dashboard, name='pro_modules_dashboard'),
+    path("admin/library/", hod_views.admin_library_overview, name='admin_library_overview'),
+    path("admin/library/catalog/", hod_views.admin_library_catalog, name='admin_library_catalog'),
+    path("admin/library/issue/", hod_views.admin_library_issue, name='admin_library_issue'),
+    path("admin/library/overdue/", hod_views.admin_library_overdue, name='admin_library_overdue'),
     path("admin/analytics/", analytics_views.admin_analytics, name='admin_analytics'),
     path("admin/analytics/export/<str:report_type>/", analytics_views.export_analytics_report, name='export_analytics_report'),
     path("metrics", analytics_views.prometheus_metrics, name='prometheus_metrics'),
@@ -76,13 +82,16 @@ urlpatterns = [
     path("backoffice/profile/", backoffice_views.backoffice_profile, name='backoffice_profile'),
     path("admin/export_staff_analytics/", hod_views.export_staff_analytics, name='export_staff_analytics'),
     path("staff/add", hod_views.add_staff, name='add_staff'),
+    path("staff/add/", hod_views.add_staff, name='add_staff_slash'),
     path("parent/add", hod_views.add_parent, name='add_parent'),
     path("course/add", hod_views.add_course, name='add_course'),
+    path("course/add/", hod_views.add_course, name='add_course_slash'),
     path("send_student_notification/", hod_views.send_student_notification,
          name='send_student_notification'),
     path("send_staff_notification/", hod_views.send_staff_notification,
          name='send_staff_notification'),
     path("add_session/", hod_views.add_session, name='add_session'),
+    path("session/add/", hod_views.add_session, name='add_session_slash'),
     path("admin_notify_student", hod_views.admin_notify_student,
          name='admin_notify_student'),
     path("admin_notify_staff", hod_views.admin_notify_staff,
@@ -94,6 +103,8 @@ urlpatterns = [
     path("session/manage/", hod_views.manage_session, name='manage_session'),
     path("session/edit/<int:session_id>",
          hod_views.edit_session, name='edit_session'),
+    path("session/edit/<int:session_id>/",
+         hod_views.edit_session, name='edit_session_slash'),
     path("student/view/feedback/", hod_views.student_feedback_message,
          name="student_feedback_message",),
     path("staff/view/feedback/", hod_views.staff_feedback_message,
@@ -139,6 +150,8 @@ urlpatterns = [
          hod_views.edit_parent, name='edit_parent'),
     path("course/edit/<int:course_id>",
          hod_views.edit_course, name='edit_course'),
+    path("course/edit/<int:course_id>/",
+         hod_views.edit_course, name='edit_course_slash'),
     path("subject/edit/<int:course_id>",
          hod_views.edit_subject, name='edit_subject'),
 
@@ -219,6 +232,8 @@ urlpatterns = [
 
     # --- New ERP Modules Routes ---
     path("student/timetable/", student_views.student_timetable, name='student_timetable'),
+    path("student/admission-letter-view/", student_views.student_admission_letter, name='student_admission_letter'),
+    path("student/fee-slip/", student_views.student_fee_slip, name='student_fee_slip'),
     path("student/hall-ticket/", student_views.student_hall_ticket, name='student_hall_ticket'),
     path("student/payable-fees/", student_views.student_payable_fees, name='student_payable_fees'),
     path("student/fee-receipt/<int:payment_id>/", student_views.student_fee_receipt, name='student_fee_receipt'),
@@ -297,6 +312,12 @@ urlpatterns = [
     path("admin/settings/fees-structure/", hod_views.admin_settings_fees_structure, name='admin_settings_fees_structure'),
     path("admin/settings/discount-type/", hod_views.admin_settings_discount_type, name='admin_settings_discount_type'),
     path("admin/settings/banks/", hod_views.admin_settings_banks, name='admin_settings_banks'),
+    path("admin/staff/id-cards/", hod_views.admin_staff_id_cards, name='admin_staff_id_cards'),
+    path("admin/question-bank/", hod_views.admin_question_bank, name='admin_question_bank'),
+    path("admin/result-sheet/", hod_views.admin_result_sheet, name='admin_result_sheet'),
+    path("admin/exam-schedule/", hod_views.admin_exam_schedule, name='admin_exam_schedule'),
+    path("admin/date-sheet/", hod_views.admin_date_sheet, name='admin_date_sheet'),
+    path("admin/blank-award-list/", hod_views.admin_blank_award_list, name='admin_blank_award_list'),
 
     # Messaging
     path("admin/messaging/", hod_views.admin_messaging, name='admin_messaging'),
@@ -344,6 +365,13 @@ urlpatterns = [
     path("student/live_classes/", student_views.student_live_classes, name='student_live_classes'),
     path("student/live_classes/join/<int:class_id>/", student_views.student_join_live_class, name='student_join_live_class'),
     path("student/live_classes/leave/<int:class_id>/", student_views.student_leave_live_class, name='student_leave_live_class'),
+    
+    # --- Online Store ---
+    path("student/store/", student_views.student_online_store, name='student_online_store'),
+    path("student/homework/", student_views.student_homework, name='student_homework'),
+    path("student/test-results/", student_views.student_test_results, name='student_test_results'),
+    path("student/report-card/", student_views.student_report_card, name='student_report_card'),
+    path("student/report-card/pdf/", student_views.student_report_card_pdf, name='student_report_card_pdf'),
 
     # --- Communication (Version 3.0) ---
     path("chat/", chat_views.chat_home, name='chat_home'),
@@ -351,6 +379,8 @@ urlpatterns = [
     path("chat/fetch/", chat_views.get_chat_messages, name='get_chat_messages'),
     path("announcements/", chat_views.announcements_board, name='announcements_board'),
     path("announcements/post/", chat_views.post_announcement, name='post_announcement'),
+    path("whatsapp/", chat_views.whatsapp_center, name='whatsapp_center'),
+    path("whatsapp/admin/", chat_views.whatsapp_center, name='admin_whatsapp'),
 
     # --- Smart Campus (Version 3.5) ---
     path("student/id-card/", smart_views.student_id_card, name='student_id_card'),
@@ -368,8 +398,10 @@ urlpatterns = [
     
     # Batch Management & Print ID Cards
     path("admin/batches/", hod_views.admin_manage_batches, name='admin_manage_batches'),
+    path("admin/verification-center/", hod_views.admin_verification_center, name='admin_verification_center'),
     path("admin/batches/promote/", hod_views.admin_promote_batch, name='admin_promote_batch'),
     path("admin/batches/print-ids/", hod_views.admin_print_batch_ids, name='admin_print_batch_ids'),
+    path("admin/students/print-ids/", hod_views.print_batch_id_cards, name='print_batch_id_cards'),
     path("staff/id-card/<int:staff_id>/", hod_views.admin_view_staff_id_card, name='admin_view_staff_id_card'),
 
     # --- AI Suite (Version 4.0) ---

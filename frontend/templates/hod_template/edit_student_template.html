@@ -156,6 +156,14 @@
                             </div>
                         {% endif %}
 
+                        {% if form.instance.unique_student_code or form.instance.id_card_code %}
+                        <div class="alert alert-info">
+                            <strong>Identity codes:</strong>
+                            {% if form.instance.unique_student_code %}{{ form.instance.unique_student_code }}{% endif %}
+                            {% if form.instance.id_card_code %}{% if form.instance.unique_student_code %} | {% endif %}{{ form.instance.id_card_code }}{% endif %}
+                        </div>
+                        {% endif %}
+
                         <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
 
@@ -211,22 +219,47 @@
                                     {{ form.session.errors }}
                                 </div>
                                 <div class="col-md-4 form-group mb-3">
+                                    <label>Batch Year</label>
+                                    <input type="number" name="batch_year" class="form-control" placeholder="2026" value="{{ form.instance.batch_year|default:'' }}">
+                                    {{ form.batch_year.errors }}
+                                </div>
+                                <div class="col-md-4 form-group mb-3">
                                     <label>Picture</label>
                                     <input type="file" name="profile_pic" class="form-control">
+                                    <div class="helper-text">JPEG or PNG up to 2MB</div>
                                     {% if form.instance.admin.profile_pic %}
                                         <div class="helper-text">Current: <a href="{{ form.instance.admin.profile_pic }}" target="_blank">View Picture</a></div>
                                     {% endif %}
                                     {{ form.profile_pic.errors }}
                                 </div>
                                 <div class="col-md-4 form-group mb-3">
-                                    <label>Date of Admission <span>*</span></label>
-                                    <input type="date" name="date_of_admission" class="form-control" value="{{ form.instance.date_of_admission|date:'Y-m-d'|default:'' }}">
-                                    {{ form.date_of_admission.errors }}
+                                    <label>Date of Admission</label>
+                                    <input type="date" name="admission_date" class="form-control" value="{{ form.instance.admission_date|date:'Y-m-d'|default:'' }}">
+                                    {{ form.admission_date.errors }}
+                                </div>
+                                <div class="col-md-4 form-group mb-3">
+                                    <label>Current Semester <span>*</span></label>
+                                    <input type="number" name="current_semester" min="1" class="form-control" value="{{ form.instance.current_semester|default:'1' }}" required>
+                                    {{ form.current_semester.errors }}
                                 </div>
                                 <div class="col-md-4 form-group mb-3">
                                     <label>Discount in Fee</label>
                                     <input type="number" name="discount_in_fee" class="form-control" placeholder="In %" value="{{ form.instance.discount_in_fee|default:'0' }}">
                                     {{ form.discount_in_fee.errors }}
+                                </div>
+                                <div class="col-md-4 form-group mb-3">
+                                    <label>Verification Status</label>
+                                    <select name="verification_status" class="form-select w-100">
+                                        <option value="Pending" {% if form.instance.verification_status == "Pending" %}selected{% endif %}>Pending</option>
+                                        <option value="Verified" {% if form.instance.verification_status == "Verified" %}selected{% endif %}>Verified</option>
+                                        <option value="Rejected" {% if form.instance.verification_status == "Rejected" %}selected{% endif %}>Rejected</option>
+                                    </select>
+                                    {{ form.verification_status.errors }}
+                                </div>
+                                <div class="col-md-12 form-group mb-3">
+                                    <label>Verification Notes</label>
+                                    <textarea name="verification_notes" class="form-control" rows="2">{{ form.instance.verification_notes|default:'' }}</textarea>
+                                    {{ form.verification_notes.errors }}
                                 </div>
                                 <div class="col-md-4 form-group mb-3">
                                     <label>Mobile for SMS/WhatsApp</label>

@@ -182,6 +182,10 @@
             </div>
             <button class="sk-btn-customize"><i class="fas fa-sliders-h"></i> Customize</button>
         </div>
+
+        <div class="alert alert-info mb-4" style="border-radius:12px;">
+            Staff records now carry a unique ID code after save, so cards and attendance can be verified quickly across the system.
+        </div>
         
         <!-- Messages -->
         {% if messages %}
@@ -215,10 +219,6 @@
                         {{ form.first_name }}
                     </div>
                     <div class="col-md-4 mb-4">
-                        <label class="sk-form-label">Mobile No for SMS/WhatsApp</label>
-                        <input type="text" class="sk-form-control" placeholder="e.g +44xxxxxxxxxx" name="mobile_no">
-                    </div>
-                    <div class="col-md-4 mb-4">
                         <label class="sk-form-label">Employee Role <span class="req-star">*</span></label>
                         <select class="sk-form-control" name="employee_role" required>
                             <option value="">-- Select Role --</option>
@@ -230,6 +230,15 @@
                             <option value="Other">Other</option>
                         </select>
                     </div>
+                    <div class="col-md-4 mb-4">
+                        <label class="sk-form-label">Course / Department</label>
+                        <select class="sk-form-control" name="course">
+                            <option value="">-- Select Course --</option>
+                            {% for course in form.fields.course.queryset %}
+                                <option value="{{ course.id }}">{{ course.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     
                     <div class="col-md-4 mb-4">
                         <label class="sk-form-label">Picture</label>
@@ -238,7 +247,7 @@
                             <div class="sk-file-text" id="file-name">No file chosen</div>
                             <input type="file" id="id_profile_pic" name="profile_pic" onchange="document.getElementById('file-name').textContent = this.files[0] ? this.files[0].name : 'No file chosen'">
                         </div>
-                        <span class="sk-file-hint"><i class="fas fa-exclamation-triangle"></i> Max size 100KB</span>
+                        <span class="sk-file-hint"><i class="fas fa-exclamation-triangle"></i> JPEG or PNG up to 2MB</span>
                     </div>
                     <div class="col-md-4 mb-4">
                         <label class="sk-form-label">Date of Joining <span class="req-star">*</span></label>
@@ -247,6 +256,10 @@
                     <div class="col-md-4 mb-4">
                         <label class="sk-form-label">Monthly Salary <span class="req-star">*</span></label>
                         <input type="number" class="sk-form-control" placeholder="Monthly Salary" name="monthly_salary" required>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <label class="sk-form-label">Experience</label>
+                        <input type="number" class="sk-form-control" placeholder="Years of experience" name="experience" min="0">
                     </div>
                 </div>
             </div>
@@ -289,6 +302,11 @@
                     <div class="col-md-4 mb-4">
                         <label class="sk-form-label">Email Address</label>
                         {{ form.email }}
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <label class="sk-form-label">Mobile Number</label>
+                        <input type="text" class="sk-form-control" placeholder="Mobile Number for WhatsApp" name="mobile_number" value="{{ form.mobile_number.value|default:'' }}">
+                        <span class="sk-file-hint">Use country code if possible, like +91...</span>
                     </div>
                     
                     <div class="col-md-4 mb-4">

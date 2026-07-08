@@ -243,51 +243,59 @@
                 <ul class="info-list">
                     <li class="info-item">
                         <div class="info-label">Registration No</div>
-                        <div class="info-value">{{ student.registration_no|default:"011" }}</div>
+                        <div class="info-value">{{ student.registration_no|default:student.unique_student_code|default:"?" }}</div>
                     </li>
                     <li class="info-item">
                         <div class="info-label">Date of Admission</div>
-                        <div class="info-value">{{ student.date_of_admission|date:"d F, Y"|default:"06 July, 2026" }}</div>
+                        <div class="info-value">{{ student.admission_date|date:"d F, Y"|default:"?" }}</div>
                     </li>
                     <li class="info-item">
                         <div class="info-label">Class</div>
-                        <div class="info-value">{{ student.course.name|default:"mscit" }}</div>
+                        <div class="info-value">{{ student.course.name|default:"?" }}</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Batch / Semester</div>
+                        <div class="info-value">{{ student.batch_year }} Batch / Sem {{ student.current_semester }}</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Verification Status</div>
+                        <div class="info-value">{{ student.verification_status }}</div>
                     </li>
                     <li class="info-item">
                         <div class="info-label">Family</div>
-                        <div class="info-value">-></div>
+                        <div class="info-value">?</div>
                     </li>
                     <li class="info-item">
                         <div class="info-label">Discount in Fee</div>
-                        <div class="info-value">{{ student.discount_in_fee|default:"200" }} %</div>
+                        <div class="info-value">{{ student.discount_in_fee|default:"0" }} %</div>
                     </li>
                     <li class="info-item">
                         <div class="info-label">Date Of Birth</div>
-                        <div class="info-value">{{ student.dob|date:"d F, Y"|default:"—" }}</div>
+                        <div class="info-value">{{ student.dob|date:"d F, Y"|default:"?" }}</div>
                     </li>
                     <li class="info-item">
                         <div class="info-label">Gender</div>
-                        <div class="info-value">{% if student.admin.gender == 'M' %}Male{% elif student.admin.gender == 'F' %}Female{% else %}—{% endif %}</div>
+                        <div class="info-value">{% if student.admin.gender == 'M' %}Male{% elif student.admin.gender == 'F' %}Female{% else %}?{% endif %}</div>
                     </li>
                     <li class="info-item">
                         <div class="info-label">Any Identification Mark?</div>
-                        <div class="info-value">{{ student.identification_mark|default:"—" }}</div>
+                        <div class="info-value">{{ student.identification_mark|default:"?" }}</div>
                     </li>
                     <li class="info-item">
                         <div class="info-label">Blood Group</div>
-                        <div class="info-value">{{ student.blood_group|default:"—" }}</div>
+                        <div class="info-value">{{ student.blood_group|default:"?" }}</div>
                     </li>
                     <li class="info-item">
                         <div class="info-label">Disease If Any?</div>
-                        <div class="info-value">{{ student.disease|default:"—" }}</div>
+                        <div class="info-value">{{ student.disease|default:"?" }}</div>
                     </li>
                     <li class="info-item">
                         <div class="info-label">Student Birth Form ID / NIC</div>
-                        <div class="info-value">{{ student.cnic|default:"—" }}</div>
+                        <div class="info-value">{{ student.cnic|default:"?" }}</div>
                     </li>
                     <li class="info-item">
                         <div class="info-label">Cast</div>
-                        <div class="info-value">{{ student.cast|default:"—" }}</div>
+                        <div class="info-value">{{ student.cast|default:"?" }}</div>
                     </li>
                 </ul>
             </div>

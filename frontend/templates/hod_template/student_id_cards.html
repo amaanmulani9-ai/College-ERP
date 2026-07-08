@@ -199,7 +199,9 @@ body { font-family: 'Poppins', sans-serif; }
                         <div class="id-info">
                             <strong>ID</strong> → {{ student.registration_no|default:"—" }}<br>
                             <strong>Class</strong> → {{ student.course.name|default:"—" }}<br>
-                            <strong>DOA</strong> → {{ student.date_of_admission|date:"d M Y"|default:"—" }}
+                            <strong>Batch</strong> → {{ student.batch_year }}<br>
+                            <strong>Status</strong> → {{ student.verification_status }}<br>
+                            <strong>DOA</strong> → {{ student.admission_date|date:"d M Y"|default:"—" }}
                         </div>
                     </div>
                     <img src="{% url 'generate_student_qr' student.id %}" class="id-qr" alt="QR"
@@ -229,13 +231,15 @@ body { font-family: 'Poppins', sans-serif; }
                     </div>
                     <div class="id-name">{{ student.admin.first_name|upper }}</div>
                 </div>
-                <div class="id-bottom">
-                    <div class="id-info">
-                        <i class="fas fa-id-badge" style="color:#6c5ce7; margin-right:4px;"></i>
-                        <strong>{{ student.registration_no|default:"—" }}</strong><br>
-                        <strong>CLASS</strong> {{ student.course.name|default:"—" }}<br>
-                        <strong>DOA</strong> {{ student.date_of_admission|date:"d M Y"|default:"—" }}
-                    </div>
+                    <div class="id-bottom">
+                        <div class="id-info">
+                            <i class="fas fa-id-badge" style="color:#6c5ce7; margin-right:4px;"></i>
+                            <strong>{{ student.registration_no|default:"—" }}</strong><br>
+                            <strong>CLASS</strong> {{ student.course.name|default:"—" }}<br>
+                            <strong>BATCH</strong> {{ student.batch_year }}<br>
+                            <strong>SEM</strong> {{ student.current_semester }}<br>
+                            <strong>DOA</strong> {{ student.admission_date|date:"d M Y"|default:"—" }}
+                        </div>
                     {% if student.admin.profile_pic %}
                         <img src="{{ student.admin.profile_pic }}" style="width:45px; height:45px; border-radius:50%; object-fit:cover;"
                              onerror="this.style.display='none';" alt="">

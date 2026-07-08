@@ -220,11 +220,13 @@ body { font-family: 'Poppins', sans-serif; }
                 <p>Official Document — College ERP System</p>
             </div>
             <div class="sk-letter-body">
-                <p>Date: <strong>{{ student.date_of_admission|date:"d F, Y"|default:"06 July, 2026" }}</strong></p>
+                <p>Date: <strong>{{ student.admission_date|date:"d F, Y"|default:"06 July, 2026" }}</strong></p>
                 <p>Dear <strong>{{ student.admin.first_name }} {{ student.admin.last_name }}</strong>,</p>
                 <p>We are pleased to inform you that you have been admitted to <strong>{{ student.course.name|default:"the program" }}</strong>
                 with Registration No. <strong>{{ student.registration_no|default:"—" }}</strong>.</p>
-                <p>Your academic session begins from <strong>{{ student.session|default:"Current Session" }}</strong>.
+                <p>Your academic session begins from <strong>{{ student.session|default:"Current Session" }}</strong>
+                and your batch is <strong>{{ student.batch_year }} Batch</strong>.
+                Current semester: <strong>{{ student.current_semester }}</strong>.
                 Please report to the institution with all required documents on or before the date mentioned above.</p>
                 <p>We congratulate you and wish you the very best in your academic journey.</p>
                 <p style="margin-top:30px;">Sincerely,<br><strong>The Administration</strong></p>

@@ -1,330 +1,215 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{ page_title }}{% endblock page_title %}
-
+{% block page_title %}Messaging{% endblock page_title %}
 {% block content %}
-<div class="container-fluid py-3">
-    <div class="row">
-        <!-- Sidebar: Contacts & Channels -->
-        <div class="col-md-4 mb-4">
-            <div class="card erpnext-card h-100 shadow-sm" style="max-height: 650px; min-height: 550px;">
-                <div class="card-header bg-transparent border-bottom">
-                    <h5 class="card-title mb-0"><i class="fas fa-comments text-primary"></i> Channels & Contacts</h5>
+<style>
+    .es-chat-container {
+        display: flex;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        height: 600px;
+        margin: 20px;
+        overflow: hidden;
+    }
+    
+    /* Left Sidebar */
+    .es-chat-sidebar {
+        width: 300px;
+        border-right: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+    }
+    .es-chat-header {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .es-chat-header h3 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    .es-btn-new {
+        background: #4f46e5;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .es-chat-search {
+        padding: 0 20px 20px 20px;
+    }
+    .es-chat-search-input {
+        position: relative;
+    }
+    .es-chat-search-input i {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        color: #94a3b8;
+    }
+    .es-chat-search-input input {
+        width: 100%;
+        padding: 8px 15px;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        outline: none;
+        font-size: 13px;
+        color: #1e293b;
+    }
+    
+    /* Right Content */
+    .es-chat-main {
+        flex: 1;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        text-align: center;
+        position: relative;
+    }
+    .es-chat-main h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 15px;
+    }
+    .es-chat-main p {
+        color: #94a3b8;
+        font-size: 15px;
+        max-width: 600px;
+        line-height: 1.6;
+        margin-bottom: 40px;
+    }
+    
+    /* Illustration mock */
+    .es-chat-illustration {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        height: 300px;
+        margin-bottom: 30px;
+    }
+    .es-chat-blob {
+        position: absolute;
+        bottom: 0;
+        right: 40px;
+        width: 250px;
+        height: 250px;
+        background: #6b46c1;
+        border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+        z-index: 1;
+    }
+    .es-chat-person {
+        position: absolute;
+        bottom: 0;
+        right: 60px;
+        width: 200px;
+        height: 250px;
+        background: #94a3b8; /* placeholder for the person image */
+        border-radius: 10px;
+        z-index: 2;
+        /* Using a CSS placeholder since we don't have the exact image */
+        background-image: url('https://img.freepik.com/free-photo/young-beautiful-woman-using-laptop_23-2148110994.jpg?w=360');
+        background-size: cover;
+        background-position: center;
+        clip-path: polygon(0 10%, 100% 0, 100% 100%, 0% 100%);
+    }
+    .es-chat-bubble {
+        position: absolute;
+        background: white;
+        padding: 10px 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        font-size: 12px;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .es-chat-bubble img {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+    }
+    .es-chat-bubble.b1 { top: 20%; left: 10%; }
+    .es-chat-bubble.b2 { top: 40%; left: 30%; background: #4f46e5; color: white; }
+    .es-chat-bubble.b3 { top: 60%; left: 5%; }
+    .es-chat-bubble.b4 { top: 50%; right: 0; }
+
+    .es-encrypted {
+        position: absolute;
+        bottom: 20px;
+        color: #94a3b8;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 500;
+    }
+</style>
+
+<div class="content">
+    <div class="es-chat-container">
+        
+        <!-- Left Sidebar -->
+        <div class="es-chat-sidebar">
+            <div class="es-chat-header">
+                <h3>Chats</h3>
+                <button class="es-btn-new"><i class="fas fa-plus"></i> New Chat</button>
+            </div>
+            <div class="es-chat-search">
+                <div class="es-chat-search-input">
+                    <input type="text" placeholder="Search">
+                    <i class="fas fa-search"></i>
                 </div>
-                <div class="card-body p-0 overflow-auto">
-                    <!-- Channels / Group Chats -->
-                    <div class="p-3 bg-light border-bottom">
-                        <h6 class="text-uppercase text-muted fw-bold mb-2" style="font-size: 0.8rem;">Group Rooms (Courses)</h6>
-                        <div class="list-group list-group-flush">
-                            {% for course in courses %}
-                            <button type="button" class="list-group-item list-group-item-action border-0 rounded mb-1 d-flex align-items-center group-channel-btn" data-course-id="{{ course.id }}">
-                                <div class="bg-primary-subtle text-primary rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                                <div class="w-100">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <strong class="mb-0">{{ course.name }}</strong>
-                                    </div>
-                                    <small class="text-muted text-truncate d-block" style="max-width: 180px;">Course Group Chat</small>
-                                </div>
-                            </button>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
-                    <!-- Direct Chats -->
-                    <div class="p-3">
-                        <h6 class="text-uppercase text-muted fw-bold mb-2" style="font-size: 0.8rem;">Direct Messages</h6>
-                        <div class="list-group list-group-flush" id="contacts-list">
-                            {% for u in users %}
-                            <button type="button" class="list-group-item list-group-item-action border-0 rounded mb-1 d-flex align-items-center direct-chat-btn" data-user-id="{{ u.id }}" data-username="{{ u.get_full_name }}">
-                                <img src="{{ u.profile_pic.url|default:'/static/img/default-avatar.png' }}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
-                                <div class="w-100">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <strong class="mb-0">{{ u.get_full_name }}</strong>
-                                    </div>
-                                    <small class="text-muted d-block">
-                                        {% if u.user_type == '1' %}Admin{% elif u.user_type == '2' %}Staff{% elif u.user_type == '3' %}Student{% else %}Parent{% endif %}
-                                    </small>
-                                </div>
-                            </button>
-                            {% endfor %}
-                        </div>
-                    </div>
+            </div>
+            <!-- empty chat list -->
+        </div>
+
+        <!-- Right Content -->
+        <div class="es-chat-main">
+            <h2>Stay Connected!</h2>
+            <p>Effortless communication at your fingertips! eSkooly's built-in chatting system lets school admins, teachers, Students, and staff collaborate instantly.</p>
+            
+            <div class="es-chat-illustration">
+                <div class="es-chat-blob"></div>
+                <div class="es-chat-person"></div>
+                
+                <div class="es-chat-bubble b1">
+                    <img src="https://ui-avatars.com/api/?name=Sarah&background=random" alt="S">
+                    <div><strong>Hi Sarah! 👋</strong><br>Have you updated Grade 8 attendance?</div>
                 </div>
+                <div class="es-chat-bubble b2">
+                    <img src="https://ui-avatars.com/api/?name=Mohsin&background=random" alt="M">
+                    <div><strong>Hi Mohsin, 🙂</strong><br>Yes, updated yesterday. Check it!</div>
+                </div>
+                <div class="es-chat-bubble b3">
+                    <img src="https://ui-avatars.com/api/?name=Sarah&background=random" alt="S">
+                    <div>Thanks for your help, appreciating the quick response!</div>
+                </div>
+                <div class="es-chat-bubble b4">
+                    <i class="fas fa-graduation-cap" style="color:#4f46e5; font-size:16px;"></i>
+                    <strong>Chat</strong>
+                </div>
+            </div>
+
+            <div class="es-encrypted">
+                <i class="fas fa-lock"></i> end-to-end encrypted.
             </div>
         </div>
 
-        <!-- Chat Conversation window -->
-        <div class="col-md-8 mb-4">
-            <div class="card erpnext-card h-100 shadow-sm d-flex flex-column" style="max-height: 650px; min-height: 550px;" id="chat-window">
-                <!-- Welcome State -->
-                <div class="card-body d-flex flex-column align-items-center justify-content-center text-center p-5 h-100" id="welcome-chat-screen">
-                    <i class="fas fa-paper-plane fa-4x text-primary mb-3 opacity-50"></i>
-                    <h4>Your Conversation Space</h4>
-                    <p class="text-muted">Select a classmate, instructor, or join a Course Group from the left sidebar to start messaging in real-time.</p>
-                </div>
-
-                <!-- Chat Active State (Hidden by default) -->
-                <div class="d-none flex-column h-100" id="active-chat-screen" style="display: none !important;">
-                    <!-- Chat Header -->
-                    <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center py-3">
-                        <div class="d-flex align-items-center">
-                            <div class="chat-header-icon bg-primary text-white rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;" id="active-chat-avatar-placeholder">
-                                <i class="fas fa-user" id="active-chat-icon"></i>
-                            </div>
-                            <img src="" class="rounded-circle me-3 d-none" style="width: 45px; height: 45px; object-fit: cover;" id="active-chat-img">
-                            <div>
-                                <h6 class="mb-0 fw-bold" id="active-chat-title">Recipient Name</h6>
-                                <small class="text-success" id="active-chat-subtitle">Online</small>
-                            </div>
-                        </div>
-                        <span class="badge bg-light text-muted border" id="sync-indicator"><i class="fas fa-sync-alt fa-spin"></i> Live Sync</span>
-                    </div>
-
-                    <!-- Chat Messages Log -->
-                    <div class="card-body overflow-auto p-4 bg-light flex-grow-1" id="messages-box" style="height: 380px;">
-                        <!-- Messages dynamically appended here -->
-                    </div>
-
-                    <!-- Chat Input Controls -->
-                    <div class="card-footer bg-transparent border-top p-3">
-                        <form id="chat-form" class="d-flex align-items-center gap-2">
-                            <button type="button" class="btn btn-outline-secondary" id="emoji-trigger" title="Add Emoji">
-                                😊
-                            </button>
-                            <input type="text" id="chat-input" class="form-control py-2" placeholder="Write a message..." autocomplete="off">
-                            <button type="submit" class="btn btn-primary px-4 py-2">
-                                <i class="fas fa-paper-plane"></i> Send
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
-
-<!-- Emoji Mart Picker script via CDN -->
-<script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.0/dist/index.min.js"></script>
-
-<script>
-let activeRecipientId = null;
-let activeCourseId = null;
-let lastMessageId = 0;
-let syncTimer = null;
-let picker = null;
-
-document.addEventListener("DOMContentLoaded", function() {
-    // Initialize Emoji Button
-    const trigger = document.querySelector('#emoji-trigger');
-    const input = document.querySelector('#chat-input');
-    
-    if (typeof EmojiButton !== 'undefined') {
-        picker = new EmojiButton({
-            position: 'top-start'
-        });
-        
-        picker.on('emoji', selection => {
-            input.value += selection.emoji;
-            input.focus();
-        });
-        
-        trigger.addEventListener('click', () => picker.togglePicker(trigger));
-    }
-
-    // Direct Chat Buttons Click
-    document.querySelectorAll('.direct-chat-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            // UI state active
-            document.querySelectorAll('.list-group-item').forEach(el => el.classList.remove('active'));
-            this.classList.add('active');
-            
-            activeRecipientId = this.getAttribute('data-user-id');
-            activeCourseId = null;
-            lastMessageId = 0;
-            
-            // Header configuration
-            document.getElementById('active-chat-title').innerText = this.getAttribute('data-username');
-            document.getElementById('active-chat-subtitle').innerText = "Direct Message";
-            
-            // Show avatar image or icon
-            const img = this.querySelector('img');
-            const placeholder = document.getElementById('active-chat-avatar-placeholder');
-            const activeImg = document.getElementById('active-chat-img');
-            
-            if (img && img.src && !img.src.includes('default-avatar.png')) {
-                activeImg.src = img.src;
-                activeImg.classList.remove('d-none');
-                placeholder.classList.add('d-none');
-            } else {
-                activeImg.classList.add('d-none');
-                placeholder.classList.remove('d-none');
-                document.getElementById('active-chat-icon').className = "fas fa-user";
-            }
-            
-            startChat();
-        });
-    });
-
-    // Group Chat Buttons Click
-    document.querySelectorAll('.group-channel-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.list-group-item').forEach(el => el.classList.remove('active'));
-            this.classList.add('active');
-            
-            activeCourseId = this.getAttribute('data-course-id');
-            activeRecipientId = null;
-            lastMessageId = 0;
-            
-            document.getElementById('active-chat-title').innerText = this.querySelector('strong').innerText;
-            document.getElementById('active-chat-subtitle').innerText = "Course Room Chat";
-            
-            document.getElementById('active-chat-img').classList.add('d-none');
-            const placeholder = document.getElementById('active-chat-avatar-placeholder');
-            placeholder.classList.remove('d-none');
-            document.getElementById('active-chat-icon').className = "fas fa-users";
-            
-            startChat();
-        });
-    });
-
-    // Send Form Submission
-    document.getElementById('chat-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const msg = input.value.trim();
-        if (!msg) return;
-        
-        const payload = {
-            message: msg,
-            recipient_id: activeRecipientId,
-            course_id: activeCourseId
-        };
-        
-        input.value = "";
-        
-        fetch("{% url 'send_chat_message' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify(payload)
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                appendMessage(data);
-                scrollToBottom();
-            }
-        });
-    });
-});
-
-function startChat() {
-    // Show Chat active screen, hide welcome screen
-    document.getElementById('welcome-chat-screen').classList.add('d-none');
-    
-    const activeScreen = document.getElementById('active-chat-screen');
-    activeScreen.classList.remove('d-none');
-    activeScreen.style.setProperty('display', 'flex', 'important');
-    
-    // Clear message box
-    document.getElementById('messages-box').innerHTML = "";
-    
-    // Fetch initial messages
-    fetchMessages();
-    
-    // Start poll loop
-    if (syncTimer) clearInterval(syncTimer);
-    syncTimer = setInterval(fetchMessages, 3000);
-}
-
-function fetchMessages() {
-    let url = `{% url 'get_chat_messages' %}?last_msg_id=${lastMessageId}`;
-    if (activeRecipientId) url += `&recipient_id=${activeRecipientId}`;
-    if (activeCourseId) url += `&course_id=${activeCourseId}`;
-    
-    const syncInd = document.getElementById('sync-indicator');
-    syncInd.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Live Sync';
-    
-    fetch(url)
-    .then(res => res.json())
-    .then(data => {
-        syncInd.innerHTML = '<i class="fas fa-check-circle text-success"></i> Live Sync';
-        if (data.status === 'success' && data.messages.length > 0) {
-            data.messages.forEach(msg => {
-                appendMessage(msg);
-                lastMessageId = msg.id;
-            });
-            scrollToBottom();
-        }
-    })
-    .catch(() => {
-        syncInd.innerHTML = '<i class="fas fa-exclamation-triangle text-danger"></i> Offline';
-    });
-}
-
-function appendMessage(msg) {
-    const box = document.getElementById('messages-box');
-    
-    // Check if message is already in list (avoid duplication)
-    if (document.getElementById(`msg-${msg.id}`)) return;
-    
-    const isCurrentUser = msg.sender_id === {{ request.user.id }};
-    const row = document.createElement('div');
-    row.id = `msg-${msg.id}`;
-    row.className = `d-flex mb-3 ${isCurrentUser ? 'justify-content-end' : 'justify-content-start'}`;
-    
-    const bubble = document.createElement('div');
-    bubble.className = `p-3 rounded-3 shadow-sm ${isCurrentUser ? 'bg-primary text-white' : 'bg-white text-dark border'}`;
-    bubble.style.maxWidth = '70%';
-    
-    // Add Sender name if group chat and not current user
-    if (activeCourseId && !isCurrentUser) {
-        const senderName = document.createElement('small');
-        senderName.className = 'd-block text-primary fw-bold mb-1';
-        senderName.style.fontSize = '0.75rem';
-        senderName.innerText = msg.sender;
-        bubble.appendChild(senderName);
-    }
-    
-    const text = document.createElement('p');
-    text.className = 'mb-1';
-    text.innerText = msg.message;
-    bubble.appendChild(text);
-    
-    const time = document.createElement('small');
-    time.className = `d-block text-end ${isCurrentUser ? 'text-white-50' : 'text-muted'}`;
-    time.style.fontSize = '0.7rem';
-    time.innerText = msg.created_at.split(' ')[1].substring(0, 5); // Just HH:MM
-    bubble.appendChild(time);
-    
-    row.appendChild(bubble);
-    box.appendChild(row);
-}
-
-function scrollToBottom() {
-    const box = document.getElementById('messages-box');
-    box.scrollTop = box.scrollHeight;
-}
-</script>
-
-<style>
-.bg-primary-subtle {
-    background-color: rgba(94, 100, 255, 0.15);
-}
-.list-group-item.active {
-    background-color: rgba(94, 100, 255, 0.08) !important;
-    border-left: 4px solid var(--primary) !important;
-    color: inherit !important;
-}
-.list-group-item-action:hover {
-    background-color: rgba(0,0,0,0.02) !important;
-}
-#messages-box {
-    background-image: radial-gradient(rgba(0,0,0,0.02) 1px, transparent 0);
-    background-size: 24px 24px;
-}
-</style>
 {% endblock content %}

@@ -3,6 +3,26 @@
 {% block page_title %}{{page_title}}{% endblock page_title %}
 {% block custom_css %}
 <style>
+    .bread-container { padding: 15px 25px; background: white; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); font-weight: 600; color: #444; }
+    .bread-container i { color: #666; margin: 0 8px; font-size: 0.8rem; }
+    
+    .eskooly-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        margin-bottom: 25px;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* Inherit global eskooly styles for body */
+    body {
+        background-color: #f4f6f9;
+        font-family: 'Poppins', sans-serif;
+    }
+
 .attendance_div_red{
     padding: 10px;
     background: #f44336;
@@ -28,19 +48,11 @@
 
 {% block content %}
 
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <!-- general form elements -->
-                <div class="card card-dark">
-                    <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
-                    </div>
-                    <!-- /.card-header -->
-                    <!-- form start -->
-                    <div class="card-body">
+<div class="bread-container">
+    <i class="fas fa-calendar-check" style="color:#673ab7; margin-right:8px;"></i> <span style="color: #31187a; font-weight: 700;">View Attendance</span>
+</div>
 
+<div class="eskooly-card">
 
 
                         <div class="form-group">
@@ -75,13 +87,7 @@
 
                         <div class="row" id="attendance_data"></div>
                     </div>
-                </div>
-                <!-- /.card -->
-
-            </div>
-        </div>
-    </div>
-</section>
+</div>
 {% endblock content %}
 
 

@@ -284,6 +284,24 @@ body, .erpnext-main { font-family: 'Poppins', sans-serif; }
         </select>
     </div>
     <div class="sk-search-group" style="flex:1;">
+        <label>Batch Year</label>
+        <select name="batch_year" onchange="this.form.submit()">
+            <option value="">-- All --</option>
+            {% for year in batch_years %}
+            <option value="{{ year }}" {% if selected_batch_year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="sk-search-group" style="flex:1;">
+        <label>Verification</label>
+        <select name="verification_status" onchange="this.form.submit()">
+            <option value="">-- All --</option>
+            <option value="Pending" {% if selected_verification_status == 'Pending' %}selected{% endif %}>Pending</option>
+            <option value="Verified" {% if selected_verification_status == 'Verified' %}selected{% endif %}>Verified</option>
+            <option value="Rejected" {% if selected_verification_status == 'Rejected' %}selected{% endif %}>Rejected</option>
+        </select>
+    </div>
+    <div class="sk-search-group" style="flex:1;">
         <label>Division</label>
         <input type="text" name="division" value="{{ selected_division }}" placeholder="e.g. Batch A" onchange="this.form.submit()">
     </div>
@@ -309,10 +327,11 @@ body, .erpnext-main { font-family: 'Poppins', sans-serif; }
 <div class="sk-student-grid" id="studentList">
     {% for student in students %}
     <div class="sk-student-card"
-         data-name="{{ student.first_name|lower }} {{ student.last_name|lower }}"
-         data-email="{{ student.email|lower }}"
-         data-course="{{ student.student.course.name|default:'' }}"
-         data-reg="{{ student.student.registration_no|default:'' }}">
+        data-name="{{ student.first_name|lower }} {{ student.last_name|lower }}"
+        data-email="{{ student.email|lower }}"
+        data-course="{{ student.student.course.name|default:'' }}"
+        data-reg="{{ student.student.registration_no|default:'' }}"
+        data-code="{{ student.student.unique_student_code|default:'' }}">
 
         <!-- Avatar -->
         {% if student.profile_pic %}
@@ -331,13 +350,24 @@ body, .erpnext-main { font-family: 'Poppins', sans-serif; }
 
         <!-- Name & Reg -->
         <p class="sk-stu-name">{{ student.first_name }} {{ student.last_name }}</p>
-        <p class="sk-stu-reg">{{ student.student.course.name|default:"—" }} | Sem {{ student.student.current_semester }}<br>{{ student.student.division|default:"No Div" }}</p>
+        <p class="sk-stu-reg">
+            {{ student.student.course.name|default:"—" }} | Sem {{ student.student.current_semester }}<br>
+            Batch {{ student.student.batch_year }} | {{ student.student.verification_status }}
+        </p>
+        <p class="sk-stu-reg" style="margin-top:-6px;">
+            <code style="font-size:11px;">{{ student.student.unique_student_code|default:"No Code" }}</code><br>
+            <span style="font-size:11px;">ID {{ student.student.id_card_code|default:"No ID Card Code" }}</span>
+        </p>
 
         <!-- Round Action Buttons -->
         <div class="sk-stu-actions">
             <a href="{% url 'admin_view_student_report' student.student.id %}"
                class="sk-action-btn sk-btn-view" title="View Report">
                 <i class="fas fa-eye"></i>
+            </a>
+            <a href="{% url 'admin_view_student_id_card' student.student.id %}"
+               class="sk-action-btn sk-btn-view" title="ID Card">
+                <i class="fas fa-id-card"></i>
             </a>
             <a href="{% url 'edit_student' student.student.id %}"
                class="sk-action-btn sk-btn-edit" title="Edit Student">

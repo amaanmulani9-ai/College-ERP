@@ -1,0 +1,172 @@
+
+.extracted-style-1 { " }
+.extracted-style-2 { " }
+.extracted-style-3 { " }
+.extracted-style-4 { " }
+
+
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb {
+        padding: 15px 25px;
+        background: #fff;
+        border-bottom: 1px solid #e0e6ed;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+    }
+    .sk-breadcrumb .breadcrumb-item {
+        color: #647081;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .sk-breadcrumb .breadcrumb-item.active { color: #8a98ac; font-weight: 400; }
+    .sk-breadcrumb .separator { color: #a0a9b6; font-size: 10px; }
+
+    .row { display: flex; flex-wrap: wrap; margin: 0 -12.5px; padding: 0 25px; }
+    .col-md-5 { flex: 0 0 41.666667%; max-width: 41.666667%; padding: 0 12.5px; }
+    .col-md-7 { flex: 0 0 58.333333%; max-width: 58.333333%; padding: 0 12.5px; }
+    
+    .eskooly-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        padding: 25px;
+        margin-bottom: 25px;
+        border: 1px solid #e0e6ed;
+    }
+    
+    .eskooly-card-title {
+        font-size: 14px;
+        color: #1b2559;
+        font-weight: 600;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .eskooly-card-title i { color: #4b6bfb; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+        display: block;
+        font-size: 10px;
+        color: #8a98ac;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+    .form-group label .required { color: #ff7675; }
+    
+    .form-control {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #e0e6ed;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #444;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus {
+        border-color: #4b6bfb;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(75, 107, 251, 0.1);
+    }
+    textarea.form-control { resize: vertical; min-height: 80px; }
+    
+    .logo-upload-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .logo-preview {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        border: 1px dashed #e0e6ed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        color: #a0a9b6;
+        font-size: 24px;
+    }
+    .logo-upload-btn {
+        padding: 6px 12px;
+        border: 1px solid #4b6bfb;
+        color: #4b6bfb;
+        background: #fff;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+    .logo-upload-btn:hover { background: #f0f4ff; }
+    
+    .btn-add {
+        background: #4b6bfb;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+        margin-top: 5px;
+        width: fit-content;
+    }
+    .btn-add:hover { background: #3a55d4; }
+    
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+    .eskooly-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .eskooly-table th {
+        padding: 12px 15px;
+        font-size: 10px;
+        color: #1b2559;
+        text-transform: uppercase;
+        font-weight: 700;
+        background-color: #f8f9fa;
+        text-align: center;
+        border-bottom: 2px solid #1b2559;
+    }
+    .eskooly-table td {
+        padding: 40px 15px;
+        font-size: 13px;
+        color: #8a98ac;
+        text-align: center;
+        border-bottom: 1px solid #e0e6ed;
+    }
+    
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #a0a9b6;
+        gap: 10px;
+    }
+    .empty-state i { font-size: 24px; color: #d0d6e0; }
+
+    @media (max-width: 992px) {
+        .col-md-5, .col-md-7 { flex: 0 0 100%; max-width: 100%; }
+    }

@@ -6,6 +6,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from datetime import datetime,timedelta
 import uuid
+from django.core.exceptions import ValidationError
 
 
 
@@ -35,8 +36,12 @@ class CustomUserManager(UserManager):
 class Session(models.Model):
     start_year = models.DateField()
     end_year = models.DateField()
+    batch_label = models.CharField(max_length=20, blank=True, default="", help_text="Example: 2019 Batch")
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
+        if self.batch_label:
+            return self.batch_label
         return "From " + str(self.start_year) + " to " + str(self.end_year)
 
 
@@ -82,6 +87,8 @@ class Course(models.Model):
     monthly_fees = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     class_teacher = models.ForeignKey('Staff', on_delete=models.SET_NULL, null=True, blank=True, related_name='class_teacher_of')
     total_semesters = models.IntegerField(default=6, help_text="Total semesters for this course (e.g., 6 for BSCIT, 4 for MSCIT)")
+    university_name = models.CharField(max_length=120, blank=True, default="Mumbai University")
+    degree_level = models.CharField(max_length=80, blank=True, default="", help_text="Example: UG, PG, Diploma")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -104,6 +111,16 @@ class Student(models.Model):
     session = models.ForeignKey(Session, on_delete=models.SET_NULL, null=True)
     batch_year = models.IntegerField(default=2022)
     current_semester = models.IntegerField(default=1)
+    admission_date = models.DateField(null=True, blank=True)
+    expected_completion_date = models.DateField(null=True, blank=True)
+    is_passed_out = models.BooleanField(default=False)
+    verification_status = models.CharField(
+        max_length=20,
+        choices=[('Pending', 'Pending'), ('Verified', 'Verified'), ('Rejected', 'Rejected')],
+        default='Pending'
+    )
+    verification_notes = models.TextField(blank=True, null=True)
+    unique_student_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
     division = models.CharField(max_length=50, blank=True, null=True, help_text="Batch or Division (e.g. Batch A)")
     id_card_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
 
@@ -146,6 +163,57 @@ class Student(models.Model):
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
 
+    def clean(self):
+        super().clean()
+        if self.course and self.current_semester:
+            max_sem = self.course.total_semesters or 0
+            if max_sem and self.current_semester > max_sem:
+                raise ValidationError({
+                    'current_semester': f"Semester cannot exceed {max_sem} for {self.course.name}."
+                })
+        if self.batch_year and self.session and self.session.start_year:
+            session_year = self.session.start_year.year
+            if self.batch_year < session_year - 10:
+                raise ValidationError({'batch_year': "Batch year looks too old for the selected session."})
+
+    def _make_student_code(self):
+        batch = self.batch_year or (self.session.start_year.year if self.session_id and self.session.start_year else datetime.today().year)
+        course_slug = (self.course.name if self.course else "STU").upper().replace(" ", "")[:6]
+        user_bits = (self.admin.first_name[:2] + self.admin.last_name[:2]).upper()
+        return f"{course_slug}-{batch}-{user_bits or 'ST'}-{uuid.uuid4().hex[:4].upper()}"
+
+    def _make_id_card_code(self):
+        return f"ID-{uuid.uuid4().hex[:10].upper()}"
+
+    def save(self, *args, **kwargs):
+        if not self.unique_student_code:
+            self.unique_student_code = self._make_student_code()
+        if not self.id_card_code:
+            self.id_card_code = self._make_id_card_code()
+        if self.admission_date and self.course and not self.expected_completion_date:
+            self.expected_completion_date = self.admission_date.replace(year=self.admission_date.year + max(1, self.course.total_semesters // 2))
+        if self.course and self.current_semester and self.current_semester >= self.course.total_semesters:
+            self.is_passed_out = True
+        super().save(*args, **kwargs)
+
+    @property
+    def academic_year_label(self):
+        if self.session and self.session.batch_label:
+            return self.session.batch_label
+        if self.batch_year:
+            return f"{self.batch_year} Batch"
+        return "Unknown Batch"
+
+    @property
+    def semester_progress(self):
+        if not self.course or not self.course.total_semesters:
+            return {"current": self.current_semester, "total": None, "is_final": False}
+        return {
+            "current": self.current_semester,
+            "total": self.course.total_semesters,
+            "is_final": self.current_semester >= self.course.total_semesters,
+        }
+
 class Library(models.Model):
     student = models.ForeignKey(Student,  on_delete=models.CASCADE, null=True, blank=False)
     book = models.ForeignKey(Book,  on_delete=models.CASCADE, null=True, blank=False)
@@ -166,6 +234,7 @@ class Staff(models.Model):
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     id_card_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    mobile_number = models.CharField(max_length=20, blank=True, null=True)
     monthly_salary = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     experience = models.PositiveIntegerField(default=0, help_text="Years of experience")
     religion = models.CharField(max_length=50, blank=True)
@@ -558,12 +627,26 @@ class StudentRegistration(models.Model):
     # Document Uploads
     aadhar_file = models.FileField(upload_to='student_documents/aadhar/', null=True, blank=True)
     marksheet_file = models.FileField(upload_to='student_documents/marksheet/', null=True, blank=True)
+    document_status = models.CharField(
+        max_length=20,
+        choices=[('Pending', 'Pending'), ('Verified', 'Verified'), ('Rejected', 'Rejected')],
+        default='Pending'
+    )
+    document_verified_at = models.DateTimeField(null=True, blank=True)
+    document_verified_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='verified_registrations')
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Registration {self.application_no} for {self.student.admin.get_full_name()}"
+
+    def clean(self):
+        super().clean()
+        if self.aadhar_file and not self.aadhar_file.name.lower().endswith(('.pdf', '.jpg', '.jpeg', '.png')):
+            raise ValidationError({'aadhar_file': 'Aadhaar document must be PDF or image.'})
+        if self.marksheet_file and not self.marksheet_file.name.lower().endswith(('.pdf', '.jpg', '.jpeg', '.png')):
+            raise ValidationError({'marksheet_file': 'Marksheet must be PDF or image.'})
 
     def save(self, *args, **kwargs):
         super(StudentRegistration, self).save(*args, **kwargs)

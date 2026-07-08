@@ -1,0 +1,61 @@
+{% extends 'hod_template/library_overview.html' %}
+
+{% block page_title %}Issue Book{% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'pro_modules_dashboard' %}">Pro Modules</a></li>
+<li class="breadcrumb-item"><a href="{% url 'admin_library_overview' %}">Library</a></li>
+<li class="breadcrumb-item active">Issue Book</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="lux-page">
+    <div class="lux-band">
+        <div><h2>Issue desk</h2><p>Select a student and book to create a library issue record.</p></div>
+        <div class="lux-actions"><a class="lux-btn secondary" href="{% url 'admin_library_catalog' %}"><i class="fas fa-book"></i> Catalog</a></div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4 mb-3">
+            <div class="lux-panel">
+                <div class="lux-head"><h3>New Issue</h3></div>
+                <div class="lux-body">
+                    <form method="post">{% csrf_token %}
+                        <label class="form-label">Student</label>
+                        <select class="form-control mb-3" name="student_email" required>
+                            <option value="">Select student</option>
+                            {% for student in students %}
+                            <option value="{{ student.admin.email }}">{{ student.admin.get_full_name }} - {{ student.admin.email }}</option>
+                            {% endfor %}
+                        </select>
+                        <label class="form-label">Book</label>
+                        <select class="form-control mb-3" name="isbn" required>
+                            <option value="">Select book</option>
+                            {% for book in books %}
+                            <option value="{{ book.isbn }}">{{ book.name }} - {{ book.isbn }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="lux-btn" type="submit"><i class="fas fa-share-square"></i> Issue Book</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 mb-3">
+            <div class="lux-panel">
+                <div class="lux-head"><h3>Recent Issue Records</h3><a class="lux-pill" href="{% url 'admin_library_overdue' %}">Overdue</a></div>
+                <div class="lux-body p-0">
+                    <table class="lux-table">
+                        <thead><tr><th>Student</th><th>ISBN</th><th>Issued</th><th>Due</th></tr></thead>
+                        <tbody>
+                        {% for issue in issued_books %}
+                        <tr><td>{{ issue.student_id }}</td><td>{{ issue.isbn }}</td><td>{{ issue.issued_date }}</td><td>{{ issue.expiry_date }}</td></tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center py-4">No issue records yet.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

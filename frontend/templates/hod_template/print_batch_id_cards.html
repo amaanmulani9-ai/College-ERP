@@ -145,6 +145,7 @@
                         <h6 class="fw-bold mb-1 text-white" style="font-size: 0.95rem;">{{ student.admin.get_full_name }}</h6>
                         <div class="text-white-50" style="font-size: 0.7rem;">Course: <strong class="text-white">{{ student.course.name }}</strong></div>
                         <div class="text-white-50" style="font-size: 0.7rem;">Batch Year: <strong class="text-white">{{ student.batch_year }}</strong></div>
+                        <div class="text-white-50" style="font-size: 0.7rem;">Status: <strong class="text-white">{{ student.verification_status }}</strong></div>
                         <div class="text-white-50" style="font-size: 0.7rem;">ID Code: <code class="text-warning fw-bold">{{ student.id_card_code }}</code></div>
                     </div>
                     <div class="col-3 d-flex justify-content-center">
@@ -160,7 +161,7 @@
                         Academic Session: <strong class="text-white">{{ student.session }}</strong>
                     </div>
                     <div class="bg-white p-1 rounded-1">
-                        <svg class="barcode-elem" data-value="PAT-{{ student.id:04d }}-{{ student.session.start_year.year|default:2026 }}" style="height: 25px; width: 120px;"></svg>
+                        <svg class="barcode-elem" data-value="PAT-{{ student.id|stringformat:'04d' }}-{{ student.session.start_year.year|default:2026 }}" style="height: 25px; width: 120px;"></svg>
                     </div>
                 </div>
             </div>

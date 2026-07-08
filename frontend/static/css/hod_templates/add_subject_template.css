@@ -1,0 +1,109 @@
+
+    .sk-breadcrumb-bar {
+        background: #fff;
+        padding: 15px 25px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .sk-breadcrumb-title {
+        color: #4a235a;
+        font-weight: 600;
+        font-size: 14px;
+        margin-right: 15px;
+    }
+    .sk-breadcrumb-path {
+        color: #b2bec3;
+        font-size: 13px;
+    }
+    .sk-form-container {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+        padding: 30px;
+    }
+    .sk-form-title {
+        color: #2d3436;
+        font-weight: 700;
+        font-size: 20px;
+        margin-bottom: 25px;
+    }
+    .sk-form-group {
+        margin-bottom: 20px;
+    }
+    .sk-form-label {
+        display: block;
+        color: #636e72;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    .sk-form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #dfe6e9;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #2d3436;
+        transition: 0.3s;
+        background: #fdfdfd;
+    }
+    .sk-form-control:focus {
+        border-color: #6c5ce7;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+    }
+    .sk-subject-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        align-items: flex-end;
+    }
+    .sk-subject-row > div {
+        flex: 1;
+    }
+    .sk-btn-primary {
+        background: #6c5ce7;
+        color: #fff;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.3s;
+        width: 100%;
+    }
+    .sk-btn-primary:hover {
+        background: #5530c5;
+    }
+    .sk-btn-action {
+        padding: 10px 15px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: 0.3s;
+    }
+    .sk-btn-add {
+        background: #e8e0ff;
+        color: #6c5ce7;
+    }
+    .sk-btn-add:hover {
+        background: #d4c4fb;
+    }
+    .sk-btn-remove {
+        background: #ffeaa7;
+        color: #d63031;
+    }
+    .sk-btn-remove:hover {
+        background: #fcdc75;
+    }
+    .sk-actions-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+    }

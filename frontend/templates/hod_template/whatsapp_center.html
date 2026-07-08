@@ -1,0 +1,262 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    .wa-shell {
+        display: grid;
+        grid-template-columns: 360px minmax(0, 1fr);
+        gap: 20px;
+    }
+    .wa-panel {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
+        border: 1px solid #edf0f5;
+    }
+    .wa-panel h4, .wa-panel h5 {
+        margin-bottom: 0;
+    }
+    .wa-side {
+        padding: 22px;
+        background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+        color: #fff;
+        border-radius: 12px;
+        position: sticky;
+        top: 18px;
+    }
+    .wa-side p, .wa-side li { color: rgba(255,255,255,.78); }
+    .wa-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(37, 211, 102, 0.12);
+        color: #d7ffe6;
+        margin: 0 8px 8px 0;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .wa-form .form-control, .wa-form .form-select {
+        border-radius: 10px;
+        min-height: 44px;
+    }
+    .wa-muted {
+        color: #64748b;
+        font-size: 12px;
+    }
+    .wa-result-message {
+        white-space: pre-wrap;
+        font-size: 13px;
+    }
+    .wa-table td {
+        vertical-align: top;
+    }
+    @media (max-width: 992px) {
+        .wa-shell { grid-template-columns: 1fr; }
+        .wa-side { position: static; }
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="wa-shell">
+        <aside class="wa-side">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="fab fa-whatsapp fa-2x"></i>
+                <div>
+                    <h4 class="mb-1">WhatsApp Command Center</h4>
+                    <div class="wa-muted text-white-50">Free deep-link messaging for school notifications.</div>
+                </div>
+            </div>
+            <p class="mb-3">Use real student, staff, and parent numbers stored in the ERP. The system prepares WhatsApp chats with your message, then you tap send inside WhatsApp.</p>
+
+            <div class="wa-chip"><i class="fas fa-bullhorn"></i> Event alerts</div>
+            <div class="wa-chip"><i class="fas fa-calendar-alt"></i> Daily timetable</div>
+            <div class="wa-chip"><i class="fas fa-video"></i> Live class notice</div>
+            <div class="wa-chip"><i class="fas fa-file-alt"></i> Report link</div>
+            <div class="wa-chip"><i class="fas fa-rupee-sign"></i> Payment link</div>
+
+            <div class="mt-4">
+                <div class="d-flex justify-content-between mb-2"><span>Students with mobile</span><strong>{{ student_count }}</strong></div>
+                <div class="d-flex justify-content-between mb-2"><span>Staff with mobile</span><strong>{{ staff_count }}</strong></div>
+                <div class="d-flex justify-content-between mb-3"><span>Parents with mobile</span><strong>{{ parent_count }}</strong></div>
+            </div>
+
+            <ul class="pl-3 mb-0">
+                <li>Send to a course, semester, batch, or specific numbers.</li>
+                <li>Quick templates for live classes, timetable, reports, and fee reminders.</li>
+                <li>Works for admin and staff. Students can also use course-related messages.</li>
+            </ul>
+        </aside>
+
+        <section>
+            <div class="wa-panel p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div>
+                        <h4>Compose Message</h4>
+                        <div class="wa-muted">Choose an audience, add the text, and generate WhatsApp chat links.</div>
+                    </div>
+                    <div class="btn-group flex-wrap" role="group">
+                        <a href="{% url 'whatsapp_center' %}?template=live_class" class="btn btn-sm btn-outline-success"><i class="fas fa-video"></i> Live Class</a>
+                        <a href="{% url 'whatsapp_center' %}?template=timetable" class="btn btn-sm btn-outline-primary"><i class="fas fa-calendar-check"></i> Timetable</a>
+                        <a href="{% url 'whatsapp_center' %}?template=report_link" class="btn btn-sm btn-outline-dark"><i class="fas fa-file-contract"></i> Report Link</a>
+                    </div>
+                </div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'warning' %}warning{% else %}{{ message.tags }}{% endif %}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST" class="wa-form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label>Message Type</label>
+                            <select name="template_key" class="form-select">
+                                <option value="custom" {% if template_key == 'custom' %}selected{% endif %}>Custom</option>
+                                <option value="live_class" {% if template_key == 'live_class' %}selected{% endif %}>Live Class</option>
+                                <option value="timetable" {% if template_key == 'timetable' %}selected{% endif %}>Timetable</option>
+                                <option value="report_link" {% if template_key == 'report_link' %}selected{% endif %}>Report Link</option>
+                                <option value="payment_link" {% if template_key == 'payment_link' %}selected{% endif %}>Payment Link</option>
+                                <option value="event_notice" {% if template_key == 'event_notice' %}selected{% endif %}>Event / Notice</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label>Audience</label>
+                            <select name="audience" class="form-select" required>
+                                {% if can_target_students %}<option value="all_students" {% if audience == 'all_students' %}selected{% endif %}>All Students</option>{% endif %}
+                                {% if can_target_students %}<option value="course_students" {% if audience == 'course_students' %}selected{% endif %}>Selected Course Students</option>{% endif %}
+                                {% if can_target_students %}<option value="batch_students" {% if audience == 'batch_students' %}selected{% endif %}>Batch Year Students</option>{% endif %}
+                                {% if can_target_students %}<option value="semester_students" {% if audience == 'semester_students' %}selected{% endif %}>Semester Students</option>{% endif %}
+                                {% if can_target_students %}<option value="previous_year_students" {% if audience == 'previous_year_students' %}selected{% endif %}>Previous Year Students</option>{% endif %}
+                                {% if can_target_students %}<option value="live_class_students" {% if audience == 'live_class_students' %}selected{% endif %}>Live Class Students</option>{% endif %}
+                                {% if can_target_staff %}<option value="all_staff" {% if audience == 'all_staff' %}selected{% endif %}>All Staff</option>{% endif %}
+                                {% if can_target_self_course %}<option value="course_staff" {% if audience == 'course_staff' %}selected{% endif %}>Selected Course Staff</option>{% endif %}
+                                {% if can_target_students %}<option value="parents" {% if audience == 'parents' %}selected{% endif %}>Parents of Students</option>{% endif %}
+                                <option value="specific_numbers" {% if audience == 'specific_numbers' %}selected{% endif %}>Specific Numbers</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label>Course</label>
+                            <select name="course" class="form-select">
+                                <option value="">All Courses</option>
+                                {% for course in courses %}
+                                    <option value="{{ course.id }}" {% if selected_course and selected_course.id == course.id %}selected{% endif %}>{{ course.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label>Session</label>
+                            <select name="session" class="form-select">
+                                <option value="">Any Session</option>
+                                {% for session in sessions %}
+                                    <option value="{{ session.id }}" {% if selected_session and selected_session.id == session.id %}selected{% endif %}>{{ session }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>Batch Year</label>
+                            <input type="number" name="batch_year" class="form-control" placeholder="2026" value="{{ request.POST.batch_year|default:'' }}">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label>Semester</label>
+                            <input type="number" name="semester" class="form-control" placeholder="1" value="{{ request.POST.semester|default:'' }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label>Live Class</label>
+                            <select name="live_class" class="form-select">
+                                <option value="">Select Live Class</option>
+                                {% for live_class in live_classes %}
+                                    <option value="{{ live_class.id }}" {% if selected_live_class and selected_live_class.id == live_class.id %}selected{% endif %}>
+                                        {{ live_class.title }} - {{ live_class.subject.course.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label>Message</label>
+                            <textarea name="message" rows="5" class="form-control" placeholder="Write the WhatsApp message here...">{{ message_body }}</textarea>
+                            <div class="wa-muted mt-1">Tip: keep the first line short. WhatsApp opens with this text prefilled.</div>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label>Specific Numbers</label>
+                            <textarea name="specific_numbers" rows="3" class="form-control" placeholder="Comma or line separated numbers with or without country code"></textarea>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="reset" class="btn btn-light border"><i class="fas fa-undo"></i> Reset</button>
+                        <button type="submit" class="btn btn-success"><i class="fab fa-whatsapp"></i> Generate WhatsApp Links</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="wa-panel p-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div>
+                        <h5>Prepared Chats</h5>
+                        <div class="wa-muted">Open each chat to send the message. No paid API required.</div>
+                    </div>
+                    {% if generated_links %}
+                        <button type="button" class="btn btn-sm btn-outline-success" onclick="openAllWhatsApp()"><i class="fas fa-external-link-alt"></i> Open All Visible</button>
+                    {% endif %}
+                </div>
+
+                {% if generated_links %}
+                <div class="table-responsive">
+                    <table class="table table-hover wa-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Phone</th>
+                                <th>Message</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in generated_links %}
+                            <tr>
+                                <td><strong>{{ item.name }}</strong></td>
+                                <td><span class="badge bg-light text-dark border">{{ item.role }}</span></td>
+                                <td>{{ item.phone }}</td>
+                                <td><div class="wa-result-message text-muted">{{ item.message }}</div></td>
+                                <td class="text-end">
+                                    <a class="btn btn-sm btn-success whatsapp-link" href="{{ item.link }}" target="_blank" rel="noopener">
+                                        <i class="fab fa-whatsapp"></i> Open Chat
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fab fa-whatsapp fa-3x text-success mb-3"></i>
+                    <h5 class="mb-2">No chats prepared yet</h5>
+                    <p class="wa-muted mb-0">Pick a template and audience, then generate chat links above.</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+    function openAllWhatsApp() {
+        const links = Array.from(document.querySelectorAll('.whatsapp-link')).map(a => a.href);
+        links.forEach((href, index) => {
+            setTimeout(() => window.open(href, '_blank', 'noopener'), index * 220);
+        });
+    }
+</script>
+{% endblock custom_js %}

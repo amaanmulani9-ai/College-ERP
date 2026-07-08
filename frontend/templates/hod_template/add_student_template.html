@@ -3,6 +3,71 @@
 
 {% block custom_css %}
 <style>
+    .admission-shell {
+        display: grid;
+        grid-template-columns: 320px minmax(0, 1fr);
+        gap: 24px;
+    }
+    .admission-side {
+        background: linear-gradient(180deg, #6c5ce7 0%, #4b6bfb 100%);
+        color: #fff;
+        border-radius: 16px;
+        padding: 28px;
+        min-height: 100%;
+        box-shadow: 0 12px 30px rgba(76, 86, 255, 0.16);
+    }
+    .admission-side h2 {
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+    .admission-side p {
+        font-size: 13px;
+        line-height: 1.7;
+        color: rgba(255,255,255,.85);
+        margin-bottom: 20px;
+    }
+    .admission-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.12);
+        border: 1px solid rgba(255,255,255,.18);
+        margin: 0 8px 8px 0;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .admission-checklist {
+        margin-top: 24px;
+        padding: 18px;
+        border-radius: 14px;
+        background: rgba(255,255,255,.08);
+        border: 1px solid rgba(255,255,255,.12);
+    }
+    .admission-checklist h4 {
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+    .admission-checklist ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .admission-checklist li {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        font-size: 12px;
+        margin-bottom: 10px;
+        color: rgba(255,255,255,.9);
+    }
+    .admission-checklist i {
+        margin-top: 2px;
+        color: #c7f9cc;
+    }
     .admission-card {
         background: #fff;
         border-radius: 12px;
@@ -115,6 +180,9 @@
         font-size: 12px;
         color: #ff4757;
     }
+    @media (max-width: 992px) {
+        .admission-shell { grid-template-columns: 1fr; }
+    }
 </style>
 {% endblock custom_css %}
 
@@ -123,15 +191,38 @@
 {% block content %}
 <section class="content">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
+        <div class="admission-shell">
+            <aside class="admission-side">
+                <h2>Student Admission</h2>
+                <p>Capture one clean student record with batch, semester, verification, and identity fields from day one. This keeps reports, ID cards, fees, and promotion flow aligned later.</p>
+                <div class="admission-pill"><i class="fas fa-qrcode"></i> Unique student code</div>
+                <div class="admission-pill"><i class="fas fa-id-card"></i> ID card ready</div>
+                <div class="admission-pill"><i class="fas fa-shield-alt"></i> Verification flow</div>
+                <div class="admission-pill"><i class="fas fa-layer-group"></i> Batch wise tracking</div>
+                <div class="admission-checklist">
+                    <h4>Before you submit</h4>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Select the correct course and session.</li>
+                        <li><i class="fas fa-check-circle"></i> Enter the batch year and current semester.</li>
+                        <li><i class="fas fa-check-circle"></i> Keep admission date and verification state accurate.</li>
+                        <li><i class="fas fa-check-circle"></i> Use a real student email that will stay unique.</li>
+                    </ul>
+                </div>
+                <div class="admission-checklist" style="margin-top:16px;">
+                    <h4>Auto-generated after save</h4>
+                    <ul>
+                        <li><i class="fas fa-qrcode"></i> Unique student code</li>
+                        <li><i class="fas fa-id-card"></i> ID card code</li>
+                        <li><i class="fas fa-file-alt"></i> Report card and admission letter links</li>
+                    </ul>
+                </div>
+            </aside>
+
+            <div>
                 <div class="card admission-card">
                     <div class="admission-header d-flex justify-content-between align-items-center">
                         <h3><i class="fas fa-user-plus mr-2"></i>Student Admission Form</h3>
                         <div>
-                            <button type="button" class="btn btn-light btn-sm text-primary mr-2" style="font-weight: 600;" onclick="alert('Customize feature coming soon!')">
-                                <i class="fas fa-cog"></i> Customize
-                            </button>
                             <button type="button" class="btn btn-light btn-sm text-primary" style="font-weight: 600;" data-bs-toggle="modal" data-bs-target="#importModal">
                                 <i class="fas fa-file-import"></i> Import Students
                             </button>
@@ -201,7 +292,7 @@
                                 <div class="col-md-4 form-group mb-3">
                                     <label>Registration No</label>
                                     <input type="text" name="registration_no" class="form-control" placeholder="Registration No" value="{{ form.registration_no.value|default:'' }}">
-                                    <div class="helper-text">LAST: 011</div>
+                                    <div class="helper-text">Use a real roll or admission number if your college already issues one</div>
                                     {{ form.registration_no.errors }}
                                 </div>
                                 <div class="col-md-4 form-group mb-3">
@@ -225,20 +316,46 @@
                                     {{ form.session.errors }}
                                 </div>
                                 <div class="col-md-4 form-group mb-3">
+                                    <label>Batch Year</label>
+                                    <input type="number" name="batch_year" class="form-control" placeholder="2026" value="{{ form.batch_year.value|default:'' }}">
+                                    <div class="helper-text">Used for unique student code and batch filtering</div>
+                                    {{ form.batch_year.errors }}
+                                </div>
+                                <div class="col-md-4 form-group mb-3">
                                     <label>Picture</label>
                                     <input type="file" name="profile_pic" class="form-control">
-                                    <div class="helper-text">Max size 100KB</div>
+                                    <div class="helper-text">JPEG or PNG up to 2MB</div>
                                     {{ form.profile_pic.errors }}
                                 </div>
                                 <div class="col-md-4 form-group mb-3">
-                                    <label>Date of Admission <span>*</span></label>
-                                    <input type="date" name="date_of_admission" class="form-control" value="{{ form.date_of_admission.value|default:'' }}">
-                                    {{ form.date_of_admission.errors }}
+                                    <label>Date of Admission</label>
+                                    <input type="date" name="admission_date" class="form-control" value="{{ form.admission_date.value|default:'' }}">
+                                    {{ form.admission_date.errors }}
+                                </div>
+                                <div class="col-md-4 form-group mb-3">
+                                    <label>Current Semester <span>*</span></label>
+                                    <input type="number" name="current_semester" min="1" class="form-control" placeholder="1" value="{{ form.current_semester.value|default:'1' }}" required>
+                                    <div class="helper-text">Auto checked against course total semesters</div>
+                                    {{ form.current_semester.errors }}
                                 </div>
                                 <div class="col-md-4 form-group mb-3">
                                     <label>Discount in Fee</label>
                                     <input type="number" name="discount_in_fee" class="form-control" placeholder="In %" value="{{ form.discount_in_fee.value|default:'0' }}">
                                     {{ form.discount_in_fee.errors }}
+                                </div>
+                                <div class="col-md-4 form-group mb-3">
+                                    <label>Verification Status</label>
+                                    <select name="verification_status" class="form-select w-100">
+                                        <option value="Pending" {% if form.verification_status.value == "Pending" %}selected{% endif %}>Pending</option>
+                                        <option value="Verified" {% if form.verification_status.value == "Verified" %}selected{% endif %}>Verified</option>
+                                        <option value="Rejected" {% if form.verification_status.value == "Rejected" %}selected{% endif %}>Rejected</option>
+                                    </select>
+                                    {{ form.verification_status.errors }}
+                                </div>
+                                <div class="col-md-12 form-group mb-3">
+                                    <label>Verification Notes</label>
+                                    <textarea name="verification_notes" class="form-control" rows="2" placeholder="Enter any document or admission verification notes">{{ form.verification_notes.value|default:'' }}</textarea>
+                                    {{ form.verification_notes.errors }}
                                 </div>
                                 <div class="col-md-4 form-group mb-3">
                                     <label>Mobile for SMS/WhatsApp</label>
@@ -359,7 +476,7 @@
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <label class="mb-0">Address <span>*</span></label>
                                         <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAIAddress" style="font-size: 11px; border-radius: 20px; padding: 2px 10px; border-color: #6c5ce7; color: #6c5ce7;">
-                                            <i class="fas fa-magic"></i> ✨ AI Format Address
+                                            <i class="fas fa-magic"></i> AI Format Address
                                         </button>
                                     </div>
                                     <textarea name="address" id="id_address" class="form-control no-tinymce" rows="3" placeholder="Student Address" required>{{ form.address.value|default:'' }}</textarea>
@@ -455,10 +572,33 @@
                             <div class="form-section-title">
                                 <span class="section-number">5</span> Documents Upload
                             </div>
-                            <div class="locked-notice mb-4">
-                                <i class="fas fa-lock d-block"></i>
-                                <strong>Desktop Subscription Required</strong>
-                                <p class="mb-0 mt-2">Document upload is available with the Desktop Version only.</p>
+                            <div class="row mb-4">
+                                <div class="col-md-4 form-group mb-3">
+                                    <label>Aadhaar / ID Proof</label>
+                                    <input type="file" name="aadhar_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                                    <div class="helper-text">PDF or image only. Stored against the registration record.</div>
+                                </div>
+                                <div class="col-md-4 form-group mb-3">
+                                    <label>Marksheet / Previous Result</label>
+                                    <input type="file" name="marksheet_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                                    <div class="helper-text">Optional for migration and verification.</div>
+                                </div>
+                                <div class="col-md-4 form-group mb-3">
+                                    <label>Document Verification</label>
+                                    <select name="document_status" class="form-select w-100">
+                                        <option value="Pending">Pending</option>
+                                        <option value="Verified">Verified</option>
+                                        <option value="Rejected">Rejected</option>
+                                    </select>
+                                    <div class="helper-text">This syncs to the student registration record.</div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="locked-notice">
+                                        <i class="fas fa-shield-alt d-block"></i>
+                                        <strong>Document Verification Ready</strong>
+                                        <p class="mb-0 mt-2">Upload admission documents now and the system will keep them attached to the student registration profile for later review.</p>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Actions -->
@@ -471,7 +611,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+            </div>
     </div>
 </section>
 
@@ -488,7 +628,7 @@
       <form action="{% url 'import_students_csv' %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="modal-body">
-          <p class="text-muted small mb-3">Upload a CSV file with the following column headers: <code>first_name, last_name, gender, course_id, session_id, date_of_admission, email (optional)</code>.</p>
+          <p class="text-muted small mb-3">Upload a CSV file with the following column headers: <code>first_name, last_name, gender, course_id, session_id, admission_date, email (optional), semester (optional), division (optional), batch_year (optional)</code>.</p>
           <div class="form-group">
             <label for="studentCsvFile">CSV File</label>
             <input type="file" class="form-control-file" id="studentCsvFile" name="file" accept=".csv" required>
@@ -558,7 +698,7 @@
                     alert("Could not connect to AI service. Please try again.");
                 },
                 complete: function() {
-                    btn.html("<i class='fas fa-magic'></i> ✨ AI Format Address").prop("disabled", false);
+                    btn.html("<i class='fas fa-magic'></i> AI Format Address").prop("disabled", false);
                 }
             });
         });

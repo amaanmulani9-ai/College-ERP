@@ -282,6 +282,245 @@ def export_staff_analytics(request):
 
 @login_required(login_url='/')
 @admin_required
+def pro_modules_dashboard(request):
+    """Role-based Pro modules command center inspired by eSkooly Pro dashboards."""
+    today = date.today()
+    fee_expected = FeeRecord.objects.aggregate(total=Sum('amount'))['total'] or 0
+    fee_collected = FeeRecord.objects.aggregate(total=Sum('amount_paid'))['total'] or 0
+    issued_books = IssuedBook.objects.count()
+    overdue_books = IssuedBook.objects.filter(expiry_date__lt=today).count()
+    pending_certificates = CertificateRequest.objects.filter(status='Pending').count()
+    pending_queries = AdmissionQuery.objects.filter(status='Active').count()
+    open_complaints = Complaint.objects.filter(action_taken__isnull=True).count()
+    pending_student_leaves = LeaveReportStudent.objects.filter(status=0).count()
+    pending_staff_leaves = LeaveReportStaff.objects.filter(status=0).count()
+
+    pro_modules = [
+        {
+            'role': 'Accountant',
+            'icon': 'fas fa-file-invoice-dollar',
+            'tone': 'green',
+            'summary': 'Fees, income, expenses, bank accounts, salary, receipts, and statements.',
+            'metrics': [
+                {'label': 'Expected', 'value': fee_expected},
+                {'label': 'Collected', 'value': fee_collected},
+                {'label': 'Pending', 'value': fee_expected - fee_collected},
+            ],
+            'links': [
+                {'label': 'Finance Dashboard', 'url': reverse('admin_finance_dashboard')},
+                {'label': 'Chart of Accounts', 'url': reverse('chart_of_accounts')},
+                {'label': 'Collect Fees', 'url': reverse('admin_collect_fees')},
+                {'label': 'Salary Slip', 'url': reverse('admin_salary_slip')},
+            ],
+        },
+        {
+            'role': 'Librarian',
+            'icon': 'fas fa-book-reader',
+            'tone': 'blue',
+            'summary': 'Book catalog, issue desk, returns, overdue tracking, and student library access.',
+            'metrics': [
+                {'label': 'Books', 'value': Book.objects.count()},
+                {'label': 'Issued', 'value': issued_books},
+                {'label': 'Overdue', 'value': overdue_books},
+            ],
+            'links': [
+                {'label': 'Library Overview', 'url': reverse('admin_library_overview')},
+                {'label': 'Book Catalog', 'url': reverse('admin_library_catalog')},
+                {'label': 'Issue Desk', 'url': reverse('admin_library_issue')},
+                {'label': 'Overdue Report', 'url': reverse('admin_library_overdue')},
+            ],
+        },
+        {
+            'role': 'Receptionist',
+            'icon': 'fas fa-headset',
+            'tone': 'orange',
+            'summary': 'Admissions desk, visitor passes, enquiries, complaints, calls, and postal records.',
+            'metrics': [
+                {'label': 'Admissions', 'value': Student.objects.count()},
+                {'label': 'Queries', 'value': pending_queries},
+                {'label': 'Complaints', 'value': open_complaints},
+            ],
+            'links': [
+                {'label': 'Admission Queries', 'url': reverse('manage_queries')},
+                {'label': 'Visitor Passes', 'url': reverse('admin_visitor_passes')},
+                {'label': 'Phone Calls', 'url': reverse('manage_call_logs')},
+                {'label': 'Postal Records', 'url': reverse('manage_postal')},
+            ],
+        },
+        {
+            'role': 'Teacher',
+            'icon': 'fas fa-chalkboard-teacher',
+            'tone': 'purple',
+            'summary': 'Class routine, attendance, exams, LMS, live classes, study material, and grading.',
+            'metrics': [
+                {'label': 'Staff', 'value': Staff.objects.count()},
+                {'label': 'Subjects', 'value': Subject.objects.count()},
+                {'label': 'Leaves', 'value': pending_staff_leaves},
+            ],
+            'links': [
+                {'label': 'Timetable', 'url': reverse('admin_manage_timetable')},
+                {'label': 'Homework', 'url': reverse('admin_homework')},
+                {'label': 'Create Exam', 'url': reverse('admin_create_exam')},
+                {'label': 'Live Class', 'url': reverse('admin_live_class')},
+            ],
+        },
+        {
+            'role': 'Parent Portal',
+            'icon': 'fas fa-user-friends',
+            'tone': 'teal',
+            'summary': 'Parent access to attendance, fee status, results, timetable, and feedback.',
+            'metrics': [
+                {'label': 'Parents', 'value': Parent.objects.count()},
+                {'label': 'Students', 'value': Student.objects.count()},
+                {'label': 'Student Leaves', 'value': pending_student_leaves},
+            ],
+            'links': [
+                {'label': 'Add Parent', 'url': reverse('add_parent')},
+                {'label': 'Manage Parents', 'url': reverse('manage_parent')},
+                {'label': 'Student Attendance', 'url': reverse('admin_students_attendance_report')},
+                {'label': 'Results', 'url': reverse('admin_result_card')},
+            ],
+        },
+        {
+            'role': 'Super Admin',
+            'icon': 'fas fa-shield-alt',
+            'tone': 'red',
+            'summary': 'Institute settings, certificates, theme, users, analytics, and operating controls.',
+            'metrics': [
+                {'label': 'Courses', 'value': Course.objects.count()},
+                {'label': 'Certificates', 'value': pending_certificates},
+                {'label': 'Users', 'value': CustomUser.objects.count()},
+            ],
+            'links': [
+                {'label': 'Institute Profile', 'url': reverse('admin_settings_profile')},
+                {'label': 'Theme Settings', 'url': reverse('admin_settings_theme')},
+                {'label': 'Certificates', 'url': reverse('manage_certificate_templates')},
+                {'label': 'Analytics', 'url': reverse('admin_analytics')},
+            ],
+        },
+    ]
+
+    context = {
+        'page_title': 'Pro Modules',
+        'page_subtitle': 'Role-based dashboards and shortcuts modeled after eSkooly Pro.',
+        'pro_modules': pro_modules,
+    }
+    return render(request, 'hod_template/pro_modules.html', context)
+
+
+@login_required(login_url='/')
+@admin_required
+def admin_library_overview(request):
+    today = date.today()
+    issued_books = IssuedBook.objects.all().order_by('-issued_date')
+    context = {
+        'page_title': 'Library Overview',
+        'total_books': Book.objects.count(),
+        'issued_books': issued_books.count(),
+        'overdue_books': issued_books.filter(expiry_date__lt=today).count(),
+        'recent_issues': issued_books[:8],
+        'popular_categories': Book.objects.values('category').annotate(total=Count('id')).order_by('-total')[:6],
+    }
+    return render(request, 'hod_template/library_overview.html', context)
+
+
+@login_required(login_url='/')
+@admin_required
+def admin_library_catalog(request):
+    query = request.GET.get('q', '').strip()
+    books = Book.objects.all().order_by('name')
+    if query:
+        book_filter = (
+            Q(name__icontains=query) |
+            Q(author__icontains=query) |
+            Q(category__icontains=query)
+        )
+        if query.isdigit():
+            book_filter |= Q(isbn=int(query))
+        books = books.filter(book_filter)
+
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        author = request.POST.get('author', '').strip()
+        isbn = request.POST.get('isbn', '').strip()
+        category = request.POST.get('category', '').strip()
+        if not all([name, author, isbn, category]):
+            messages.error(request, 'Please fill book name, author, ISBN, and category.')
+        elif not isbn.isdigit():
+            messages.error(request, 'ISBN must contain numbers only.')
+        else:
+            Book.objects.create(name=name, author=author, isbn=int(isbn), category=category)
+            messages.success(request, 'Book added to the catalog.')
+            return redirect(reverse('admin_library_catalog'))
+
+    context = {
+        'page_title': 'Book Catalog',
+        'books': books[:100],
+        'query': query,
+    }
+    return render(request, 'hod_template/library_catalog.html', context)
+
+
+@login_required(login_url='/')
+@admin_required
+def admin_library_issue(request):
+    books = Book.objects.all().order_by('name')
+    students = Student.objects.select_related('admin', 'course').order_by('admin__first_name')
+
+    if request.method == 'POST':
+        student_email = request.POST.get('student_email', '').strip()
+        isbn = request.POST.get('isbn', '').strip()
+        if not student_email or not isbn:
+            messages.error(request, 'Select a student and a book before issuing.')
+        elif not CustomUser.objects.filter(email=student_email, user_type='3').exists():
+            messages.error(request, 'Selected student account was not found.')
+        elif not Book.objects.filter(isbn=isbn).exists():
+            messages.error(request, 'Selected book was not found.')
+        else:
+            IssuedBook.objects.create(student_id=student_email, isbn=isbn)
+            messages.success(request, 'Book issued successfully.')
+            return redirect(reverse('admin_library_issue'))
+
+    context = {
+        'page_title': 'Issue Book',
+        'books': books,
+        'students': students,
+        'issued_books': IssuedBook.objects.all().order_by('-issued_date')[:25],
+    }
+    return render(request, 'hod_template/library_issue.html', context)
+
+
+@login_required(login_url='/')
+@admin_required
+def admin_library_overdue(request):
+    today = date.today()
+    overdue = IssuedBook.objects.filter(expiry_date__lt=today).order_by('expiry_date')
+    details = []
+    books_by_isbn = {
+        str(book.isbn): book
+        for book in Book.objects.filter(isbn__in=[loan.isbn for loan in overdue])
+    }
+    users_by_email = {
+        user.email: user
+        for user in CustomUser.objects.filter(email__in=[loan.student_id for loan in overdue])
+    }
+    for loan in overdue:
+        days_overdue = max(0, (today - loan.expiry_date).days)
+        details.append({
+            'loan': loan,
+            'book': books_by_isbn.get(str(loan.isbn)),
+            'student': users_by_email.get(loan.student_id),
+            'days_overdue': days_overdue,
+            'fine': days_overdue * 5,
+        })
+    return render(request, 'hod_template/library_overdue.html', {
+        'page_title': 'Overdue Books',
+        'overdue_details': details,
+    })
+
+
+@login_required(login_url='/')
+@admin_required
 def add_staff(request):
     form = StaffForm(request.POST or None, request.FILES or None)
     context = {'form': form, 'page_title': 'Add Staff'}
@@ -310,6 +549,7 @@ def add_staff(request):
                 # Save additional custom fields
                 staff = user.staff
                 staff.course = course
+                staff.mobile_number = form.cleaned_data.get('mobile_number')
                 staff.monthly_salary = request.POST.get('monthly_salary') or 0.00
                 staff.experience = request.POST.get('experience') or 0
                 staff.religion = request.POST.get('religion', '')
@@ -362,7 +602,12 @@ def add_student(request):
                 student = user.student
                 student.session = session
                 student.course = course
+                student.batch_year = student_form.cleaned_data.get('batch_year') or (session.start_year.year if session else datetime.today().year)
                 student.current_semester = student_form.cleaned_data.get('current_semester') or 1
+                student.admission_date = student_form.cleaned_data.get('admission_date')
+                student.expected_completion_date = student_form.cleaned_data.get('expected_completion_date')
+                student.verification_status = student_form.cleaned_data.get('verification_status') or 'Pending'
+                student.verification_notes = student_form.cleaned_data.get('verification_notes')
                 student.division = student_form.cleaned_data.get('division')
                 
                 # eSkooly student admission fields
@@ -403,6 +648,29 @@ def add_student(request):
                 
                 student.save()
 
+                reg, _ = StudentRegistration.objects.get_or_create(student=student)
+                reg.application_no = student.registration_no or student.unique_student_code or f"ADM-{student.id}"
+                reg.session = str(session)
+                reg.course_name = course.name if course else ""
+                reg.current_semester = student.current_semester
+                reg.division = student.division or ""
+                reg.first_name = first_name.upper()
+                reg.surname = last_name.upper()
+                reg.father_name = student.father_name or ""
+                reg.mother_name = student.mother_name or ""
+                reg.gender = "MALE" if gender == "M" else "FEMALE"
+                reg.dob = student.dob
+                reg.student_phone = student.mobile or ""
+                reg.student_email = email.lower()
+                reg.address = address or ""
+                reg.document_status = request.POST.get('document_status') or 'Pending'
+                if request.FILES.get('aadhar_file'):
+                    reg.aadhar_file = request.FILES['aadhar_file']
+                if request.FILES.get('marksheet_file'):
+                    reg.marksheet_file = request.FILES['marksheet_file']
+                reg.full_clean(exclude=['document_verified_at', 'document_verified_by'])
+                reg.save()
+
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_student'))
             except Exception as e:
@@ -427,11 +695,17 @@ def add_course(request):
             name = form.cleaned_data.get('name')
             monthly_fees = form.cleaned_data.get('monthly_fees')
             class_teacher = form.cleaned_data.get('class_teacher')
+            university_name = form.cleaned_data.get('university_name')
+            degree_level = form.cleaned_data.get('degree_level')
+            total_semesters = form.cleaned_data.get('total_semesters')
             try:
                 course = Course()
                 course.name = name
                 course.monthly_fees = monthly_fees
                 course.class_teacher = class_teacher
+                course.university_name = university_name or 'Mumbai University'
+                course.degree_level = degree_level or ''
+                course.total_semesters = total_semesters or 6
                 course.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_course'))
@@ -497,6 +771,8 @@ def manage_student(request):
     course_filter = request.GET.get('course', '')
     session_filter = request.GET.get('session', '')
     semester_filter = request.GET.get('semester', '')
+    batch_year_filter = request.GET.get('batch_year', '')
+    verification_filter = request.GET.get('verification_status', '')
     division_filter = request.GET.get('division', '')
     
     if course_filter:
@@ -505,6 +781,10 @@ def manage_student(request):
         students = students.filter(student__session_id=session_filter)
     if semester_filter:
         students = students.filter(student__current_semester=semester_filter)
+    if batch_year_filter:
+        students = students.filter(student__batch_year=batch_year_filter)
+    if verification_filter:
+        students = students.filter(student__verification_status=verification_filter)
     if division_filter:
         students = students.filter(student__division__iexact=division_filter)
         
@@ -512,9 +792,12 @@ def manage_student(request):
         'students': students,
         'courses': courses,
         'sessions': sessions,
+        'batch_years': Student.objects.values_list('batch_year', flat=True).distinct().order_by('-batch_year'),
         'selected_course': course_filter,
         'selected_session': session_filter,
         'selected_semester': semester_filter,
+        'selected_batch_year': batch_year_filter,
+        'selected_verification_status': verification_filter,
         'selected_division': division_filter,
         'page_title': 'Manage Students'
     }
@@ -611,6 +894,7 @@ def edit_staff(request, staff_id):
                 user.gender = gender
                 user.address = address
                 staff.course = course
+                staff.mobile_number = form.cleaned_data.get('mobile_number')
                 user.save()
                 staff.save()
                 messages.success(request, "Successfully Updated")
@@ -662,7 +946,12 @@ def edit_student(request, student_id):
 
                 student.session = session
                 student.course = course
+                student.batch_year = form.cleaned_data.get('batch_year') or (session.start_year.year if session else student.batch_year)
                 student.current_semester = form.cleaned_data.get('current_semester') or student.current_semester
+                student.admission_date = form.cleaned_data.get('admission_date')
+                student.expected_completion_date = form.cleaned_data.get('expected_completion_date')
+                student.verification_status = form.cleaned_data.get('verification_status') or student.verification_status
+                student.verification_notes = form.cleaned_data.get('verification_notes')
                 student.division = form.cleaned_data.get('division') or student.division
                 
                 # eSkooly student admission fields
@@ -741,11 +1030,17 @@ def edit_course(request, course_id):
             name = form.cleaned_data.get('name')
             monthly_fees = form.cleaned_data.get('monthly_fees')
             class_teacher = form.cleaned_data.get('class_teacher')
+            university_name = form.cleaned_data.get('university_name')
+            degree_level = form.cleaned_data.get('degree_level')
+            total_semesters = form.cleaned_data.get('total_semesters')
             try:
                 course = Course.objects.get(id=course_id)
                 course.name = name
                 course.monthly_fees = monthly_fees
                 course.class_teacher = class_teacher
+                course.university_name = university_name or course.university_name
+                course.degree_level = degree_level or course.degree_level
+                course.total_semesters = total_semesters or course.total_semesters
                 course.save()
                 messages.success(request, "Successfully Updated")
             except Exception as e:
@@ -1764,6 +2059,65 @@ def admin_manage_batches(request):
     }
     return render(request, "hod_template/manage_batches.html", context)
 
+
+@login_required(login_url='/')
+@admin_required
+def admin_verification_center(request):
+    courses = Course.objects.all().order_by('name')
+    sessions = Session.objects.all().order_by('-start_year')
+
+    students = Student.objects.select_related('admin', 'course', 'session').order_by('course__name', 'batch_year', 'current_semester', 'admin__first_name')
+
+    query = request.GET.get('q', '').strip()
+    course_id = request.GET.get('course')
+    session_id = request.GET.get('session')
+    batch_year = request.GET.get('batch_year')
+    semester = request.GET.get('semester')
+    verification_status = request.GET.get('verification_status')
+
+    if query:
+        students = students.filter(
+            Q(admin__first_name__icontains=query) |
+            Q(admin__last_name__icontains=query) |
+            Q(admin__email__icontains=query) |
+            Q(unique_student_code__icontains=query) |
+            Q(id_card_code__icontains=query) |
+            Q(registration_no__icontains=query)
+        )
+    if course_id:
+        students = students.filter(course_id=course_id)
+    if session_id:
+        students = students.filter(session_id=session_id)
+    if batch_year:
+        students = students.filter(batch_year=batch_year)
+    if semester:
+        students = students.filter(current_semester=semester)
+    if verification_status:
+        students = students.filter(verification_status=verification_status)
+
+    status_counts = {
+        'pending': Student.objects.filter(verification_status='Pending').count(),
+        'verified': Student.objects.filter(verification_status='Verified').count(),
+        'rejected': Student.objects.filter(verification_status='Rejected').count(),
+    }
+
+    context = {
+        'page_title': 'Verification Center',
+        'courses': courses,
+        'sessions': sessions,
+        'students': students[:250],
+        'status_counts': status_counts,
+        'batch_years': Student.objects.values_list('batch_year', flat=True).distinct().order_by('-batch_year'),
+        'semesters': Student.objects.values_list('current_semester', flat=True).distinct().order_by('current_semester'),
+        'selected_course': int(course_id) if course_id else None,
+        'selected_session': int(session_id) if session_id else None,
+        'selected_batch_year': int(batch_year) if batch_year else None,
+        'selected_semester': int(semester) if semester else None,
+        'selected_status': verification_status or '',
+        'query': query,
+    }
+    return render(request, "hod_template/verification_center.html", context)
+
 @login_required(login_url='/')
 @admin_required
 def admin_promote_batch(request):
@@ -1883,10 +2237,119 @@ def admin_settings_rules(request):
         return redirect('admin_settings_rules')
     return render(request, 'hod_template/settings_rules.html', {'page_title': 'Rules & Regulations', 'rules': rules})
 
+@login_required(login_url='/')
+@admin_required
+def admin_staff_id_cards(request):
+    staff_members = Staff.objects.select_related('admin', 'course').order_by('admin__first_name', 'admin__last_name')
+    for staff in staff_members:
+        if not staff.id_card_code:
+            staff.id_card_code = f"EMP-{staff.course.name[:3].upper() if staff.course else 'GEN'}-{staff.id:04d}"
+            staff.save(update_fields=['id_card_code'])
+    return render(request, 'hod_template/staff_id_cards.html', {
+        'page_title': 'Staff ID Cards',
+        'staff_members': staff_members,
+    })
+
+@login_required(login_url='/')
+@admin_required
+def admin_question_bank(request):
+    courses = Course.objects.all().order_by('name')
+    selected_course = request.GET.get('course', '')
+    exams = Exam.objects.select_related('subject', 'subject__course', 'staff', 'staff__admin').prefetch_related('questions').order_by('-created_at')
+    if selected_course:
+        exams = exams.filter(subject__course_id=selected_course)
+    return render(request, 'hod_template/question_bank.html', {
+        'page_title': 'Question Bank',
+        'courses': courses,
+        'selected_course': selected_course,
+        'exams': exams,
+    })
+
+@login_required(login_url='/')
+@admin_required
+def admin_result_sheet(request):
+    courses = Course.objects.all().order_by('name')
+    selected_course = request.GET.get('course', '')
+    results = StudentResult.objects.select_related('student__admin', 'student__course', 'subject').order_by('student__admin__first_name', 'subject__name')
+    if selected_course:
+        results = results.filter(student__course_id=selected_course)
+
+    grouped = {}
+    for result in results:
+        row = grouped.setdefault(result.student_id, {
+            'student': result.student,
+            'entries': [],
+            'test_total': 0,
+            'exam_total': 0,
+            'grand_total': 0,
+        })
+        total = (result.test or 0) + (result.exam or 0)
+        row['entries'].append({'subject': result.subject.name, 'test': result.test, 'exam': result.exam, 'total': total})
+        row['test_total'] += result.test or 0
+        row['exam_total'] += result.exam or 0
+        row['grand_total'] += total
+
+    return render(request, 'hod_template/result_sheet.html', {
+        'page_title': 'Result Sheet',
+        'courses': courses,
+        'selected_course': selected_course,
+        'student_rows': list(grouped.values()),
+    })
+
+@login_required(login_url='/')
+@admin_required
+def admin_exam_schedule(request):
+    events = CollegeEvent.objects.filter(event_type='exam').order_by('date', 'title')
+    exams = Exam.objects.select_related('subject', 'subject__course', 'staff', 'staff__admin').order_by('-created_at')
+    return render(request, 'hod_template/exam_schedule.html', {
+        'page_title': 'Exam Schedule',
+        'events': events,
+        'exams': exams,
+    })
+
+@login_required(login_url='/')
+@admin_required
+def admin_date_sheet(request):
+    events = CollegeEvent.objects.filter(event_type='exam').order_by('date', 'title')
+    exams = Exam.objects.select_related('subject', 'subject__course').order_by('-created_at')
+    return render(request, 'hod_template/date_sheet.html', {
+        'page_title': 'Date Sheet',
+        'events': events,
+        'exams': exams,
+    })
+
+@login_required(login_url='/')
+@admin_required
+def admin_blank_award_list(request):
+    courses = Course.objects.all().order_by('name')
+    exams = Exam.objects.select_related('subject', 'subject__course').prefetch_related('questions').order_by('-created_at')
+    return render(request, 'hod_template/blank_award_list.html', {
+        'page_title': 'Blank Award List',
+        'courses': courses,
+        'exams': exams,
+    })
+
 def feature_coming_soon(request, feature_name):
-    # Decode feature name for display (e.g., replace hyphens with spaces and title case)
+    feature_map = {
+        'staff-id-cards': 'admin_staff_id_cards',
+        'delete-fees': 'admin_settings_fees',
+        'students-report-card': 'admin_students_info_report',
+        'question-bank': 'admin_question_bank',
+        'create-question-paper': 'staff_generate_paper',
+        'result-sheet': 'admin_result_sheet',
+        'exam-schedule': 'admin_exam_schedule',
+        'date-sheet': 'admin_date_sheet',
+        'blank-award-list': 'admin_blank_award_list',
+    }
+    if feature_name in feature_map:
+        return redirect(reverse(feature_map[feature_name]))
     display_name = feature_name.replace('-', ' ').title()
-    return render(request, 'hod_template/feature_coming_soon.html', {'feature_name': display_name, 'page_title': display_name})
+    return render(request, 'hod_template/feature_coming_soon.html', {
+        'feature_name': display_name,
+        'page_title': display_name,
+        'feature_status': 'available',
+        'feature_note': 'This module is not part of the locked set and can be opened from the sidebar.',
+    })
 
 def admin_settings_grading(request):
     from .models import MarksGrading, FailCriteria
@@ -1999,7 +2462,7 @@ def import_students_csv(request):
             error_count = 0
             
             for column in csv.reader(io_string, delimiter=',', quotechar='"'):
-                # Expected format: first_name, last_name, gender, course_id, session_id, date_of_admission, email (optional), semester (optional), division (optional)
+                # Expected format: first_name, last_name, gender, course_id, session_id, admission_date, email (optional), semester (optional), division (optional), batch_year (optional)
                 if len(column) < 6:
                     continue
                     
@@ -2010,10 +2473,11 @@ def import_students_csv(request):
                     gender = 'M' if gender.lower() == 'male' else 'F'
                 course_id = column[3].strip()
                 session_id = column[4].strip()
-                date_of_admission = column[5].strip()
+                admission_date = column[5].strip()
                 provided_email = column[6].strip() if len(column) > 6 else ""
                 semester = int(column[7].strip()) if len(column) > 7 and column[7].strip() else 1
                 division = column[8].strip() if len(column) > 8 else ""
+                batch_year = int(column[9].strip()) if len(column) > 9 and column[9].strip().isdigit() else None
                 
                 email = None
                 if provided_email:
@@ -2050,10 +2514,14 @@ def import_students_csv(request):
                     student = user.student # Will be created by signal
                     student.course = course
                     student.session = session
+                    student.batch_year = batch_year or session.start_year.year
                     student.current_semester = semester
                     student.division = division
-                    if date_of_admission:
-                        student.date_of_admission = date_of_admission
+                    if admission_date:
+                        try:
+                            student.admission_date = datetime.strptime(admission_date, "%Y-%m-%d").date()
+                        except Exception:
+                            pass
                     student.save()
                     success_count += 1
                 except Exception as e:
@@ -2250,6 +2718,24 @@ def print_basic_list(request):
         'selected_course': course_filter,
     }
     return render(request, 'hod_template/print_basic_list.html', context)
+
+
+@login_required(login_url='/')
+@admin_required
+def print_batch_id_cards(request):
+    student_ids = request.GET.get('ids', '').split(',')
+    student_ids = [int(sid) for sid in student_ids if sid.isdigit()]
+    students = Student.objects.filter(id__in=student_ids).select_related('admin', 'course', 'session')
+    for student in students:
+        if not student.id_card_code:
+            student.id_card_code = f"STU-{student.course.name[:3].upper() if student.course else 'GEN'}-{student.batch_year}-{student.id:04d}"
+            student.save()
+    context = {
+        'page_title': 'Print ID Cards',
+        'students': students,
+        'is_batch_print': True,
+    }
+    return render(request, 'hod_template/print_batch_id_cards.html', context)
 
 @login_required(login_url='/')
 @admin_required

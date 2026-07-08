@@ -1,0 +1,111 @@
+
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb-bar {
+        background: transparent;
+        padding: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+    }
+    .sk-breadcrumb-title {
+        color: #6c5ce7;
+        font-weight: 600;
+        font-size: 15px;
+        margin-right: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .sk-breadcrumb-title i { font-size: 14px; }
+    .sk-breadcrumb-path {
+        color: #888;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .center-card-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    
+    .salary-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        width: 100%;
+        max-width: 600px;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .icon-wrapper {
+        width: 50px;
+        height: 50px;
+        background: rgba(108, 92, 231, 0.1);
+        color: #6c5ce7;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin: 0 auto 15px auto;
+    }
+
+    .salary-card h2 {
+        color: #2c3e50;
+        font-weight: 700;
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+
+    .salary-card p {
+        color: #7f8fa6;
+        font-size: 13px;
+        margin-bottom: 30px;
+    }
+
+    .search-input-wrapper {
+        position: relative;
+        margin-bottom: 25px;
+        max-width: 450px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .search-input-wrapper i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #b2bec3;
+    }
+    .form-control-search {
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid #dfe6e9;
+        padding: 12px 15px 12px 40px;
+        font-size: 14px;
+        color: #2d3436;
+    }
+    .form-control-search:focus {
+        border-color: #6c5ce7;
+        box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.1);
+        outline: none;
+    }
+
+    .submit-btn {
+        background: #6c5ce7;
+        color: #fff;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .submit-btn:hover { background: #5b4bc4; }
+
