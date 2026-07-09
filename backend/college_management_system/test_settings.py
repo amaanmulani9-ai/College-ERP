@@ -4,7 +4,7 @@ DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': ':memory:',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -13,15 +13,8 @@ MIDDLEWARE = [m for m in MIDDLEWARE if 'django_tenants' not in m]
 INSTALLED_APPS = [app for app in INSTALLED_APPS if app != 'django_tenants']
 DATABASE_ROUTERS = []
 
-# Disable migrations for speed
-class DisableMigrations:
-    def __contains__(self, item):
-        return True
-
-    def __getitem__(self, item):
-        return None
-
-MIGRATION_MODULES = DisableMigrations()
+# Enable migrations for local SQLite running
+MIGRATION_MODULES = {}
 
 # Faster password hashing
 PASSWORD_HASHERS = [
