@@ -301,8 +301,43 @@
         <section class="login-panel-wrap">
             <div class="login-panel">
                 <div class="login-panel-head">
-                    <h3>Sign in</h3>
-                    <p>Use your institute email and password to continue.</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                        <div>
+                            <h3>Sign in</h3>
+                            <p>Use your institute email and password to continue.</p>
+                        </div>
+                        <!-- Locale Selectors -->
+                        <div style="display: flex; gap: 6px;">
+                            <!-- Country Select -->
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle font-weight-bold" type="button" id="loginCountryBtn" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px; font-size: 11px;">
+                                    <i class="fas fa-globe me-1"></i> {{ selected_country }}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="loginCountryBtn">
+                                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('IN', 'en')">🇮🇳 India (IN)</a></li>
+                                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('AE', 'ar')">🇦🇪 UAE (AE)</a></li>
+                                </ul>
+                            </div>
+                            <!-- Language Select -->
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle font-weight-bold" type="button" id="loginLangBtn" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px; font-size: 11px;">
+                                    <i class="fas fa-language me-1"></i> {{ selected_lang|upper }}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="loginLangBtn">
+                                    {% if selected_country == 'IN' %}
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('IN', 'en')">English (EN)</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('IN', 'hi')">हिन्दी (HI)</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('IN', 'bn')">বাংলা (BN)</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('IN', 'ta')">தமிழ் (TA)</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('IN', 'te')">తెలుగు (TE)</a></li>
+                                    {% else %}
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('AE', 'ar')">العربية (AR)</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('AE', 'en')">English (EN)</a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="login-panel-body">
                     <div class="message-stack">
@@ -374,8 +409,187 @@
         </section>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // --- Locale & Currency Localization Engine ---
+        function changeLocale(country, lang) {
+            fetch('/set_locale/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ country: country, lang: lang })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.reload();
+                }
+            });
+        }
+
+        const TRANSLATIONS = {
+            'hi': {
+                'Sign in': 'साइन इन करें',
+                'Use your institute email and password to continue.': 'जारी रखने के लिए अपने संस्थान के ईमेल और पासवर्ड का उपयोग करें।',
+                'Email address': 'ईमेल पता',
+                'Password': 'पासवर्ड',
+                'Remember me': 'मुझे याद रखें',
+                'Forgot password?': 'पासवर्ड भूल गए?',
+                'Student registration': 'छात्र पंजीकरण',
+                'Admin': 'व्यवस्थापक',
+                'Staff': 'कर्मचारी',
+                'Student': 'छात्र',
+                'Parent': 'अभिभावक',
+                'Back Office': 'बैक ऑफिस',
+                'Click to auto-fill': 'ऑटो-फिल करने के लिए क्लिक करें',
+                'CAMPUS PRO ERP': 'कैंपस प्रो ईआरपी',
+                'Unified campus operations for admin, staff, students, and parents': 'एडमिन, स्टाफ, छात्रों और अभिभावकों के लिए एकीकृत कैंपस संचालन',
+                'One login. Every campus role. Clean, fast, and ready for daily work.': 'एक लॉगिन। हर कैंपस भूमिका। साफ, तेज और दैनिक काम के लिए तैयार।',
+                'Move through finance, attendance, certificates, classrooms, notices, and support without hunting through disconnected screens.': 'बिना अलग-अलग स्क्रीन खोजे वित्त, उपस्थिति, प्रमाण पत्र, कक्षाओं, सूचनाओं और समर्थन के माध्यम से आगे बढ़ें।',
+                'Role workspaces connected from the same entry point': 'एक ही प्रवेश बिंदु से जुड़े भूमिका कार्यक्षेत्र',
+                'Responsive access on desktop, tablet, and mobile': 'डेस्कटॉप, टैबलेट और मोबाइल पर रिस्पॉन्सिव एक्सेस',
+                'Attendance, fees, messages, and module status in sync': 'उपस्थिति, फीस, संदेश और मॉड्यूल स्थिति सिंक में',
+                'Secure tenant-aware access for your institute': 'आपके संस्थान के लिए सुरक्षित किराएदार-जागरूक पहुंच'
+            },
+            'bn': {
+                'Sign in': 'সাইন ইন',
+                'Use your institute email and password to continue.': 'চালিয়ে যেতে আপনার ইনস্টিটিউটের ইমেল এবং পাসওয়ার্ড ব্যবহার করুন।',
+                'Email address': 'ইমেল ঠিকানা',
+                'Password': 'পাসওয়ার্ড',
+                'Remember me': 'মনে রাখুন',
+                'Forgot password?': 'পাসওয়ার্ড ভুলে গেছেন?',
+                'Student registration': 'ছাত্র নিবন্ধন',
+                'Admin': 'অ্যাডমিন',
+                'Staff': 'স্টাফ',
+                'Student': 'ছাত্র',
+                'Parent': 'অভিভাবক',
+                'Back Office': 'ব্যাক অফিস',
+                'Click to auto-fill': 'অটো-ফিল করতে ক্লিক করুন',
+                'CAMPUS PRO ERP': 'ক্যাম্পাস প্রো ইআরপি',
+                'Unified campus operations for admin, staff, students, and parents': 'অ্যাডমিন, স্টাফ, ছাত্র এবং অভিভাবকদের জন্য সমন্বিত ক্যাম্পাস কার্যক্রম',
+                'One login. Every campus role. Clean, fast, and ready for daily work.': 'একটি লগইন। প্রতিটি ক্যাম্পাস ভূমিকা। পরিচ্ছন্ন, দ্রুত এবং দৈনন্দিন কাজের জন্য প্রস্তুত।',
+                'Move through finance, attendance, certificates, classrooms, notices, and support without hunting through disconnected screens.': 'আলাদা স্ক্রিন না খুঁজে অর্থ, উপস্থিতি, শংসাপত্র, ক্লাসরুম, নোটিশ এবং সহায়তার মাধ্যমে এগিয়ে যান।',
+                'Role workspaces connected from the same entry point': 'একই প্রবেশ বিন্দু থেকে সংযুক্ত ভূমিকা কর্মক্ষেত্র',
+                'Responsive access on desktop, tablet, and mobile': 'ডেস্কটপ, ট্যাবলেট এবং মোবাইলে প্রতিক্রিয়াশীল অ্যাক্সেস',
+                'Attendance, fees, messages, and module status in sync': 'উপস্থিতি, ফি, বার্তা এবং মডিউল স্থিতি সিঙ্কে',
+                'Secure tenant-aware access for your institute': 'আপনার ইনস্টিটিউটের জন্য নিরাপদ ভাড়াটে-সচেতন অ্যাক্সেস'
+            },
+            'ta': {
+                'Sign in': 'உள்நுழைய',
+                'Use your institute email and password to continue.': 'தொடர உங்கள் நிறுவனத்தின் மின்னஞ்சல் மற்றும் கடவுச்சொல்லைப் பயன்படுத்தவும்.',
+                'Email address': 'மின்னஞ்சல் முகவரி',
+                'Password': 'கடவுச்சொல்',
+                'Remember me': 'என்னை நினைவில் கொள்',
+                'Forgot password?': 'கடவுச்சொல் மறந்துவிட்டதா?',
+                'Student registration': 'மாணவர் பதிவு',
+                'Admin': 'நிர்வாகி',
+                'Staff': 'பணியாளர்கள்',
+                'Student': 'மாணவர்',
+                'Parent': 'பெற்றோர்',
+                'Back Office': 'பின் அலுவலகம்',
+                'Click to auto-fill': 'தானாக நிரப்ப கிளிக் செய்க',
+                'CAMPUS PRO ERP': 'கேம்பஸ் ப்ரோ ஈஆர்பி',
+                'Unified campus operations for admin, staff, students, and parents': 'நிர்வாகம், பணியாளர்கள், மாணவர்கள் மற்றும் பெற்றோர்களுக்கான ஒருங்கிணைந்த வளாக செயல்பாடுகள்',
+                'One login. Every campus role. Clean, fast, and ready for daily work.': 'ஒரு உள்நுழைவு. ஒவ்வொரு வளாகப் பொறுப்பும். சுத்தமான, வேகமான மற்றும் தினசரி வேலைக்குத் தயாராக உள்ளது.',
+                'Move through finance, attendance, certificates, classrooms, notices, and support without hunting through disconnected screens.': 'தொடர்பற்ற திரைகளைத் தேடாமல் நிதி, வருகை, சான்றிதழ்கள், வகுப்பறைகள், அறிவிப்புகள் மற்றும் ஆதரவு ஆகியவற்றைக் கடந்து செல்லுங்கள்.',
+                'Role workspaces connected from the same entry point': 'ஒரே நுழைவுப் புள்ளியிலிருந்து இணைக்கப்பட்ட பணி இடைவெளிகள்',
+                'Responsive access on desktop, tablet, and mobile': 'டெஸ்க்டாப், டேப்லெட் மற்றும் மொபைலில் பதிலளிக்கக்கூடிய அணுகல்',
+                'Attendance, fees, messages, and module status in sync': 'வருகை, கட்டணம், செய்திகள் மற்றும் தொகுதி நிலை ஒத்திசைவில் உள்ளது',
+                'Secure tenant-aware access for your institute': 'உங்கள் நிறுவனத்திற்கான பாதுகாப்பான குத்தகைதாரர்-அறிந்த அணுகல்'
+            },
+            'te': {
+                'Sign in': 'సైన్ ఇన్',
+                'Use your institute email and password to continue.': 'కొనసాగించడానికి మీ ఇన్స్టిట్యూట్ ఇమెయిల్ మరియు పాస్‌వర్డ్ ఉపయోగించండి.',
+                'Email address': 'ఇమెయిల్ చిరునామా',
+                'Password': 'పాస్‌వర్డ్',
+                'Remember me': 'నన్ను గుర్తుంచుకో',
+                'Forgot password?': 'పాస్‌వర్డ్ మర్చిపోయారా?',
+                'Student registration': 'విద్యార్థి నమోదు',
+                'Admin': 'అడ్మిన్',
+                'Staff': 'సిబ్బంది',
+                'Student': 'విద్యార్థి',
+                'Parent': 'తల్లిదండ్రులు',
+                'Back Office': 'బ్యాక్ ఆఫీస్',
+                'Click to auto-fill': 'ఆటో-ఫిల్ చేయడానికి క్లిక్ చేయండి',
+                'CAMPUS PRO ERP': 'క్యాంపస్ ప్రో ఈఆర్‌పి',
+                'Unified campus operations for admin, staff, students, and parents': 'అడ్మిన్, సిబ్బంది, విద్యార్థులు మరియు తల్లిదండ్రుల కోసం ఏకీకృత క్యాంపస్ కార్యకలాపాలు',
+                'One login. Every campus role. Clean, fast, and ready for daily work.': 'ఒక లాగిన్. ప్రతి క్యాంపస్ పాత్ర. శుభ్రంగా, వేగంగా మరియు రోజువారీ పని కోసం సిద్ధంగా ఉంది.',
+                'Move through finance, attendance, certificates, classrooms, notices, and support without hunting through disconnected screens.': 'విడివిడిగా ఉండే స్క్రీన్‌లను వెతకకుండా ఫైనాన్స్, హాజరు, సర్టిఫికెట్లు, క్లాస్‌రూమ్‌లు, నోటీసులు మరియు సపోర్ట్ ద్వారా ముందుకు సాగండి.',
+                'Role workspaces connected from the same entry point': 'ఒకే ఎంట్రీ పాయింట్ నుండి కనెక్ట్ చేయబడిన పాత్ర వర్క్‌స్పేస్‌లు',
+                'Responsive access on desktop, tablet, and mobile': 'డెస్క్‌టాప్, టాబ్లెట్ మరియు మొబైల్‌లో రెస్పాన్సివ్ యాక్సెస్',
+                'Attendance, fees, messages, and module status in sync': 'హాజరు, ఫీజులు, సందేశాలు మరియు మాడ్యూల్ స్థితి సమకాలీకరణలో ఉన్నాయి',
+                'Secure tenant-aware access for your institute': 'మీ ఇన్స్టిట్యూట్ కోసం సురక్షితమైన యాక్సెస్'
+            },
+            'ar': {
+                'Sign in': 'تسجيل الدخول',
+                'Use your institute email and password to continue.': 'استخدم البريد الإلكتروني للمعهد وكلمة المرور للمتابعة.',
+                'Email address': 'البريد الإلكتروني',
+                'Password': 'كلمة المرور',
+                'Remember me': 'تذكرني',
+                'Forgot password?': 'هل نسيت كلمة المرور؟',
+                'Student registration': 'تسجيل الطلاب',
+                'Admin': 'مدير النظام',
+                'Staff': 'الموظف',
+                'Student': 'الطالب',
+                'Parent': 'ولي الأمر',
+                'Back Office': 'المكتب الخلفي',
+                'Click to auto-fill': 'انقر للتعبئة التلقائية',
+                'CAMPUS PRO ERP': 'كامبوس برو إي آر بي',
+                'Unified campus operations for admin, staff, students, and parents': 'عمليات جامعية موحدة للمشرفين والموظفين والطلاب وأولياء الأمور',
+                'One login. Every campus role. Clean, fast, and ready for daily work.': 'تسجيل دخول واحد. كل الأدوار الجامعية. نظيف وسريع وجاهز للعمل اليومي.',
+                'Move through finance, attendance, certificates, classrooms, notices, and support without hunting through disconnected screens.': 'تنقل عبر المالية والحضور والشهادات والفصول الدراسية والإشعارات والدعم دون البحث عبر الشاشات المنفصلة.',
+                'Role workspaces connected from the same entry point': 'مساحات عمل الأدوار متصلة من نفس نقطة الدخول',
+                'Responsive access on desktop, tablet, and mobile': 'وصول متجاوب على الأجهزة المكتبية واللوحية والهواتف',
+                'Attendance, fees, messages, and module status in sync': 'الحضور والرسوم والرسائل وحالة الوحدة قيد المزامنة',
+                'Secure tenant-aware access for your institute': 'وصول آمن لمعهدك'
+            }
+        };
+
+        function translatePage(lang) {
+            if (!lang || lang === 'en') return;
+            const map = TRANSLATIONS[lang];
+            if (!map) return;
+            
+            function walk(node) {
+                if (node.nodeType === 3) {
+                    let val = node.nodeValue.trim();
+                    if (map[val]) {
+                        node.nodeValue = map[val];
+                    } else {
+                        for (let key in map) {
+                            if (val === key) {
+                                node.nodeValue = map[key];
+                                break;
+                            }
+                        }
+                    }
+                } else if (node.nodeType === 1 && (node.tagName === 'INPUT' || node.tagName === 'TEXTAREA')) {
+                    let placeholder = node.getAttribute('placeholder');
+                    if (placeholder && map[placeholder.trim()]) {
+                        node.setAttribute('placeholder', map[placeholder.trim()]);
+                    }
+                } else {
+                    for (let child of node.childNodes) {
+                        walk(child);
+                    }
+                }
+            }
+            walk(document.body);
+            
+            if (lang === 'ar') {
+                document.documentElement.dir = 'rtl';
+                document.body.style.textAlign = 'right';
+            } else {
+                document.documentElement.dir = 'ltr';
+                document.body.style.textAlign = 'left';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
+            translatePage("{{ selected_lang }}");
+
             const remember = document.getElementById('remember');
             const saved = localStorage.getItem('rememberMe');
             if (remember && saved === 'true') remember.checked = true;

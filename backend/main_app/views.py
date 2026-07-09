@@ -225,6 +225,25 @@ def logout_user(request):
 
 
 @csrf_exempt
+def set_locale(request):
+    """AJAX endpoint to update selected country and language in Django session."""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            country = data.get('country', 'IN')
+            lang = data.get('lang', 'en')
+            
+            # Store in session
+            request.session['selected_country'] = country
+            request.session['selected_lang'] = lang
+            
+            return JsonResponse({'status': 'success', 'country': country, 'lang': lang})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    return JsonResponse({'status': 'error', 'message': 'Only POST allowed'}, status=405)
+
+
+@csrf_exempt
 def get_attendance(request):
     subject_id = request.POST.get('subject')
     session_id = request.POST.get('session')

@@ -28,6 +28,7 @@ urlpatterns = [
     path("firebase-messaging-sw.js", views.showFirebaseJS, name='showFirebaseJS'),
     path("doLogin/", views.doLogin, name='doLogin'),
     path("logout_user/", views.logout_user, name='logout_user'),
+    path("set_locale/", views.set_locale, name='set_locale'),
     path("admin/home/", hod_views.admin_home, name='admin_home'),
     path("admin/pro-modules/", hod_views.pro_modules_dashboard, name='pro_modules_dashboard'),
     path("admin/library/", hod_views.admin_library_overview, name='admin_library_overview'),

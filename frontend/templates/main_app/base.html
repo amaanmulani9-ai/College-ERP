@@ -160,6 +160,39 @@
                     <i class="fas fa-moon"></i>
                 </span>
             </label>
+
+            <!-- Country & Language Selector -->
+            <div style="display: flex; gap: 8px; align-items: center;" class="tb-dropdown-container">
+                <!-- Country Dropdown -->
+                <div style="position: relative;">
+                    <button class="tb-action-btn" onclick="toggleTbDropdown('country-dropdown')" title="Select Country">
+                        <i class="fas fa-globe"></i> <span style="font-size: 11px; margin-left: 4px; font-weight: bold;">{{ selected_country }}</span>
+                    </button>
+                    <div id="country-dropdown" class="tb-dropdown-menu" style="width: 140px;">
+                        <a href="javascript:void(0)" onclick="changeLocale('IN', 'en')" class="dropdown-item">🇮🇳 India (IN)</a>
+                        <a href="javascript:void(0)" onclick="changeLocale('AE', 'ar')" class="dropdown-item">🇦🇪 UAE (AE)</a>
+                    </div>
+                </div>
+
+                <!-- Language Dropdown -->
+                <div style="position: relative;">
+                    <button class="tb-action-btn" onclick="toggleTbDropdown('lang-dropdown')" title="Select Language">
+                        <i class="fas fa-language"></i> <span style="font-size: 11px; margin-left: 4px; font-weight: bold;">{{ selected_lang|upper }}</span>
+                    </button>
+                    <div id="lang-dropdown" class="tb-dropdown-menu" style="width: 160px;">
+                        {% if selected_country == 'IN' %}
+                            <a href="javascript:void(0)" onclick="changeLocale('IN', 'en')" class="dropdown-item">English (EN)</a>
+                            <a href="javascript:void(0)" onclick="changeLocale('IN', 'hi')" class="dropdown-item">हिन्दी (HI)</a>
+                            <a href="javascript:void(0)" onclick="changeLocale('IN', 'bn')" class="dropdown-item">বাংলা (BN)</a>
+                            <a href="javascript:void(0)" onclick="changeLocale('IN', 'ta')" class="dropdown-item">தமிழ் (TA)</a>
+                            <a href="javascript:void(0)" onclick="changeLocale('IN', 'te')" class="dropdown-item">తెలుగు (TE)</a>
+                        {% else %}
+                            <a href="javascript:void(0)" onclick="changeLocale('AE', 'ar')" class="dropdown-item">العربية (AR)</a>
+                            <a href="javascript:void(0)" onclick="changeLocale('AE', 'en')" class="dropdown-item">English (EN)</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
             
             <!-- Chat Dropdown -->
             <div style="position: relative;" class="tb-dropdown-container">
@@ -867,8 +900,6 @@
             document.getElementById('notif-badge').style.display = 'none';
             fetchNotifications();
         }).catch(() => {});
-    }
-
     // Poll every 45 seconds
     document.addEventListener('DOMContentLoaded', function() {
         fetchNotifications();
@@ -888,6 +919,291 @@
                 });
             });
         }
+
+        // --- Locale & Currency Localization Engine ---
+        function changeLocale(country, lang) {
+            fetch('/set_locale/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ country: country, lang: lang })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.reload();
+                }
+            });
+        }
+
+        const TRANSLATIONS = {
+            'hi': {
+                'Admission Queries': 'प्रवेश प्रश्न',
+                'Visitor Passes': 'आगंतुक पास',
+                'Complaints Box': 'शिकायत पेटी',
+                'Postal Records': 'डाक रिकॉर्ड',
+                'Phone Call Logs': 'फ़ोन कॉल लॉग्स',
+                'Office Operations': 'कार्यालय संचालन',
+                'Admissions Center': 'प्रवेश केंद्र',
+                'Fees Operations': 'फीस संचालन',
+                'Certificate Requests': 'प्रमाण पत्र अनुरोध',
+                'Leave Applications': 'अवकाश आवेदन',
+                'Administrative Reports': 'प्रशासनिक रिपोर्ट',
+                'Account Profile': 'खाता प्रोफ़ाइल',
+                'Log out': 'लॉग आउट',
+                'Dashboard': 'डैशबोर्ड',
+                'Messages': 'संदेश',
+                'Notifications': 'अधिसूचना',
+                'Calendar': 'कैलेंडर',
+                'Parent Dashboard': 'अभिभावक डैशबोर्ड',
+                'My Profile': 'मेरी प्रोफाइल',
+                'Child Timetable': 'बच्चे की समय सारणी',
+                'Attendance Details': 'उपस्थिति विवरण',
+                'Fee Statement': 'शुल्क विवरण',
+                'Exam Results': 'परीक्षा परिणाम',
+                'Feedback': 'प्रतिक्रिया',
+                'Expected Revenue': 'अपेक्षित राजस्व',
+                'Collected Fees': 'एकत्रित शुल्क',
+                'Pending Receivables': 'लंबित प्राप्तियां',
+                'Total Students': 'कुल छात्र',
+                'Students Enrolled': 'नामांकित छात्र',
+                'Collection Rate': 'संग्रह दर',
+                'Pending Review': 'समीक्षा लंबित',
+                'Approved': 'स्वीकृत',
+                'Rejected': 'अस्वीकृत',
+                'Pending': 'लंबित',
+                'Register Walk-in Visitor': 'वॉक-इन विज़िटर पंजीकृत करें',
+                'Host Person / Dept': 'मेजबान व्यक्ति / विभाग',
+                'Registered Visitor Records': 'पंजीकृत विज़िटर रिकॉर्ड'
+            },
+            'bn': {
+                'Admission Queries': 'ভর্তি জিজ্ঞাসা',
+                'Visitor Passes': 'दर्शনার্থী পাস',
+                'Complaints Box': 'অভিযোগ বাক্স',
+                'Postal Records': 'ডাক রেকর্ড',
+                'Phone Call Logs': 'ফোন কল লগ',
+                'Office Operations': 'অফিস কার্যক্রম',
+                'Admissions Center': 'ভর্তি কেন্দ্র',
+                'Fees Operations': 'ফি কার্যক্রম',
+                'Certificate Requests': 'শংসাপত্র অনুরোধ',
+                'Leave Applications': 'ছুটির আবেদন',
+                'Administrative Reports': 'প্রশাসনিক রিপোর্ট',
+                'Account Profile': 'অ্যাকাউন্ট প্রোফাইল',
+                'Log out': 'লগ আউট',
+                'Dashboard': 'ড্যাশবোর্ড',
+                'Messages': 'বার্তা',
+                'Notifications': 'বিজ্ঞপ্তি',
+                'Calendar': 'ক্যালেন্ডার',
+                'Parent Dashboard': 'অভিভাবক ড্যাশবোর্ড',
+                'My Profile': 'আমার প্রোফাইল',
+                'Child Timetable': 'শিশুর সময়সূচী',
+                'Attendance Details': 'উপস্থিতির বিবরণ',
+                'Fee Statement': 'ফি বিবরণী',
+                'Exam Results': 'পরীক্ষার ফলাফল',
+                'Feedback': 'মতামত',
+                'Expected Revenue': 'প্রত্যাশিত রাজস্ব',
+                'Collected Fees': 'সংগৃহীত ফি',
+                'Pending Receivables': 'মুলতুবি পাওনা',
+                'Total Students': 'মোট ছাত্র',
+                'Students Enrolled': 'ভর্তি হওয়া ছাত্র',
+                'Collection Rate': 'সংগ্রহের হার',
+                'Pending Review': 'পর্যালোচনা মুলতুবি',
+                'Approved': 'অনুমোদিত',
+                'Rejected': 'প্রত্যাখ্যাত',
+                'Pending': 'মুলতুবি',
+                'Register Walk-in Visitor': 'ওয়াক-ইন ভিজিটর নিবন্ধন করুন',
+                'Host Person / Dept': 'হোস্ট ব্যক্তি / বিভাগ',
+                'Registered Visitor Records': 'নিবন্ধিত ভিজিটর রেকর্ড'
+            },
+            'ta': {
+                'Admission Queries': 'சேர்க்கை விசாரணைகள்',
+                'Visitor Passes': 'வருகையாளர் அனுமதி',
+                'Complaints Box': 'புகார் பெட்டி',
+                'Postal Records': 'தபால் பதிவுகள்',
+                'Phone Call Logs': 'தொலைபேசி அழைப்பு பதிவுகள்',
+                'Office Operations': 'அலுவலக செயல்பாடுகள்',
+                'Admissions Center': 'சேர்க்கை மையம்',
+                'Fees Operations': 'கட்டண செயல்பாடுகள்',
+                'Certificate Requests': 'சான்றிதழ் கோரிக்கைகள்',
+                'Leave Applications': 'விடுப்பு விண்ணப்பங்கள்',
+                'Administrative Reports': 'நிர்வாக அறிக்கைகள்',
+                'Account Profile': 'கணக்கு சுயவிவரம்',
+                'Log out': 'வெளியேறு',
+                'Dashboard': 'டாஷ்போர்டு',
+                'Messages': 'செய்திகள்',
+                'Notifications': 'அறிவிப்புகள்',
+                'Calendar': 'நாட்காட்டி',
+                'Parent Dashboard': 'பெற்றோர் டாஷ்போர்டு',
+                'My Profile': 'என் சுயவிவரம்',
+                'Child Timetable': 'குழந்தை கால அட்டவணை',
+                'Attendance Details': 'வருகை விவரங்கள்',
+                'Fee Statement': 'கட்டண அறிக்கை',
+                'Exam Results': 'தேர்வு முடிவுகள்',
+                'Feedback': 'கருத்து',
+                'Expected Revenue': 'எதிர்பார்க்கப்படும் வருவாய்',
+                'Collected Fees': 'வசூலிக்கப்பட்ட கட்டணம்',
+                'Pending Receivables': 'நிலுவையில் உள்ளவை',
+                'Total Students': 'மொத்த மாணவர்கள்',
+                'Students Enrolled': 'பதிவுசெய்யப்பட்ட மாணவர்கள்',
+                'Collection Rate': 'வசூல் விகிதம்',
+                'Pending Review': 'மதிப்பாய்வு நிலுவையில் உள்ளது',
+                'Approved': 'அங்கீகரிக்கப்பட்டது',
+                'Rejected': 'நிராகரிக்கப்பட்டது',
+                'Pending': 'நிலுவையில் உள்ளது',
+                'Register Walk-in Visitor': 'வருகையாளரைப் பதிவுசெய்க',
+                'Host Person / Dept': 'வரவேற்கும் நபர் / துறை',
+                'Registered Visitor Records': 'பதிவுசெய்யப்பட்ட வருகையாளர் பதிவுகள்'
+            },
+            'te': {
+                'Admission Queries': 'ప్రవేశ విచారణలు',
+                'Visitor Passes': 'సందర్శకుల పాస్',
+                'Complaints Box': 'ఫిర్యాదుల పెట్టె',
+                'Postal Records': 'తపాలా రికార్డులు',
+                'Phone Call Logs': 'ఫోన్ కాల్ లాగ్‌లు',
+                'Office Operations': 'కార్యాలయ కార్యకలాపలు',
+                'Admissions Center': 'ప్రవేశ కేంద్రం',
+                'Fees Operations': 'ఫీజుల కార్యకలాపాలు',
+                'Certificate Requests': 'ధృవీకరణ పత్రాల అభ్యర్థనలు',
+                'Leave Applications': 'సెలవు దరఖాస్తులు',
+                'Administrative Reports': 'నివేదికలు',
+                'Account Profile': 'ఖాతా ప్రొఫైల్',
+                'Log out': 'లాగ్ అవుట్',
+                'Dashboard': 'డాష్‌బోర్డ్',
+                'Messages': 'సందేశాలు',
+                'Notifications': 'నోటిఫికేషన్‌లు',
+                'Calendar': 'క్యాలెండర్',
+                'Parent Dashboard': 'తల్లిదండ్రుల డాష్‌బోర్డ్',
+                'My Profile': 'నా ప్రొఫైల్',
+                'Child Timetable': 'పిల్లల టైమ్‌టేబుల్',
+                'Attendance Details': 'హాజరు వివరాలు',
+                'Fee Statement': 'ఫీజు స్టేట్‌మెంట్',
+                'Exam Results': 'పరీక్షా ఫలితాలు',
+                'Feedback': 'అభిప్రాయం',
+                'Expected Revenue': 'ఆశించిన ఆదాయం',
+                'Collected Fees': 'సేకరించిన ఫీజులు',
+                'Pending Receivables': 'పెండింగ్ బకాయిలు',
+                'Total Students': 'మొత్తం విద్యార్థులు',
+                'Students Enrolled': 'నమోదైన విద్యార్థులు',
+                'Collection Rate': 'సేకరణ రేటు',
+                'Pending Review': 'సమీక్ష పెండింగ్‌లో ఉంది',
+                'Approved': 'ఆమోదించబడింది',
+                'Rejected': 'తిరస్కరించబడింది',
+                'Pending': 'పెండింగ్',
+                'Register Walk-in Visitor': 'సందర్శకుడిని నమోదు చేయండి',
+                'Host Person / Dept': 'హోస్ట్ వ్యక్తి / విభాగం',
+                'Registered Visitor Records': 'నమోదైన సందర్శకుల రికార్డులు'
+            },
+            'ar': {
+                'Admission Queries': 'استفسارات القبول',
+                'Visitor Passes': 'تصاريح الزوار',
+                'Complaints Box': 'صندوق الشكاوى',
+                'Postal Records': 'السجلات البريدية',
+                'Phone Call Logs': 'سجلات المكالمات الهاتفية',
+                'Office Operations': 'العمليات المكتبية',
+                'Admissions Center': 'مركز القبول',
+                'Fees Operations': 'عمليات الرسوم',
+                'Certificate Requests': 'طلبات الشهادات',
+                'Leave Applications': 'طلبات الإجازات',
+                'Administrative Reports': 'التقارير الإدارية',
+                'Account Profile': 'ملف الحساب',
+                'Log out': 'تسجيل الخروج',
+                'Dashboard': 'لوحة التحكم',
+                'Messages': 'الرسائل',
+                'Notifications': 'الإشعارات',
+                'Calendar': 'التقويم',
+                'Parent Dashboard': 'لوحة تحكم ولي الأمر',
+                'My Profile': 'ملفي الشخصي',
+                'Child Timetable': 'جدول حصص الطفل',
+                'Attendance Details': 'تفاصيل الحضور',
+                'Fee Statement': 'كشف الرسوم',
+                'Exam Results': 'نتائج الاختبارات',
+                'Feedback': 'الآراء والملاحظات',
+                'Expected Revenue': 'الإيرادات المتوقعة',
+                'Collected Fees': 'الرسوم المحصلة',
+                'Pending Receivables': 'المستحقات المعلقة',
+                'Total Students': 'إجمالي الطلاب',
+                'Students Enrolled': 'الطلاب المسجلين',
+                'Collection Rate': 'معدل التحصيل',
+                'Pending Review': 'قيد المراجعة',
+                'Approved': 'مقبول',
+                'Rejected': 'مرفوض',
+                'Pending': 'معلق',
+                'Register Walk-in Visitor': 'تسجيل زائر يدوي',
+                'Host Person / Dept': 'المضيف / القسم',
+                'Registered Visitor Records': 'سجلات الزوار المسجلين'
+            }
+        };
+
+        function translatePage(lang) {
+            if (!lang || lang === 'en') return;
+            const map = TRANSLATIONS[lang];
+            if (!map) return;
+            
+            function walk(node) {
+                if (node.nodeType === 3) {
+                    let val = node.nodeValue.trim();
+                    if (map[val]) {
+                        node.nodeValue = map[val];
+                    } else {
+                        for (let key in map) {
+                            if (val === key) {
+                                node.nodeValue = map[key];
+                                break;
+                            }
+                        }
+                    }
+                } else if (node.nodeType === 1 && (node.tagName === 'INPUT' || node.tagName === 'TEXTAREA')) {
+                    let placeholder = node.getAttribute('placeholder');
+                    if (placeholder && map[placeholder.trim()]) {
+                        node.setAttribute('placeholder', map[placeholder.trim()]);
+                    }
+                } else {
+                    for (let child of node.childNodes) {
+                        walk(child);
+                    }
+                }
+            }
+            walk(document.body);
+            
+            if (lang === 'ar') {
+                document.documentElement.dir = 'rtl';
+                document.body.style.textAlign = 'right';
+            } else {
+                document.documentElement.dir = 'ltr';
+                document.body.style.textAlign = 'left';
+            }
+        }
+
+        function convertAllPrices() {
+            const symbol = "{{ currency_symbol }}";
+            const rate = parseFloat("{{ currency_rate }}");
+            
+            function walk(node) {
+                if (node.nodeType === 3) {
+                    let text = node.nodeValue;
+                    const regex = /\$\s*([0-9]+(?:\.[0-9]+)?)/g;
+                    if (regex.test(text)) {
+                        node.nodeValue = text.replace(regex, (match, p1) => {
+                            const originalVal = parseFloat(p1);
+                            const convertedVal = (originalVal * rate).toFixed(2);
+                            return symbol + " " + convertedVal;
+                        });
+                    }
+                } else {
+                    for (let child of node.childNodes) {
+                        walk(child);
+                    }
+                }
+            }
+            walk(document.body);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            translatePage("{{ selected_lang }}");
+            convertAllPrices();
+        });
     </script>
 </body>
 </html>

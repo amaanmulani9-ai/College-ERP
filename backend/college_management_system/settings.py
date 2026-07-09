@@ -206,6 +206,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'main_app.context_processors.tinymce_api_key',
+                'main_app.context_processors.locale_settings',
             ],
         },
     },
