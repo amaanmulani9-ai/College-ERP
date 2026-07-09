@@ -1,0 +1,145 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<style>
+    :root {
+        --color-purple: #6c5ce7;
+        --radius-2xl: 15px;
+        --shadow-2: rgba(0, 0, 0, 0.08) 0px 4px 15px 0px;
+    }
+    
+    .profile-card {
+        background: #ffffff;
+        border-radius: var(--radius-2xl);
+        padding: 28px;
+        box-shadow: var(--shadow-2);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        margin-bottom: 24px;
+    }
+    
+    .profile-header-circle {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--color-purple) 0%, #a29bfe 100%);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: 700;
+        margin-right: 18px;
+        box-shadow: 0 4px 12px rgba(108, 92, 231, 0.25);
+    }
+    
+    .form-group-custom {
+        margin-bottom: 18px;
+    }
+    
+    .form-label-custom {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .form-control-custom {
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        padding: 10px 14px;
+        font-size: 14px;
+        color: #1e293b;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .form-control-custom:focus {
+        border-color: var(--color-purple);
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+    }
+    
+    .form-control-custom:disabled {
+        background-color: #f8fafc;
+        color: #64748b;
+        cursor: not-allowed;
+    }
+    
+    .update-btn {
+        background: linear-gradient(135deg, var(--color-purple) 0%, #8b5cf6 100%);
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 12px 24px;
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2);
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .update-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(108, 92, 231, 0.3);
+    }
+</style>
+
+<section class="content py-3">
+    <div class="container-fluid col-md-8 offset-md-2 col-lg-6 offset-lg-3">
+        
+        <!-- General Info Banner Card -->
+        <div class="profile-card d-flex align-items-center mb-4">
+            <div class="profile-header-circle">
+                {{ parent.admin.first_name|first }}{{ parent.admin.last_name|first }}
+            </div>
+            <div>
+                <h4 class="font-weight-bold m-0" style="color: #0f172a;">{{ parent.admin.get_full_name }}</h4>
+                <div class="text-muted" style="font-size: 13.5px; margin-top: 4px;">
+                    <span class="badge bg-light text-dark border p-1 mr-2"><i class="fas fa-user-friends mr-1"></i> Parent Account</span>
+                    <span>Parent of: <strong>{{ parent.student.admin.get_full_name }}</strong></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Profile Form Card -->
+        <div class="profile-card">
+            <h5 class="font-weight-bold mb-4" style="color: #0f172a;"><i class="fas fa-cog mr-2 text-primary"></i> Edit Profile Information</h5>
+            
+            <form method="post" action="{% url 'parent_profile' %}">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6 form-group-custom">
+                        <label class="form-label-custom">First Name</label>
+                        <input type="text" name="first_name" class="form-control-custom" value="{{ parent.admin.first_name }}" required>
+                    </div>
+                    <div class="col-md-6 form-group-custom">
+                        <label class="form-label-custom">Last Name</label>
+                        <input type="text" name="last_name" class="form-control-custom" value="{{ parent.admin.last_name }}" required>
+                    </div>
+                </div>
+                
+                <div class="form-group-custom">
+                    <label class="form-label-custom">Registered Email Address (Username)</label>
+                    <input type="email" class="form-control-custom" value="{{ parent.admin.email }}" disabled>
+                    <small class="text-muted">Registered Email cannot be modified for security reasons.</small>
+                </div>
+                
+                <div class="form-group-custom">
+                    <label class="form-label-custom">Contact Mobile Number</label>
+                    <input type="text" name="mobile_number" class="form-control-custom" value="{{ parent.mobile_number|default:'' }}">
+                </div>
+                
+                <hr class="my-4" style="border-top: 1px solid #eef2f6;">
+                
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="update-btn"><i class="fas fa-save mr-2"></i> Save Changes</button>
+                </div>
+            </form>
+        </div>
+        
+    </div>
+</section>
+{% endblock content %}

@@ -214,6 +214,15 @@
             font-size:12px;
             color:#334155;
         }
+        .demo-login-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .demo-login-btn:hover {
+            background:#f1f5f9;
+            border-color:#c99746;
+            transform:translateY(-2px);
+            box-shadow:0 6px 15px rgba(15,95,108,.08);
+        }
         .mini-card strong{display:block;font-size:12px;color:#0f172a;margin-bottom:4px}
         .footer-note{
             margin-top:18px;
@@ -333,13 +342,25 @@
                         <button type="submit" class="login-btn">Sign in</button>
 
                         <div class="login-mini">
-                            <div class="mini-card">
-                                <strong>Student access</strong>
-                                Register, attendance, results, and fees.
+                            <div class="mini-card demo-login-btn" data-email="admin@admin.com" data-password="admin123" style="cursor: pointer;">
+                                <strong><i class="fas fa-user-shield me-1" style="color: #0f5f6c;"></i> Admin</strong>
+                                Click to auto-fill
                             </div>
-                            <div class="mini-card">
-                                <strong>Admin access</strong>
-                                Finance, modules, reports, and settings.
+                            <div class="mini-card demo-login-btn" data-email="staff@example.com" data-password="staffpass123" style="cursor: pointer;">
+                                <strong><i class="fas fa-user-tie me-1" style="color: #c99746;"></i> Staff</strong>
+                                Click to auto-fill
+                            </div>
+                            <div class="mini-card demo-login-btn" data-email="student@example.com" data-password="studentpass123" style="cursor: pointer;">
+                                <strong><i class="fas fa-user-graduate me-1" style="color: #0f9f7a;"></i> Student</strong>
+                                Click to auto-fill
+                            </div>
+                            <div class="mini-card demo-login-btn" data-email="parent@example.com" data-password="parentpass123" style="cursor: pointer;">
+                                <strong><i class="fas fa-user-friends me-1" style="color: #c99746;"></i> Parent</strong>
+                                Click to auto-fill
+                            </div>
+                            <div class="mini-card demo-login-btn" data-email="backoffice@example.com" data-password="backofficepass123" style="cursor: pointer; grid-column: span 2;">
+                                <strong><i class="fas fa-briefcase me-1" style="color: #0f5f6c;"></i> Back Office</strong>
+                                Click to auto-fill
                             </div>
                         </div>
 
@@ -373,6 +394,32 @@
                     toggle.innerHTML = isHidden ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
                 });
             }
+
+            // Quick demo login auto-filler
+            document.querySelectorAll('.demo-login-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const email = this.getAttribute('data-email');
+                    const passwordVal = this.getAttribute('data-password');
+                    
+                    const emailField = document.getElementById('email');
+                    const passField = document.getElementById('password');
+                    
+                    if (emailField && passField) {
+                        emailField.value = email;
+                        passField.value = passwordVal;
+                        
+                        // Flash inputs with color to indicate auto-fill action
+                        [emailField, passField].forEach(f => {
+                            f.style.transform = 'scale(1.02)';
+                            f.style.borderColor = '#c99746';
+                            setTimeout(() => {
+                                f.style.transform = 'none';
+                                f.style.borderColor = 'rgba(15,95,108,.16)';
+                            }, 250);
+                        });
+                    }
+                });
+            });
         });
     </script>
 </body>

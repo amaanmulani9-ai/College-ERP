@@ -1,0 +1,150 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<style>
+    :root {
+        --color-purple: #6c5ce7;
+        --radius-2xl: 15px;
+        --shadow-2: rgba(0, 0, 0, 0.08) 0px 4px 15px 0px;
+    }
+    
+    .feedback-grid {
+        display: grid;
+        grid-template-columns: 1.1fr .9fr;
+        gap: 24px;
+    }
+    @media(max-width: 992px) {
+        .feedback-grid { grid-template-columns: 1fr; }
+    }
+    
+    .feedback-card {
+        background: #ffffff;
+        border-radius: var(--radius-2xl);
+        padding: 24px;
+        box-shadow: var(--shadow-2);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        margin-bottom: 24px;
+        height: fit-content;
+    }
+    
+    .form-textarea {
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding: 16px;
+        font-size: 14px;
+        color: #1e293b;
+        outline: none;
+        resize: vertical;
+        min-height: 120px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    
+    .form-textarea:focus {
+        border-color: var(--color-purple);
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+    }
+    
+    .history-item {
+        border-bottom: 1px solid #eef2f6;
+        padding: 16px 0;
+    }
+    .history-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    .history-item:first-child {
+        padding-top: 0;
+    }
+    
+    .feedback-msg {
+        font-size: 14px;
+        color: #1e293b;
+        margin-bottom: 6px;
+    }
+    
+    .admin-reply-box {
+        background-color: #f8fafc;
+        border-left: 3px solid var(--color-purple);
+        border-radius: 4px;
+        padding: 10px 14px;
+        font-size: 13px;
+        color: #475569;
+        margin-top: 8px;
+    }
+    
+    .submit-btn {
+        background: linear-gradient(135deg, var(--color-purple) 0%, #8b5cf6 100%);
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 12px 24px;
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2);
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+    }
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(108, 92, 231, 0.3);
+    }
+</style>
+
+<section class="content py-3">
+    <div class="container-fluid col-md-10 offset-md-1">
+        
+        <div class="feedback-grid">
+            <!-- Left: Write Feedback Form -->
+            <div class="feedback-card">
+                <h5 class="font-weight-bold mb-3" style="color: #0f172a;"><i class="fas fa-edit mr-2 text-primary"></i> Write a Feedback or Complaint</h5>
+                <p class="text-muted" style="font-size: 13.5px;">Your thoughts help us improve campus services. Submitted feedback is routed directly to administration.</p>
+                
+                <form method="post" action="{% url 'parent_feedback' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <textarea name="feedback" class="form-textarea" placeholder="Describe your suggestions, queries, or complaints here..." required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn"><i class="fas fa-paper-plane mr-2"></i> Submit Feedback</button>
+                </form>
+            </div>
+            
+            <!-- Right: Submission History -->
+            <div class="feedback-card">
+                <h5 class="font-weight-bold mb-3" style="color: #0f172a;"><i class="fas fa-history mr-2 text-primary"></i> Submission History & Status</h5>
+                
+                <div style="max-height: 480px; overflow-y: auto; padding-right: 6px;">
+                    {% for item in feedbacks %}
+                    <div class="history-item">
+                        <div class="d-flex justify-content-between text-muted mb-2" style="font-size: 11px;">
+                            <span><i class="far fa-clock mr-1"></i> {{ item.created_at|date:"M d, Y" }}</span>
+                            {% if item.reply %}
+                            <span class="text-success font-weight-bold"><i class="fas fa-check-circle"></i> Responded</span>
+                            {% else %}
+                            <span class="text-warning font-weight-bold"><i class="far fa-hourglass"></i> Pending Review</span>
+                            {% endif %}
+                        </div>
+                        <div class="feedback-msg"><strong>Q:</strong> {{ item.feedback }}</div>
+                        {% if item.reply %}
+                        <div class="admin-reply-box">
+                            <strong><i class="fas fa-user-shield mr-1"></i> Admin Response:</strong><br>
+                            {{ item.reply }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-comments fa-3x mb-3" style="opacity: 0.3;"></i>
+                        <p class="mb-0">You haven't submitted any feedback yet.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock content %}

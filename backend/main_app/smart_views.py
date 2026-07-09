@@ -203,24 +203,47 @@ def visitor_pass_request(request):
 
 @login_required
 def admin_visitor_passes(request):
-    if request.user.user_type != '1': # HOD only
+    if request.user.user_type not in ['1', '7']: # HOD or Backoffice/Receptionist
         messages.error(request, "Permission Denied")
         return redirect(reverse('login_page'))
         
     passes = VisitorPass.objects.all().order_by('-created_at')
     
     if request.method == 'POST':
-        pass_id = request.POST.get('pass_id')
-        action = request.POST.get('action') # Approve / Reject
+        action = request.POST.get('action')
         
-        v_pass = get_object_or_404(VisitorPass, id=pass_id)
-        if action == 'approve':
-            v_pass.status = 'Approved'
-            messages.success(request, f"Visitor Pass for {v_pass.name} approved.")
+        if action == 'manual_add':
+            name = request.POST.get('name')
+            email = request.POST.get('email') or 'walkin@example.com'
+            phone = request.POST.get('phone')
+            purpose = request.POST.get('purpose')
+            host_person = request.POST.get('host_person')
+            visit_date = request.POST.get('visit_date') or date.today()
+            
+            pass_code = str(uuid.uuid4())[:8].upper()
+            
+            VisitorPass.objects.create(
+                name=name,
+                email=email,
+                phone=phone,
+                purpose=purpose,
+                host_person=host_person,
+                visit_date=visit_date,
+                pass_code=pass_code,
+                status='Approved'
+            )
+            messages.success(request, f"Manual Visitor Pass created and approved for {name}. Code: {pass_code}")
         else:
-            v_pass.status = 'Rejected'
-            messages.success(request, f"Visitor Pass for {v_pass.name} rejected.")
-        v_pass.save()
+            pass_id = request.POST.get('pass_id')
+            v_pass = get_object_or_404(VisitorPass, id=pass_id)
+            if action == 'approve':
+                v_pass.status = 'Approved'
+                messages.success(request, f"Visitor Pass for {v_pass.name} approved.")
+            elif action == 'reject':
+                v_pass.status = 'Rejected'
+                messages.success(request, f"Visitor Pass for {v_pass.name} rejected.")
+            v_pass.save()
+            
         return redirect(reverse('admin_visitor_passes'))
         
     context = {

@@ -3,10 +3,61 @@
 {% block page_title %}{{ page_title }}{% endblock page_title %}
 
 {% block content %}
-<div class="container-fluid">
+<div class="container-fluid py-3">
+    <!-- Add Visitor Collapse Button -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0 text-dark font-weight-bold"><i class="fas fa-id-badge text-primary mr-2"></i> Visitor Pass Management</h5>
+        <button class="btn btn-primary font-weight-bold" type="button" data-toggle="collapse" data-target="#collapseAddVisitor" aria-expanded="false" aria-controls="collapseAddVisitor" style="border-radius: 8px;">
+            <i class="fas fa-plus mr-1"></i> Register Walk-in Visitor
+        </button>
+    </div>
+
+    <!-- Collapsible Add Visitor Form -->
+    <div class="collapse mb-4" id="collapseAddVisitor">
+        <div class="card shadow-sm border-0 p-4" style="border-radius: 15px; background: #ffffff;">
+            <h6 class="font-weight-bold mb-3 text-dark"><i class="fas fa-user-plus mr-2 text-success"></i> Walk-in Visitor Registration</h6>
+            <form method="POST" action="{% url 'admin_visitor_passes' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="manual_add">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold text-muted small mb-1">Visitor Full Name</label>
+                        <input type="text" class="form-control" name="name" placeholder="Full Name" required style="border-radius: 8px;">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold text-muted small mb-1">Phone Number</label>
+                        <input type="text" class="form-control" name="phone" placeholder="Phone Number" required style="border-radius: 8px;">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold text-muted small mb-1">Email (Optional)</label>
+                        <input type="email" class="form-control" name="email" placeholder="Email Address" style="border-radius: 8px;">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold text-muted small mb-1">Purpose of Visit</label>
+                        <input type="text" class="form-control" name="purpose" placeholder="e.g. Admission Enquiry, Meeting HOD" required style="border-radius: 8px;">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold text-muted small mb-1">Host Person / Dept</label>
+                        <input type="text" class="form-control" name="host_person" placeholder="e.g. Dr. Verma / Administration" required style="border-radius: 8px;">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold text-muted small mb-1">Visit Date</label>
+                        <input type="date" class="form-control" name="visit_date" style="border-radius: 8px;">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end" style="gap: 8px;">
+                    <button type="button" class="btn btn-light" data-toggle="collapse" data-target="#collapseAddVisitor">Cancel</button>
+                    <button type="submit" class="btn btn-success font-weight-bold px-4" style="border-radius: 8px;"><i class="fas fa-check mr-2"></i> Register & Issue Pass</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="card erpnext-card shadow-sm">
         <div class="card-header bg-transparent border-bottom">
-            <h5 class="card-title mb-0"><i class="fas fa-id-badge text-primary"></i> Visitor Pass Management</h5>
+            <h6 class="card-title mb-0"><i class="fas fa-list text-primary"></i> Registered Visitor Records</h6>
         </div>
         <div class="card-body">
             {% if passes %}

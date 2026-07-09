@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
-from .decorators import admin_required, staff_required, student_required
+from .decorators import admin_required, staff_required, student_required, admin_or_backoffice_required
 import json
 import os
 import csv
@@ -2871,39 +2871,72 @@ def send_student_login_sms(request):
 # --- ADMINISTRATION VIEWS ---
 
 @login_required(login_url='/')
-@admin_required
+@admin_or_backoffice_required
 def manage_queries(request):
     from .models import AdmissionQuery
     queries = AdmissionQuery.objects.all().order_by('-query_date')
     if request.method == "POST":
-        name = request.POST.get('name')
-        phone = request.POST.get('phone')
-        email = request.POST.get('email')
-        source = request.POST.get('source')
-        AdmissionQuery.objects.create(name=name, phone=phone, email=email, source=source)
-        messages.success(request, "Query added successfully.")
+        query_id = request.POST.get('query_id')
+        if query_id:
+            query = get_object_or_404(AdmissionQuery, id=query_id)
+            action = request.POST.get('action')
+            if action == 'toggle_status':
+                query.status = 'Inactive' if query.status == 'Active' else 'Active'
+                query.save()
+                messages.success(request, f"Query for {query.name} status updated.")
+            elif action == 'save_follow_up':
+                follow_up = request.POST.get('follow_up_date')
+                description = request.POST.get('description')
+                if follow_up:
+                    query.follow_up_date = follow_up
+                if description:
+                    query.description = description
+                query.save()
+                messages.success(request, "Follow up details updated.")
+        else:
+            name = request.POST.get('name')
+            phone = request.POST.get('phone')
+            email = request.POST.get('email')
+            source = request.POST.get('source')
+            description = request.POST.get('description')
+            AdmissionQuery.objects.create(name=name, phone=phone, email=email, source=source, description=description)
+            messages.success(request, "Query added successfully.")
         return redirect(reverse('manage_queries'))
     context = {'page_title': 'Admission Queries', 'queries': queries}
     return render(request, 'hod_template/manage_queries.html', context)
 
 @login_required(login_url='/')
-@admin_required
+@admin_or_backoffice_required
 def manage_complaints(request):
     from .models import Complaint
     complaints = Complaint.objects.all().order_by('-date')
     if request.method == "POST":
-        complaint_by = request.POST.get('complaint_by')
-        complainer_name = request.POST.get('complainer_name')
-        complaint_type = request.POST.get('complaint_type')
-        description = request.POST.get('description')
-        Complaint.objects.create(complaint_by=complaint_by, complainer_name=complainer_name, complaint_type=complaint_type, description=description)
-        messages.success(request, "Complaint added successfully.")
+        complaint_id = request.POST.get('complaint_id')
+        if complaint_id:
+            complaint = get_object_or_404(Complaint, id=complaint_id)
+            action_taken = request.POST.get('action_taken')
+            complaint.action_taken = action_taken
+            complaint.save()
+            messages.success(request, f"Complaint from {complaint.complainer_name} updated with resolution.")
+        else:
+            complaint_by = request.POST.get('complaint_by')
+            complainer_name = request.POST.get('complainer_name')
+            complaint_type = request.POST.get('complaint_type')
+            description = request.POST.get('description')
+            phone = request.POST.get('phone')
+            source = request.POST.get('source')
+            Complaint.objects.create(
+                complaint_by=complaint_by, complainer_name=complainer_name,
+                complaint_type=complaint_type, description=description,
+                phone=phone, source=source
+            )
+            messages.success(request, "Complaint added successfully.")
         return redirect(reverse('manage_complaints'))
     context = {'page_title': 'Complaints', 'complaints': complaints, 'complaint_by_choices': Complaint.COMPLAINT_BY_CHOICES}
     return render(request, 'hod_template/manage_complaints.html', context)
 
 @login_required(login_url='/')
-@admin_required
+@admin_or_backoffice_required
 def manage_postal(request):
     from .models import PostalReceive, PostalDispatch
     receives = PostalReceive.objects.all().order_by('-date')
@@ -2913,18 +2946,27 @@ def manage_postal(request):
         from_title = request.POST.get('from_title')
         to_title = request.POST.get('to_title')
         reference_no = request.POST.get('reference_no')
+        address = request.POST.get('address')
+        note = request.POST.get('note')
+        
         if postal_type == 'Receive':
-            PostalReceive.objects.create(from_title=from_title, to_title=to_title, reference_no=reference_no)
+            PostalReceive.objects.create(
+                from_title=from_title, to_title=to_title,
+                reference_no=reference_no, address=address, note=note
+            )
             messages.success(request, "Postal Receive added successfully.")
         else:
-            PostalDispatch.objects.create(from_title=from_title, to_title=to_title, reference_no=reference_no)
+            PostalDispatch.objects.create(
+                from_title=from_title, to_title=to_title,
+                reference_no=reference_no, address=address, note=note
+            )
             messages.success(request, "Postal Dispatch added successfully.")
         return redirect(reverse('manage_postal'))
     context = {'page_title': 'Postal Records', 'receives': receives, 'dispatches': dispatches}
     return render(request, 'hod_template/manage_postal.html', context)
 
 @login_required(login_url='/')
-@admin_required
+@admin_or_backoffice_required
 def manage_call_logs(request):
     from .models import PhoneCallLog
     logs = PhoneCallLog.objects.all().order_by('-date')
@@ -2932,7 +2974,14 @@ def manage_call_logs(request):
         name = request.POST.get('name')
         phone = request.POST.get('phone')
         call_type = request.POST.get('call_type')
-        PhoneCallLog.objects.create(name=name, phone=phone, call_type=call_type)
+        follow_up_date = request.POST.get('follow_up_date') or None
+        call_duration = request.POST.get('call_duration')
+        note = request.POST.get('note')
+        
+        PhoneCallLog.objects.create(
+            name=name, phone=phone, call_type=call_type,
+            follow_up_date=follow_up_date, call_duration=call_duration, note=note
+        )
         messages.success(request, "Call Log added successfully.")
         return redirect(reverse('manage_call_logs'))
     context = {'page_title': 'Phone Call Logs', 'logs': logs, 'call_type_choices': PhoneCallLog.CALL_TYPE_CHOICES}

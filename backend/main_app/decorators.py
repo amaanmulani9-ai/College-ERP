@@ -47,3 +47,20 @@ def student_required(function=None, login_url='/login/'):
         return actual_decorator(function)
     return actual_decorator
 
+
+def is_admin_or_backoffice(user):
+    if user.is_authenticated and str(getattr(user, 'user_type', '')) in ['1', '7']:
+        return True
+    raise PermissionDenied
+
+
+def admin_or_backoffice_required(function=None, login_url='/'):
+    actual_decorator = user_passes_test(
+        is_admin_or_backoffice,
+        login_url=login_url,
+        redirect_field_name=None
+    )
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
+

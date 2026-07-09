@@ -576,12 +576,34 @@
             </a>
         </div>
         <div class="nav-item">
+        
+    {% elif user.user_type == '2' %}
+        <!-- Basic Staff Fallback -->
+        <div class="nav-item">
+            <a href="{% url 'staff_home' %}" class="nav-link {% if request.path == '/staff/home/' %}active{% endif %}">
+                <i class="nav-icon fas fa-chart-pie"></i>
+                <span class="nav-text">Dashboard</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'staff_take_attendance' %}" class="nav-link">
+                <i class="nav-icon fas fa-check-circle"></i>
+                <span class="nav-text">Attendance</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'staff_add_result' %}" class="nav-link">
+                <i class="nav-icon fas fa-plus-circle"></i>
+                <span class="nav-text">Add Results</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{% url 'view_online_registrations' %}" class="nav-link {% if 'registrations' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-file-csv"></i>
                 <span class="nav-text">Online Registrations</span>
             </a>
         </div>
-    {% else %}
+    {% elif user.user_type == '3' %}
         <!-- Student Sidebar (eSkooly Style) -->
         
         <!-- Search Menu Input -->
@@ -677,10 +699,172 @@
                 <span class="nav-text">Log out</span>
             </a>
         </div>
+
+    {% elif user.user_type == '4' %}
+        <!-- Parent Sidebar (eSkooly Style) -->
+        
+        <!-- Search Menu Input -->
+        <div style="padding: 15px 15px 5px 15px;">
+            <div style="position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 15px; top: 12px; color: #a0a9b6; font-size: 14px;"></i>
+                <input type="text" placeholder="Search menu..." style="width: 100%; padding: 10px 10px 10px 38px; border-radius: 8px; border: 1px solid #e0e6ed; background: #fff; font-size: 13.5px; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <a href="{% url 'parent_home' %}" class="nav-link {% if request.path == '/parent/home/' %}active{% endif %}">
+                <i class="nav-icon fas fa-th-large"></i>
+                <span class="nav-text">Dashboard</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'parent_attendance' %}" class="nav-link {% if 'attendance' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-calendar-check"></i>
+                <span class="nav-text">View Attendance</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'parent_fees' %}" class="nav-link {% if 'fees' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-file-invoice-dollar"></i>
+                <span class="nav-text">Fee Statement</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'parent_results' %}" class="nav-link {% if 'results' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-award"></i>
+                <span class="nav-text">Exam Results</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'parent_timetable' %}" class="nav-link {% if 'timetable' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-calendar-alt"></i>
+                <span class="nav-text">Class Timetable</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'parent_feedback' %}" class="nav-link {% if 'feedback' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-comment-dots"></i>
+                <span class="nav-text">Feedback/Complaints</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'parent_profile' %}" class="nav-link {% if 'profile' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-user-cog"></i>
+                <span class="nav-text">My Profile</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'logout_user' %}" class="nav-link">
+                <i class="nav-icon fas fa-lock"></i>
+                <span class="nav-text">Log out</span>
+            </a>
+        </div>
+
+    {% elif user.user_type == '7' %}
+        <!-- Backoffice Sidebar (eSkooly Style) -->
+        
+        <!-- Search Menu Input -->
+        <div style="padding: 15px 15px 5px 15px;">
+            <div style="position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 15px; top: 12px; color: #a0a9b6; font-size: 14px;"></i>
+                <input type="text" placeholder="Search menu..." style="width: 100%; padding: 10px 10px 10px 38px; border-radius: 8px; border: 1px solid #e0e6ed; background: #fff; font-size: 13.5px; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <a href="{% url 'backoffice_home' %}" class="nav-link {% if request.path == '/backoffice/home/' %}active{% endif %}">
+                <i class="nav-icon fas fa-th-large"></i>
+                <span class="nav-text">Dashboard</span>
+            </a>
+        </div>
+        
+        <!-- Receptionist Desk Sub-menu -->
+        <div style="padding: 10px 15px 5px 15px; font-size: 11px; font-weight: 700; color: #a0a9b6; text-transform: uppercase; letter-spacing: 0.5px;">
+            Reception Desk
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'manage_queries' %}" class="nav-link {% if 'queries' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-question-circle"></i>
+                <span class="nav-text">Admission Queries</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'admin_visitor_passes' %}" class="nav-link {% if 'visitors' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-id-card-alt"></i>
+                <span class="nav-text">Visitor Passes</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'manage_complaints' %}" class="nav-link {% if 'complaints' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-exclamation-triangle"></i>
+                <span class="nav-text">Complaints Box</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'manage_postal' %}" class="nav-link {% if 'postal' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-envelope"></i>
+                <span class="nav-text">Postal Records</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'manage_call_logs' %}" class="nav-link {% if 'call_logs' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-phone-alt"></i>
+                <span class="nav-text">Phone Call Logs</span>
+            </a>
+        </div>
+
+        <div style="padding: 10px 15px 5px 15px; font-size: 11px; font-weight: 700; color: #a0a9b6; text-transform: uppercase; letter-spacing: 0.5px;">
+            Office Operations
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'backoffice_admissions' %}" class="nav-link {% if 'admissions' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-user-plus"></i>
+                <span class="nav-text">Admissions Center</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'backoffice_fees' %}" class="nav-link {% if 'fees' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-money-bill-wave"></i>
+                <span class="nav-text">Fees Operations</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'backoffice_certificates' %}" class="nav-link {% if 'certificates' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-medal"></i>
+                <span class="nav-text">Certificate Requests</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'backoffice_leaves' %}" class="nav-link {% if 'leaves' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-envelope-open-text"></i>
+                <span class="nav-text">Leave Applications</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'backoffice_reports' %}" class="nav-link {% if 'reports' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-chart-bar"></i>
+                <span class="nav-text">Administrative Reports</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'backoffice_profile' %}" class="nav-link {% if 'profile' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-user-cog"></i>
+                <span class="nav-text">Account Profile</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'logout_user' %}" class="nav-link">
+                <i class="nav-icon fas fa-lock"></i>
+                <span class="nav-text">Log out</span>
+            </a>
+        </div>
+
+    {% else %}
+        <!-- Default Fallback -->
+        <div class="nav-item">
+            <a href="{% url 'logout_user' %}" class="nav-link">
+                <i class="nav-icon fas fa-lock"></i>
+                <span class="nav-text">Log out</span>
+            </a>
+        </div>
     {% endif %}
-    
-    <div style="padding: 20px; font-size: 11px; color: #a0a9b6; text-align: center; border-top: 1px solid #e0e6ed; margin-top: 20px;">
-        Need More Advance?<br>
-        Check our PRO version.
-    </div>
-</div>

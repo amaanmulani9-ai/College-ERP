@@ -1,73 +1,172 @@
-{% extends 'hod_template/base_template.html' %}
+{% extends 'main_app/base.html' %}
+{% load static %}
 {% block page_title %}{{ page_title }}{% endblock page_title %}
-{% block main_content %}
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">Add Call Log</h3>
-                    </div>
-                    <form role="form" method="POST" action="{% url 'manage_call_logs' %}">
-                        {% csrf_token %}
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label>Name</label>
-                                <input type="text" class="form-control" name="name" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Phone</label>
-                                <input type="text" class="form-control" name="phone" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Call Type</label>
-                                <select class="form-control" name="call_type" required>
-                                    {% for value, display in call_type_choices %}
-                                    <option value="{{ value }}">{{ display }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <button type="submit" class="btn btn-primary">Add Log</button>
-                        </div>
-                    </form>
-                </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Call Logs</h3>
-                    </div>
-                    <div class="card-body table-responsive p-0">
-                        <table class="table table-hover text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Phone</th>
-                                    <th>Type</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for log in logs %}
-                                <tr>
-                                    <td>{{ log.id }}</td>
-                                    <td>{{ log.name }}</td>
-                                    <td>{{ log.phone }}</td>
-                                    <td>{{ log.call_type }}</td>
-                                    <td>{{ log.date }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr><td colspan="5" class="text-center">No call logs found.</td></tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+{% block content %}
+<style>
+    :root {
+        --color-purple: #6c5ce7;
+        --color-cyan: #02aab0;
+        --color-success: #10b981;
+        --color-error: #ef4444;
+        --radius-2xl: 15px;
+        --shadow-2: rgba(0, 0, 0, 0.08) 0px 4px 15px 0px;
+    }
+    
+    .logs-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 24px;
+    }
+    @media(max-width: 992px) {
+        .logs-grid { grid-template-columns: 1fr; }
+    }
+    
+    .desk-card {
+        background: #ffffff;
+        border-radius: var(--radius-2xl);
+        padding: 24px;
+        box-shadow: var(--shadow-2);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        margin-bottom: 24px;
+        height: fit-content;
+    }
+    
+    .form-control-custom {
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        padding: 10px 14px;
+        font-size: 14px;
+        color: #1e293b;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control-custom:focus {
+        border-color: var(--color-purple);
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+    }
+    
+    .table-responsive {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #eef2f6;
+    }
+    
+    .desk-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .desk-table th {
+        background-color: #f8fafc;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 12px 18px;
+        text-align: left;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    .desk-table td {
+        padding: 14px 18px;
+        font-size: 14px;
+        color: #1e293b;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: top;
+    }
+    .desk-table tr:hover td {
+        background-color: #f8fafc;
+    }
+    
+    .badge-incoming { background-color: rgba(16, 185, 129, 0.12); color: var(--color-success); border: 1px solid rgba(16, 185, 129, 0.2); }
+    .badge-outgoing { background-color: rgba(59, 130, 246, 0.12); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+</style>
+
+<div class="container-fluid py-3">
+    <div class="logs-grid">
+        <!-- Left panel: Add Log -->
+        <div class="desk-card">
+            <h5 class="font-weight-bold mb-3" style="color: #0f172a;"><i class="fas fa-plus-circle mr-2 text-primary"></i> Add Phone Call Log</h5>
+            <form method="POST" action="{% url 'manage_call_logs' %}">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Contact Name</label>
+                    <input type="text" class="primary_input_field form-control-custom" name="name" placeholder="Person Name" required>
                 </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Phone Number</label>
+                    <input type="text" class="primary_input_field form-control-custom" name="phone" placeholder="Phone Number" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Call Type</label>
+                    <select class="form-control-custom" name="call_type" required>
+                        {% for value, display in call_type_choices %}
+                        <option value="{{ value }}">{{ display }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Call Duration (optional)</label>
+                    <input type="text" class="form-control-custom" name="call_duration" placeholder="e.g. 5 mins 30 secs">
+                </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Follow up Date (optional)</label>
+                    <input type="date" class="form-control-custom" name="follow_up_date">
+                </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Call Summary / Notes</label>
+                    <textarea class="form-control-custom" name="note" rows="3" placeholder="Summary of phone conversation..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 font-weight-bold" style="border-radius: 8px;"><i class="fas fa-save mr-2"></i> Save Call Log</button>
+            </form>
+        </div>
+        
+        <!-- Right panel: Call Logs list -->
+        <div class="desk-card">
+            <h5 class="font-weight-bold mb-3" style="color: #0f172a;"><i class="fas fa-phone-volume mr-2 text-primary"></i> Phone Call Log Book</h5>
+            
+            <div class="table-responsive">
+                <table class="desk-table">
+                    <thead>
+                        <tr>
+                            <th>Contact Info</th>
+                            <th>Call Type</th>
+                            <th>Duration</th>
+                            <th>Summary & Follow up</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>
+                                <strong>{{ log.name }}</strong>
+                                <br><small class="text-muted"><i class="fas fa-phone mr-1"></i> {{ log.phone }}</small>
+                            </td>
+                            <td>
+                                {% if log.call_type == 'Incoming' %}
+                                    <span class="badge badge-incoming px-2 py-1" style="border-radius: 5px;"><i class="fas fa-phone-alt"></i> Incoming</span>
+                                {% else %}
+                                    <span class="badge badge-outgoing px-2 py-1" style="border-radius: 5px;"><i class="fas fa-phone-slash"></i> Outgoing</span>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge bg-light text-dark border">{{ log.call_duration|default:"N/A" }}</span></td>
+                            <td>
+                                {% if log.note %}<small class="text-dark"><strong>Note:</strong> {{ log.note }}</small><br>{% endif %}
+                                {% if log.follow_up_date %}
+                                    <small class="text-primary font-weight-bold"><i class="far fa-calendar-alt"></i> Follow-up: {{ log.follow_up_date|date:"M d, Y" }}</small>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted font-weight-bold">{{ log.date|date:"M d, Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center py-4 text-muted">No call logs registered.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-</section>
-{% endblock main_content %}
+</div>
+{% endblock content %}

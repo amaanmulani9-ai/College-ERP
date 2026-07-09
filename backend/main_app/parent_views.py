@@ -6,10 +6,12 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.utils import timezone
+from django.db.models import Q, Sum
 from .models import (
     Parent, Student, StudentResult, AttendanceReport,
     OnlineExamResult, FeeRecord, FeePayment, Timetable,
-    LeaveReportStudent, FeedbackParent, Subject, Session, Course
+    LeaveReportStudent, FeedbackParent, Subject, Session, Course,
+    IssuedBook, Assignment, AssignmentSubmission, NotificationStudent, StudentBehaviourRecord, Event, Exam
 )
 
 
@@ -52,13 +54,34 @@ def parent_home(request):
         course=student.course, day_of_week=today_day
     ).select_related('subject').order_by('start_time')
 
+    # --- Additional Dashboard Stats ---
+    subjects_count = Subject.objects.filter(course=student.course).count()
+    notices_count = NotificationStudent.objects.filter(student=student, is_read=False).count()
+    exams_count = Exam.objects.filter(subject__course=student.course).count()
+    online_exams_count = Exam.objects.filter(subject__course=student.course, is_active=True).count()
+    
+    # Total distinct teachers assigned to student's course subjects
+    teachers_count = Subject.objects.filter(course=student.course).values('staff').distinct().count()
+    
+    # Library issued books count (checking both email and ID)
+    issued_books_count = IssuedBook.objects.filter(
+        Q(student_id=student.admin.email) | Q(student_id=str(student.id))
+    ).count()
+    
+    # Pending homework count (assignments that don't have submissions from this student yet)
+    submitted_assignment_ids = AssignmentSubmission.objects.filter(student=student).values_list('assignment_id', flat=True)
+    pending_homework_count = Assignment.objects.filter(subject__course=student.course).exclude(id__in=submitted_assignment_ids).count()
+    
+    # Student behavior points sum
+    behaviour_points = StudentBehaviourRecord.objects.filter(student=student).aggregate(total=Sum('incident__point'))['total'] or 0
+
     # --- Subject Results Chart Data ---
     chart_labels = [r.subject.name for r in results]
     chart_test = [r.test for r in results]
     chart_exam = [r.exam for r in results]
 
     context = {
-        'page_title': f'Parent Dashboard',
+        'page_title': 'Parent Dashboard',
         'student': student,
         'parent': parent,
         'total_attendance': total_attendance,
@@ -72,6 +95,17 @@ def parent_home(request):
         'total_paid': total_paid,
         'total_due': total_due,
         'todays_timetable': todays_timetable,
+        
+        # New Context Stats
+        'subjects_count': subjects_count,
+        'notices_count': notices_count,
+        'exams_count': exams_count,
+        'online_exams_count': online_exams_count,
+        'teachers_count': teachers_count,
+        'issued_books_count': issued_books_count,
+        'pending_homework_count': pending_homework_count,
+        'behaviour_points': behaviour_points,
+        
         'chart_labels': json.dumps(chart_labels),
         'chart_test': json.dumps(chart_test),
         'chart_exam': json.dumps(chart_exam),

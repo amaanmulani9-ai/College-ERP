@@ -13,7 +13,7 @@ from .models import (
     FeeRecord, FeePayment, CertificateRequest,
     LeaveReportStudent, LeaveReportStaff,
     Attendance, AttendanceReport, Backoffice,
-    StudentRegistration, PlacementDrive
+    StudentRegistration, PlacementDrive, Parent, AdmissionQuery, Complaint
 )
 
 
@@ -65,17 +65,25 @@ def backoffice_home(request):
     pending_student_leaves = LeaveReportStudent.objects.filter(status=0).count()
     pending_staff_leaves = LeaveReportStaff.objects.filter(status=0).count()
 
-    # --- Fee Collection Chart (last 6 months) ---
+    # --- Fee Collection Chart (last 6 months - optimized to 1 query) ---
+    from django.db.models.functions import TruncMonth
     months_labels = []
     months_collected = []
+    start_date = (today.replace(day=1) - timedelta(days=150)).replace(day=1)
+    
+    payments_by_month = {
+        p['month'].strftime('%Y-%m'): p['total'] or 0
+        for p in FeePayment.objects.filter(payment_date__gte=start_date)
+                                    .annotate(month=TruncMonth('payment_date'))
+                                    .values('month')
+                                    .annotate(total=Sum('amount_paid'))
+    }
+    
     for i in range(5, -1, -1):
         m = today.replace(day=1) - timedelta(days=30 * i)
         months_labels.append(m.strftime('%b %Y'))
-        collected = FeePayment.objects.filter(
-            payment_date__year=m.year,
-            payment_date__month=m.month
-        ).aggregate(total=Sum('amount_paid'))['total'] or 0
-        months_collected.append(float(collected))
+        key = m.strftime('%Y-%m')
+        months_collected.append(float(payments_by_month.get(key, 0)))
 
     # --- Course-wise Student Count ---
     course_data = Course.objects.annotate(student_count=Count('student')).values('name', 'student_count').order_by('-student_count')
@@ -84,6 +92,12 @@ def backoffice_home(request):
 
     # --- Recent Students ---
     recent_students = Student.objects.select_related('admin', 'course', 'session').order_by('-admin__created_at')[:8]
+
+    # --- eSkooly Receptionist Stats ---
+    total_parents = Parent.objects.count()
+    total_staffs = CustomUser.objects.filter(user_type='7').count()
+    pending_queries = AdmissionQuery.objects.filter(status='Active').count()
+    open_complaints = Complaint.objects.filter(action_taken__isnull=True).count()
 
     context = {
         'page_title': 'Backoffice Dashboard',
@@ -106,6 +120,10 @@ def backoffice_home(request):
         'course_labels': course_labels,
         'course_counts': course_counts,
         'recent_students': recent_students,
+        'total_parents': total_parents,
+        'total_staffs': total_staffs,
+        'pending_queries_count': pending_queries,
+        'open_complaints_count': open_complaints,
     }
     return render(request, 'backoffice_template/home_content.html', context)
 

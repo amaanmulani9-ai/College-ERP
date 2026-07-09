@@ -223,7 +223,13 @@ else:
     _database_url = get_database_url()
 _using_postgres = _database_url.startswith(('postgres://', 'postgresql://'))
 
-if _using_postgres:
+_is_testing = (
+    os.environ.get('DJANGO_SETTINGS_MODULE') == 'college_management_system.test_settings'
+    or 'pytest' in sys.modules
+    or 'test' in sys.argv
+)
+
+if _using_postgres and not _is_testing:
     try:
         import psycopg2
         parsed_db = dj_database_url.parse(_database_url)
