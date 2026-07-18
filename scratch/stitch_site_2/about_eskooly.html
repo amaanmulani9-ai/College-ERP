@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>About Us - eSkooly</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary": "#ffffff",
+                      "on-secondary-container": "#514585",
+                      "on-tertiary": "#ffffff",
+                      "inverse-primary": "#cabeff",
+                      "surface-container-low": "#f6f3f2",
+                      "tertiary-container": "#5b5d73",
+                      "surface-dim": "#dcd9d9",
+                      "on-surface": "#1b1c1c",
+                      "on-secondary-fixed-variant": "#493d7c",
+                      "on-tertiary-container": "#d5d6f1",
+                      "accent-paid": "#E7EDFC",
+                      "surface-variant": "#e4e2e1",
+                      "primary-container": "#613ddf",
+                      "surface-muted": "#F5F7FF",
+                      "primary-fixed": "#e6deff",
+                      "on-error": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "inverse-surface": "#303030",
+                      "secondary-fixed-dim": "#cbbeff",
+                      "outline-variant": "#cac4d8",
+                      "tertiary-fixed": "#dfe0fc",
+                      "on-surface-variant": "#484555",
+                      "surface-container-highest": "#e4e2e1",
+                      "on-secondary-fixed": "#1d0e4e",
+                      "secondary-fixed": "#e6deff",
+                      "surface-container-high": "#eae7e7",
+                      "on-tertiary-fixed-variant": "#43455b",
+                      "secondary-container": "#c6b7ff",
+                      "surface-tint": "#613ddf",
+                      "secondary": "#615596",
+                      "tertiary": "#43455b",
+                      "on-tertiary-fixed": "#171a2d",
+                      "primary": "#4918c7",
+                      "on-primary-fixed-variant": "#4919c7",
+                      "error": "#ba1a1a",
+                      "on-secondary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-deep": "#1D1443",
+                      "surface": "#fcf9f8",
+                      "on-primary-fixed": "#1c0062",
+                      "on-primary-container": "#dcd2ff",
+                      "tertiary-fixed-dim": "#c3c5df",
+                      "surface-container": "#f0eded",
+                      "primary-fixed-dim": "#cabeff",
+                      "surface-bright": "#fcf9f8",
+                      "inverse-on-surface": "#f3f0ef",
+                      "on-background": "#1b1c1c",
+                      "outline": "#797586",
+                      "error-container": "#ffdad6",
+                      "text-muted": "#777777",
+                      "background": "#fcf9f8"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "card-padding": "40px",
+                      "container-max": "1440px",
+                      "grid-gutter": "32px",
+                      "section-v-padding-mobile": "80px",
+                      "stack-gap": "16px",
+                      "section-v-padding": "120px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": [
+                              "Hanken Grotesk"
+                      ],
+                      "label-bold": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "nav-link": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-sm": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-lg": [
+                              "Hanken Grotesk"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": [
+                              "40px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-bold": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "64px",
+                              {
+                                      "lineHeight": "1.04",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "nav-link": [
+                              "15px",
+                              {
+                                      "lineHeight": "1",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "28px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .dot-pattern {
+            background-image: radial-gradient(circle at center, #E7EDFC 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 30px rgba(97, 61, 223, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-sans antialiased overflow-x-hidden selection:bg-primary-container selection:text-white">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-deep/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm transition-all duration-300" id="mainNav">
+<div class="max-w-container mx-auto px-8 flex justify-between items-center h-20">
+<!-- Brand Logo -->
+<a class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed hover:scale-105 transition-transform duration-200" href="#">
+                eSkooly
+            </a>
+<!-- Desktop Navigation -->
+<div class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:scale-105 duration-200 font-nav-link text-nav-link" href="#">Features</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:scale-105 duration-200 font-nav-link text-nav-link" href="#">Pricing</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-nav-link text-nav-link translate-y-[-2px] transition-all" href="#">About Us</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors hover:scale-105 duration-200 font-nav-link text-nav-link" href="#">Contact</a>
+</div>
+<!-- Actions -->
+<div class="hidden md:flex items-center gap-4">
+<a class="font-nav-link text-nav-link text-primary hover:scale-105 transition-transform duration-200" href="#">Login</a>
+<a class="font-nav-link text-nav-link bg-primary text-on-primary px-6 py-2 rounded-full hover:translate-y-[-2px] hover:shadow-lg hover:shadow-primary/30 transition-all duration-300" href="#">Get Started Free</a>
+</div>
+<!-- Mobile Menu Toggle -->
+<button aria-label="Toggle Menu" class="md:hidden text-on-surface p-2">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+</div>
+</nav>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative min-h-[819px] flex items-center justify-center overflow-hidden dot-pattern">
+<div class="absolute inset-0 bg-gradient-to-b from-surface/50 to-surface pointer-events-none"></div>
+<div class="max-w-container mx-auto px-8 relative z-10 py-section-v-padding-mobile md:py-section-v-padding text-center">
+<div class="inline-flex items-center gap-2 bg-accent-paid/50 text-secondary px-4 py-1.5 rounded-full font-label-bold text-label-bold uppercase tracking-wider mb-8 mx-auto">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                    Our Mission
+                </div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-surface-deep mb-6 max-w-4xl mx-auto">
+                    Empowering Education <span class="text-primary">Everywhere.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-10">
+                    We believe that quality school management software should be accessible to every institution on earth, regardless of size or budget.
+                </p>
+<div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+<a class="bg-primary text-on-primary font-nav-link text-nav-link px-8 py-3.5 rounded-full hover:translate-y-[-2px] hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 w-full sm:w-auto text-center" href="#">
+                        Join the Revolution
+                    </a>
+</div>
+</div>
+<!-- Abstract decorative elements -->
+<div class="absolute top-1/4 -left-32 w-96 h-96 bg-primary-fixed-dim/30 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute bottom-1/4 -right-32 w-96 h-96 bg-secondary-fixed/40 rounded-full blur-3xl pointer-events-none"></div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-deep dark:bg-surface-dark w-full py-16">
+<div class="max-w-container mx-auto px-8 grid grid-cols-1 md:grid-cols-4 gap-grid-gutter">
+<!-- Brand Column -->
+<div class="col-span-1 md:col-span-1 flex flex-col gap-6">
+<a class="font-headline-sm text-headline-sm font-bold text-primary-fixed" href="#">
+                    eSkooly
+                </a>
+<p class="font-body-md text-body-md text-on-primary-container/80">
+                    © 2024 eSkooly. All rights reserved. The world's #1 free school management software.
+                </p>
+<div class="flex gap-4 mt-auto">
+<!-- Social placeholders -->
+<a class="w-10 h-10 rounded-full bg-surface-deep/50 border border-primary-fixed/20 flex items-center justify-center text-primary-fixed hover:bg-primary-fixed hover:text-surface-deep transition-all" href="#">
+<span class="material-symbols-outlined">language</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-surface-deep/50 border border-primary-fixed/20 flex items-center justify-center text-primary-fixed hover:bg-primary-fixed hover:text-surface-deep transition-all" href="#">
+<span class="material-symbols-outlined">share</span>
+</a>
+</div>
+</div>
+<!-- Links Column -->
+<div class="col-span-1">
+<h4 class="font-body-lg text-body-lg text-primary-fixed mb-6">Legal</h4>
+<ul class="flex flex-col gap-4">
+<li><a class="font-body-md text-body-md text-on-primary-container/80 hover:text-white transition-colors hover:opacity-80" href="#">Privacy Policy</a></li>
+<li><a class="font-body-md text-body-md text-on-primary-container/80 hover:text-white transition-colors hover:opacity-80" href="#">Terms of Service</a></li>
+</ul>
+</div>
+<!-- Links Column -->
+<div class="col-span-1">
+<h4 class="font-body-lg text-body-lg text-primary-fixed mb-6">Resources</h4>
+<ul class="flex flex-col gap-4">
+<li><a class="font-body-md text-body-md text-on-primary-container/80 hover:text-white transition-colors hover:opacity-80" href="#">Support Center</a></li>
+<li><a class="font-body-md text-body-md text-on-primary-container/80 hover:text-white transition-colors hover:opacity-80" href="#">Documentation</a></li>
+<li><a class="font-body-md text-body-md text-on-primary-container/80 hover:text-white transition-colors hover:opacity-80" href="#">API Status</a></li>
+</ul>
+</div>
+<!-- Empty column for grid alignment based on JSON -->
+<div class="col-span-1">
+</div>
+</div>
+</footer>
+<script>
+        // Simple script to handle nav styling on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('mainNav');
+            if (window.scrollY > 10) {
+                nav.classList.add('shadow-md');
+                nav.classList.remove('shadow-sm');
+            } else {
+                nav.classList.remove('shadow-md');
+                nav.classList.add('shadow-sm');
+            }
+        });
+    </script>
+</body></html>

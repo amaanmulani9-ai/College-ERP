@@ -283,7 +283,7 @@ def export_staff_analytics(request):
 @login_required(login_url='/')
 @admin_required
 def pro_modules_dashboard(request):
-    """Role-based Pro modules command center inspired by eSkooly Pro dashboards."""
+    """Role-based Pro modules command center."""
     today = date.today()
     fee_expected = FeeRecord.objects.aggregate(total=Sum('amount'))['total'] or 0
     fee_collected = FeeRecord.objects.aggregate(total=Sum('amount_paid'))['total'] or 0
@@ -402,7 +402,7 @@ def pro_modules_dashboard(request):
 
     context = {
         'page_title': 'Pro Modules',
-        'page_subtitle': 'Role-based dashboards and shortcuts modeled after eSkooly Pro.',
+        'page_subtitle': 'Role-based dashboards and shortcuts.',
         'pro_modules': pro_modules,
     }
     return render(request, 'hod_template/pro_modules.html', context)
@@ -610,7 +610,7 @@ def add_student(request):
                 student.verification_notes = student_form.cleaned_data.get('verification_notes')
                 student.division = student_form.cleaned_data.get('division')
                 
-                # eSkooly student admission fields
+                # CampusPro student admission fields
                 student.registration_no = student_form.cleaned_data.get('registration_no')
                 student.discount_in_fee = student_form.cleaned_data.get('discount_in_fee') or 0
                 student.mobile = student_form.cleaned_data.get('mobile')
@@ -954,7 +954,7 @@ def edit_student(request, student_id):
                 student.verification_notes = form.cleaned_data.get('verification_notes')
                 student.division = form.cleaned_data.get('division') or student.division
                 
-                # eSkooly student admission fields
+                # CampusPro student admission fields
                 student.registration_no = form.cleaned_data.get('registration_no')
                 student.discount_in_fee = form.cleaned_data.get('discount_in_fee') or 0
                 student.mobile = form.cleaned_data.get('mobile')
@@ -3174,7 +3174,7 @@ def admin_employees_attendance_report(request):
 @login_required(login_url='/')
 @admin_required
 def admin_staff_login_credentials(request):
-    """Staff Login Credentials interface (matches eSkooly UI)"""
+    """Staff Login Credentials interface."""
     staffs = Staff.objects.select_related('admin', 'course').all()
     
     # Mock roles for UI demonstration since the Staff model doesn't explicitly store role types like Principal/Teacher

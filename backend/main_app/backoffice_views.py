@@ -93,7 +93,7 @@ def backoffice_home(request):
     # --- Recent Students ---
     recent_students = Student.objects.select_related('admin', 'course', 'session').order_by('-admin__created_at')[:8]
 
-    # --- eSkooly Receptionist Stats ---
+    # --- CampusPro Receptionist Stats ---
     total_parents = Parent.objects.count()
     total_staffs = CustomUser.objects.filter(user_type='7').count()
     pending_queries = AdmissionQuery.objects.filter(status='Active').count()

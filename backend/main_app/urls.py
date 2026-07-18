@@ -20,7 +20,8 @@ from main_app.EditResultView import EditResultView
 from . import hod_views, staff_views, student_views, parent_views, views, chat_views, smart_views, ai_views, analytics_views, mobile_api_views, finance_views, placement_views, backoffice_views
 
 urlpatterns = [
-    path("", views.login_page, name='login_page'),
+    path("", views.landing_page, name='landing_page'),
+    path("login/", views.login_page, name='login_page'),
     path("healthz/", views.health_check, name='health_check'),
     path('offline/', views.offline, name='offline'),
     path('student/register/', views.online_registration, name='online_registration'),
@@ -55,8 +56,6 @@ urlpatterns = [
     path("api/placement/resume/save/", placement_views.save_json_resume, name='save_json_resume'),
     path("api/placement/interviews/calendar/", placement_views.get_interviews_calendar_events, name='interviews_calendar'),
     path("admin/placement/", placement_views.admin_placement_dashboard, name='admin_placement_dashboard'),
-    path("alumni/portal/", placement_views.alumni_portal, name='alumni_portal'),
-    path("company/dashboard/", placement_views.company_hr_dashboard, name='company_hr_dashboard'),
     path("parent/home/", parent_views.parent_home, name='parent_home'),
     path("parent/attendance/", parent_views.parent_attendance_detail, name='parent_attendance'),
     path("parent/fees/", parent_views.parent_fee_view, name='parent_fees'),

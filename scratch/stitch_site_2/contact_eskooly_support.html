@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Contact Us - eSkooly</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#493d7c",
+                        "inverse-surface": "#303030",
+                        "surface-container-high": "#eae7e7",
+                        "surface-deep": "#1D1443",
+                        "surface-bright": "#fcf9f8",
+                        "surface": "#fcf9f8",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#171a2d",
+                        "surface-muted": "#F5F7FF",
+                        "on-secondary-fixed": "#1d0e4e",
+                        "on-primary-fixed": "#1c0062",
+                        "on-primary-fixed-variant": "#4919c7",
+                        "accent-paid": "#E7EDFC",
+                        "outline": "#797586",
+                        "background": "#fcf9f8",
+                        "on-background": "#1b1c1c",
+                        "on-tertiary-fixed-variant": "#43455b",
+                        "surface-variant": "#e4e2e1",
+                        "surface-container-low": "#f6f3f2",
+                        "on-surface": "#1b1c1c",
+                        "on-primary-container": "#dcd2ff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#cbbeff",
+                        "surface-container": "#f0eded",
+                        "primary-fixed-dim": "#cabeff",
+                        "on-tertiary-container": "#d5d6f1",
+                        "tertiary": "#43455b",
+                        "secondary-fixed": "#e6deff",
+                        "on-error": "#ffffff",
+                        "text-muted": "#777777",
+                        "inverse-primary": "#cabeff",
+                        "on-secondary": "#ffffff",
+                        "primary": "#4918c7",
+                        "surface-container-highest": "#e4e2e1",
+                        "primary-fixed": "#e6deff",
+                        "secondary-container": "#c6b7ff",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#5b5d73",
+                        "on-secondary-container": "#514585",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#dfe0fc",
+                        "primary-container": "#613ddf",
+                        "tertiary-fixed-dim": "#c3c5df",
+                        "secondary": "#615596",
+                        "surface-tint": "#613ddf",
+                        "surface-dim": "#dcd9d9",
+                        "on-tertiary": "#ffffff",
+                        "outline-variant": "#cac4d8",
+                        "inverse-on-surface": "#f3f0ef",
+                        "on-surface-variant": "#484555"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "section-v-padding": "120px",
+                        "stack-gap": "16px",
+                        "section-v-padding-mobile": "80px",
+                        "card-padding": "40px",
+                        "grid-gutter": "32px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "label-bold": ["Hanken Grotesk"],
+                        "nav-link": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-sm": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["48px", { "lineHeight": "1.1", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["40px", { "lineHeight": "1.1", "fontWeight": "600" }],
+                        "headline-lg": ["64px", { "lineHeight": "1.04", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "label-bold": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "nav-link": ["15px", { "lineHeight": "1", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-sm": ["28px", { "lineHeight": "1.2", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.5", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Hanken Grotesk', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 30px rgba(97, 61, 223, 0.08);
+        }
+        .btn-primary {
+            @apply bg-primary text-on-primary rounded-full px-6 py-3 font-nav-link text-nav-link transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30;
+        }
+        .btn-ghost {
+            @apply bg-tertiary text-primary rounded-full px-6 py-3 font-nav-link text-nav-link transition-all duration-200 hover:-translate-y-0.5 hover:bg-tertiary/80;
+        }
+        .input-field {
+            @apply w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 font-body-md text-body-md text-on-surface placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-3 focus:ring-primary/20 transition-all;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col pt-[80px]">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-8 py-4 max-w-container-max mx-auto bg-surface/80 dark:bg-inverse-surface/80 backdrop-blur-xl shadow-md dark:shadow-none transition-all duration-300" id="main-nav">
+<div class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed-dim">
+            EduSync
+        </div>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-nav-link text-nav-link text-on-surface-variant hover:text-primary transition-colors" href="#">Features</a>
+<a class="font-nav-link text-nav-link text-on-surface-variant hover:text-primary transition-colors" href="#">Pricing</a>
+<a class="font-nav-link text-nav-link text-on-surface-variant hover:text-primary transition-colors" href="#">About Us</a>
+<a class="font-nav-link text-nav-link text-primary border-b-2 border-primary pb-1" href="#">Contact</a>
+</div>
+<div class="hidden md:flex items-center gap-4">
+<a class="font-nav-link text-nav-link text-on-surface-variant hover:text-primary transition-colors" href="#">Login</a>
+<a class="btn-primary" href="#">Get Started Free</a>
+</div>
+<!-- Mobile Menu Button -->
+<button class="md:hidden text-on-surface-variant p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col items-center w-full max-w-container-max mx-auto px-4 md:px-8">
+<!-- Hero Section -->
+<section class="w-full py-section-v-padding-mobile md:py-section-v-padding text-center flex flex-col items-center">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-6 max-w-3xl">
+                Contact Support
+            </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                We're here to help your institution succeed. Reach out to our dedicated team for assistance, inquiries, or feedback.
+            </p>
+</section>
+<!-- Contact Section (Form + Info) -->
+<section class="w-full grid grid-cols-1 lg:grid-cols-12 gap-grid-gutter mb-section-v-padding-mobile md:mb-section-v-padding">
+<!-- Contact Form -->
+<div class="lg:col-span-7 glass-card rounded-xl p-6 md:p-card-padding">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-8">Send us a Message</h2>
+<form class="flex flex-col gap-stack-gap">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-gap">
+<div>
+<label class="block font-label-bold text-label-bold text-on-surface-variant uppercase mb-2">Name</label>
+<input class="input-field" placeholder="John Doe" type="text"/>
+</div>
+<div>
+<label class="block font-label-bold text-label-bold text-on-surface-variant uppercase mb-2">School Name</label>
+<input class="input-field" placeholder="Acme Academy" type="text"/>
+</div>
+</div>
+<div>
+<label class="block font-label-bold text-label-bold text-on-surface-variant uppercase mb-2">Email</label>
+<input class="input-field" placeholder="john@acme.edu" type="email"/>
+</div>
+<div>
+<label class="block font-label-bold text-label-bold text-on-surface-variant uppercase mb-2">Subject</label>
+<select class="input-field appearance-none">
+<option>Technical Support</option>
+<option>Sales Inquiry</option>
+<option>Billing Question</option>
+<option>Other</option>
+</select>
+</div>
+<div>
+<label class="block font-label-bold text-label-bold text-on-surface-variant uppercase mb-2">Message</label>
+<textarea class="input-field min-h-[150px] resize-y" placeholder="How can we help you today?"></textarea>
+</div>
+<div class="mt-4">
+<button class="btn-primary w-full md:w-auto px-8" type="submit">Send Message</button>
+</div>
+</form>
+</div>
+<!-- Contact Information -->
+<div class="lg:col-span-5 flex flex-col gap-stack-gap">
+<!-- Live Chat Card (Highlighted) -->
+<div class="bg-primary-container rounded-xl p-8 relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[100px] text-on-primary-container">forum</span>
+</div>
+<div class="relative z-10">
+<div class="inline-flex items-center gap-2 bg-on-primary-container/20 px-3 py-1 rounded-full mb-4">
+<div class="w-2 h-2 rounded-full bg-surface"></div>
+<span class="font-label-bold text-label-bold text-on-primary-container uppercase">Fastest Response</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-primary-container mb-2">24/7 Live Chat</h3>
+<p class="font-body-md text-body-md text-on-primary-container/80 mb-6">
+                            Connect with our support team instantly for immediate assistance.
+                        </p>
+<button class="bg-surface text-primary rounded-full px-6 py-2 font-nav-link text-nav-link hover:bg-surface-muted transition-colors">
+                            Start Chat
+                        </button>
+</div>
+</div>
+<!-- Email Card -->
+<div class="glass-card rounded-xl p-8 flex items-start gap-4 group hover:-translate-y-1 transition-transform duration-300">
+<div class="w-12 h-12 rounded-full bg-surface-muted flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">mail</span>
+</div>
+<div>
+<h3 class="font-nav-link text-nav-link text-on-surface mb-1">Email Support</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">We aim to reply within 2 hours.</p>
+<a class="font-nav-link text-nav-link text-primary hover:underline" href="mailto:support@eskooly.com">support@eskooly.com</a>
+</div>
+</div>
+<!-- Phone Card -->
+<div class="glass-card rounded-xl p-8 flex items-start gap-4 group hover:-translate-y-1 transition-transform duration-300">
+<div class="w-12 h-12 rounded-full bg-surface-muted flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">call</span>
+</div>
+<div>
+<h3 class="font-nav-link text-nav-link text-on-surface mb-1">Phone Support</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-2">Mon-Fri, 9am-6pm GMT.</p>
+<a class="font-nav-link text-nav-link text-primary hover:underline" href="tel:+447404074252">+44 (740) 407 4252</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Global Locations Section -->
+<section class="w-full mb-section-v-padding-mobile md:mb-section-v-padding">
+<div class="glass-card rounded-xl overflow-hidden flex flex-col md:flex-row">
+<div class="w-full md:w-1/2 p-8 md:p-card-padding flex flex-col justify-center">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-4">Our Headquarters</h2>
+<address class="font-body-md text-body-md text-on-surface-variant not-italic mb-6">
+                        103, Oxford House<br/>
+                        Oxford Rd<br/>
+                        Manchester M1 7ED<br/>
+                        United Kingdom
+                    </address>
+<div class="bg-surface-muted rounded-lg p-6 border border-primary/10">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-primary">dns</span>
+<h3 class="font-nav-link text-nav-link text-on-surface">Global Infrastructure</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">
+                            Supported by 7 state-of-the-art global data centers ensuring unparalleled uptime, security, and trust for your institution's data.
+                        </p>
+</div>
+</div>
+<div class="w-full md:w-1/2 h-64 md:h-auto bg-surface-muted relative border-l border-outline-variant/20">
+<!-- Map Placeholder -->
+<div class="bg-cover bg-center w-full h-full absolute inset-0" data-alt="A stylized, modern, high-key digital map of Manchester, UK. The map features a clean light-mode aesthetic with soft white and light grey landmasses. Subtle, glowing primary purple nodes indicate key locations, representing data centers and headquarters. The visual style is sleek, corporate, and minimalist, conveying trust and technical sophistication." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA20EQjWfh_BE7O1U74zNFdBEO5C_V2hCTVD7CWQFrDG_xNbpG4IO4yIaByVJQkmIpcSMTjl6zgendD3rO_1G3JYf7pCWffiS0Z4-tuAzPaqUSDMACAdA2eKzyjUvXnreShgGz-HulqTmqgNrxOrKQ7vvpL6sENDANASt-gRrz0vkkgvTfDYQG9nywp16-z1jaOfoDI1yvHbRp_So7qMeANe-7eUVovkndWCGa7xaBBgDXXjRYmGLrBocw1RD7dYEozGx-HtfGduk_k')"></div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full px-8 py-section-v-padding border-t border-outline-variant/20 bg-secondary dark:bg-surface-deep mt-auto">
+<div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="font-headline-sm text-headline-sm text-on-secondary">
+                EduSync
+            </div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-body-md text-body-md text-on-secondary/80 hover:text-on-secondary hover:underline transition-all" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-on-secondary/80 hover:text-on-secondary hover:underline transition-all" href="#">Terms of Service</a>
+<a class="font-body-md text-body-md text-on-secondary/80 hover:text-on-secondary hover:underline transition-all" href="#">Help Center</a>
+<a class="font-body-md text-body-md text-on-secondary/80 hover:text-on-secondary hover:underline transition-all" href="#">API Documentation</a>
+<a class="font-body-md text-body-md text-on-secondary-fixed font-bold hover:underline transition-all opacity-80" href="#">Contact Support</a>
+<a class="font-body-md text-body-md text-on-secondary/80 hover:text-on-secondary hover:underline transition-all" href="#">Download iOS</a>
+<a class="font-body-md text-body-md text-on-secondary/80 hover:text-on-secondary hover:underline transition-all" href="#">Download Android</a>
+</div>
+<div class="font-body-md text-body-md text-on-secondary/60">
+                © 2024 EduSync ERP. All rights reserved.
+            </div>
+</div>
+</footer>
+<script>
+        // Simple scroll effect for navbar
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('main-nav');
+            if (window.scrollY > 20) {
+                nav.classList.add('shadow-lg', 'bg-surface/95');
+                nav.classList.remove('bg-surface/80');
+            } else {
+                nav.classList.remove('shadow-lg', 'bg-surface/95');
+                nav.classList.add('bg-surface/80');
+            }
+        });
+    </script>
+</body></html>

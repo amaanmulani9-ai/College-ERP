@@ -21,8 +21,6 @@ LOGIN_REDIRECT_ROUTES = {
     "2": "staff_home",
     "3": "student_home",
     "4": "parent_home",
-    "5": "alumni_portal",
-    "6": "company_hr_dashboard",
     "7": "backoffice_home",
     "8": "super_admin_dashboard",
 }
@@ -46,6 +44,12 @@ def _redirect_for_user(user):
     if route_name:
         return redirect(reverse(route_name))
     return redirect(reverse("login_page"))
+
+
+def landing_page(request):
+    if request.user.is_authenticated:
+        return _redirect_for_user(request.user)
+    return render(request, 'main_app/landing_page.html')
 
 
 def login_page(request):

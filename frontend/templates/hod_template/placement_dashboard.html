@@ -1,11 +1,11 @@
-{% extends 'hod_template/base_template.html' %}
+{% extends 'main_app/base.html' %}
 {% load static %}
 
 {% block page_title %}
 Admin Placement Dashboard
 {% endblock page_title %}
 
-{% block main_content %}
+{% block content %}
 <section class="content">
     <div class="container-fluid">
         <div class="row">
@@ -22,7 +22,7 @@ Admin Placement Dashboard
         </div>
     </div>
 </section>
-{% endblock main_content %}
+{% endblock content %}
 
 {% block custom_js %}
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>

@@ -1,65 +1,76 @@
 {% load static i18n %}
 <style>
-    /* eSkooly Sidebar specific overrides */
+    /* CampusPro Sidebar specific overrides */
     .erpnext-sidebar {
-        background-color: #ffffff;
-        border-right: 1px solid #e0e6ed;
-        font-family: 'Poppins', sans-serif;
+        background-color: var(--bg-sidebar);
+        border-right: 1px solid var(--border-element);
+        font-family: 'Outfit', sans-serif;
+        backdrop-filter: var(--glass-blur);
+        -webkit-backdrop-filter: var(--glass-blur);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
     }
     .sidebar-header {
         display: none; /* Hide old profile header */
     }
-    .eskooly-sidebar-top {
+    .campuspro-sidebar-top {
         padding: 20px 24px 10px;
     }
-    .eskooly-menu-label {
+    .campuspro-menu-label {
         font-size: 11px;
-        color: #8a98ac;
+        color: var(--text-muted);
         text-transform: uppercase;
-        font-weight: 500;
+        font-weight: 600;
         margin-bottom: 8px;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.8px;
     }
-    .eskooly-search {
+    .campuspro-search {
         position: relative;
         margin-bottom: 15px;
     }
-    .eskooly-search input {
+    .campuspro-search input {
         width: 100%;
-        border: none;
-        background: transparent;
-        border-bottom: 1px solid #e0e6ed;
-        padding: 5px 0 5px 20px;
+        border: 1px solid var(--border-element);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        padding: 8px 12px 8px 36px;
         font-size: 13px;
-        color: #555;
+        color: var(--text-main);
         outline: none;
+        transition: all 0.2s ease;
     }
-    .eskooly-search input::placeholder {
-        color: #a0a9b6;
+    .campuspro-search input::placeholder {
+        color: var(--text-muted);
+        opacity: 0.7;
     }
-    .eskooly-search i {
+    .campuspro-search input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        background: rgba(255, 255, 255, 0.05);
+    }
+    .campuspro-search i {
         position: absolute;
-        left: 0;
-        top: 8px;
-        font-size: 12px;
-        color: #a0a9b6;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 13px;
+        color: var(--text-muted);
     }
     
     .nav-section {
-        padding: 0 10px;
+        padding: 0 12px;
     }
     .nav-item {
         margin: 0;
     }
     .nav-link {
         padding: 10px 14px;
-        color: #53686d;
+        color: var(--text-muted);
         font-size: 14px;
-        font-weight: 400;
+        font-weight: 500;
         display: flex;
         align-items: center;
         transition: color 180ms ease, background 180ms ease, transform 180ms ease, box-shadow 180ms ease;
-        border-radius: 8px;
+        border-radius: 10px;
         text-decoration: none !important;
         position: relative;
         overflow: hidden;
@@ -72,7 +83,7 @@
     .nav-icon {
         width: 28px;
         font-size: 16px;
-        color: #7a8f93;
+        color: var(--text-muted);
         text-align: left;
         transition: color 180ms ease, transform 180ms ease;
     }
@@ -81,7 +92,7 @@
     }
     .nav-arrow {
         font-size: 12px;
-        color: #8a98ac;
+        color: var(--text-muted);
         font-weight: 400;
     }
     /* Override arrow to be a plus/minus */
@@ -98,33 +109,32 @@
     }
     
     .nav-link:hover {
-        background: linear-gradient(135deg, rgba(15,95,108,.10), rgba(201,151,70,.14));
-        color: #083f49;
+        background: rgba(99, 102, 241, 0.08);
+        color: var(--primary-color);
         transform: translateX(4px);
-        box-shadow: 0 10px 24px rgba(15,95,108,.08);
     }
     .nav-link:hover .nav-icon {
-        color: #c99746;
+        color: var(--primary-color);
         transform: scale(1.08);
     }
     
     .nav-link.active {
-        background: linear-gradient(135deg, rgba(15,95,108,.13), rgba(201,151,70,.18));
-        color: #083f49;
-        font-weight: 700;
-        box-shadow: inset 3px 0 0 #c99746, 0 10px 24px rgba(15,95,108,.08);
+        background: rgba(99, 102, 241, 0.12);
+        color: var(--primary-color);
+        font-weight: 600;
+        box-shadow: inset 3px 0 0 var(--primary-color);
     }
     .nav-link.active .nav-icon {
-        color: #c99746;
+        color: var(--primary-color);
     }
 
-    /* Submenu styling matching eSkooly */
+    /* Submenu styling matching CampusPro */
     .nav-submenu {
-        background-color: #ffffff;
+        background-color: transparent;
         position: relative;
         margin-left: 28px;
         padding-left: 0;
-        border-left: 1px solid #e0e8ff; /* Clean light blue track line */
+        border-left: 1px solid var(--border-color);
         margin-bottom: 8px;
         margin-top: 4px;
         display: none;
@@ -136,20 +146,24 @@
     .nav-submenu .nav-link {
         padding: 8px 16px 8px 24px;
         font-size: 13px;
-        color: #647081;
+        color: var(--text-muted);
         background: transparent !important;
         border-radius: 0;
         position: relative;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        box-shadow: none !important;
+        transform: none !important;
     }
     .nav-submenu .nav-link:hover {
-        color: #0f5f6c;
+        color: var(--primary-color);
+        background: transparent !important;
     }
     .nav-submenu .nav-link.active {
-        color: #0f5f6c;
-        font-weight: 500;
+        color: var(--primary-color);
+        font-weight: 600;
+        background: transparent !important;
     }
     /* Active dot indicator on the track line */
     .nav-submenu .nav-link.active::before {
@@ -160,9 +174,10 @@
         transform: translateY(-50%);
         width: 8px;
         height: 8px;
-        background-color: #c99746;
+        background-color: var(--primary-color);
         border-radius: 50%;
         z-index: 2;
+        box-shadow: 0 0 8px var(--primary-color);
     }
     /* Lock icon for pro features */
     .lock-icon {
@@ -191,9 +206,9 @@
     }
 </style>
 
-<div class="eskooly-sidebar-top">
-    <div class="eskooly-menu-label">menu</div>
-    <div class="eskooly-search">
+<div class="campuspro-sidebar-top">
+    <div class="campuspro-menu-label">menu</div>
+    <div class="campuspro-search">
         <i class="fas fa-search"></i>
         <input type="text" placeholder="Search menu...">
     </div>
@@ -604,7 +619,7 @@
             </a>
         </div>
     {% elif user.user_type == '3' %}
-        <!-- Student Sidebar (eSkooly Style) -->
+        <!-- Student Sidebar (CampusPro Style) -->
         
         <!-- Search Menu Input -->
         <div style="padding: 15px 15px 5px 15px;">
@@ -701,7 +716,7 @@
         </div>
 
     {% elif user.user_type == '4' %}
-        <!-- Parent Sidebar (eSkooly Style) -->
+        <!-- Parent Sidebar (CampusPro Style) -->
         
         <!-- Search Menu Input -->
         <div style="padding: 15px 15px 5px 15px;">
@@ -761,7 +776,7 @@
         </div>
 
     {% elif user.user_type == '7' %}
-        <!-- Backoffice Sidebar (eSkooly Style) -->
+        <!-- Backoffice Sidebar (CampusPro Style) -->
         
         <!-- Search Menu Input -->
         <div style="padding: 15px 15px 5px 15px;">

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login - eSkooly</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Hanken Grotesk -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#cac4d8",
+                        "secondary-container": "#c6b7ff",
+                        "inverse-primary": "#cabeff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#e6deff",
+                        "primary": "#4918c7",
+                        "on-surface": "#1b1c1c",
+                        "surface-dim": "#dcd9d9",
+                        "surface-container": "#f0eded",
+                        "secondary": "#615596",
+                        "on-tertiary-container": "#d5d6f1",
+                        "on-background": "#1b1c1c",
+                        "background": "#fcf9f8",
+                        "text-muted": "#777777",
+                        "on-secondary-container": "#514585",
+                        "tertiary-fixed-dim": "#c3c5df",
+                        "tertiary-fixed": "#dfe0fc",
+                        "surface-muted": "#F5F7FF",
+                        "on-tertiary-fixed-variant": "#43455b",
+                        "inverse-on-surface": "#f3f0ef",
+                        "secondary-fixed": "#e6deff",
+                        "primary-fixed-dim": "#cabeff",
+                        "inverse-surface": "#303030",
+                        "on-primary-fixed": "#1c0062",
+                        "surface-variant": "#e4e2e1",
+                        "on-primary-container": "#dcd2ff",
+                        "primary-container": "#613ddf",
+                        "surface-container-low": "#f6f3f2",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#43455b",
+                        "on-secondary-fixed-variant": "#493d7c",
+                        "tertiary-container": "#5b5d73",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#4919c7",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e4e2e1",
+                        "secondary-fixed-dim": "#cbbeff",
+                        "outline": "#797586",
+                        "surface-deep": "#1D1443",
+                        "surface": "#fcf9f8",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#eae7e7",
+                        "on-secondary-fixed": "#1d0e4e",
+                        "on-tertiary-fixed": "#171a2d",
+                        "accent-paid": "#E7EDFC",
+                        "on-surface-variant": "#484555",
+                        "surface-tint": "#613ddf",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#fcf9f8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "card-padding": "40px",
+                        "section-v-padding-mobile": "80px",
+                        "stack-gap": "16px",
+                        "container-max": "1440px",
+                        "section-v-padding": "120px",
+                        "grid-gutter": "32px"
+                    },
+                    "fontFamily": {
+                        "label-bold": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "nav-link": ["Hanken Grotesk"],
+                        "headline-sm": ["Hanken Grotesk"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "body-md": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "label-bold": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "headline-md": ["48px", { "lineHeight": "1.1", "fontWeight": "500" }],
+                        "nav-link": ["15px", { "lineHeight": "1", "fontWeight": "600" }],
+                        "headline-sm": ["28px", { "lineHeight": "1.2", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.5", "fontWeight": "500" }],
+                        "headline-lg": ["64px", { "lineHeight": "1.04", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["40px", { "lineHeight": "1.1", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface font-body-md h-screen overflow-hidden antialiased flex items-center justify-center">
+<!-- Split Pane Container -->
+<div class="w-full max-w-container mx-auto h-full flex flex-col md:flex-row bg-surface-container-lowest relative overflow-hidden shadow-2xl md:h-[921px] md:rounded-2xl md:w-[95vw] lg:w-[85vw] border border-outline-variant/20">
+<!-- Left Side: Login Form Canvas -->
+<div class="w-full md:w-1/2 flex flex-col justify-center px-8 sm:px-16 lg:px-24 py-12 relative z-10 h-full overflow-y-auto">
+<!-- Brand Logo Header (Suppressed main nav since it's a linear transactional page, but keeping logo) -->
+<div class="absolute top-8 left-8 sm:left-16 lg:left-24">
+<a class="flex items-center gap-2 group" href="#">
+<div class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200">
+<span class="material-symbols-outlined font-bold text-[20px]" data-icon="school">school</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-primary font-extrabold tracking-tight">eSkooly</span>
+</a>
+</div>
+<div class="w-full max-w-md mx-auto mt-16 md:mt-0">
+<!-- Form Header -->
+<div class="mb-10 text-center md:text-left">
+<h1 class="font-headline-md text-headline-md text-on-surface mb-2 tracking-tight">Welcome Back</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Please enter your details to sign in.</p>
+</div>
+<!-- Social Logins -->
+<div class="flex flex-col gap-4 mb-8">
+<button class="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl border border-outline-variant/60 bg-surface-container-lowest hover:bg-surface-container-low transition-colors duration-200 text-on-surface font-nav-link text-nav-link group">
+<svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+                        Continue with Google
+                    </button>
+<button class="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl border border-outline-variant/60 bg-surface-container-lowest hover:bg-surface-container-low transition-colors duration-200 text-on-surface font-nav-link text-nav-link group">
+<svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" viewbox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 0H0V10H10V0Z" fill="#F25022"></path>
+<path d="M21 0H11V10H21V0Z" fill="#7FBA00"></path>
+<path d="M10 11H0V21H10V11Z" fill="#00A4EF"></path>
+<path d="M21 11H11V21H21V11Z" fill="#FFB900"></path>
+</svg>
+                        Continue with Microsoft
+                    </button>
+</div>
+<!-- Divider -->
+<div class="relative flex items-center mb-8">
+<div class="flex-grow border-t border-outline-variant/40"></div>
+<span class="flex-shrink-0 mx-4 text-outline font-body-md text-sm">or sign in with email</span>
+<div class="flex-grow border-t border-outline-variant/40"></div>
+</div>
+<!-- Form -->
+<form action="#" class="space-y-5" method="POST">
+<div>
+<label class="block font-label-bold text-label-bold text-on-surface-variant mb-1 uppercase" for="email">Email Address</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-outline">
+<span class="material-symbols-outlined text-[20px]" data-icon="mail">mail</span>
+</span>
+<input autocomplete="email" class="w-full pl-10 pr-4 py-3 bg-surface-container-low border border-outline-variant/50 rounded-lg text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all shadow-sm" id="email" name="email" placeholder="admin@school.edu" required="" type="email"/>
+</div>
+</div>
+<div>
+<label class="block font-label-bold text-label-bold text-on-surface-variant mb-1 uppercase" for="password">Password</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-outline">
+<span class="material-symbols-outlined text-[20px]" data-icon="lock">lock</span>
+</span>
+<input autocomplete="current-password" class="w-full pl-10 pr-10 py-3 bg-surface-container-low border border-outline-variant/50 rounded-lg text-on-surface font-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-all shadow-sm" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute inset-y-0 right-0 flex items-center pr-3 text-outline hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility_off">visibility_off</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between mt-2">
+<div class="flex items-center">
+<input class="h-4 w-4 text-primary focus:ring-primary border-outline-variant rounded transition-colors cursor-pointer" id="remember-me" name="remember-me" type="checkbox"/>
+<label class="ml-2 block font-body-md text-[14px] text-on-surface-variant cursor-pointer" for="remember-me">
+                                Remember me
+                            </label>
+</div>
+<div class="text-sm">
+<a class="font-nav-link text-[14px] text-primary hover:text-primary-container font-semibold hover:underline transition-all" href="#">
+                                Forgot Password?
+                            </a>
+</div>
+</div>
+<div class="pt-4">
+<button class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-full shadow-md text-on-primary bg-primary hover:bg-primary-container focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary font-nav-link text-nav-link transform hover:-translate-y-[2px] transition-all duration-200 group" type="submit">
+                            Login
+                            <span class="material-symbols-outlined ml-2 group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</form>
+<div class="mt-8 text-center">
+<p class="font-body-md text-[14px] text-on-surface-variant">
+                        Don't have an account? 
+                        <a class="font-nav-link text-primary font-semibold hover:underline hover:text-primary-container transition-colors" href="#">Sign up for free</a>
+</p>
+</div>
+</div>
+</div>
+<!-- Right Side: Branded Visual Area (Glassmorphic & Ambient) -->
+<div class="hidden md:flex md:w-1/2 relative bg-surface-deep flex-col justify-between overflow-hidden">
+<!-- Ambient Gradient Background -->
+<div class="absolute inset-0 bg-gradient-to-br from-primary-container via-surface-deep to-[#2A1A5E] opacity-90"></div>
+<!-- Abstract Floating Shapes (Simulating Depth) -->
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary blur-[120px] opacity-40 animate-pulse"></div>
+<div class="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-secondary-container blur-[140px] opacity-30"></div>
+<!-- Content Overlay -->
+<div class="relative z-10 flex flex-col h-full justify-center px-12 lg:px-20 py-16">
+<div class="mb-16 transform translate-y-4 opacity-0 animate-[fade-in-up_0.8s_ease-out_forwards]">
+<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+<span class="material-symbols-outlined text-secondary-fixed text-[18px]" data-icon="stars">stars</span>
+<span class="font-label-bold text-label-bold text-on-primary uppercase tracking-wider">#1 Education ERP</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-primary mb-6 leading-tight">
+                        Welcome Back to <br/>
+<span class="text-primary-fixed">eSkooly.</span>
+</h2>
+<p class="font-body-lg text-body-lg text-primary-fixed-dim max-w-md leading-relaxed">
+                        Manage your institution with precision. Access real-time analytics, streamline administration, and connect your entire educational ecosystem from one powerful workspace.
+                    </p>
+</div>
+<!-- Floating Glass Card (Testimonial/Stat) -->
+<div class="mt-auto transform translate-y-4 opacity-0 animate-[fade-in-up_1s_ease-out_0.3s_forwards]">
+<div class="relative overflow-hidden rounded-xl p-8 bg-white/5 backdrop-blur-2xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.2)] group hover:bg-white/10 transition-colors duration-500">
+<!-- Decorative quote mark -->
+<span class="material-symbols-outlined absolute top-4 right-4 text-[64px] text-white/5 font-light transform -rotate-12 group-hover:rotate-0 transition-transform duration-700" data-icon="format_quote">format_quote</span>
+<div class="flex items-center gap-4 mb-4">
+<div class="flex -space-x-3">
+<img class="w-10 h-10 rounded-full border-2 border-surface-deep object-cover" data-alt="A close-up portrait of a professional female school administrator in her 40s, smiling confidently. She is wearing a modern blazer. The background is a slightly blurred, bright, contemporary school office with high-key lighting, fitting a modern corporate light-mode UI aesthetic. The color palette features soft neutrals with subtle purple undertones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyeGsXhkDlHUChUDJn1x1dh9H3rNFB-nVGNPgB38C8CIptI7HZwaf5rqHYvQ7rXNoXOnGD1d83b8wx3ddapgYHlJqLPjLh4tWcbawfPYuGi40AS-LGFpm9qU3p_qC3CiLEUhWLK-GpKM-J8bmZfouiTlHZVn7tKnQbKCIXFXESlmWi5lVWuwTInjs78VLOFHB9ivY0KCMeuJLnpGAiHXc43MEC5Wn9TIjiAeCTkvuw3lrXI5gmWe6r6MUOkCGTjp0Wwjz3VIB-38WJ"/>
+<img class="w-10 h-10 rounded-full border-2 border-surface-deep object-cover" data-alt="A close-up portrait of a male school principal with glasses, looking approachable and professional. The background is a bright, minimalist educational setting. High-key lighting, sharp focus, modern UI aesthetic with light, airy colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNkc3g8NrbvMKZZASwQW7o31y3S9vbu-T5LGzkqG1w6ZhIPtjYXnXCRWTbh3sDxEUkHaMeznakKprBGgLBY9nHjASRuG4xf5w_9rVkjlWKCr3mxkJuocNlcBFZM_kglBIxEyNQ8rjuOUL1J4loyxve6zTxt4L62PLGN7g-Pphi37TTCMIBsQYEaIE8rgq67AeJL04iLb0wr2WGRQ5WBJCHd_PHaGAwqBfgcdjTQ3QKJ7ntSTlKmtrtB2OyXEgy-iVYn2EetR1mE2_z"/>
+<div class="w-10 h-10 rounded-full border-2 border-surface-deep bg-primary flex items-center justify-center text-on-primary font-label-bold text-xs">
+                                    +5k
+                                </div>
+</div>
+<div class="font-label-bold text-label-bold text-primary-fixed uppercase tracking-wider">
+                                Trusted Globally
+                            </div>
+</div>
+<p class="font-body-md text-on-primary/90 relative z-10">
+                            "eSkooly transformed how we manage our district. The interface is incredibly intuitive, and the depth of the features is unmatched."
+                        </p>
+<div class="mt-4 flex items-center gap-2">
+<div class="flex text-[#FFB900]">
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<span class="font-body-md text-sm text-primary-fixed-dim">Join 125,000+ schools</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Minimal Animation Styles -->
+<style>
+        @keyframes fade-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</body></html>

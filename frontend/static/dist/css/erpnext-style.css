@@ -1,18 +1,47 @@
 /* ERPNext Style CSS for College ERP */
 
 :root {
-  --primary-color: #5e64ff;
-  --secondary-color: #8d99ae;
-  --success-color: #28a745;
-  --danger-color: #dc3545;
-  --warning-color: #ffc107;
-  --info-color: #17a2b8;
-  --light-color: #f8f9fc;
-  --dark-color: #262626;
-  --border-color: #d1d8dd;
-  --text-muted: #8d99ae;
+  --primary-color: #6366f1;
+  --secondary-color: #94a3b8;
+  --success-color: #10b981;
+  --danger-color: #ef4444;
+  --warning-color: #f59e0b;
+  --info-color: #06b6d4;
+  --light-color: #f8fafc;
+  --dark-color: #0f172a;
+  --border-color: #e2e8f0;
+  --text-muted: #64748b;
   --sidebar-width: 240px;
-  --navbar-height: 60px;
+  --navbar-height: 72px;
+
+  --bg-app: #f8fafc;
+  --bg-sidebar: #ffffff;
+  --bg-card: #ffffff;
+  --bg-navbar: #ffffff;
+  --border-element: #e2e8f0;
+  --text-main: #0f172a;
+  --text-title: #1e293b;
+  --glass-blur: blur(0px);
+  --glass-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+  --glass-border: #e2e8f0;
+}
+
+body.dark-mode {
+  --light-color: #0c0d12;
+  --dark-color: #f8fafc;
+  --border-color: rgba(255, 255, 255, 0.06);
+  --text-muted: #94a3b8;
+
+  --bg-app: #0c0d12;
+  --bg-sidebar: rgba(13, 14, 21, 0.7);
+  --bg-card: rgba(20, 22, 32, 0.65);
+  --bg-navbar: rgba(13, 14, 21, 0.75);
+  --border-element: rgba(255, 255, 255, 0.06);
+  --text-main: #e2e8f0;
+  --text-title: #f8fafc;
+  --glass-blur: blur(20px);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+  --glass-border: rgba(255, 255, 255, 0.08);
 }
 
 /* Reset and base styles */
@@ -21,12 +50,13 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-  background-color: var(--light-color);
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-app);
   margin: 0;
   padding: 0;
   line-height: 1.6;
-  color: var(--dark-color);
+  color: var(--text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Header/Navbar */
@@ -387,14 +417,16 @@ body {
 
 /* Cards */
 .erpnext-card {
-  background: #fff;
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
   margin-bottom: 24px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   position: relative;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
 
 .erpnext-card::before {
@@ -405,29 +437,29 @@ body {
   right: 0;
   height: 4px;
   background: linear-gradient(90deg, var(--primary-color), var(--info-color));
-  border-radius: 12px 12px 0 0;
+  border-radius: 16px 16px 0 0;
   z-index: 1;
 }
 
 .erpnext-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.15);
+  transform: translateY(-4px);
 }
 
 .card-header {
   padding: 24px;
   border-bottom: 1px solid var(--border-color);
-  background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
-  border-radius: 0; /* Remove border radius since it's not at the top anymore */
+  background: transparent;
+  border-radius: 0;
   position: relative;
-  margin-top: 4px; /* Push header down to account for the gradient border */
+  margin-top: 4px;
 }
 
 .card-title {
   font-size: 18px;
   font-weight: 600;
   margin: 0;
-  color: var(--dark-color);
+  color: var(--text-title);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -440,7 +472,8 @@ body {
 
 .card-body {
   padding: 24px;
-  background: #fff;
+  background: transparent;
+  color: var(--text-main);
 }
 
 /* Stats Cards */
@@ -1870,7 +1903,7 @@ a {
 }
 
 .tb-quick-search input,
-.eskooly-search input,
+.campuspro-search input,
 .form-control,
 .form-select,
 input[type="text"],
@@ -1888,7 +1921,7 @@ textarea {
 }
 
 .tb-quick-search input:focus,
-.eskooly-search input:focus,
+.campuspro-search input:focus,
 .form-control:focus,
 .form-select:focus,
 input:focus,
@@ -1905,7 +1938,7 @@ textarea:focus {
   box-shadow: 16px 0 35px rgba(22, 49, 55, 0.05);
 }
 
-.eskooly-menu-label,
+.campuspro-menu-label,
 .nav-section-title,
 .breadcrumb,
 .text-muted {
@@ -2458,4 +2491,42 @@ body.dark-mode .sk-table th {
   .sk-card {
     margin: 0.5rem 0 !important;
   }
+}
+
+/* Page Interaction and Exit Loading Flow overrides */
+.campus-ripple {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: scale(0);
+  animation: campus-ripple-effect 0.65s linear;
+  z-index: 100;
+}
+
+@keyframes campus-ripple-effect {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.page-loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3.5px;
+  background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 1.2s cubic-bezier(0.1, 0.8, 0.1, 1);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Ensure parents of ripples are relatively positioned and clip overflows */
+.btn, .nav-link, .quick-tile, .wb-btn, .action-link {
+  position: relative;
+  overflow: hidden;
 }

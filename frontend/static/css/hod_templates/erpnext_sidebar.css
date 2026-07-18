@@ -1,5 +1,5 @@
 
-    /* eSkooly Sidebar specific overrides */
+    /* CampusPro Sidebar specific overrides */
     .erpnext-sidebar {
         background-color: #ffffff;
         border-right: 1px solid #e0e6ed;
@@ -8,10 +8,10 @@
     .sidebar-header {
         display: none; /* Hide old profile header */
     }
-    .eskooly-sidebar-top {
+    .campuspro-sidebar-top {
         padding: 20px 24px 10px;
     }
-    .eskooly-menu-label {
+    .campuspro-menu-label {
         font-size: 11px;
         color: #8a98ac;
         text-transform: uppercase;
@@ -19,11 +19,11 @@
         margin-bottom: 8px;
         letter-spacing: 0.5px;
     }
-    .eskooly-search {
+    .campuspro-search {
         position: relative;
         margin-bottom: 15px;
     }
-    .eskooly-search input {
+    .campuspro-search input {
         width: 100%;
         border: none;
         background: transparent;
@@ -33,10 +33,10 @@
         color: #555;
         outline: none;
     }
-    .eskooly-search input::placeholder {
+    .campuspro-search input::placeholder {
         color: #a0a9b6;
     }
-    .eskooly-search i {
+    .campuspro-search i {
         position: absolute;
         left: 0;
         top: 8px;
@@ -105,7 +105,7 @@
         color: #4b6bfb;
     }
 
-    /* Submenu styling matching eSkooly */
+    /* Submenu styling matching CampusPro */
     .nav-submenu {
         background-color: #ffffff;
         position: relative;

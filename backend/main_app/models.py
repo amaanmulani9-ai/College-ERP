@@ -124,7 +124,7 @@ class Student(models.Model):
     division = models.CharField(max_length=50, blank=True, null=True, help_text="Batch or Division (e.g. Batch A)")
     id_card_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
 
-    # eSkooly student admission fields
+    # CampusPro student admission fields
     registration_no = models.CharField(max_length=50, blank=True, null=True)
     discount_in_fee = models.IntegerField(default=0, blank=True, null=True)
     mobile = models.CharField(max_length=20, blank=True, null=True)

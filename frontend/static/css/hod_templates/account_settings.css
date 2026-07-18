@@ -43,7 +43,7 @@
     .col-md-7 { flex: 0 0 58.333333%; max-width: 58.333333%; padding: 0 12.5px; }
     .col-md-5 { flex: 0 0 41.666667%; max-width: 41.666667%; padding: 0 12.5px; }
     
-    .eskooly-card {
+    .campuspro-card {
         background: #fff;
         border-radius: 8px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.02);
@@ -52,7 +52,7 @@
         border: 1px solid #e0e6ed;
     }
     
-    .eskooly-card-title {
+    .campuspro-card-title {
         font-size: 16px;
         color: #1b2559;
         font-weight: 600;
@@ -61,7 +61,7 @@
         align-items: center;
         gap: 10px;
     }
-    .eskooly-card-title i { color: #4b6bfb; }
+    .campuspro-card-title i { color: #4b6bfb; }
 
     .form-group { margin-bottom: 20px; }
     .form-group label {
