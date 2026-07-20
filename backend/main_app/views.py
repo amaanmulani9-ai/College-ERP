@@ -695,6 +695,8 @@ def free_digital_library(request):
         }
     ]
 
+    real_api_total = 74281
+
     # Live Gutendex Project Gutenberg Free API Call
     if search_query or category_filter == 'Story Books & Literature':
         try:
@@ -702,6 +704,8 @@ def free_digital_library(request):
             res = requests.get(api_url, timeout=3)
             if res.status_code == 200:
                 data = res.json()
+                if data.get('count'):
+                    real_api_total = data.get('count')
                 api_results = data.get('results', [])[:6]
                 for idx, b in enumerate(api_results):
                     authors = ", ".join([a.get('name', '') for a in b.get('authors', [])]) or 'Project Gutenberg Archive'
@@ -744,13 +748,19 @@ def free_digital_library(request):
         'Arts, Humanities & UPSC'
     ]
 
+    if search_query or (category_filter and category_filter != 'All'):
+        total_books_display = f"{len(all_books)} Available"
+    else:
+        total_books_display = f"{real_api_total:,} Free Books"
+
     context = {
         'page_title': 'Indian Educational Digital Library & Open Course Notes',
         'books': all_books,
         'categories': categories,
         'selected_category': category_filter,
         'search_query': search_query,
-        'total_books_count': '70,000+',
+        'total_books_count': total_books_display,
+        'exact_live_number': f"{real_api_total:,}",
     }
     return render(request, 'main_app/free_digital_library.html', context)
 
