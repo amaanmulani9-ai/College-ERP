@@ -606,24 +606,59 @@
                 <span class="nav-text">Online Registrations</span>
             </a>
         </div>
-        <div class="nav-item">
-            <a href="{% url 'staff_lms_home' %}" class="nav-link {% if 'lms' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-book-open"></i>
-                <span class="nav-text">LMS / Chapters</span>
+
+        <!-- Academics Submenu -->
+        <div class="nav-item has-submenu {% if 'lms' in request.path or 'generate-paper' in request.path or 'exams' in request.path or 'timetable' in request.path or 'live_class' in request.path %}open{% endif %}">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-graduation-cap"></i>
+                <span class="nav-text">Academics</span>
+                <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="{% url 'staff_lms_home' %}" class="nav-link {% if 'lms' in request.path %}active{% endif %}">LMS / Chapters</a>
+                <a href="{% url 'staff_generate_paper' %}" class="nav-link {% if 'generate-paper' in request.path %}active{% endif %}">Question Paper</a>
+                <a href="{% url 'staff_manage_exams' %}" class="nav-link {% if 'exams' in request.path %}active{% endif %}">Online Exams</a>
+                <a href="{% url 'staff_view_timetable' %}" class="nav-link {% if 'timetable' in request.path %}active{% endif %}">Timetable</a>
+                <a href="{% url 'staff_live_classes' %}" class="nav-link {% if 'live_class' in request.path %}active{% endif %}">Virtual Classrooms</a>
+            </div>
         </div>
-        <div class="nav-item">
-            <a href="{% url 'staff_generate_paper' %}" class="nav-link {% if 'generate-paper' in request.path %}active{% endif %}">
-                <i class="nav-icon far fa-file-alt"></i>
-                <span class="nav-text">Question Paper</span>
+
+        <!-- Library Desk Submenu -->
+        <div class="nav-item has-submenu {% if 'addbook' in request.path or 'issue_book' in request.path or 'view_issued_book' in request.path %}open{% endif %}">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-book"></i>
+                <span class="nav-text">Library Desk</span>
+                <i class="nav-arrow"></i>
             </a>
+            <div class="nav-submenu">
+                <a href="{% url 'add_book' %}" class="nav-link {% if 'addbook' in request.path %}active{% endif %}">Add New Book</a>
+                <a href="{% url 'issue_book' %}" class="nav-link {% if 'issue_book' in request.path %}active{% endif %}">Issue a Book</a>
+                <a href="{% url 'view_issued_book' %}" class="nav-link {% if 'view_issued_book' in request.path %}active{% endif %}">Issued Books List</a>
+            </div>
         </div>
+
         <div class="nav-item">
             <a href="{% url 'discussion_board' %}" class="nav-link {% if 'discussion' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-comments"></i>
                 <span class="nav-text">Discussion Board</span>
             </a>
         </div>
+
+        <!-- Personal Desk Submenu -->
+        <div class="nav-item has-submenu {% if 'leave' in request.path or 'feedback' in request.path or 'profile' in request.path or 'events' in request.path %}open{% endif %}">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fas fa-user-cog"></i>
+                <span class="nav-text">Personal Desk</span>
+                <i class="nav-arrow"></i>
+            </a>
+            <div class="nav-submenu">
+                <a href="{% url 'staff_apply_leave' %}" class="nav-link {% if 'leave' in request.path %}active{% endif %}">Apply for Leave</a>
+                <a href="{% url 'staff_feedback' %}" class="nav-link {% if 'feedback' in request.path %}active{% endif %}">Submit Feedback</a>
+                <a href="{% url 'staff_view_profile' %}" class="nav-link {% if 'profile' in request.path %}active{% endif %}">Account Profile</a>
+                <a href="{% url 'staff_events_calendar' %}" class="nav-link {% if 'events' in request.path %}active{% endif %}">Events Calendar</a>
+            </div>
+        </div>
+
         <div class="nav-item">
             <a href="{% url 'free_digital_library' %}" class="nav-link {% if 'library/free-books' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-book-reader"></i>
@@ -749,6 +784,24 @@
             <a href="{% url 'student_view_attendance' %}" class="nav-link {% if 'attendance' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-calendar-check"></i>
                 <span class="nav-text">View Attendance</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_apply_leave' %}" class="nav-link {% if 'leave' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-envelope-open-text"></i>
+                <span class="nav-text">Apply for Leave</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_feedback' %}" class="nav-link {% if 'feedback' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-comment-dots"></i>
+                <span class="nav-text">Submit Feedback</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_events_calendar' %}" class="nav-link {% if 'events' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-calendar-alt"></i>
+                <span class="nav-text">Events Calendar</span>
             </a>
         </div>
         <div class="nav-item">
