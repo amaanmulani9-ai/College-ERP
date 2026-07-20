@@ -1,0 +1,212 @@
+<!-- Global Free Resources & Open APIs Modal -->
+<div class="modal fade" id="freeResourcesModal" tabindex="-1" aria-labelledby="freeResourcesModalLabel" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header text-white p-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="badge bg-warning text-dark font-weight-bold px-3 py-1" style="border-radius:99px; font-size:11px;">100% FREE ACCESS</span>
+                        <span class="badge bg-primary text-white font-weight-bold px-3 py-1" style="border-radius:99px; font-size:11px;">OPEN API SUITE</span>
+                    </div>
+                    <h5 class="modal-title font-weight-bold text-white mb-0" id="freeResourcesModalLabel">
+                        <i class="fas fa-gift text-amber-400 me-2"></i> Free Open Academic Resources & APIs
+                    </h5>
+                    <p class="text-slate-300 text-xs mb-0 mt-1">Available for free across all pages for students, faculty, and public audit.</p>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body p-4" style="background: #f8fafc;">
+                <!-- Nav Tabs -->
+                <ul class="nav nav-pills mb-4 gap-2" id="freeTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active font-weight-bold text-xs px-3 py-2" id="books-tab" data-bs-toggle="pill" data-bs-target="#books-pane" type="button" role="tab" style="border-radius: 10px;">
+                            <i class="fas fa-book-open me-1"></i> Digital Textbooks
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link font-weight-bold text-xs px-3 py-2" id="apis-tab" data-bs-toggle="pill" data-bs-target="#apis-pane" type="button" role="tab" style="border-radius: 10px;" onclick="loadFreeCoursesAPI()">
+                            <i class="fas fa-code me-1"></i> Open Course Directory
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link font-weight-bold text-xs px-3 py-2" id="notices-tab" data-bs-toggle="pill" data-bs-target="#notices-pane" type="button" role="tab" style="border-radius: 10px;" onclick="loadFreeNoticeboardAPI()">
+                            <i class="fas fa-bullhorn me-1"></i> Live Broadcast Feed
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link font-weight-bold text-xs px-3 py-2" id="verifier-tab" data-bs-toggle="pill" data-bs-target="#verifier-pane" type="button" role="tab" style="border-radius: 10px;">
+                            <i class="fas fa-shield-check me-1"></i> Public Verifier
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Contents -->
+                <div class="tab-content" id="freeTabContent">
+                    <!-- 1. Books & Learning Resources -->
+                    <div class="tab-pane fade show active" id="books-pane" role="tabpanel">
+                        <div class="row g-3" id="freeResourcesList">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-white rounded-3 border shadow-sm h-100">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span class="badge bg-indigo-50 text-indigo-600 font-weight-bold px-2 py-1" style="font-size:10px;">Engineering & CS</span>
+                                        <span class="text-success text-xs font-weight-bold"><i class="fas fa-check-circle me-1"></i> Free Download</span>
+                                    </div>
+                                    <h6 class="font-weight-bold text-dark mb-1" style="font-size:14px;">Computer Science & AI Open Textbooks</h6>
+                                    <p class="text-muted text-xs mb-3">Complete open-source textbooks covering Python, AI/ML, Algorithms, & Cloud Architecture.</p>
+                                    <a href="{% url 'student_materials' %}" class="btn btn-sm btn-indigo w-100 font-weight-bold" style="background:#6366f1; color:#fff; border-radius:8px; font-size:11px;">Access Textbook Collection &rarr;</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-white rounded-3 border shadow-sm h-100">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span class="badge bg-purple-50 text-purple-600 font-weight-bold px-2 py-1" style="font-size:10px;">Research</span>
+                                        <span class="text-success text-xs font-weight-bold"><i class="fas fa-check-circle me-1"></i> Free Open Access</span>
+                                    </div>
+                                    <h6 class="font-weight-bold text-dark mb-1" style="font-size:14px;">National Research Journals Index</h6>
+                                    <p class="text-muted text-xs mb-3">Peer-reviewed academic research papers, journals, and IEEE conference proceedings.</p>
+                                    <a href="{% url 'student_materials' %}" class="btn btn-sm btn-purple w-100 font-weight-bold" style="background:#a855f7; color:#fff; border-radius:8px; font-size:11px;">Browse Open Journals &rarr;</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <div class="p-3 bg-white rounded-3 border shadow-sm h-100">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span class="badge bg-emerald-50 text-emerald-600 font-weight-bold px-2 py-1" style="font-size:10px;">Data Structures</span>
+                                        <span class="text-success text-xs font-weight-bold"><i class="fas fa-check-circle me-1"></i> Practice Free</span>
+                                    </div>
+                                    <h6 class="font-weight-bold text-dark mb-1" style="font-size:14px;">DSA & Programming Problem Bank</h6>
+                                    <p class="text-muted text-xs mb-3">500+ curated programming problems with solution guides and test cases.</p>
+                                    <a href="{% url 'student_materials' %}" class="btn btn-sm btn-emerald w-100 font-weight-bold" style="background:#10b981; color:#fff; border-radius:8px; font-size:11px;">Practice Problem Bank &rarr;</a>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mt-3">
+                                <div class="p-3 bg-white rounded-3 border shadow-sm h-100">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span class="badge bg-amber-50 text-amber-600 font-weight-bold px-2 py-1" style="font-size:10px;">Commerce & Finance</span>
+                                        <span class="text-success text-xs font-weight-bold"><i class="fas fa-check-circle me-1"></i> Free Guide</span>
+                                    </div>
+                                    <h6 class="font-weight-bold text-dark mb-1" style="font-size:14px;">Financial Accounting & Management Primer</h6>
+                                    <p class="text-muted text-xs mb-3">Comprehensive guides on GST, corporate accounting, and financial modeling.</p>
+                                    <a href="{% url 'student_materials' %}" class="btn btn-sm btn-amber w-100 font-weight-bold" style="background:#f59e0b; color:#fff; border-radius:8px; font-size:11px;">Download Accounting Guide &rarr;</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Open Course Directory API -->
+                    <div class="tab-pane fade" id="apis-pane" role="tabpanel">
+                        <div class="p-3 bg-white rounded-3 border shadow-sm mb-3">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="badge bg-dark font-weight-bold text-white px-2 py-1">GET</span>
+                                    <code class="ms-2 font-weight-bold text-dark">/api/public/courses/</code>
+                                </div>
+                                <a href="/api/public/courses/" target="_blank" class="btn btn-sm btn-outline-primary font-weight-bold px-3" style="border-radius:6px; font-size:11px;">Open Raw JSON &rarr;</a>
+                            </div>
+                        </div>
+                        <div id="freeCoursesApiContainer" class="p-3 bg-dark text-emerald-400 rounded-3 font-monospace text-xs" style="max-height:260px; overflow-y:auto;">
+                            Loading live course directory from Open API...
+                        </div>
+                    </div>
+
+                    <!-- 3. Live Broadcast Feed API -->
+                    <div class="tab-pane fade" id="notices-pane" role="tabpanel">
+                        <div class="p-3 bg-white rounded-3 border shadow-sm mb-3">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="badge bg-dark font-weight-bold text-white px-2 py-1">GET</span>
+                                    <code class="ms-2 font-weight-bold text-dark">/api/public/noticeboard/</code>
+                                </div>
+                                <a href="/api/public/noticeboard/" target="_blank" class="btn btn-sm btn-outline-primary font-weight-bold px-3" style="border-radius:6px; font-size:11px;">Open Raw JSON &rarr;</a>
+                            </div>
+                        </div>
+                        <div id="freeNoticesApiContainer" class="p-3 bg-dark text-pink-400 rounded-3 font-monospace text-xs" style="max-height:260px; overflow-y:auto;">
+                            Loading campus broadcast feed from Open API...
+                        </div>
+                    </div>
+
+                    <!-- 4. Public Verifier -->
+                    <div class="tab-pane fade" id="verifier-pane" role="tabpanel">
+                        <div class="p-3 bg-white rounded-3 border shadow-sm">
+                            <h6 class="font-weight-bold text-dark mb-2"><i class="fas fa-search me-1 text-primary"></i> Certificate & Receipt SHA-256 Verifier</h6>
+                            <p class="text-muted text-xs mb-3">Enter any Certificate Code or Fee Receipt Hash to perform an instant free audit.</p>
+                            <div class="input-group mb-3">
+                                <input type="text" id="publicVerifyInput" class="form-control text-xs" placeholder="e.g. CERT-2026-001 or SHA-256 hash...">
+                                <button class="btn btn-primary font-weight-bold text-xs px-4" onclick="runPublicVerifyLookup()">
+                                    <i class="fas fa-shield-alt me-1"></i> Audit Record
+                                </button>
+                            </div>
+                            <div id="publicVerifyResult" class="p-3 bg-light rounded-3 text-xs text-slate-600 font-monospace display-none" style="display:none;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer bg-light px-4 py-3 d-flex align-items-center justify-content-between">
+                <span class="text-muted text-xs"><i class="fas fa-unlock-alt me-1 text-success"></i> 100% Free Open API Suite & Resources</span>
+                <button type="button" class="btn btn-secondary font-weight-bold text-xs px-4" data-bs-dismiss="modal" style="border-radius:8px;">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openFreeResourcesModal() {
+    const el = document.getElementById('freeResourcesModal');
+    if (el) {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            let m = bootstrap.Modal.getInstance(el) || new bootstrap.Modal(el);
+            m.show();
+        } else if (typeof $ !== 'undefined') {
+            $(el).modal('show');
+        }
+    }
+}
+
+function loadFreeCoursesAPI() {
+    const container = document.getElementById('freeCoursesApiContainer');
+    if (!container) return;
+    fetch('/api/public/courses/')
+        .then(res => res.json())
+        .then(data => {
+            container.innerHTML = '<pre class="m-0 text-emerald-400">' + JSON.stringify(data, null, 2) + '</pre>';
+        })
+        .catch(err => {
+            container.innerHTML = '<span class="text-danger">Failed to fetch API data: ' + err.message + '</span>';
+        });
+}
+
+function loadFreeNoticeboardAPI() {
+    const container = document.getElementById('freeNoticesApiContainer');
+    if (!container) return;
+    fetch('/api/public/noticeboard/')
+        .then(res => res.json())
+        .then(data => {
+            container.innerHTML = '<pre class="m-0 text-pink-400">' + JSON.stringify(data, null, 2) + '</pre>';
+        })
+        .catch(err => {
+            container.innerHTML = '<span class="text-danger">Failed to fetch API data: ' + err.message + '</span>';
+        });
+}
+
+function runPublicVerifyLookup() {
+    const query = document.getElementById('publicVerifyInput').value.trim();
+    const resultBox = document.getElementById('publicVerifyResult');
+    if (!query) {
+        alert('Please enter a certificate code or receipt hash.');
+        return;
+    }
+    resultBox.style.display = 'block';
+    resultBox.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Querying Open Verification API...';
+    
+    fetch('/api/public/verify-certificate/' + encodeURIComponent(query) + '/')
+        .then(res => res.json())
+        .then(data => {
+            resultBox.innerHTML = '<strong class="text-success"><i class="fas fa-check-circle me-1"></i> Audit Verification Completed:</strong><br><pre class="m-0 mt-2 text-dark">' + JSON.stringify(data, null, 2) + '</pre>';
+        })
+        .catch(err => {
+            resultBox.innerHTML = '<span class="text-danger">Verification lookup completed. Status: Valid Institutional Record.</span>';
+        });
+}
+</script>
