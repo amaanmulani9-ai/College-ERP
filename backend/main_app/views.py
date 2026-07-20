@@ -487,256 +487,259 @@ An advanced, glassmorphic multitenant ERP solution built on modern Python and Dj
 
 
 def free_digital_library(request):
-    """Free Digital Library & Open Study Notes Reader for Indian Curriculum & Global Courses."""
+    """Free Digital Library with Google Books, Gutendex & Open Library APIs."""
     category_filter = request.GET.get('category', 'All')
     search_query = request.GET.get('q', '').strip().lower()
+    page = int(request.GET.get('page', 1))
 
-    all_books = [
-        # B.Tech / BCA / Computer Science
-        {
-            'id': 1,
-            'title': 'Data Structures & Algorithms (B.Tech / BCA / GATE)',
-            'author': 'NPTEL & AICTE Open Curriculum',
-            'category': 'Computer Science (B.Tech/BCA)',
-            'pages': '410 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://nptel.ac.in/courses/106102064',
-            'download_url': 'https://nptel.ac.in/courses/106102064',
-            'description': 'Complete syllabus covering Arrays, Stacks, Queues, Trees, Graphs, Sorting algorithms, and GATE CSE problem solving.',
-            'badge': 'AICTE / NPTEL',
-            'color': 'linear-gradient(135deg, #0f5f6c, #14b8a6)'
+    # ── Category → API Routing Map ──────────────────────────────────
+    CATEGORY_API_MAP = {
+        'Computer Science (B.Tech/BCA)': {
+            'api': 'google', 'query': 'subject:computers+OR+subject:programming+OR+subject:data+structures',
+            'color': 'linear-gradient(135deg, #0f5f6c, #14b8a6)', 'badge': 'GOOGLE BOOKS',
         },
-        {
-            'id': 2,
-            'title': 'Python Programming & Data Science Notes',
-            'author': 'OpenStax & NPTEL IIT Madras',
-            'category': 'Computer Science (B.Tech/BCA)',
-            'pages': '340 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://openstax.org/details/books/introduction-python-programming',
-            'download_url': 'https://open.umn.edu/opentextbooks/textbooks/python-for-everybody-exploring-data-in-python-3',
-            'description': 'Comprehensive textbook covering Python fundamentals, NumPy, Pandas, OOPs concepts, and data visualization.',
-            'badge': 'FREE TEXTBOOK',
-            'color': 'linear-gradient(135deg, #10b981, #059669)'
+        'Commerce (B.Com/BBA/MBA)': {
+            'api': 'google', 'query': 'subject:business+OR+subject:economics+OR+subject:accounting',
+            'color': 'linear-gradient(135deg, #f59e0b, #d97706)', 'badge': 'GOOGLE BOOKS',
         },
-        {
-            'id': 3,
-            'title': 'Database Management Systems & SQL (DBMS)',
-            'author': 'e-GyanKosh IGNOU & Stanford Notes',
-            'category': 'Computer Science (B.Tech/BCA)',
-            'pages': '285 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://egyankosh.ac.in/',
-            'download_url': 'https://open.umn.edu/opentextbooks/textbooks/relational-databases-and-microsoft-access-365-2021-edition',
-            'description': 'Relational model, ER Diagrams, SQL queries, Normalization (1NF to BCNF), and Transaction concurrency control.',
-            'badge': 'IGNOU / UGC',
-            'color': 'linear-gradient(135deg, #3b82f6, #06b6d4)'
+        'Mathematics & Physics (B.Sc)': {
+            'api': 'google', 'query': 'subject:mathematics+OR+subject:physics+OR+subject:calculus',
+            'color': 'linear-gradient(135deg, #6366f1, #a855f7)', 'badge': 'GOOGLE BOOKS',
         },
-        # Commerce & Management (B.Com / BBA / MBA)
-        {
-            'id': 4,
-            'title': 'Financial Accounting & Corporate Law (B.Com / BBA)',
-            'author': 'ICAI & e-GyanKosh Portal',
-            'category': 'Commerce (B.Com/BBA/MBA)',
-            'pages': '380 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://egyankosh.ac.in/',
-            'download_url': 'https://openstax.org/details/books/principles-financial-accounting',
-            'description': 'Journal entries, Ledger posting, Trial Balance, Depreciation, Balance Sheets, and Indian Companies Act fundamentals.',
-            'badge': 'ICAI / IGNOU',
-            'color': 'linear-gradient(135deg, #0284c7, #0369a1)'
+        'Core Engineering (EE/ECE/ME/CE)': {
+            'api': 'google', 'query': 'subject:engineering+OR+subject:electrical+OR+subject:mechanical',
+            'color': 'linear-gradient(135deg, #8b5cf6, #ec4899)', 'badge': 'GOOGLE BOOKS',
         },
-        {
-            'id': 5,
-            'title': 'Principles of Micro & Macro Economics (B.Com / BA)',
-            'author': 'OpenStax & UGC e-Pathshala',
-            'category': 'Commerce (B.Com/BBA/MBA)',
-            'pages': '420 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://epathshala.nic.in/',
-            'download_url': 'https://openstax.org/details/books/principles-microeconomics-3e',
-            'description': 'Demand & Supply analysis, Indian Economic System, Inflation, Monetary policy, RBI functions, and Fiscal budgets.',
-            'badge': 'UGC PATHSHALA',
-            'color': 'linear-gradient(135deg, #f59e0b, #d97706)'
+        'Story Books & Literature': {
+            'api': 'gutendex', 'query': 'topic=literature',
+            'color': 'linear-gradient(135deg, #1e293b, #475569)', 'badge': 'PROJECT GUTENBERG',
         },
-        # Mathematics & Basic Sciences (B.Sc / M.Sc)
-        {
-            'id': 6,
-            'title': 'Engineering Mathematics & Calculus (Sem 1 & 2)',
-            'author': 'IIT Kharagpur NPTEL Courseware',
-            'category': 'Mathematics & Physics (B.Sc)',
-            'pages': '512 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://nptel.ac.in/courses/111105121',
-            'download_url': 'https://openstax.org/details/books/calculus-volume-1',
-            'description': 'Differential calculus, Matrices, Eigen values, Vector integration, Differential equations, and Fourier series.',
-            'badge': 'IIT NPTEL',
-            'color': 'linear-gradient(135deg, #6366f1, #a855f7)'
+        'Arts, Humanities & UPSC': {
+            'api': 'openlibrary', 'query': 'history',
+            'color': 'linear-gradient(135deg, #4f46e5, #4338ca)', 'badge': 'OPEN LIBRARY',
         },
-        {
-            'id': 7,
-            'title': 'University Physics: Mechanics & Electromagnetism',
-            'author': 'NCERT & OpenStax Physics Team',
-            'category': 'Mathematics & Physics (B.Sc)',
-            'pages': '610 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://epathshala.nic.in/',
-            'download_url': 'https://openstax.org/details/books/university-physics-volume-1',
-            'description': 'Newtonian mechanics, Quantum wave optics, Electrostatics, Magnetism, and Semiconductor Electronics.',
-            'badge': 'NCERT / OPENSTAX',
-            'color': 'linear-gradient(135deg, #ef4444, #dc2626)'
-        },
-        # Core Engineering (Mechanical, Electrical, Civil)
-        {
-            'id': 8,
-            'title': 'Basic Electrical & Electronics Engineering (B.E/B.Tech)',
-            'author': 'AICTE Model Curriculum Notes',
-            'category': 'Core Engineering (EE/ECE/ME/CE)',
-            'pages': '390 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://nptel.ac.in/courses/108108076',
-            'download_url': 'https://nptel.ac.in/courses/108108076',
-            'description': 'DC/AC Circuits, Transformers, Induction Motors, Logic Gates, Op-Amps, and Microprocessor 8085 architecture.',
-            'badge': 'AICTE MODEL',
-            'color': 'linear-gradient(135deg, #8b5cf6, #ec4899)'
-        },
-        {
-            'id': 9,
-            'title': 'Thermodynamics & Fluid Mechanics Notes',
-            'author': 'IIT Madras Mechanical Wing',
-            'category': 'Core Engineering (EE/ECE/ME/CE)',
-            'pages': '440 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://nptel.ac.in/courses/112105123',
-            'download_url': 'https://nptel.ac.in/courses/112105123',
-            'description': 'Laws of Thermodynamics, Carnot Engine, Fluid Dynamics, Bernoulli equation, and Heat Transfer principles.',
-            'badge': 'IIT MECHANICAL',
-            'color': 'linear-gradient(135deg, #d97706, #b45309)'
-        },
-        # Humanities, UPSC & General Studies
-        {
-            'id': 10,
-            'title': 'Indian Constitution, Polity & World History (B.A / UPSC)',
-            'author': 'NCERT & e-GyanKosh Open Archive',
-            'category': 'Arts, Humanities & UPSC',
-            'pages': '520 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://epathshala.nic.in/',
-            'download_url': 'https://egyankosh.ac.in/',
-            'description': 'Preamble, Fundamental Rights, Parliamentary Structure, Indian Freedom Struggle, and Administrative Governance.',
-            'badge': 'NCERT / UPSC',
-            'color': 'linear-gradient(135deg, #4f46e5, #4338ca)'
-        },
-        # Story Books & Classic Literature
-        {
-            'id': 11,
-            'title': 'The Adventures of Sherlock Holmes',
-            'author': 'Arthur Conan Doyle',
-            'category': 'Story Books & Literature',
-            'pages': '307 Pages',
-            'format': 'EPUB / HTML',
-            'read_url': 'https://www.gutenberg.org/files/1661/1661-h/1661-h.htm',
-            'download_url': 'https://www.gutenberg.org/ebooks/1661.epub3.images',
-            'description': 'A collection of twelve detective stories featuring the famous consulting detective Sherlock Holmes and Dr. John Watson.',
-            'badge': 'CLASSIC FICTION',
-            'color': 'linear-gradient(135deg, #1e293b, #475569)'
-        },
-        {
-            'id': 12,
-            'title': 'Panchatantra Ancient Fables & Moral Stories',
-            'author': 'Vishnu Sharma (Traditional Archive)',
-            'category': 'Story Books & Literature',
-            'pages': '220 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://www.gutenberg.org/ebooks/4705',
-            'download_url': 'https://www.gutenberg.org/ebooks/4705.epub.noimages',
-            'description': 'Timeless Indian fables of animal wisdom, ethics, leadership, friendship, and moral principles.',
-            'badge': 'INDIAN CLASSIC',
-            'color': 'linear-gradient(135deg, #ea580c, #c2410c)'
-        },
-        {
-            'id': 13,
-            'title': 'Alice\'s Adventures in Wonderland',
-            'author': 'Lewis Carroll',
-            'category': 'Story Books & Literature',
-            'pages': '180 Pages',
-            'format': 'EPUB / HTML',
-            'read_url': 'https://www.gutenberg.org/files/11/11-h/11-h.htm',
-            'download_url': 'https://www.gutenberg.org/ebooks/11.epub3.images',
-            'description': 'Classic fantasy story following Alice falling down a rabbit hole into a whimsical world of anthropomorphic creatures.',
-            'badge': 'WORLD CLASSIC',
-            'color': 'linear-gradient(135deg, #ec4899, #be185d)'
-        },
-        {
-            'id': 14,
-            'title': 'Pride and Prejudice',
-            'author': 'Jane Austen',
-            'category': 'Story Books & Literature',
-            'pages': '432 Pages',
-            'format': 'EPUB / HTML',
-            'read_url': 'https://www.gutenberg.org/files/1342/1342-h/1342-h.htm',
-            'download_url': 'https://www.gutenberg.org/ebooks/1342.epub3.images',
-            'description': 'Renowned romantic novel dealing with issues of manners, upbringing, morality, education, and marriage in regency England.',
-            'badge': 'ROMANCE NOVEL',
-            'color': 'linear-gradient(135deg, #e11d48, #9f1239)'
-        },
-        {
-            'id': 15,
-            'title': 'Treasure Island',
-            'author': 'Robert Louis Stevenson',
-            'category': 'Story Books & Literature',
-            'pages': '292 Pages',
-            'format': 'EPUB / HTML',
-            'read_url': 'https://www.gutenberg.org/files/120/120-h/120-h.htm',
-            'download_url': 'https://www.gutenberg.org/ebooks/120.epub3.images',
-            'description': 'High-seas adventure tale of buccaneers, buried gold, tropical islands, and pirate Long John Silver.',
-            'badge': 'ADVENTURE',
-            'color': 'linear-gradient(135deg, #0d9488, #0f766e)'
-        }
+    }
+
+    # ── Curated Fallback Books ──────────────────────────────────────
+    curated_books = [
+        {'id': 1, 'title': 'Data Structures & Algorithms (B.Tech / BCA / GATE)',
+         'author': 'NPTEL & AICTE Open Curriculum', 'category': 'Computer Science (B.Tech/BCA)',
+         'pages': '410 Pages', 'format': 'PDF / Reader', 'read_url': 'https://nptel.ac.in/courses/106102064',
+         'download_url': 'https://nptel.ac.in/courses/106102064',
+         'description': 'Arrays, Stacks, Queues, Trees, Graphs, Sorting algorithms, GATE CSE.',
+         'badge': 'AICTE / NPTEL', 'color': 'linear-gradient(135deg, #0f5f6c, #14b8a6)', 'cover': ''},
+        {'id': 2, 'title': 'Python Programming & Data Science Notes',
+         'author': 'OpenStax & NPTEL IIT Madras', 'category': 'Computer Science (B.Tech/BCA)',
+         'pages': '340 Pages', 'format': 'PDF / Reader',
+         'read_url': 'https://openstax.org/details/books/introduction-python-programming',
+         'download_url': 'https://open.umn.edu/opentextbooks/textbooks/python-for-everybody-exploring-data-in-python-3',
+         'description': 'Python fundamentals, NumPy, Pandas, OOPs, data visualization.',
+         'badge': 'FREE TEXTBOOK', 'color': 'linear-gradient(135deg, #10b981, #059669)', 'cover': ''},
+        {'id': 3, 'title': 'Database Management Systems & SQL (DBMS)',
+         'author': 'e-GyanKosh IGNOU & Stanford Notes', 'category': 'Computer Science (B.Tech/BCA)',
+         'pages': '285 Pages', 'format': 'PDF / Reader', 'read_url': 'https://egyankosh.ac.in/',
+         'download_url': 'https://open.umn.edu/opentextbooks/textbooks/relational-databases-and-microsoft-access-365-2021-edition',
+         'description': 'Relational model, ER Diagrams, SQL queries, Normalization (1NF to BCNF).',
+         'badge': 'IGNOU / UGC', 'color': 'linear-gradient(135deg, #3b82f6, #06b6d4)', 'cover': ''},
+        {'id': 4, 'title': 'Financial Accounting & Corporate Law (B.Com / BBA)',
+         'author': 'ICAI & e-GyanKosh Portal', 'category': 'Commerce (B.Com/BBA/MBA)',
+         'pages': '380 Pages', 'format': 'PDF / Reader', 'read_url': 'https://egyankosh.ac.in/',
+         'download_url': 'https://openstax.org/details/books/principles-financial-accounting',
+         'description': 'Journal entries, Ledger posting, Trial Balance, Depreciation, Balance Sheets.',
+         'badge': 'ICAI / IGNOU', 'color': 'linear-gradient(135deg, #0284c7, #0369a1)', 'cover': ''},
+        {'id': 5, 'title': 'Principles of Micro & Macro Economics (B.Com / BA)',
+         'author': 'OpenStax & UGC e-Pathshala', 'category': 'Commerce (B.Com/BBA/MBA)',
+         'pages': '420 Pages', 'format': 'PDF / Reader', 'read_url': 'https://epathshala.nic.in/',
+         'download_url': 'https://openstax.org/details/books/principles-microeconomics-3e',
+         'description': 'Demand & Supply, Indian Economic System, Inflation, RBI functions.',
+         'badge': 'UGC PATHSHALA', 'color': 'linear-gradient(135deg, #f59e0b, #d97706)', 'cover': ''},
+        {'id': 6, 'title': 'Engineering Mathematics & Calculus (Sem 1 & 2)',
+         'author': 'IIT Kharagpur NPTEL Courseware', 'category': 'Mathematics & Physics (B.Sc)',
+         'pages': '512 Pages', 'format': 'PDF / Reader', 'read_url': 'https://nptel.ac.in/courses/111105121',
+         'download_url': 'https://openstax.org/details/books/calculus-volume-1',
+         'description': 'Differential calculus, Matrices, Eigen values, Fourier series.',
+         'badge': 'IIT NPTEL', 'color': 'linear-gradient(135deg, #6366f1, #a855f7)', 'cover': ''},
+        {'id': 7, 'title': 'University Physics: Mechanics & Electromagnetism',
+         'author': 'NCERT & OpenStax Physics Team', 'category': 'Mathematics & Physics (B.Sc)',
+         'pages': '610 Pages', 'format': 'PDF / Reader', 'read_url': 'https://epathshala.nic.in/',
+         'download_url': 'https://openstax.org/details/books/university-physics-volume-1',
+         'description': 'Newtonian mechanics, Quantum wave optics, Electrostatics.',
+         'badge': 'NCERT / OPENSTAX', 'color': 'linear-gradient(135deg, #ef4444, #dc2626)', 'cover': ''},
+        {'id': 8, 'title': 'Basic Electrical & Electronics Engineering (B.E/B.Tech)',
+         'author': 'AICTE Model Curriculum Notes', 'category': 'Core Engineering (EE/ECE/ME/CE)',
+         'pages': '390 Pages', 'format': 'PDF / Reader', 'read_url': 'https://nptel.ac.in/courses/108108076',
+         'download_url': 'https://nptel.ac.in/courses/108108076',
+         'description': 'DC/AC Circuits, Transformers, Induction Motors, Logic Gates, Op-Amps.',
+         'badge': 'AICTE MODEL', 'color': 'linear-gradient(135deg, #8b5cf6, #ec4899)', 'cover': ''},
+        {'id': 9, 'title': 'Thermodynamics & Fluid Mechanics Notes',
+         'author': 'IIT Madras Mechanical Wing', 'category': 'Core Engineering (EE/ECE/ME/CE)',
+         'pages': '440 Pages', 'format': 'PDF / Reader', 'read_url': 'https://nptel.ac.in/courses/112105123',
+         'download_url': 'https://nptel.ac.in/courses/112105123',
+         'description': 'Laws of Thermodynamics, Carnot Engine, Fluid Dynamics, Bernoulli.',
+         'badge': 'IIT MECHANICAL', 'color': 'linear-gradient(135deg, #d97706, #b45309)', 'cover': ''},
+        {'id': 10, 'title': 'Indian Constitution, Polity & World History (B.A / UPSC)',
+         'author': 'NCERT & e-GyanKosh Open Archive', 'category': 'Arts, Humanities & UPSC',
+         'pages': '520 Pages', 'format': 'PDF / Reader', 'read_url': 'https://epathshala.nic.in/',
+         'download_url': 'https://egyankosh.ac.in/',
+         'description': 'Preamble, Fundamental Rights, Parliamentary Structure, Freedom Struggle.',
+         'badge': 'NCERT / UPSC', 'color': 'linear-gradient(135deg, #4f46e5, #4338ca)', 'cover': ''},
+        {'id': 11, 'title': 'The Adventures of Sherlock Holmes',
+         'author': 'Arthur Conan Doyle', 'category': 'Story Books & Literature',
+         'pages': '307 Pages', 'format': 'EPUB / HTML',
+         'read_url': 'https://www.gutenberg.org/files/1661/1661-h/1661-h.htm',
+         'download_url': 'https://www.gutenberg.org/ebooks/1661.epub3.images',
+         'description': 'Twelve detective stories featuring Sherlock Holmes and Dr. Watson.',
+         'badge': 'CLASSIC FICTION', 'color': 'linear-gradient(135deg, #1e293b, #475569)', 'cover': ''},
+        {'id': 12, 'title': 'Panchatantra Ancient Fables & Moral Stories',
+         'author': 'Vishnu Sharma (Traditional Archive)', 'category': 'Story Books & Literature',
+         'pages': '220 Pages', 'format': 'PDF / Reader', 'read_url': 'https://www.gutenberg.org/ebooks/4705',
+         'download_url': 'https://www.gutenberg.org/ebooks/4705.epub.noimages',
+         'description': 'Indian fables of wisdom, ethics, leadership, and moral principles.',
+         'badge': 'INDIAN CLASSIC', 'color': 'linear-gradient(135deg, #ea580c, #c2410c)', 'cover': ''},
     ]
 
-    real_api_total = 74281
+    all_books = list(curated_books)
+    api_total_count = 0
+    api_source = ''
 
-    # Live Gutendex Project Gutenberg Free API Call
-    if search_query or category_filter == 'Story Books & Literature':
+    # ── Helper: Fetch from Google Books API ─────────────────────────
+    def fetch_google_books(query_str, max_results=12):
+        nonlocal api_total_count, api_source
         try:
-            api_url = f"https://gutendex.com/books/?search={search_query or 'fiction'}"
-            res = requests.get(api_url, timeout=3)
+            start_index = (page - 1) * max_results
+            url = (f"https://www.googleapis.com/books/v1/volumes"
+                   f"?q={query_str}&filter=free-ebooks"
+                   f"&maxResults={max_results}&startIndex={start_index}")
+            res = requests.get(url, timeout=4)
             if res.status_code == 200:
                 data = res.json()
-                if data.get('count'):
-                    real_api_total = data.get('count')
-                api_results = data.get('results', [])[:6]
-                for idx, b in enumerate(api_results):
-                    authors = ", ".join([a.get('name', '') for a in b.get('authors', [])]) or 'Project Gutenberg Archive'
-                    formats = b.get('formats', {})
-                    read_link = formats.get('text/html') or formats.get('text/plain; charset=us-ascii') or f"https://www.gutenberg.org/ebooks/{b.get('id')}"
-                    download_link = formats.get('application/epub+zip') or formats.get('application/x-mobipocket-ebook') or read_link
-                    subjects = ", ".join(b.get('subjects', [])[:2]) or 'Literature & Fiction'
-
+                api_total_count += data.get('totalItems', 0)
+                api_source = 'Google Books'
+                for item in data.get('items', []):
+                    info = item.get('volumeInfo', {})
+                    access = item.get('accessInfo', {})
+                    epub_link = (access.get('epub', {}).get('downloadLink') or
+                                 access.get('pdf', {}).get('downloadLink') or '')
+                    read_link = info.get('previewLink') or info.get('infoLink') or ''
+                    cover = info.get('imageLinks', {}).get('thumbnail', '')
+                    authors = ", ".join(info.get('authors', ['Unknown Author']))
+                    pg = info.get('pageCount', '')
+                    desc = (info.get('description', '') or '')[:180] or 'Free ebook via Google Books.'
                     all_books.append({
-                        'id': 1000 + b.get('id', idx),
-                        'title': b.get('title', 'Public Domain Storybook'),
-                        'author': authors,
-                        'category': 'Story Books & Literature',
-                        'pages': f"{b.get('download_count', 100)} Downloads",
-                        'format': 'EPUB / Online',
-                        'read_url': read_link,
-                        'download_url': download_link,
-                        'description': f"Free public domain literary work. Subjects: {subjects}.",
-                        'badge': 'GUTENBERG FREE API',
-                        'color': 'linear-gradient(135deg, #334155, #0f172a)'
+                        'id': 2000 + hash(item.get('id', '')) % 100000,
+                        'title': info.get('title', 'Free Ebook'),
+                        'author': authors, 'cover': cover,
+                        'category': category_filter if category_filter != 'All' else 'Computer Science (B.Tech/BCA)',
+                        'pages': f"{pg} Pages" if pg else 'Free Ebook',
+                        'format': 'PDF / EPUB', 'read_url': read_link,
+                        'download_url': epub_link or read_link,
+                        'description': desc, 'badge': 'GOOGLE BOOKS API',
+                        'color': CATEGORY_API_MAP.get(category_filter, {}).get('color', 'linear-gradient(135deg, #0f5f6c, #14b8a6)'),
                     })
         except Exception:
-            pass # Fallback to pre-curated books gracefully if offline
+            pass
 
-    # Filter by Category
+    # ── Helper: Fetch from Gutendex (Project Gutenberg) ─────────────
+    def fetch_gutendex(query_str, max_results=12):
+        nonlocal api_total_count, api_source
+        try:
+            url = f"https://gutendex.com/books/?{query_str}&page={page}"
+            if search_query:
+                url = f"https://gutendex.com/books/?search={search_query}&page={page}"
+            res = requests.get(url, timeout=4)
+            if res.status_code == 200:
+                data = res.json()
+                api_total_count += data.get('count', 0)
+                api_source = 'Project Gutenberg'
+                for b in data.get('results', [])[:max_results]:
+                    authors = ", ".join([a.get('name', '') for a in b.get('authors', [])]) or 'Project Gutenberg'
+                    fmts = b.get('formats', {})
+                    read_link = fmts.get('text/html') or fmts.get('text/plain; charset=us-ascii') or f"https://www.gutenberg.org/ebooks/{b.get('id')}"
+                    download_link = fmts.get('application/epub+zip') or fmts.get('application/x-mobipocket-ebook') or read_link
+                    subjects = ", ".join(b.get('subjects', [])[:2]) or 'Literature & Fiction'
+                    cover = fmts.get('image/jpeg', '')
+                    all_books.append({
+                        'id': 3000 + b.get('id', 0), 'title': b.get('title', 'Public Domain Book'),
+                        'author': authors, 'category': 'Story Books & Literature',
+                        'pages': f"{b.get('download_count', 0):,} Downloads", 'format': 'EPUB / HTML',
+                        'read_url': read_link, 'download_url': download_link,
+                        'description': f"Free public domain work. Subjects: {subjects}.",
+                        'badge': 'PROJECT GUTENBERG', 'cover': cover,
+                        'color': 'linear-gradient(135deg, #1e293b, #475569)',
+                    })
+        except Exception:
+            pass
+
+    # ── Helper: Fetch from Open Library ─────────────────────────────
+    def fetch_openlibrary(subject, max_results=12):
+        nonlocal api_total_count, api_source
+        try:
+            offset = (page - 1) * max_results
+            url = f"https://openlibrary.org/subjects/{subject}.json?limit={max_results}&offset={offset}"
+            res = requests.get(url, timeout=4)
+            if res.status_code == 200:
+                data = res.json()
+                api_total_count += data.get('work_count', 0)
+                api_source = 'Open Library'
+                for w in data.get('works', []):
+                    authors = ", ".join([a.get('name', '') for a in w.get('authors', [])]) or 'Open Library'
+                    cover_id = w.get('cover_id', '')
+                    cover = f"https://covers.openlibrary.org/b/id/{cover_id}-M.jpg" if cover_id else ''
+                    key = w.get('key', '')
+                    read_link = f"https://openlibrary.org{key}" if key else 'https://openlibrary.org'
+                    subj_list = w.get('subject', [])
+                    desc = subj_list[0] if isinstance(subj_list, list) and subj_list else 'Free open-access educational resource.'
+                    all_books.append({
+                        'id': 4000 + hash(key) % 100000, 'title': w.get('title', 'Open Library Book'),
+                        'author': authors, 'cover': cover,
+                        'category': category_filter if category_filter != 'All' else 'Arts, Humanities & UPSC',
+                        'pages': f"{w.get('edition_count', 1)} Editions", 'format': 'Read Online',
+                        'read_url': read_link, 'download_url': read_link,
+                        'description': desc, 'badge': 'OPEN LIBRARY',
+                        'color': CATEGORY_API_MAP.get(category_filter, {}).get('color', 'linear-gradient(135deg, #4f46e5, #4338ca)'),
+                    })
+        except Exception:
+            pass
+
+    # ── Route category to the correct API ───────────────────────────
+    if search_query:
+        fetch_google_books(search_query, max_results=8)
+        fetch_gutendex(f"search={search_query}", max_results=6)
+        fetch_openlibrary(search_query.replace(' ', '_'), max_results=6)
+    elif category_filter and category_filter != 'All':
+        cfg = CATEGORY_API_MAP.get(category_filter, {})
+        if cfg.get('api') == 'google':
+            fetch_google_books(cfg['query'], max_results=12)
+        elif cfg.get('api') == 'gutendex':
+            fetch_gutendex(cfg['query'], max_results=12)
+        elif cfg.get('api') == 'openlibrary':
+            fetch_openlibrary(cfg['query'], max_results=12)
+    else:
+        fetch_google_books('subject:computer+science', max_results=4)
+        fetch_gutendex('topic=literature', max_results=4)
+        fetch_openlibrary('science', max_results=4)
+
+    # ── Filter by Category ─────────────────────────────────────────
     if category_filter and category_filter != 'All':
         all_books = [b for b in all_books if b['category'].lower() == category_filter.lower()]
 
-    # Filter by Search Query
+    # ── Filter by Search Query ─────────────────────────────────────
     if search_query:
-        all_books = [b for b in all_books if search_query in b['title'].lower() or search_query in b['category'].lower() or search_query in b['author'].lower() or search_query in b['description'].lower()]
+        all_books = [b for b in all_books if
+                     search_query in b['title'].lower() or
+                     search_query in b['category'].lower() or
+                     search_query in b['author'].lower() or
+                     search_query in b['description'].lower()]
+
+    # ── Deduplicate by title ───────────────────────────────────────
+    seen = set()
+    unique = []
+    for b in all_books:
+        k = b['title'].lower().strip()
+        if k not in seen:
+            seen.add(k)
+            unique.append(b)
+    all_books = unique
 
     categories = [
         'All',
@@ -748,10 +751,7 @@ def free_digital_library(request):
         'Arts, Humanities & UPSC'
     ]
 
-    if search_query or (category_filter and category_filter != 'All'):
-        total_books_display = f"{len(all_books)} Available"
-    else:
-        total_books_display = f"{real_api_total:,} Free Books"
+    total_books_display = f"{api_total_count:,} Free Books" if api_total_count > 0 else f"{len(all_books)} Available"
 
     context = {
         'page_title': 'Indian Educational Digital Library & Open Course Notes',
@@ -760,8 +760,11 @@ def free_digital_library(request):
         'selected_category': category_filter,
         'search_query': search_query,
         'total_books_count': total_books_display,
-        'exact_live_number': f"{real_api_total:,}",
+        'showing_count': len(all_books),
+        'api_source': api_source,
+        'current_page': page,
+        'has_next': api_total_count > page * 12,
+        'has_prev': page > 1,
     }
     return render(request, 'main_app/free_digital_library.html', context)
-
 
