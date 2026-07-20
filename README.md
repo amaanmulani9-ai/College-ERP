@@ -23,6 +23,11 @@
 
 Built on Django and PostgreSQL, the platform utilizes schema-level database isolation to securely partition institutional records while offering premium web interfaces, offline PWA access, mobile API sync, and an integrated AI Suite for academic automation.
 
+### 🤖 Specialized Smart AI Modules
+* **Predictive Student Analytics**: ML-based trend analysis identifying at-risk students for early faculty intervention.
+* **24/7 AI Helpdesk Chatbot**: Automated instant support handling exam dates, timetables, and campus queries.
+* **Fee Receipt Fraud Detection**: Cryptographic verification for fee receipts and bank transactions to prevent fraud.
+
 ---
 
 ## 📸 Screenshots

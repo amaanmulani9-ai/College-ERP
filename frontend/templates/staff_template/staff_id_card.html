@@ -31,7 +31,7 @@
                             <div class="row align-items-center my-3">
                                 <div class="col-4">
                                     <div class="avatar-border p-1 bg-white rounded-3 shadow">
-                                        <img src="{{ staff.admin.profile_pic.url|default:'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}" class="img-fluid rounded-3" style="width: 100%; height: 95px; object-fit: cover;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                                        <img src="{% if staff.admin.profile_pic %}{{ staff.admin.profile_pic.url }}{% else %}https://cdn-icons-png.flaticon.com/512/3135/3135715.png{% endif %}" class="img-fluid rounded-3" style="width: 100%; height: 95px; object-fit: cover;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
                                     </div>
                                 </div>
                                 <div class="col-8 text-white">

@@ -337,6 +337,49 @@ body, .erpnext-main, .content-area { font-family: 'Poppins', sans-serif; font-si
     <a href="{% url 'admin_finance_dashboard' %}" class="command-chip"><i class="fas fa-coins"></i><span>Finance</span></a>
 </div>
 
+<!-- ═══════════ SMART AI OPERATIONS STRIP ═══════════ -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="sk-card p-3 border-l-4 border-l-indigo-500 cursor-pointer transition-all hover:-translate-y-1 shadow-md" onclick="openPredictiveAnalyticsModal()" style="border-left: 4px solid #6366f1; cursor: pointer;">
+            <div class="d-flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-bold text-lg">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div>
+                    <h6 class="m-0 font-bold text-sm text-indigo-400">Predictive Student Risk Radar</h6>
+                    <span class="text-xs text-slate-400">Click to view ML risk scores & recommended interventions &rarr;</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="sk-card p-3 border-l-4 border-l-emerald-500 cursor-pointer transition-all hover:-translate-y-1 shadow-md" onclick="openReceiptFraudModal(1)" style="border-left: 4px solid #10b981; cursor: pointer;">
+            <div class="d-flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold text-lg">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <div>
+                    <h6 class="m-0 font-bold text-sm text-emerald-400">Fee Receipt Fraud Ledger</h6>
+                    <span class="text-xs text-slate-400">Click to view SHA-256 cryptographic verification audit &rarr;</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="sk-card p-3 border-l-4 border-l-purple-500 cursor-pointer transition-all hover:-translate-y-1 shadow-md" onclick="toggleCampusChatbot()" style="border-left: 4px solid #a855f7; cursor: pointer;">
+            <div class="d-flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center font-bold text-lg">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div>
+                    <h6 class="m-0 font-bold text-sm text-purple-400">24/7 AI Helpdesk Assistant</h6>
+                    <span class="text-xs text-slate-400">Click to launch live campus query assistant &rarr;</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ═══════════ HERO STAT CARDS ═══════════ -->
 <div class="hero-grid">
     <div class="hero-card c1">

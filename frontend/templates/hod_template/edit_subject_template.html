@@ -151,6 +151,10 @@
                             <input type="text" class="sk-form-control" name="subject_name[]" value="{{ subject.name }}" required>
                         </div>
                         <div>
+                            <label class="sk-form-label">Subject Code</label>
+                            <input type="text" class="sk-form-control" name="subject_code[]" value="{{ subject.subject_code|default:'' }}" placeholder="e.g PHY-11-SCI">
+                        </div>
+                        <div>
                             <label class="sk-form-label">Marks</label>
                             <input type="number" class="sk-form-control" name="marks[]" value="{{ subject.marks }}" required>
                         </div>
@@ -171,6 +175,10 @@
                         <div>
                             <label class="sk-form-label">Subject Name</label>
                             <input type="text" class="sk-form-control" name="subject_name[]" placeholder="Enter Subject Name" required>
+                        </div>
+                        <div>
+                            <label class="sk-form-label">Subject Code</label>
+                            <input type="text" class="sk-form-control" name="subject_code[]" placeholder="e.g PHY-11-SCI">
                         </div>
                         <div>
                             <label class="sk-form-label">Marks</label>

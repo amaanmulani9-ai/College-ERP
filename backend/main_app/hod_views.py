@@ -729,6 +729,7 @@ def add_subject(request):
     if request.method == 'POST':
         course_id = request.POST.get('course')
         subject_names = request.POST.getlist('subject_name[]')
+        subject_codes = request.POST.getlist('subject_code[]')
         marks_list = request.POST.getlist('marks[]')
         staff_ids = request.POST.getlist('staff[]')
         
@@ -736,11 +737,12 @@ def add_subject(request):
             course = Course.objects.get(id=course_id)
             for i in range(len(subject_names)):
                 name = subject_names[i]
+                sub_code = subject_codes[i] if i < len(subject_codes) else None
                 marks = int(marks_list[i]) if i < len(marks_list) and marks_list[i].isdigit() else 100
                 staff_id = staff_ids[i] if i < len(staff_ids) else None
                 if name and staff_id:
                     staff = Staff.objects.get(id=staff_id)
-                    Subject.objects.create(name=name, marks=marks, staff=staff, course=course)
+                    Subject.objects.create(name=name, subject_code=sub_code, marks=marks, staff=staff, course=course)
             
             messages.success(request, "Successfully Added Subjects")
             return redirect(reverse('manage_subject'))
@@ -1065,6 +1067,7 @@ def edit_subject(request, course_id):
     }
     if request.method == 'POST':
         subject_names = request.POST.getlist('subject_name[]')
+        subject_codes = request.POST.getlist('subject_code[]')
         marks_list = request.POST.getlist('marks[]')
         staff_ids = request.POST.getlist('staff[]')
         subject_ids = request.POST.getlist('subject_id[]')
@@ -1076,6 +1079,7 @@ def edit_subject(request, course_id):
             
             for i in range(len(subject_names)):
                 name = subject_names[i]
+                sub_code = subject_codes[i] if i < len(subject_codes) else None
                 marks = int(marks_list[i]) if i < len(marks_list) and marks_list[i].isdigit() else 100
                 staff_id = staff_ids[i] if i < len(staff_ids) else None
                 s_id = subject_ids[i] if i < len(subject_ids) else None
@@ -1086,12 +1090,13 @@ def edit_subject(request, course_id):
                         # Update existing
                         subject = Subject.objects.get(id=s_id)
                         subject.name = name
+                        subject.subject_code = sub_code
                         subject.marks = marks
                         subject.staff = staff
                         subject.save()
                     else:
                         # Create new
-                        Subject.objects.create(name=name, marks=marks, staff=staff, course=course)
+                        Subject.objects.create(name=name, subject_code=sub_code, marks=marks, staff=staff, course=course)
                         
             messages.success(request, "Successfully Updated Subjects")
             return redirect(reverse('manage_subject'))
@@ -1994,7 +1999,9 @@ def delete_parent(request, parent_id):
 @login_required(login_url='/')
 @admin_required
 def admin_view_student_id_card(request, student_id):
-    student = get_object_or_404(Student.objects.select_related('admin', 'course', 'session'), admin_id=student_id)
+    student = Student.objects.select_related('admin', 'course', 'session').filter(id=student_id).first()
+    if not student:
+        student = get_object_or_404(Student.objects.select_related('admin', 'course', 'session'), admin_id=student_id)
     if not student.id_card_code:
         student.id_card_code = f"STU-{student.course.name[:3].upper() if student.course else 'GEN'}-{student.batch_year}-{student.id:04d}"
         student.save()
@@ -2008,7 +2015,9 @@ def admin_view_student_id_card(request, student_id):
 @login_required(login_url='/')
 @admin_required
 def admin_view_staff_id_card(request, staff_id):
-    staff = get_object_or_404(Staff.objects.select_related('admin', 'course'), admin_id=staff_id)
+    staff = Staff.objects.select_related('admin', 'course').filter(id=staff_id).first()
+    if not staff:
+        staff = get_object_or_404(Staff.objects.select_related('admin', 'course'), admin_id=staff_id)
     if not staff.id_card_code:
         staff.id_card_code = f"EMP-{staff.course.name[:3].upper() if staff.course else 'GEN'}-{staff.id:04d}"
         staff.save()

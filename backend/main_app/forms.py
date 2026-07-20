@@ -157,7 +157,7 @@ class SubjectForm(FormSettings):
 
     class Meta:
         model = Subject
-        fields = ['name', 'staff', 'course']
+        fields = ['name', 'subject_code', 'staff', 'course']
 
 
 class SessionForm(FormSettings):
@@ -220,6 +220,47 @@ class FeedbackStudentForm(FormSettings):
     def __init__(self, *args, **kwargs):
         super(FeedbackStudentForm, self).__init__(*args, **kwargs)
 
+
+
+class LeaveReportStaffForm(FormSettings):
+    def __init__(self, *args, **kwargs):
+        super(LeaveReportStaffForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = LeaveReportStaff
+        fields = ['date', 'message']
+        widgets = {
+            'date': DateInput(attrs={'type': 'date'}),
+        }
+
+
+class FeedbackStaffForm(FormSettings):
+
+    def __init__(self, *args, **kwargs):
+        super(FeedbackStaffForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = FeedbackStaff
+        fields = ['feedback']
+
+
+class LeaveReportStudentForm(FormSettings):
+    def __init__(self, *args, **kwargs):
+        super(LeaveReportStudentForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = LeaveReportStudent
+        fields = ['date', 'message']
+        widgets = {
+            'date': DateInput(attrs={'type': 'date'}),
+        }
+
+
+class FeedbackStudentForm(FormSettings):
+
+    def __init__(self, *args, **kwargs):
+        super(FeedbackStudentForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = FeedbackStudent
         fields = ['feedback']
@@ -232,7 +273,7 @@ class StudentEditForm(CustomUserForm):
     class Meta(CustomUserForm.Meta):
         model = Student
         fields = CustomUserForm.Meta.fields + \
-            ['course', 'session', 'registration_no', 'discount_in_fee', 'mobile', 'dob', 'cnic', 'orphan', 'cast', 'osc', 
+            ['course', 'session', 'division', 'registration_no', 'discount_in_fee', 'mobile', 'dob', 'cnic', 'orphan', 'cast', 'osc', 
              'identification_mark', 'previous_school', 'religion', 'blood_group', 'previous_roll_no', 'disease', 'additional_note', 'siblings',
              'father_name', 'father_nic', 'father_occupation', 'father_education', 'father_mobile', 'father_profession', 'father_income',
              'mother_name', 'mother_nic', 'mother_occupation', 'mother_education', 'mother_mobile', 'mother_profession', 'mother_income'] 

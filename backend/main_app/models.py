@@ -249,6 +249,7 @@ class Staff(models.Model):
 
 class Subject(models.Model):
     name = models.CharField(max_length=120)
+    subject_code = models.CharField(max_length=50, blank=True, null=True)
     marks = models.IntegerField(default=100)
     staff = models.ForeignKey(Staff,on_delete=models.CASCADE,)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -468,11 +469,29 @@ class FeeRecord(models.Model):
 
 
 class FeePayment(models.Model):
+    STATUS_CHOICES = [
+        ('Verified', 'Verified'),
+        ('Suspicious', 'Suspicious'),
+        ('Flagged', 'Flagged'),
+    ]
     fee_record = models.ForeignKey(FeeRecord, on_delete=models.CASCADE)
     transaction_id = models.CharField(max_length=100)
     amount_paid = models.FloatField()
     payment_method = models.CharField(max_length=50) # UPI, Card, Net Banking
     payment_date = models.DateTimeField(auto_now_add=True)
+    receipt_hash = models.CharField(max_length=64, blank=True, default='')
+    verification_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Verified')
+    verification_notes = models.TextField(blank=True, default='Verified via cryptographic SHA-256 transaction ledger.')
+
+    def generate_receipt_hash(self):
+        import hashlib
+        raw_data = f"{self.transaction_id}:{self.amount_paid}:{self.fee_record_id}:{self.payment_method}"
+        return hashlib.sha256(raw_data.encode('utf-8')).hexdigest()
+
+    def save(self, *args, **kwargs):
+        if not self.receipt_hash:
+            self.receipt_hash = self.generate_receipt_hash()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Payment of {self.amount_paid} for {self.fee_record.category} (TXN: {self.transaction_id})"

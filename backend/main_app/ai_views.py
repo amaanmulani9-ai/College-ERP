@@ -224,3 +224,82 @@ def ai_format_address(request):
             return JsonResponse({'status': 'error', 'message': str(e)})
             
     return JsonResponse({'status': 'error', 'message': 'Invalid action'})
+
+
+@csrf_exempt
+@login_required
+def ai_helpdesk_chat(request):
+    """
+    24/7 AI Chatbot AJAX Handler for instant student & staff helpdesk queries.
+    """
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user_message = data.get('message', '').strip()
+            if not user_message:
+                return JsonResponse({'status': 'error', 'message': 'Message cannot be empty.'})
+                
+            from .ai_helper import ai_helpdesk_answer
+            answer = ai_helpdesk_answer(request.user, user_message)
+            return JsonResponse({'status': 'success', 'response': answer})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+            
+    return JsonResponse({'status': 'error', 'message': 'Invalid HTTP method.'})
+
+
+@login_required
+def predictive_analytics_api(request, student_id=None):
+    """
+    Detailed Predictive Analytics API endpoint triggered when clicking a student risk card.
+    """
+    try:
+        from .models import Student
+        if student_id:
+            student = get_object_or_404(Student, id=student_id)
+        elif hasattr(request.user, 'student'):
+            student = request.user.student
+        else:
+            student = Student.objects.first()
+            
+        if not student:
+            return JsonResponse({'status': 'error', 'message': 'No student record found.'})
+            
+        from .ai_helper import predict_student_risk
+        risk_data = predict_student_risk(student)
+        return JsonResponse({'status': 'success', 'data': risk_data})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+
+
+@login_required
+def receipt_fraud_audit_api(request, payment_id):
+    """
+    Cryptographic Receipt Fraud Verification API endpoint triggered when clicking a receipt.
+    """
+    try:
+        from .models import FeePayment
+        payment = get_object_or_404(FeePayment, id=payment_id)
+        
+        # Verify receipt hash consistency
+        expected_hash = payment.generate_receipt_hash()
+        is_authentic = (payment.receipt_hash == expected_hash)
+        
+        data = {
+            'payment_id': payment.id,
+            'student_name': payment.fee_record.student.admin.get_full_name(),
+            'category': payment.fee_record.category,
+            'amount_paid': payment.amount_paid,
+            'payment_method': payment.payment_method,
+            'payment_date': payment.payment_date.strftime('%Y-%m-%d %H:%M:%S'),
+            'transaction_id': payment.transaction_id,
+            'receipt_hash': payment.receipt_hash,
+            'expected_hash': expected_hash,
+            'is_authentic': is_authentic,
+            'verification_status': payment.verification_status,
+            'verification_notes': payment.verification_notes or 'Receipt hash matches internal ledger signature.'
+        }
+        return JsonResponse({'status': 'success', 'data': data})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+

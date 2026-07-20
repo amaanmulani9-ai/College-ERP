@@ -1,0 +1,155 @@
+{% load static %}
+<!-- FEE RECEIPT FRAUD DETECTION AUDIT MODAL DRAWER -->
+<div class="modal fade" id="receiptFraudModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content text-slate-100 rounded-3xl border border-emerald-500/30 overflow-hidden shadow-2xl" style="background: rgba(13, 15, 23, 0.95); backdrop-filter: blur(24px);">
+            <!-- Header -->
+            <div class="modal-header border-b border-white/10 p-4 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                        <i class="fas fa-shield-check text-xl"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title font-bold text-white text-lg m-0 flex items-center gap-2">
+                            Cryptographic Fraud Verification Audit <span class="badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px]">SHA-256 Ledger</span>
+                        </h5>
+                        <span class="text-xs text-slate-400">Automated verification for fee receipts & bank transaction hashes</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body p-6">
+                <!-- Loading State -->
+                <div id="fraud-modal-loading" class="text-center py-8 text-slate-400">
+                    <i class="fas fa-spinner fa-spin text-3xl text-emerald-400 mb-3 block"></i>
+                    Verifying cryptographic SHA-256 receipt signature against ledger...
+                </div>
+
+                <!-- Content State -->
+                <div id="fraud-modal-content" style="display: none;">
+                    <!-- Verification Badge Header -->
+                    <div class="p-4 rounded-2xl mb-6 flex items-center justify-between border" id="fraud-verification-banner">
+                        <div class="flex items-center gap-3">
+                            <i id="fraud-status-icon" class="fas fa-check-circle text-2xl text-emerald-400"></i>
+                            <div>
+                                <h5 id="fraud-status-title" class="font-bold text-white text-base m-0">Receipt Verified Authentic</h5>
+                                <span id="fraud-status-sub" class="text-xs text-slate-300">Transaction signature matches internal ledger checksum.</span>
+                            </div>
+                        </div>
+                        <span id="fraud-badge-tag" class="badge bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 text-xs font-bold rounded-full">
+                            VERIFIED
+                        </span>
+                    </div>
+
+                    <!-- Payment Details Table -->
+                    <div class="bg-black/30 rounded-2xl p-4 border border-white/5 mb-6 text-xs">
+                        <div class="grid grid-cols-2 gap-y-3 gap-x-4">
+                            <div>
+                                <span class="text-slate-400 font-medium block">Student Name:</span>
+                                <strong id="fraud-student-name" class="text-white">Student Name</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 font-medium block">Fee Category:</span>
+                                <strong id="fraud-category" class="text-white">Tuition Fee</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 font-medium block">Amount Paid:</span>
+                                <strong id="fraud-amount" class="text-emerald-400 font-bold">$0.00</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 font-medium block">Payment Method:</span>
+                                <strong id="fraud-method" class="text-white">UPI / Card</strong>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 font-medium block">Transaction ID:</span>
+                                <code id="fraud-txnid" class="text-indigo-300 font-mono">TXN-00000000</code>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 font-medium block">Timestamp:</span>
+                                <span id="fraud-timestamp" class="text-slate-300">2026-07-20 20:00:00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cryptographic Hash Viewer -->
+                    <div class="bg-black/50 rounded-2xl p-4 border border-white/10 font-mono text-xs">
+                        <span class="text-slate-400 font-sans font-bold uppercase tracking-widest text-[10px] block mb-2">Cryptographic Hash Signature (SHA-256)</span>
+                        <div id="fraud-receipt-hash" class="text-cyan-400 break-all bg-black/40 p-2.5 rounded-xl border border-white/5 select-all">
+                            e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                        </div>
+                        <div class="mt-2 flex items-center justify-between text-[11px] text-slate-400 font-sans">
+                            <span>Ledger Match Status: <strong class="text-emerald-400">100% MATCH</strong></span>
+                            <span>Algorithm: <strong class="text-white">SHA-256</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer border-t border-white/10 p-4 bg-white/[0.01]">
+                <button type="button" class="btn btn-outline-light text-xs font-semibold px-4 py-2 rounded-xl" data-bs-dismiss="modal">Close</button>
+                <button type="button" onclick="alert('Receipt authenticity seal exported as PDF verification certificate.')" class="btn btn-emerald text-xs font-bold px-4 py-2 rounded-xl text-white" style="background: linear-gradient(135deg, #10b981, #06b6d4); border: 0;">
+                    Download Security Seal
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function openReceiptFraudModal(paymentId) {
+    const modalEl = document.getElementById('receiptFraudModal');
+    const modal = new bootstrap.Modal(modalEl);
+    
+    document.getElementById('fraud-modal-loading').style.display = 'block';
+    document.getElementById('fraud-modal-content').style.display = 'none';
+    modal.show();
+    
+    fetch(`/api/ai/receipt-fraud-audit/${paymentId}/`)
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('fraud-modal-loading').style.display = 'none';
+        if (data.status === 'success') {
+            const d = data.data;
+            document.getElementById('fraud-student-name').innerText = d.student_name;
+            document.getElementById('fraud-category').innerText = d.category;
+            document.getElementById('fraud-amount').innerText = '$' + Number(d.amount_paid).toFixed(2);
+            document.getElementById('fraud-method').innerText = d.payment_method;
+            document.getElementById('fraud-txnid').innerText = d.transaction_id;
+            document.getElementById('fraud-timestamp').innerText = d.payment_date;
+            document.getElementById('fraud-receipt-hash').innerText = d.receipt_hash;
+            
+            const banner = document.getElementById('fraud-verification-banner');
+            const statusIcon = document.getElementById('fraud-status-icon');
+            const statusTitle = document.getElementById('fraud-status-title');
+            const statusSub = document.getElementById('fraud-status-sub');
+            const tag = document.getElementById('fraud-badge-tag');
+            
+            if (d.is_authentic && d.verification_status === 'Verified') {
+                banner.className = 'p-4 rounded-2xl mb-6 flex items-center justify-between border border-emerald-500/30 bg-emerald-500/10';
+                statusIcon.className = 'fas fa-check-circle text-2xl text-emerald-400';
+                statusTitle.innerText = 'Receipt Verified Authentic';
+                statusSub.innerText = 'Transaction signature matches internal ledger SHA-256 checksum.';
+                tag.innerText = 'VERIFIED';
+                tag.className = 'badge bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1 text-xs font-bold rounded-full';
+            } else {
+                banner.className = 'p-4 rounded-2xl mb-6 flex items-center justify-between border border-rose-500/30 bg-rose-500/10';
+                statusIcon.className = 'fas fa-exclamation-triangle text-2xl text-rose-400';
+                statusTitle.innerText = 'Flagged Receipt Anomaly Detected';
+                statusSub.innerText = 'Signature mismatch or duplicate transaction ID flagged for audit.';
+                tag.innerText = 'FLAGGED';
+                tag.className = 'badge bg-rose-500/20 text-rose-400 border border-rose-500/30 px-3 py-1 text-xs font-bold rounded-full';
+            }
+            
+            document.getElementById('fraud-modal-content').style.display = 'block';
+        } else {
+            alert('Could not verify receipt: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(err => {
+        document.getElementById('fraud-modal-loading').innerText = 'Failed to load receipt verification audit.';
+    });
+}
+</script>

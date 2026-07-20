@@ -212,7 +212,7 @@
                 
                 <ul class="sk-subject-list">
                     {% for subject in group.subjects %}
-                    <li class="sk-subject-item"><i class="fas fa-circle"></i> {{ subject.name }} ({{ subject.marks }} Marks)</li>
+                    <li class="sk-subject-item"><i class="fas fa-circle"></i> {{ subject.name }}{% if subject.subject_code %} [{{ subject.subject_code }}]{% endif %} ({{ subject.marks }} Marks)</li>
                     {% endfor %}
                 </ul>
             </div>

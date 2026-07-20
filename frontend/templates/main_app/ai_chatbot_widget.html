@@ -1,0 +1,206 @@
+{% load static %}
+<!-- 24/7 AI HELPDESK CHATBOT WIDGET -->
+<style>
+    #ai-chatbot-launcher {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    #ai-chatbot-launcher:hover {
+        transform: scale(1.08) rotate(-3deg);
+    }
+    #ai-chatbot-box {
+        position: fixed;
+        bottom: 92px;
+        right: 24px;
+        width: 380px;
+        max-width: calc(100vw - 32px);
+        height: 520px;
+        max-height: calc(100vh - 120px);
+        z-index: 9999;
+        display: none;
+        flex-direction: column;
+        background: rgba(13, 15, 23, 0.94);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        border-radius: 24px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(99, 102, 241, 0.15);
+        overflow: hidden;
+        animation: chatSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes chatSlideUp {
+        from { opacity: 0; transform: translateY(20px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .chat-msg-user {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #6366f1, #818cf8);
+        color: #ffffff;
+        border-radius: 16px 16px 4px 16px;
+        padding: 10px 14px;
+        margin: 6px 0;
+        max-width: 80%;
+        font-size: 13px;
+        line-height: 1.5;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+    }
+    .chat-msg-bot {
+        align-self: flex-start;
+        background: rgba(255, 255, 255, 0.06);
+        color: #e2e8f0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px 16px 16px 4px;
+        padding: 10px 14px;
+        margin: 6px 0;
+        max-width: 85%;
+        font-size: 13px;
+        line-height: 1.55;
+    }
+    .chip-btn {
+        background: rgba(99, 102, 241, 0.12);
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        color: #a5b4fc;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+    .chip-btn:hover {
+        background: #6366f1;
+        color: #ffffff;
+    }
+</style>
+
+<!-- Floating Launcher Button -->
+<button id="ai-chatbot-launcher" onclick="toggleCampusChatbot()" class="btn btn-primary rounded-circle shadow-lg p-0 flex items-center justify-center" style="width: 58px; height: 58px; background: linear-gradient(135deg, #6366f1, #a855f7); border: 1px solid rgba(255,255,255,0.2);">
+    <i class="fas fa-robot text-white text-2xl" id="chat-icon-main"></i>
+</button>
+
+<!-- Chatbot Window -->
+<div id="ai-chatbot-box">
+    <!-- Header -->
+    <div class="p-3 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md">
+                <i class="fas fa-headset text-base"></i>
+            </div>
+            <div>
+                <h6 class="m-0 font-bold text-white text-sm flex items-center gap-2">
+                    CampusBot AI <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                </h6>
+                <span class="text-[11px] text-slate-400">24/7 Smart Campus Helpdesk</span>
+            </div>
+        </div>
+        <button onclick="toggleCampusChatbot()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Messages Area -->
+    <div id="chat-messages-container" class="p-3 flex-1 overflow-y-auto flex flex-col gap-1">
+        <div class="chat-msg-bot">
+            👋 <strong>Hi {{ request.user.first_name|default:"there" }}!</strong> I am your 24/7 Campus AI Helpdesk assistant. Ask me anything about your attendance, fees, timetable, or exam dates!
+        </div>
+    </div>
+
+    <!-- Quick Prompts Bar -->
+    <div class="px-3 py-2 border-t border-white/5 bg-black/20 flex gap-2 overflow-x-auto no-scrollbar">
+        <button class="chip-btn" onclick="sendQuickPrompt('Check my attendance rate')">📊 Attendance</button>
+        <button class="chip-btn" onclick="sendQuickPrompt('What is my fee balance?')">💳 Fee Status</button>
+        <button class="chip-btn" onclick="sendQuickPrompt('When is the next exam?')">📅 Exam Dates</button>
+        <button class="chip-btn" onclick="sendQuickPrompt('How to request certificate?')">📜 Certificates</button>
+    </div>
+
+    <!-- Input Box -->
+    <div class="p-3 border-t border-white/10 bg-black/40 flex items-center gap-2">
+        <input type="text" id="chatbot-input-field" onkeypress="handleChatKeyPress(event)" placeholder="Ask CampusBot..." class="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-indigo-500 transition-colors">
+        <button onclick="submitChatbotMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl px-3 py-2 text-xs font-bold transition-all flex items-center gap-1">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+function toggleCampusChatbot() {
+    const box = document.getElementById('ai-chatbot-box');
+    if (box.style.display === 'flex') {
+        box.style.display = 'none';
+    } else {
+        box.style.display = 'flex';
+        document.getElementById('chatbot-input-field').focus();
+    }
+}
+
+function handleChatKeyPress(e) {
+    if (e.key === 'Enter') {
+        submitChatbotMessage();
+    }
+}
+
+function sendQuickPrompt(msg) {
+    document.getElementById('chatbot-input-field').value = msg;
+    submitChatbotMessage();
+}
+
+function appendChatMessage(sender, text) {
+    const container = document.getElementById('chat-messages-container');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = sender === 'user' ? 'chat-msg-user' : 'chat-msg-bot';
+    
+    // Parse bold text
+    const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    msgDiv.innerHTML = formatted;
+    
+    container.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+}
+
+function submitChatbotMessage() {
+    const field = document.getElementById('chatbot-input-field');
+    const query = field.value.trim();
+    if (!query) return;
+    
+    appendChatMessage('user', query);
+    field.value = '';
+    
+    // Typing indicator
+    const container = document.getElementById('chat-messages-container');
+    const typingDiv = document.createElement('div');
+    typingDiv.id = 'chat-typing-indicator';
+    typingDiv.className = 'chat-msg-bot text-slate-400 italic text-xs';
+    typingDiv.innerHTML = '<i class="fas fa-circle-notch fa-spin me-1"></i> CampusBot is thinking...';
+    container.appendChild(typingDiv);
+    container.scrollTop = container.scrollHeight;
+
+    fetch('/api/ai/helpdesk-chat/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ message: query })
+    })
+    .then(res => res.json())
+    .then(data => {
+        const ind = document.getElementById('chat-typing-indicator');
+        if (ind) ind.remove();
+        
+        if (data.status === 'success') {
+            appendChatMessage('bot', data.response);
+        } else {
+            appendChatMessage('bot', "⚠️ " + (data.message || "Sorry, I am having trouble connecting to the AI server. Please try again."));
+        }
+    })
+    .catch(err => {
+        const ind = document.getElementById('chat-typing-indicator');
+        if (ind) ind.remove();
+        appendChatMessage('bot', "⚠️ Connection error. Please check your internet connection.");
+    });
+}
+</script>

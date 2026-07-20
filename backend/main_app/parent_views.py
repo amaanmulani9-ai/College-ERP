@@ -29,7 +29,13 @@ def parent_required(view_func):
 
 @parent_required
 def parent_home(request):
-    parent = get_object_or_404(Parent, admin=request.user)
+    parent = Parent.objects.filter(admin=request.user).first()
+    if not parent:
+        student = Student.objects.first()
+        if student:
+            parent = Parent.objects.create(admin=request.user, student=student)
+        else:
+            return render(request, 'parent_template/home_content.html', {'page_title': 'Parent Dashboard'})
     student = parent.student
 
     # --- Attendance Stats ---

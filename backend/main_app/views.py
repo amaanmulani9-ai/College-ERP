@@ -58,7 +58,12 @@ def login_page(request):
         if next_url:
             return redirect(next_url)
         return _redirect_for_user(request.user)
-    return render(request, 'main_app/erpnext_login.html', {'next_url': _safe_next_url(request)})
+    
+    context = {
+        'next_url': _safe_next_url(request),
+        'recaptcha_public_key': getattr(settings, 'RECAPTCHA_PUBLIC_KEY', None)
+    }
+    return render(request, 'main_app/erpnext_login.html', context)
 
 def offline(request):
     return render(request, 'main_app/offline.html')
@@ -428,3 +433,63 @@ def mark_notifications_read(request):
             import logging
             logging.getLogger(__name__).warning(f"Error updating notifications for staff: {e}")
     return JsonResponse({'status': 'ok'})
+
+
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /admin/",
+        "Disallow: /staff/",
+        "Disallow: /student/",
+        "Disallow: /parent/",
+        "",
+        "Sitemap: https://college-erp-web.onrender.com/sitemap.xml"
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")
+
+
+def sitemap_xml(request):
+    content = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://college-erp-web.onrender.com/</loc>
+    <lastmod>2026-07-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://college-erp-web.onrender.com/student/register/</loc>
+    <lastmod>2026-07-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://college-erp-web.onrender.com/login/</loc>
+    <lastmod>2026-07-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>"""
+    return HttpResponse(content, content_type="application/xml")
+
+
+def llms_txt(request):
+    content = """# CampusPro B2B SaaS College ERP System
+
+An advanced, glassmorphic multitenant ERP solution built on modern Python and Django. Designed for speed, security, and exceptional visual beauty.
+
+## Core Features
+- **Online Admission Stepper:** Interactive multi-stage application forms.
+- **Finance & Online Checkout:** Ledger items, GST tracking, Razorpay integration.
+- **Smart ID Card Engine:** Flip animation glassmorphic digital ID cards with scanned QR verification.
+- **AI Suite:** Generates exam papers, timetables, auto-grades assignments.
+
+## Role Portals
+- **Admin**: custom fee configuration, certificate templates, session management.
+- **Staff / Faculty**: attendance logging, marksheets, leave approvals, classroom discussion.
+- **Student**: view courses, watch lessons, pay fees, fetch timetables.
+- **Parent**: monitor academic metrics, submit feedback, view calendars.
+"""
+    return HttpResponse(content, content_type="text/plain")
+

@@ -20,6 +20,9 @@ from main_app.EditResultView import EditResultView
 from . import hod_views, staff_views, student_views, parent_views, views, chat_views, smart_views, ai_views, analytics_views, mobile_api_views, finance_views, placement_views, backoffice_views
 
 urlpatterns = [
+    path("robots.txt", views.robots_txt, name="robots_txt"),
+    path("sitemap.xml", views.sitemap_xml, name="sitemap_xml"),
+    path("llms.txt", views.llms_txt, name="llms_txt"),
     path("", views.landing_page, name='landing_page'),
     path("login/", views.login_page, name='login_page'),
     path("healthz/", views.health_check, name='health_check'),
@@ -412,6 +415,10 @@ urlpatterns = [
     path("staff/ai-timetable/", ai_views.staff_generate_timetable, name='staff_generate_timetable'),
     path("staff/ai-grade/", ai_views.staff_ai_grade_assignment, name='staff_ai_grade_assignment'),
     path("api/ai/format-address/", ai_views.ai_format_address, name='ai_format_address'),
+    path("api/ai/helpdesk-chat/", ai_views.ai_helpdesk_chat, name='ai_helpdesk_chat'),
+    path("api/ai/predictive-analytics/", ai_views.predictive_analytics_api, name='predictive_analytics_api'),
+    path("api/ai/predictive-analytics/<int:student_id>/", ai_views.predictive_analytics_api, name='predictive_analytics_student'),
+    path("api/ai/receipt-fraud-audit/<int:payment_id>/", ai_views.receipt_fraud_audit_api, name='receipt_fraud_audit_api'),
     
     # --- TinyMCE Integration ---
     path("api/tinymce-jwt/", ai_views.tinymce_jwt_provider, name='tinymce_jwt_provider'),

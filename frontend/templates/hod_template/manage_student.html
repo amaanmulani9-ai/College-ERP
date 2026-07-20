@@ -351,7 +351,7 @@ body, .erpnext-main { font-family: 'Poppins', sans-serif; }
         <!-- Name & Reg -->
         <p class="sk-stu-name">{{ student.first_name }} {{ student.last_name }}</p>
         <p class="sk-stu-reg">
-            {{ student.student.course.name|default:"—" }} | Sem {{ student.student.current_semester }}<br>
+            {{ student.student.course.name|default:"—" }} | Sem {{ student.student.current_semester }} | Sec {{ student.student.division|default:"—" }}<br>
             Batch {{ student.student.batch_year }} | {{ student.student.verification_status }}
         </p>
         <p class="sk-stu-reg" style="margin-top:-6px;">
@@ -361,6 +361,10 @@ body, .erpnext-main { font-family: 'Poppins', sans-serif; }
 
         <!-- Round Action Buttons -->
         <div class="sk-stu-actions">
+            <button type="button" onclick="openPredictiveAnalyticsModal({{ student.student.id }})"
+                    class="sk-action-btn" style="background:rgba(99,102,241,0.15);color:#4f46e5;" title="AI Predictive Risk Radar">
+                <i class="fas fa-brain"></i>
+            </button>
             <a href="{% url 'admin_view_student_report' student.student.id %}"
                class="sk-action-btn sk-btn-view" title="View Report">
                 <i class="fas fa-eye"></i>
@@ -391,7 +395,6 @@ body, .erpnext-main { font-family: 'Poppins', sans-serif; }
     </div>
     {% endfor %}
 
-    <!-- Add New Student Card -->
     {% if students %}
     <a href="{% url 'add_student' %}" class="sk-add-card">
         <div class="sk-add-icon"><i class="fas fa-plus"></i></div>
@@ -399,13 +402,6 @@ body, .erpnext-main { font-family: 'Poppins', sans-serif; }
         <div class="sk-add-subtitle">Student</div>
     </a>
     {% endif %}
-</div>
-
-<!-- Dynamic Empty State (shown by JS when filter returns nothing) -->
-<div class="sk-empty" id="jsEmptyState" style="display:none;">
-    <i class="fas fa-search"></i>
-    <h5>No Students Found</h5>
-    <p>Try adjusting your search or filter.</p>
 </div>
 
 {% endblock content %}

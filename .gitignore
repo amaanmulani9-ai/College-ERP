@@ -36,3 +36,4 @@ dmypy.json
 node_modules/
 .coverage
 .reticle.json
+scratch/

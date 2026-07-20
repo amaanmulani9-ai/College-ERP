@@ -243,6 +243,19 @@
                                     {{ form.current_semester.errors }}
                                 </div>
                                 <div class="col-md-4 form-group mb-3">
+                                    <label>Division / Section</label>
+                                    <select name="division" class="form-select w-100">
+                                        <option value="">-- Select Section --</option>
+                                        <option value="A" {% if form.instance.division == "A" %}selected{% endif %}>Section A</option>
+                                        <option value="B" {% if form.instance.division == "B" %}selected{% endif %}>Section B</option>
+                                        <option value="C" {% if form.instance.division == "C" %}selected{% endif %}>Section C</option>
+                                        <option value="D" {% if form.instance.division == "D" %}selected{% endif %}>Section D</option>
+                                        <option value="E" {% if form.instance.division == "E" %}selected{% endif %}>Section E</option>
+                                        <option value="F" {% if form.instance.division == "F" %}selected{% endif %}>Section F</option>
+                                    </select>
+                                    {{ form.division.errors }}
+                                </div>
+                                <div class="col-md-4 form-group mb-3">
                                     <label>Discount in Fee</label>
                                     <input type="number" name="discount_in_fee" class="form-control" placeholder="In %" value="{{ form.instance.discount_in_fee|default:'0' }}">
                                     {{ form.discount_in_fee.errors }}
