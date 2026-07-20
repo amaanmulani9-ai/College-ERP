@@ -284,7 +284,7 @@
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
             <div class="category-chips" style="margin-bottom: 0;">
                 {% for cat in categories %}
-                    <a href="?category={{ cat }}{% if search_query %}&q={{ search_query }}{% endif %}" class="category-chip {% if selected_category == cat %}active{% endif %}">
+                    <a href="?category={{ cat|urlencode }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}" class="category-chip {% if selected_category == cat %}active{% endif %}">
                         {{ cat }}
                     </a>
                 {% endfor %}
@@ -332,13 +332,13 @@
         {% if has_prev or has_next %}
         <div class="pagination-bar">
             {% if has_prev %}
-            <a href="?page={{ current_page|add:'-1' }}{% if selected_category != 'All' %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">
+            <a href="?page={{ current_page|add:'-1' }}{% if selected_category != 'All' %}&category={{ selected_category|urlencode }}{% endif %}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}">
                 <i class="fas fa-chevron-left mr-1"></i> Previous
             </a>
             {% endif %}
             <span class="page-current">Page {{ current_page }}</span>
             {% if has_next %}
-            <a href="?page={{ current_page|add:'1' }}{% if selected_category != 'All' %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}">
+            <a href="?page={{ current_page|add:'1' }}{% if selected_category != 'All' %}&category={{ selected_category|urlencode }}{% endif %}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}">
                 Next <i class="fas fa-chevron-right ml-1"></i>
             </a>
             {% endif %}
