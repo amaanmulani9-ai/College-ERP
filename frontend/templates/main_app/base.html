@@ -243,13 +243,7 @@
                     <div style="padding:20px;text-align:center;color:#999;font-size:13px;">No events due now</div>
                 </div>
             </div>
-            
-            <!-- Free Open Resources & APIs Global Trigger -->
-            <div style="position: relative;" class="tb-dropdown-container">
-                <button class="tb-badge-icon" onclick="openFreeResourcesModal()" title="Free Open Resources & APIs" aria-label="Free Resources" style="background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3);">
-                    <i class="fas fa-gift"></i>
-                </button>
-            </div>
+
             
             <!-- Profile Dropdown -->
             <div class="tb-profile tb-dropdown-container" onclick="toggleTbDropdown('profile-dropdown')">
@@ -1508,10 +1502,9 @@
         });
     </script>
 
-    <!-- Global Smart AI & Free Resources Components -->
+    <!-- Global Smart AI Components -->
     {% include "main_app/ai_chatbot_widget.html" %}
     {% include "main_app/predictive_analytics_modal.html" %}
     {% include "main_app/receipt_fraud_modal.html" %}
-    {% include "main_app/free_resources_modal.html" %}
 </body>
 </html>

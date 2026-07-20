@@ -280,68 +280,7 @@ def export_staff_analytics(request):
     return response
 
 
-@login_required(login_url='/')
-@admin_required
-def free_modules_dashboard(request):
-    """Free Open Modules & Public API Suite Workspace."""
-    today = date.today()
-    fee_expected = FeeRecord.objects.aggregate(total=Sum('amount'))['total'] or 0
-    fee_collected = FeeRecord.objects.aggregate(total=Sum('amount_paid'))['total'] or 0
-    
-    free_modules = [
-        {
-            'name': 'Open Course & Syllabus API',
-            'badge': '100% Free Open API',
-            'icon': 'fas fa-graduation-cap',
-            'color': '#6366f1',
-            'description': 'Public REST endpoint serving course structures, degree levels, total semesters, and subject mappings.',
-            'endpoint': '/api/public/courses/',
-            'action_label': 'Test Open API',
-        },
-        {
-            'name': 'Noticeboard & Circular Broadcasts API',
-            'badge': '100% Free Open API',
-            'icon': 'fas fa-bullhorn',
-            'color': '#ec4899',
-            'description': 'Real-time JSON feed of institutional circulars, exams schedule alerts, and campus announcements.',
-            'endpoint': '/api/public/noticeboard/',
-            'action_label': 'View Live Feed',
-        },
-        {
-            'name': 'SHA-256 Fee Receipt Verification API',
-            'badge': 'Cryptographic Security',
-            'icon': 'fas fa-shield-check',
-            'color': '#10b981',
-            'description': 'Public cryptographic verification suite to audit fee receipt hashes against immutable ledger entries.',
-            'endpoint': '/api/public/verify-receipt/demo/',
-            'action_label': 'Verify Hash',
-        },
-        {
-            'name': 'Digital Certificate & Transcript Verification API',
-            'badge': 'Free Verification',
-            'icon': 'fas fa-certificate',
-            'color': '#8b5cf6',
-            'description': 'Open API allowing employers & universities to instantly verify student certificates without friction.',
-            'endpoint': '/api/public/verify-certificate/demo/',
-            'action_label': 'Check Certificate',
-        },
-        {
-            'name': 'Free Open Digital Library Resources',
-            'badge': 'Unlimited Access',
-            'icon': 'fas fa-book-reader',
-            'color': '#f59e0b',
-            'description': 'Open-access academic journals, free PDF textbooks, DSA problem sets, and course reference guides.',
-            'endpoint': '/api/public/free-resources/',
-            'action_label': 'Access Resources',
-        },
-    ]
 
-    context = {
-        'page_title': 'Free Modules & Open APIs Suite',
-        'page_subtitle': '100% free open-access modules and REST API endpoints for students, faculty, and public audit.',
-        'free_modules': free_modules,
-    }
-    return render(request, 'hod_template/free_modules.html', context)
 
 
 @login_required(login_url='/')
