@@ -1476,7 +1476,28 @@
             walk(document.body);
         }
 
+        function initThemeToggle() {
+            const themeCheckbox = document.querySelector('.tb-theme-toggle input');
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                if (themeCheckbox) themeCheckbox.checked = true;
+            }
+            if (themeCheckbox) {
+                themeCheckbox.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        document.body.classList.add('dark-mode');
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                        localStorage.setItem('theme', 'light');
+                    }
+                });
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            initThemeToggle();
             translatePage("{{ selected_lang }}");
             convertAllPrices();
         });

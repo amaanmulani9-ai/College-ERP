@@ -29,19 +29,109 @@
 body.dark-mode {
   --light-color: #0c0d12;
   --dark-color: #f8fafc;
-  --border-color: rgba(255, 255, 255, 0.06);
+  --border-color: rgba(255, 255, 255, 0.08);
   --text-muted: #94a3b8;
 
   --bg-app: #0c0d12;
-  --bg-sidebar: rgba(13, 14, 21, 0.7);
-  --bg-card: rgba(20, 22, 32, 0.65);
-  --bg-navbar: rgba(13, 14, 21, 0.75);
-  --border-element: rgba(255, 255, 255, 0.06);
+  --bg-sidebar: #121520;
+  --bg-card: #171b29;
+  --bg-navbar: #121520;
+  --border-element: rgba(255, 255, 255, 0.08);
   --text-main: #e2e8f0;
   --text-title: #f8fafc;
   --glass-blur: blur(20px);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+/* Complete Dark Mode System Overrides for Full Project */
+body.dark-mode {
+  background-color: #0c0d12 !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark-mode .custom-top-bar {
+  background: linear-gradient(90deg, #121520 0%, #171b29 100%) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+body.dark-mode .tb-profile {
+  background: rgba(23, 27, 41, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+}
+
+body.dark-mode .tb-dropdown-menu {
+  background: #171b29 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.5) !important;
+}
+
+body.dark-mode .tb-dropdown-menu a.dropdown-item {
+  background: #171b29 !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark-mode .tb-dropdown-menu a.dropdown-item:hover {
+  background: rgba(99, 102, 241, 0.15) !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .tb-quick-search input {
+  background: #121520 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+}
+
+body.dark-mode .card,
+body.dark-mode .erpnext-card,
+body.dark-mode .sk-card,
+body.dark-mode .admission-card,
+body.dark-mode .rules-card,
+body.dark-mode .modal-content {
+  background-color: #171b29 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .modal-header,
+body.dark-mode .modal-footer {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-mode .table,
+body.dark-mode .table-responsive {
+  background-color: #171b29 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark-mode .table th {
+  background-color: #121520 !important;
+  color: #f8fafc !important;
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode .table td {
+  border-bottom-color: rgba(255, 255, 255, 0.05) !important;
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select,
+body.dark-mode textarea {
+  background-color: #121520 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus,
+body.dark-mode textarea:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
 }
 
 /* Reset and base styles */
