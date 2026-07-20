@@ -464,9 +464,17 @@
 
         <!-- Messaging -->
         <div class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{% url 'chat_home' %}" class="nav-link {% if 'chat' in request.path %}active{% endif %}">
                 <i class="nav-icon far fa-comment-dots"></i>
                 <span class="nav-text">Messaging</span>
+            </a>
+        </div>
+
+        <!-- Discussion Board -->
+        <div class="nav-item">
+            <a href="{% url 'discussion_board' %}" class="nav-link {% if 'discussion' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-comments"></i>
+                <span class="nav-text">Discussion Board</span>
             </a>
         </div>
 
@@ -573,7 +581,7 @@
         </div>
         
     {% elif user.user_type == '2' %}
-        <!-- Basic Staff Fallback -->
+        <!-- Staff Sidebar -->
         <div class="nav-item">
             <a href="{% url 'staff_home' %}" class="nav-link {% if request.path == '/staff/home/' %}active{% endif %}">
                 <i class="nav-icon fas fa-chart-pie"></i>
@@ -581,39 +589,13 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="{% url 'staff_take_attendance' %}" class="nav-link">
+            <a href="{% url 'staff_take_attendance' %}" class="nav-link {% if 'attendance' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-check-circle"></i>
                 <span class="nav-text">Attendance</span>
             </a>
         </div>
         <div class="nav-item">
-            <a href="{% url 'staff_add_result' %}" class="nav-link">
-                <i class="nav-icon fas fa-plus-circle"></i>
-                <span class="nav-text">Add Results</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="{% url 'free_digital_library' %}" class="nav-link {% if 'library/free-books' in request.path %}active{% endif %}">
-                <i class="nav-icon fas fa-book-reader"></i>
-                <span class="nav-text">📖 Free Books & Notes</span>
-            </a>
-        </div>
-    {% elif user.user_type == '2' %}
-        <!-- Basic Staff Fallback -->
-        <div class="nav-item">
-            <a href="{% url 'staff_home' %}" class="nav-link {% if request.path == '/staff/home/' %}active{% endif %}">
-                <i class="nav-icon fas fa-chart-pie"></i>
-                <span class="nav-text">Dashboard</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="{% url 'staff_take_attendance' %}" class="nav-link">
-                <i class="nav-icon fas fa-check-circle"></i>
-                <span class="nav-text">Attendance</span>
-            </a>
-        </div>
-        <div class="nav-item">
-            <a href="{% url 'staff_add_result' %}" class="nav-link">
+            <a href="{% url 'staff_add_result' %}" class="nav-link {% if 'result' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-plus-circle"></i>
                 <span class="nav-text">Add Results</span>
             </a>
@@ -625,13 +607,38 @@
             </a>
         </div>
         <div class="nav-item">
+            <a href="{% url 'staff_lms_home' %}" class="nav-link {% if 'lms' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-book-open"></i>
+                <span class="nav-text">LMS / Chapters</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'staff_generate_paper' %}" class="nav-link {% if 'generate-paper' in request.path %}active{% endif %}">
+                <i class="nav-icon far fa-file-alt"></i>
+                <span class="nav-text">Question Paper</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'discussion_board' %}" class="nav-link {% if 'discussion' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-comments"></i>
+                <span class="nav-text">Discussion Board</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{% url 'free_digital_library' %}" class="nav-link {% if 'library/free-books' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-book-reader"></i>
                 <span class="nav-text">📖 Free Books & Notes</span>
             </a>
         </div>
+        <div class="nav-item">
+            <a href="{% url 'logout_user' %}" class="nav-link">
+                <i class="nav-icon fas fa-lock"></i>
+                <span class="nav-text">Log out</span>
+            </a>
+        </div>
     {% elif user.user_type == '3' %}
         <!-- Student Sidebar (CampusPro Style) -->
+
         
         <!-- Search Menu Input -->
         <div style="padding: 15px 15px 5px 15px;">
@@ -699,6 +706,36 @@
             <a href="{% url 'chat_home' %}" class="nav-link {% if 'chat' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-comment-dots"></i>
                 <span class="nav-text">Messaging</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'discussion_board' %}" class="nav-link {% if 'discussion' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-comments"></i>
+                <span class="nav-text">Discussion Board</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_lms_home' %}" class="nav-link {% if 'student/lms' in request.path and 'materials' not in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-graduation-cap"></i>
+                <span class="nav-text">LMS / Courseware</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_materials' %}" class="nav-link {% if 'materials' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-folder-open"></i>
+                <span class="nav-text">Study Materials</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_certificates' %}" class="nav-link {% if 'certificates' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-certificate"></i>
+                <span class="nav-text">My Certificates</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'student_placements' %}" class="nav-link {% if 'placements' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-briefcase"></i>
+                <span class="nav-text">Placement Cell</span>
             </a>
         </div>
         <div class="nav-item">
@@ -772,6 +809,12 @@
             <a href="{% url 'parent_timetable' %}" class="nav-link {% if 'timetable' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-calendar-alt"></i>
                 <span class="nav-text">Class Timetable</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'discussion_board' %}" class="nav-link {% if 'discussion' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-comments"></i>
+                <span class="nav-text">Discussion Board</span>
             </a>
         </div>
         <div class="nav-item">
@@ -883,6 +926,12 @@
             <a href="{% url 'backoffice_reports' %}" class="nav-link {% if 'reports' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-chart-bar"></i>
                 <span class="nav-text">Administrative Reports</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'discussion_board' %}" class="nav-link {% if 'discussion' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-comments"></i>
+                <span class="nav-text">Discussion Board</span>
             </a>
         </div>
         <div class="nav-item">

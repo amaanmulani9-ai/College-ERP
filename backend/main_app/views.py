@@ -322,7 +322,7 @@ def discussion_board(request):
     active_subject = None
     
     # Fetch subjects based on user type
-    if user.user_type == '1': # Admin
+    if user.user_type == '1' or user.user_type == '7': # Admin or Backoffice
         subjects = Subject.objects.all()
     elif user.user_type == '2': # Staff
         try:
@@ -334,6 +334,13 @@ def discussion_board(request):
             subjects = Subject.objects.filter(course=user.student.course)
         except Exception:
             subjects = Subject.objects.none()
+    elif user.user_type == '4': # Parent
+        try:
+            subjects = Subject.objects.filter(course=user.parent.student.course)
+        except Exception:
+            subjects = Subject.objects.none()
+    else:
+        subjects = Subject.objects.none()
         
     # Get active subject
     active_subject_id = request.GET.get('subject_id')
