@@ -710,19 +710,37 @@ def free_digital_library(request):
 
     # ── Route category to the correct API ───────────────────────────
     if search_query:
+        before_count = len(all_books)
         fetch_google_books(search_query, max_results=8)
+        if len(all_books) == before_count:
+            fetch_openlibrary(search_query.replace(' ', '_'), max_results=12)
+        else:
+            fetch_openlibrary(search_query.replace(' ', '_'), max_results=6)
         fetch_gutendex(f"search={search_query}", max_results=6)
-        fetch_openlibrary(search_query.replace(' ', '_'), max_results=6)
     elif category_filter and category_filter != 'All':
         cfg = CATEGORY_API_MAP.get(category_filter, {})
         if cfg.get('api') == 'google':
+            before_count = len(all_books)
             fetch_google_books(cfg['query'], max_results=12)
+            if len(all_books) == before_count:
+                ol_subjects = {
+                    'Computer Science (B.Tech/BCA)': 'computer_science',
+                    'Commerce (B.Com/BBA/MBA)': 'finance',
+                    'Mathematics & Physics (B.Sc)': 'mathematics',
+                    'Core Engineering (EE/ECE/ME/CE)': 'engineering'
+                }
+                subj = ol_subjects.get(category_filter, 'education')
+                fetch_openlibrary(subj, max_results=12)
         elif cfg.get('api') == 'gutendex':
             fetch_gutendex(cfg['query'], max_results=12)
         elif cfg.get('api') == 'openlibrary':
             fetch_openlibrary(cfg['query'], max_results=12)
     else:
+        before_count = len(all_books)
         fetch_google_books('subject:computer+science', max_results=4)
+        if len(all_books) == before_count:
+            fetch_openlibrary('computer_science', max_results=4)
+            
         fetch_gutendex('topic=literature', max_results=4)
         fetch_openlibrary('science', max_results=4)
 
