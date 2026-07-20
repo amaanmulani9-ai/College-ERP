@@ -593,7 +593,11 @@
             </a>
         </div>
         <div class="nav-item">
-        
+            <a href="{% url 'free_digital_library' %}" class="nav-link {% if 'library/free-books' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-book-reader"></i>
+                <span class="nav-text">📖 Free Books & Notes</span>
+            </a>
+        </div>
     {% elif user.user_type == '2' %}
         <!-- Basic Staff Fallback -->
         <div class="nav-item">
@@ -618,6 +622,12 @@
             <a href="{% url 'view_online_registrations' %}" class="nav-link {% if 'registrations' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-file-csv"></i>
                 <span class="nav-text">Online Registrations</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'free_digital_library' %}" class="nav-link {% if 'library/free-books' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-book-reader"></i>
+                <span class="nav-text">📖 Free Books & Notes</span>
             </a>
         </div>
     {% elif user.user_type == '3' %}
@@ -711,6 +721,12 @@
             </a>
         </div>
         <div class="nav-item">
+            <a href="{% url 'free_digital_library' %}" class="nav-link {% if 'library/free-books' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-book-reader"></i>
+                <span class="nav-text">📖 Free Books & Notes</span>
+            </a>
+        </div>
+        <div class="nav-item">
             <a href="{% url 'logout_user' %}" class="nav-link">
                 <i class="nav-icon fas fa-lock"></i>
                 <span class="nav-text">Log out</span>
@@ -768,6 +784,12 @@
             <a href="{% url 'parent_profile' %}" class="nav-link {% if 'profile' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-user-cog"></i>
                 <span class="nav-text">My Profile</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'free_digital_library' %}" class="nav-link {% if 'library/free-books' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-book-reader"></i>
+                <span class="nav-text">📖 Free Books & Notes</span>
             </a>
         </div>
         <div class="nav-item">
@@ -867,6 +889,12 @@
             <a href="{% url 'backoffice_profile' %}" class="nav-link {% if 'profile' in request.path %}active{% endif %}">
                 <i class="nav-icon fas fa-user-cog"></i>
                 <span class="nav-text">Account Profile</span>
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'free_digital_library' %}" class="nav-link {% if 'library/free-books' in request.path %}active{% endif %}">
+                <i class="nav-icon fas fa-book-reader"></i>
+                <span class="nav-text">📖 Free Books & Notes</span>
             </a>
         </div>
         <div class="nav-item">
