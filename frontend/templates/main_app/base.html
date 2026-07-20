@@ -850,16 +850,21 @@
     
     {% block custom_js %}{% endblock custom_js %}
     
-    <!-- TinyMCE Rich Text Editor Integration -->
-    <script src="https://cdn.tiny.cloud/1/{{ TINYMCE_API_KEY }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <!-- Free Community TinyMCE Rich Text Editor Integration (No API Key Required) -->
+    <style>
+        .tox-notification, .tox-statusbar__branding, .tox-notifications-container { display: none !important; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
-        if(document.querySelector('textarea')) {
+        if(typeof tinymce !== 'undefined' && document.querySelector('textarea')) {
             tinymce.init({
               selector: 'textarea:not(.no-tinymce)',
               menubar: false,
               plugins: 'link lists autolink',
               toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link',
+              branding: false,
+              promotion: false,
               setup: function (editor) {
                   editor.on('change', function () {
                       tinymce.triggerSave();
