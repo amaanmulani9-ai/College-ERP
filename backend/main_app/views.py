@@ -626,8 +626,105 @@ def free_digital_library(request):
             'description': 'Preamble, Fundamental Rights, Parliamentary Structure, Indian Freedom Struggle, and Administrative Governance.',
             'badge': 'NCERT / UPSC',
             'color': 'linear-gradient(135deg, #4f46e5, #4338ca)'
+        },
+        # Story Books & Classic Literature
+        {
+            'id': 11,
+            'title': 'The Adventures of Sherlock Holmes',
+            'author': 'Arthur Conan Doyle',
+            'category': 'Story Books & Literature',
+            'pages': '307 Pages',
+            'format': 'EPUB / HTML',
+            'read_url': 'https://www.gutenberg.org/files/1661/1661-h/1661-h.htm',
+            'download_url': 'https://www.gutenberg.org/ebooks/1661.epub3.images',
+            'description': 'A collection of twelve detective stories featuring the famous consulting detective Sherlock Holmes and Dr. John Watson.',
+            'badge': 'CLASSIC FICTION',
+            'color': 'linear-gradient(135deg, #1e293b, #475569)'
+        },
+        {
+            'id': 12,
+            'title': 'Panchatantra Ancient Fables & Moral Stories',
+            'author': 'Vishnu Sharma (Traditional Archive)',
+            'category': 'Story Books & Literature',
+            'pages': '220 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://www.gutenberg.org/ebooks/4705',
+            'download_url': 'https://www.gutenberg.org/ebooks/4705.epub.noimages',
+            'description': 'Timeless Indian fables of animal wisdom, ethics, leadership, friendship, and moral principles.',
+            'badge': 'INDIAN CLASSIC',
+            'color': 'linear-gradient(135deg, #ea580c, #c2410c)'
+        },
+        {
+            'id': 13,
+            'title': 'Alice\'s Adventures in Wonderland',
+            'author': 'Lewis Carroll',
+            'category': 'Story Books & Literature',
+            'pages': '180 Pages',
+            'format': 'EPUB / HTML',
+            'read_url': 'https://www.gutenberg.org/files/11/11-h/11-h.htm',
+            'download_url': 'https://www.gutenberg.org/ebooks/11.epub3.images',
+            'description': 'Classic fantasy story following Alice falling down a rabbit hole into a whimsical world of anthropomorphic creatures.',
+            'badge': 'WORLD CLASSIC',
+            'color': 'linear-gradient(135deg, #ec4899, #be185d)'
+        },
+        {
+            'id': 14,
+            'title': 'Pride and Prejudice',
+            'author': 'Jane Austen',
+            'category': 'Story Books & Literature',
+            'pages': '432 Pages',
+            'format': 'EPUB / HTML',
+            'read_url': 'https://www.gutenberg.org/files/1342/1342-h/1342-h.htm',
+            'download_url': 'https://www.gutenberg.org/ebooks/1342.epub3.images',
+            'description': 'Renowned romantic novel dealing with issues of manners, upbringing, morality, education, and marriage in regency England.',
+            'badge': 'ROMANCE NOVEL',
+            'color': 'linear-gradient(135deg, #e11d48, #9f1239)'
+        },
+        {
+            'id': 15,
+            'title': 'Treasure Island',
+            'author': 'Robert Louis Stevenson',
+            'category': 'Story Books & Literature',
+            'pages': '292 Pages',
+            'format': 'EPUB / HTML',
+            'read_url': 'https://www.gutenberg.org/files/120/120-h/120-h.htm',
+            'download_url': 'https://www.gutenberg.org/ebooks/120.epub3.images',
+            'description': 'High-seas adventure tale of buccaneers, buried gold, tropical islands, and pirate Long John Silver.',
+            'badge': 'ADVENTURE',
+            'color': 'linear-gradient(135deg, #0d9488, #0f766e)'
         }
     ]
+
+    # Live Gutendex Project Gutenberg Free API Call
+    if search_query or category_filter == 'Story Books & Literature':
+        try:
+            api_url = f"https://gutendex.com/books/?search={search_query or 'fiction'}"
+            res = requests.get(api_url, timeout=3)
+            if res.status_code == 200:
+                data = res.json()
+                api_results = data.get('results', [])[:6]
+                for idx, b in enumerate(api_results):
+                    authors = ", ".join([a.get('name', '') for a in b.get('authors', [])]) or 'Project Gutenberg Archive'
+                    formats = b.get('formats', {})
+                    read_link = formats.get('text/html') or formats.get('text/plain; charset=us-ascii') or f"https://www.gutenberg.org/ebooks/{b.get('id')}"
+                    download_link = formats.get('application/epub+zip') or formats.get('application/x-mobipocket-ebook') or read_link
+                    subjects = ", ".join(b.get('subjects', [])[:2]) or 'Literature & Fiction'
+
+                    all_books.append({
+                        'id': 1000 + b.get('id', idx),
+                        'title': b.get('title', 'Public Domain Storybook'),
+                        'author': authors,
+                        'category': 'Story Books & Literature',
+                        'pages': f"{b.get('download_count', 100)} Downloads",
+                        'format': 'EPUB / Online',
+                        'read_url': read_link,
+                        'download_url': download_link,
+                        'description': f"Free public domain literary work. Subjects: {subjects}.",
+                        'badge': 'GUTENBERG FREE API',
+                        'color': 'linear-gradient(135deg, #334155, #0f172a)'
+                    })
+        except Exception:
+            pass # Fallback to pre-curated books gracefully if offline
 
     # Filter by Category
     if category_filter and category_filter != 'All':
@@ -639,6 +736,7 @@ def free_digital_library(request):
 
     categories = [
         'All',
+        'Story Books & Literature',
         'Computer Science (B.Tech/BCA)',
         'Commerce (B.Com/BBA/MBA)',
         'Mathematics & Physics (B.Sc)',
