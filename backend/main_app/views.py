@@ -487,114 +487,145 @@ An advanced, glassmorphic multitenant ERP solution built on modern Python and Dj
 
 
 def free_digital_library(request):
-    """Free Digital Library & Open Notes Reader accessible to everyone."""
+    """Free Digital Library & Open Study Notes Reader for Indian Curriculum & Global Courses."""
     category_filter = request.GET.get('category', 'All')
     search_query = request.GET.get('q', '').strip().lower()
 
     all_books = [
+        # B.Tech / BCA / Computer Science
         {
             'id': 1,
-            'title': 'Python Programming & Data Structures',
-            'author': 'OpenStax & Academic Press',
-            'category': 'Computer Science',
-            'pages': '340 Pages',
+            'title': 'Data Structures & Algorithms (B.Tech / BCA / GATE)',
+            'author': 'NPTEL & AICTE Open Curriculum',
+            'category': 'Computer Science (B.Tech/BCA)',
+            'pages': '410 Pages',
             'format': 'PDF / Reader',
-            'read_url': 'https://openstax.org/details/books/introduction-python-programming',
-            'download_url': 'https://open.umn.edu/opentextbooks/textbooks/python-for-everybody-exploring-data-in-python-3',
-            'description': 'Comprehensive textbook covering Python fundamentals, algorithms, data structures, and object-oriented design.',
-            'badge': 'FREE TEXTBOOK',
+            'read_url': 'https://nptel.ac.in/courses/106102064',
+            'download_url': 'https://nptel.ac.in/courses/106102064',
+            'description': 'Complete syllabus covering Arrays, Stacks, Queues, Trees, Graphs, Sorting algorithms, and GATE CSE problem solving.',
+            'badge': 'AICTE / NPTEL',
             'color': 'linear-gradient(135deg, #0f5f6c, #14b8a6)'
         },
         {
             'id': 2,
-            'title': 'Calculus & Multivariable Mathematics',
-            'author': 'OpenCourseWare Consortium',
-            'category': 'Mathematics',
-            'pages': '512 Pages',
+            'title': 'Python Programming & Data Science Notes',
+            'author': 'OpenStax & NPTEL IIT Madras',
+            'category': 'Computer Science (B.Tech/BCA)',
+            'pages': '340 Pages',
             'format': 'PDF / Reader',
-            'read_url': 'https://openstax.org/details/books/calculus-volume-1',
-            'download_url': 'https://openstax.org/details/books/calculus-volume-1',
-            'description': 'Full open-access textbook on single & multivariable calculus, derivatives, integrals, and vector analysis.',
-            'badge': 'MIT OPEN COURSE',
-            'color': 'linear-gradient(135deg, #6366f1, #a855f7)'
-        },
-        {
-            'id': 3,
-            'title': 'Database Management & SQL Systems',
-            'author': 'Stanford Educational Commons',
-            'category': 'Computer Science',
-            'pages': '285 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://open.umn.edu/opentextbooks/textbooks/relational-databases-and-microsoft-access-365-2021-edition',
-            'download_url': 'https://open.umn.edu/opentextbooks/textbooks/relational-databases-and-microsoft-access-365-2021-edition',
-            'description': 'Relational algebra, SQL query optimization, ER diagrams, indexing, normalization, and ACID transactions.',
-            'badge': 'FREE NOTES',
-            'color': 'linear-gradient(135deg, #3b82f6, #06b6d4)'
-        },
-        {
-            'id': 4,
-            'title': 'Principles of Micro & Macro Economics',
-            'author': 'OpenStax Economics Team',
-            'category': 'Business',
-            'pages': '420 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://openstax.org/details/books/principles-microeconomics-3e',
-            'download_url': 'https://openstax.org/details/books/principles-microeconomics-3e',
-            'description': 'Fundamental principles of supply & demand, market structures, fiscal policy, trade, and monetary economics.',
-            'badge': 'OPEN ACCESS',
-            'color': 'linear-gradient(135deg, #f59e0b, #d97706)'
-        },
-        {
-            'id': 5,
-            'title': 'University Physics: Mechanics & Waves',
-            'author': 'Dr. Samuel J. Ling et al.',
-            'category': 'Engineering',
-            'pages': '610 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://openstax.org/details/books/university-physics-volume-1',
-            'download_url': 'https://openstax.org/details/books/university-physics-volume-1',
-            'description': 'Classical mechanics, Newton laws, rotational kinematics, thermodynamics, and wave oscillations.',
+            'read_url': 'https://openstax.org/details/books/introduction-python-programming',
+            'download_url': 'https://open.umn.edu/opentextbooks/textbooks/python-for-everybody-exploring-data-in-python-3',
+            'description': 'Comprehensive textbook covering Python fundamentals, NumPy, Pandas, OOPs concepts, and data visualization.',
             'badge': 'FREE TEXTBOOK',
-            'color': 'linear-gradient(135deg, #ef4444, #dc2626)'
-        },
-        {
-            'id': 6,
-            'title': 'Organic Chemistry & Molecular Structures',
-            'author': 'Open Textbooks Network',
-            'category': 'Science',
-            'pages': '490 Pages',
-            'format': 'PDF / Reader',
-            'read_url': 'https://openstax.org/details/books/organic-chemistry',
-            'download_url': 'https://openstax.org/details/books/organic-chemistry',
-            'description': 'Functional groups, reaction mechanisms, stereochemistry, synthesis, and spectroscopic identification.',
-            'badge': 'FREE NOTES',
             'color': 'linear-gradient(135deg, #10b981, #059669)'
         },
         {
-            'id': 7,
-            'title': 'Web Development & Full-Stack Engineering',
-            'author': 'Open Web Alliance',
-            'category': 'Computer Science',
-            'pages': '310 Pages',
+            'id': 3,
+            'title': 'Database Management Systems & SQL (DBMS)',
+            'author': 'e-GyanKosh IGNOU & Stanford Notes',
+            'category': 'Computer Science (B.Tech/BCA)',
+            'pages': '285 Pages',
             'format': 'PDF / Reader',
-            'read_url': 'https://open.umn.edu/opentextbooks/textbooks/web-literacy',
-            'download_url': 'https://open.umn.edu/opentextbooks/textbooks/web-literacy',
-            'description': 'HTML5, CSS3, Modern JavaScript (ES6+), RESTful APIs, responsive design, and web deployment.',
-            'badge': 'FREE HANDBOOK',
+            'read_url': 'https://egyankosh.ac.in/',
+            'download_url': 'https://open.umn.edu/opentextbooks/textbooks/relational-databases-and-microsoft-access-365-2021-edition',
+            'description': 'Relational model, ER Diagrams, SQL queries, Normalization (1NF to BCNF), and Transaction concurrency control.',
+            'badge': 'IGNOU / UGC',
+            'color': 'linear-gradient(135deg, #3b82f6, #06b6d4)'
+        },
+        # Commerce & Management (B.Com / BBA / MBA)
+        {
+            'id': 4,
+            'title': 'Financial Accounting & Corporate Law (B.Com / BBA)',
+            'author': 'ICAI & e-GyanKosh Portal',
+            'category': 'Commerce (B.Com/BBA/MBA)',
+            'pages': '380 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://egyankosh.ac.in/',
+            'download_url': 'https://openstax.org/details/books/principles-financial-accounting',
+            'description': 'Journal entries, Ledger posting, Trial Balance, Depreciation, Balance Sheets, and Indian Companies Act fundamentals.',
+            'badge': 'ICAI / IGNOU',
+            'color': 'linear-gradient(135deg, #0284c7, #0369a1)'
+        },
+        {
+            'id': 5,
+            'title': 'Principles of Micro & Macro Economics (B.Com / BA)',
+            'author': 'OpenStax & UGC e-Pathshala',
+            'category': 'Commerce (B.Com/BBA/MBA)',
+            'pages': '420 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://epathshala.nic.in/',
+            'download_url': 'https://openstax.org/details/books/principles-microeconomics-3e',
+            'description': 'Demand & Supply analysis, Indian Economic System, Inflation, Monetary policy, RBI functions, and Fiscal budgets.',
+            'badge': 'UGC PATHSHALA',
+            'color': 'linear-gradient(135deg, #f59e0b, #d97706)'
+        },
+        # Mathematics & Basic Sciences (B.Sc / M.Sc)
+        {
+            'id': 6,
+            'title': 'Engineering Mathematics & Calculus (Sem 1 & 2)',
+            'author': 'IIT Kharagpur NPTEL Courseware',
+            'category': 'Mathematics & Physics (B.Sc)',
+            'pages': '512 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://nptel.ac.in/courses/111105121',
+            'download_url': 'https://openstax.org/details/books/calculus-volume-1',
+            'description': 'Differential calculus, Matrices, Eigen values, Vector integration, Differential equations, and Fourier series.',
+            'badge': 'IIT NPTEL',
+            'color': 'linear-gradient(135deg, #6366f1, #a855f7)'
+        },
+        {
+            'id': 7,
+            'title': 'University Physics: Mechanics & Electromagnetism',
+            'author': 'NCERT & OpenStax Physics Team',
+            'category': 'Mathematics & Physics (B.Sc)',
+            'pages': '610 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://epathshala.nic.in/',
+            'download_url': 'https://openstax.org/details/books/university-physics-volume-1',
+            'description': 'Newtonian mechanics, Quantum wave optics, Electrostatics, Magnetism, and Semiconductor Electronics.',
+            'badge': 'NCERT / OPENSTAX',
+            'color': 'linear-gradient(135deg, #ef4444, #dc2626)'
+        },
+        # Core Engineering (Mechanical, Electrical, Civil)
+        {
+            'id': 8,
+            'title': 'Basic Electrical & Electronics Engineering (B.E/B.Tech)',
+            'author': 'AICTE Model Curriculum Notes',
+            'category': 'Core Engineering (EE/ECE/ME/CE)',
+            'pages': '390 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://nptel.ac.in/courses/108108076',
+            'download_url': 'https://nptel.ac.in/courses/108108076',
+            'description': 'DC/AC Circuits, Transformers, Induction Motors, Logic Gates, Op-Amps, and Microprocessor 8085 architecture.',
+            'badge': 'AICTE MODEL',
             'color': 'linear-gradient(135deg, #8b5cf6, #ec4899)'
         },
         {
-            'id': 8,
-            'title': 'Financial Accounting & Reporting Notes',
-            'author': 'Global Open Business Library',
-            'category': 'Business',
-            'pages': '360 Pages',
+            'id': 9,
+            'title': 'Thermodynamics & Fluid Mechanics Notes',
+            'author': 'IIT Madras Mechanical Wing',
+            'category': 'Core Engineering (EE/ECE/ME/CE)',
+            'pages': '440 Pages',
             'format': 'PDF / Reader',
-            'read_url': 'https://openstax.org/details/books/principles-financial-accounting',
-            'download_url': 'https://openstax.org/details/books/principles-financial-accounting',
-            'description': 'Balance sheets, cash flow statements, ledger entries, auditing standards, and managerial accounting.',
-            'badge': 'OPEN ACCESS',
-            'color': 'linear-gradient(135deg, #0284c7, #0369a1)'
+            'read_url': 'https://nptel.ac.in/courses/112105123',
+            'download_url': 'https://nptel.ac.in/courses/112105123',
+            'description': 'Laws of Thermodynamics, Carnot Engine, Fluid Dynamics, Bernoulli equation, and Heat Transfer principles.',
+            'badge': 'IIT MECHANICAL',
+            'color': 'linear-gradient(135deg, #d97706, #b45309)'
+        },
+        # Humanities, UPSC & General Studies
+        {
+            'id': 10,
+            'title': 'Indian Constitution, Polity & World History (B.A / UPSC)',
+            'author': 'NCERT & e-GyanKosh Open Archive',
+            'category': 'Arts, Humanities & UPSC',
+            'pages': '520 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://epathshala.nic.in/',
+            'download_url': 'https://egyankosh.ac.in/',
+            'description': 'Preamble, Fundamental Rights, Parliamentary Structure, Indian Freedom Struggle, and Administrative Governance.',
+            'badge': 'NCERT / UPSC',
+            'color': 'linear-gradient(135deg, #4f46e5, #4338ca)'
         }
     ]
 
@@ -606,10 +637,17 @@ def free_digital_library(request):
     if search_query:
         all_books = [b for b in all_books if search_query in b['title'].lower() or search_query in b['category'].lower() or search_query in b['author'].lower() or search_query in b['description'].lower()]
 
-    categories = ['All', 'Computer Science', 'Mathematics', 'Engineering', 'Business', 'Science']
+    categories = [
+        'All',
+        'Computer Science (B.Tech/BCA)',
+        'Commerce (B.Com/BBA/MBA)',
+        'Mathematics & Physics (B.Sc)',
+        'Core Engineering (EE/ECE/ME/CE)',
+        'Arts, Humanities & UPSC'
+    ]
 
     context = {
-        'page_title': 'Free Digital Library & Open Study Notes',
+        'page_title': 'Indian Educational Digital Library & Open Course Notes',
         'books': all_books,
         'categories': categories,
         'selected_category': category_filter,

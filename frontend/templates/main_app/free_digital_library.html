@@ -190,18 +190,32 @@
     <div class="container-fluid">
         <!-- Hero Header -->
         <div class="library-hero">
-            <h1><i class="fas fa-book-reader mr-2"></i> Free Digital Library & Open Study Notes</h1>
-            <p>Access 100% free open-access educational textbooks, lecture notes, reference guides, and learning resources across all major academic streams.</p>
+            <h1><i class="fas fa-book-reader mr-2"></i> Indian Educational Digital Library & Open Courseware</h1>
+            <p>Access 100% free open-access textbooks, NPTEL IIT lecture notes, AICTE model curricula, IGNOU e-GyanKosh study material, and NCERT/UGC pathshala guides across B.Tech, B.Com, B.Sc, BBA, BA, and GATE/UPSC prep.</p>
 
             <form method="GET" class="d-flex gap-2" style="max-width: 540px;">
                 {% if selected_category != 'All' %}
                     <input type="hidden" name="category" value="{{ selected_category }}">
                 {% endif %}
-                <input type="text" name="q" class="form-control" placeholder="Search books by title, author, or subject..." value="{{ search_query }}" style="border-radius: 12px; padding: 12px 18px; border: none; font-size: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                <input type="text" name="q" class="form-control" placeholder="Search Indian courses (B.Tech, B.Com, B.Sc, NPTEL, GATE)..." value="{{ search_query }}" style="border-radius: 12px; padding: 12px 18px; border: none; font-size: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
                 <button type="submit" class="btn btn-warning" style="border-radius: 12px; padding: 0 24px; font-weight: 700; background: #c99746; border: none; color: #fff;">
                     <i class="fas fa-search"></i> Search
                 </button>
             </form>
+        </div>
+
+        <!-- Official Indian Open Access Portals Quick Bar -->
+        <div class="mb-4 p-3" style="background: var(--sk-white, #fff); border-radius: 14px; border: 1px solid var(--border-color, #e2e8f0); box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <span style="font-weight: 700; font-size: 13px; color: var(--text-title, #1e293b);"><i class="fas fa-university text-primary mr-1"></i> Direct Access Indian Portals:</span>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="https://nptel.ac.in/" target="_blank" class="btn btn-sm btn-outline-secondary" style="border-radius: 20px; font-size: 11px; font-weight: 600;"><i class="fas fa-graduation-cap"></i> NPTEL IIT Courses</a>
+                    <a href="https://swayam.gov.in/" target="_blank" class="btn btn-sm btn-outline-secondary" style="border-radius: 20px; font-size: 11px; font-weight: 600;"><i class="fas fa-laptop-code"></i> SWAYAM Govt Portal</a>
+                    <a href="https://egyankosh.ac.in/" target="_blank" class="btn btn-sm btn-outline-secondary" style="border-radius: 20px; font-size: 11px; font-weight: 600;"><i class="fas fa-book"></i> IGNOU e-GyanKosh</a>
+                    <a href="https://epathshala.nic.in/" target="_blank" class="btn btn-sm btn-outline-secondary" style="border-radius: 20px; font-size: 11px; font-weight: 600;"><i class="fas fa-school"></i> e-Pathshala NCERT</a>
+                    <a href="https://ndl.iitkgp.ac.in/" target="_blank" class="btn btn-sm btn-outline-secondary" style="border-radius: 20px; font-size: 11px; font-weight: 600;"><i class="fas fa-archive"></i> NDLI National Library</a>
+                </div>
+            </div>
         </div>
 
         <!-- Category Filters -->
