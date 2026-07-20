@@ -750,6 +750,7 @@ def free_digital_library(request):
         'categories': categories,
         'selected_category': category_filter,
         'search_query': search_query,
+        'total_books_count': '70,000+',
     }
     return render(request, 'main_app/free_digital_library.html', context)
 
