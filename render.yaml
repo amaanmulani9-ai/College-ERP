@@ -24,10 +24,6 @@ services:
         value: "False"
       - key: SECRET_KEY
         generateValue: true
-      - key: TINYMCE_API_KEY
-        value: "jjfi2acmd8qgfrdcr92rvhgd1g5e2rp7ou8ocgsfc77qbt7x"
-      - key: TINYMCE_PRIVATE_KEY
-        value: "a0b7db0fd0bd5fe92a2335af8aff5e286fd673b0ebb1aa3242de02cc0cb32b89"
 
 
   - type: redis

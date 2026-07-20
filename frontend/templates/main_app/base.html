@@ -849,31 +849,6 @@
     </script>
     
     {% block custom_js %}{% endblock custom_js %}
-    
-    <!-- Free Community TinyMCE Rich Text Editor Integration (No API Key Required) -->
-    <style>
-        .tox-notification, .tox-statusbar__branding, .tox-notifications-container { display: none !important; }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js" referrerpolicy="origin"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        if(typeof tinymce !== 'undefined' && document.querySelector('textarea')) {
-            tinymce.init({
-              selector: 'textarea:not(.no-tinymce)',
-              menubar: false,
-              plugins: 'link lists autolink',
-              toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | bullist numlist | link',
-              branding: false,
-              promotion: false,
-              setup: function (editor) {
-                  editor.on('change', function () {
-                      tinymce.triggerSave();
-                  });
-              }
-            });
-        }
-      });
-    </script>
 
     <!-- Notification Bell JS -->
     {% if user.user_type == '2' or user.user_type == '3' %}

@@ -419,9 +419,7 @@ urlpatterns = [
     path("api/ai/predictive-analytics/<int:student_id>/", ai_views.predictive_analytics_api, name='predictive_analytics_student'),
     path("api/ai/receipt-fraud-audit/<int:payment_id>/", ai_views.receipt_fraud_audit_api, name='receipt_fraud_audit_api'),
     
-    # --- TinyMCE Integration ---
-    path("api/tinymce-jwt/", ai_views.tinymce_jwt_provider, name='tinymce_jwt_provider'),
-    
+
     # --- Settings Tabs ---
     path("admin/settings/grading/", hod_views.admin_settings_grading, name='admin_settings_grading'),
     path("admin/settings/rules/", hod_views.admin_settings_rules, name='admin_settings_rules'),

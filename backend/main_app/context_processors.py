@@ -1,10 +1,5 @@
 import os
 
-def tinymce_api_key(request):
-    return {
-        'TINYMCE_API_KEY': os.environ.get('TINYMCE_API_KEY', 'no-api-key')
-    }
-
 def locale_settings(request):
     """Exposes country, language, and currency parameters to all templates."""
     # Read from session, fallback to defaults
