@@ -181,46 +181,6 @@ class SessionForm(FormSettings):
         return cleaned
 
 
-class LeaveReportStaffForm(FormSettings):
-    def __init__(self, *args, **kwargs):
-        super(LeaveReportStaffForm, self).__init__(*args, **kwargs)
-
-    class Meta:
-        model = LeaveReportStaff
-        fields = ['date', 'message']
-        widgets = {
-            'date': DateInput(attrs={'type': 'date'}),
-        }
-
-
-class FeedbackStaffForm(FormSettings):
-
-    def __init__(self, *args, **kwargs):
-        super(FeedbackStaffForm, self).__init__(*args, **kwargs)
-
-    class Meta:
-        model = FeedbackStaff
-        fields = ['feedback']
-
-
-class LeaveReportStudentForm(FormSettings):
-    def __init__(self, *args, **kwargs):
-        super(LeaveReportStudentForm, self).__init__(*args, **kwargs)
-
-    class Meta:
-        model = LeaveReportStudent
-        fields = ['date', 'message']
-        widgets = {
-            'date': DateInput(attrs={'type': 'date'}),
-        }
-
-
-class FeedbackStudentForm(FormSettings):
-
-    def __init__(self, *args, **kwargs):
-        super(FeedbackStudentForm, self).__init__(*args, **kwargs)
-
-
 
 class LeaveReportStaffForm(FormSettings):
     def __init__(self, *args, **kwargs):
@@ -300,17 +260,12 @@ class EditResultForm(FormSettings):
         model = StudentResult
         fields = ['session_year', 'subject', 'student', 'test', 'exam']
 
-#todos
-# class TodoForm(forms.ModelForm):
-#     class Meta:
-#         model=Todo
-#         fields=["title","is_finished"]
-
-#issue book
 
 class IssueBookForm(forms.Form):
     isbn2 = forms.ModelChoiceField(queryset=models.Book.objects.all(), empty_label="Book Name [ISBN]", to_field_name="isbn", label="Book (Name and ISBN)")
     name2 = forms.ModelChoiceField(queryset=models.Student.objects.all(), empty_label="Name ", to_field_name="", label="Student Details")
-    
-    isbn2.widget.attrs.update({'class': 'form-control'})
-    name2.widget.attrs.update({'class':'form-control'})
+
+    def __init__(self, *args, **kwargs):
+        super(IssueBookForm, self).__init__(*args, **kwargs)
+        self.fields['isbn2'].widget.attrs.update({'class': 'form-control'})
+        self.fields['name2'].widget.attrs.update({'class': 'form-control'})
