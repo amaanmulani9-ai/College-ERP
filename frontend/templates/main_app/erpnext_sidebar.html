@@ -223,6 +223,12 @@
                 <span class="nav-text">Dashboard</span>
             </a>
         </div>
+        <div class="nav-item">
+            <a href="{% url 'free_modules_dashboard' %}" class="nav-link {% if request.path == '/admin/free-modules/' %}active{% endif %}">
+                <i class="nav-icon fas fa-gift text-amber-400"></i>
+                <span class="nav-text">Free Modules & APIs</span>
+            </a>
+        </div>
         <div class="nav-item has-submenu {% if '/admin/library/' in request.path %}open{% endif %}">
             <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-book-reader"></i>

@@ -282,130 +282,66 @@ def export_staff_analytics(request):
 
 @login_required(login_url='/')
 @admin_required
-def pro_modules_dashboard(request):
-    """Role-based Pro modules command center."""
+def free_modules_dashboard(request):
+    """Free Open Modules & Public API Suite Workspace."""
     today = date.today()
     fee_expected = FeeRecord.objects.aggregate(total=Sum('amount'))['total'] or 0
     fee_collected = FeeRecord.objects.aggregate(total=Sum('amount_paid'))['total'] or 0
-    issued_books = IssuedBook.objects.count()
-    overdue_books = IssuedBook.objects.filter(expiry_date__lt=today).count()
-    pending_certificates = CertificateRequest.objects.filter(status='Pending').count()
-    pending_queries = AdmissionQuery.objects.filter(status='Active').count()
-    open_complaints = Complaint.objects.filter(action_taken__isnull=True).count()
-    pending_student_leaves = LeaveReportStudent.objects.filter(status=0).count()
-    pending_staff_leaves = LeaveReportStaff.objects.filter(status=0).count()
-
-    pro_modules = [
+    
+    free_modules = [
         {
-            'role': 'Accountant',
-            'icon': 'fas fa-file-invoice-dollar',
-            'tone': 'green',
-            'summary': 'Fees, income, expenses, bank accounts, salary, receipts, and statements.',
-            'metrics': [
-                {'label': 'Expected', 'value': fee_expected},
-                {'label': 'Collected', 'value': fee_collected},
-                {'label': 'Pending', 'value': fee_expected - fee_collected},
-            ],
-            'links': [
-                {'label': 'Finance Dashboard', 'url': reverse('admin_finance_dashboard')},
-                {'label': 'Chart of Accounts', 'url': reverse('chart_of_accounts')},
-                {'label': 'Collect Fees', 'url': reverse('admin_collect_fees')},
-                {'label': 'Salary Slip', 'url': reverse('admin_salary_slip')},
-            ],
+            'name': 'Open Course & Syllabus API',
+            'badge': '100% Free Open API',
+            'icon': 'fas fa-graduation-cap',
+            'color': '#6366f1',
+            'description': 'Public REST endpoint serving course structures, degree levels, total semesters, and subject mappings.',
+            'endpoint': '/api/public/courses/',
+            'action_label': 'Test Open API',
         },
         {
-            'role': 'Librarian',
+            'name': 'Noticeboard & Circular Broadcasts API',
+            'badge': '100% Free Open API',
+            'icon': 'fas fa-bullhorn',
+            'color': '#ec4899',
+            'description': 'Real-time JSON feed of institutional circulars, exams schedule alerts, and campus announcements.',
+            'endpoint': '/api/public/noticeboard/',
+            'action_label': 'View Live Feed',
+        },
+        {
+            'name': 'SHA-256 Fee Receipt Verification API',
+            'badge': 'Cryptographic Security',
+            'icon': 'fas fa-shield-check',
+            'color': '#10b981',
+            'description': 'Public cryptographic verification suite to audit fee receipt hashes against immutable ledger entries.',
+            'endpoint': '/api/public/verify-receipt/demo/',
+            'action_label': 'Verify Hash',
+        },
+        {
+            'name': 'Digital Certificate & Transcript Verification API',
+            'badge': 'Free Verification',
+            'icon': 'fas fa-certificate',
+            'color': '#8b5cf6',
+            'description': 'Open API allowing employers & universities to instantly verify student certificates without friction.',
+            'endpoint': '/api/public/verify-certificate/demo/',
+            'action_label': 'Check Certificate',
+        },
+        {
+            'name': 'Free Open Digital Library Resources',
+            'badge': 'Unlimited Access',
             'icon': 'fas fa-book-reader',
-            'tone': 'blue',
-            'summary': 'Book catalog, issue desk, returns, overdue tracking, and student library access.',
-            'metrics': [
-                {'label': 'Books', 'value': Book.objects.count()},
-                {'label': 'Issued', 'value': issued_books},
-                {'label': 'Overdue', 'value': overdue_books},
-            ],
-            'links': [
-                {'label': 'Library Overview', 'url': reverse('admin_library_overview')},
-                {'label': 'Book Catalog', 'url': reverse('admin_library_catalog')},
-                {'label': 'Issue Desk', 'url': reverse('admin_library_issue')},
-                {'label': 'Overdue Report', 'url': reverse('admin_library_overdue')},
-            ],
-        },
-        {
-            'role': 'Receptionist',
-            'icon': 'fas fa-headset',
-            'tone': 'orange',
-            'summary': 'Admissions desk, visitor passes, enquiries, complaints, calls, and postal records.',
-            'metrics': [
-                {'label': 'Admissions', 'value': Student.objects.count()},
-                {'label': 'Queries', 'value': pending_queries},
-                {'label': 'Complaints', 'value': open_complaints},
-            ],
-            'links': [
-                {'label': 'Admission Queries', 'url': reverse('manage_queries')},
-                {'label': 'Visitor Passes', 'url': reverse('admin_visitor_passes')},
-                {'label': 'Phone Calls', 'url': reverse('manage_call_logs')},
-                {'label': 'Postal Records', 'url': reverse('manage_postal')},
-            ],
-        },
-        {
-            'role': 'Teacher',
-            'icon': 'fas fa-chalkboard-teacher',
-            'tone': 'purple',
-            'summary': 'Class routine, attendance, exams, LMS, live classes, study material, and grading.',
-            'metrics': [
-                {'label': 'Staff', 'value': Staff.objects.count()},
-                {'label': 'Subjects', 'value': Subject.objects.count()},
-                {'label': 'Leaves', 'value': pending_staff_leaves},
-            ],
-            'links': [
-                {'label': 'Timetable', 'url': reverse('admin_manage_timetable')},
-                {'label': 'Homework', 'url': reverse('admin_homework')},
-                {'label': 'Create Exam', 'url': reverse('admin_create_exam')},
-                {'label': 'Live Class', 'url': reverse('admin_live_class')},
-            ],
-        },
-        {
-            'role': 'Parent Portal',
-            'icon': 'fas fa-user-friends',
-            'tone': 'teal',
-            'summary': 'Parent access to attendance, fee status, results, timetable, and feedback.',
-            'metrics': [
-                {'label': 'Parents', 'value': Parent.objects.count()},
-                {'label': 'Students', 'value': Student.objects.count()},
-                {'label': 'Student Leaves', 'value': pending_student_leaves},
-            ],
-            'links': [
-                {'label': 'Add Parent', 'url': reverse('add_parent')},
-                {'label': 'Manage Parents', 'url': reverse('manage_parent')},
-                {'label': 'Student Attendance', 'url': reverse('admin_students_attendance_report')},
-                {'label': 'Results', 'url': reverse('admin_result_card')},
-            ],
-        },
-        {
-            'role': 'Super Admin',
-            'icon': 'fas fa-shield-alt',
-            'tone': 'red',
-            'summary': 'Institute settings, certificates, theme, users, analytics, and operating controls.',
-            'metrics': [
-                {'label': 'Courses', 'value': Course.objects.count()},
-                {'label': 'Certificates', 'value': pending_certificates},
-                {'label': 'Users', 'value': CustomUser.objects.count()},
-            ],
-            'links': [
-                {'label': 'Institute Profile', 'url': reverse('admin_settings_profile')},
-                {'label': 'Theme Settings', 'url': reverse('admin_settings_theme')},
-                {'label': 'Certificates', 'url': reverse('manage_certificate_templates')},
-                {'label': 'Analytics', 'url': reverse('admin_analytics')},
-            ],
+            'color': '#f59e0b',
+            'description': 'Open-access academic journals, free PDF textbooks, DSA problem sets, and course reference guides.',
+            'endpoint': '/api/public/free-resources/',
+            'action_label': 'Access Resources',
         },
     ]
 
     context = {
-        'page_title': 'Pro Modules',
-        'page_subtitle': 'Role-based dashboards and shortcuts.',
-        'pro_modules': pro_modules,
+        'page_title': 'Free Modules & Open APIs Suite',
+        'page_subtitle': '100% free open-access modules and REST API endpoints for students, faculty, and public audit.',
+        'free_modules': free_modules,
     }
-    return render(request, 'hod_template/pro_modules.html', context)
+    return render(request, 'hod_template/free_modules.html', context)
 
 
 @login_required(login_url='/')

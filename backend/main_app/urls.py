@@ -17,7 +17,7 @@ from django.urls import path
 
 from main_app.EditResultView import EditResultView
 
-from . import hod_views, staff_views, student_views, parent_views, views, chat_views, smart_views, ai_views, analytics_views, mobile_api_views, finance_views, placement_views, backoffice_views
+from . import hod_views, staff_views, student_views, parent_views, views, chat_views, smart_views, ai_views, analytics_views, mobile_api_views, finance_views, placement_views, backoffice_views, free_api_views
 
 urlpatterns = [
     path("robots.txt", views.robots_txt, name="robots_txt"),
@@ -34,7 +34,12 @@ urlpatterns = [
     path("logout_user/", views.logout_user, name='logout_user'),
     path("set_locale/", views.set_locale, name='set_locale'),
     path("admin/home/", hod_views.admin_home, name='admin_home'),
-    path("admin/pro-modules/", hod_views.pro_modules_dashboard, name='pro_modules_dashboard'),
+    path("admin/free-modules/", hod_views.free_modules_dashboard, name='free_modules_dashboard'),
+    path("api/public/courses/", free_api_views.public_courses_api, name='public_courses_api'),
+    path("api/public/noticeboard/", free_api_views.public_noticeboard_api, name='public_noticeboard_api'),
+    path("api/public/verify-certificate/<str:cert_code>/", free_api_views.public_verify_certificate_api, name='public_verify_certificate_api'),
+    path("api/public/verify-receipt/<str:receipt_hash>/", free_api_views.public_verify_receipt_api, name='public_verify_receipt_api'),
+    path("api/public/free-resources/", free_api_views.public_free_resources_api, name='public_free_resources_api'),
     path("admin/library/", hod_views.admin_library_overview, name='admin_library_overview'),
     path("admin/library/catalog/", hod_views.admin_library_catalog, name='admin_library_catalog'),
     path("admin/library/issue/", hod_views.admin_library_issue, name='admin_library_issue'),
