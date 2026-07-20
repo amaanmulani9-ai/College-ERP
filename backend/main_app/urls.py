@@ -38,6 +38,7 @@ urlpatterns = [
     path("admin/library/catalog/", hod_views.admin_library_catalog, name='admin_library_catalog'),
     path("admin/library/issue/", hod_views.admin_library_issue, name='admin_library_issue'),
     path("admin/library/overdue/", hod_views.admin_library_overdue, name='admin_library_overdue'),
+    path("library/free-books/", views.free_digital_library, name='free_digital_library'),
     path("admin/analytics/", analytics_views.admin_analytics, name='admin_analytics'),
     path("admin/analytics/export/<str:report_type>/", analytics_views.export_analytics_report, name='export_analytics_report'),
     path("metrics", analytics_views.prometheus_metrics, name='prometheus_metrics'),

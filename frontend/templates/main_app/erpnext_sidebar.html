@@ -237,6 +237,7 @@
                 <i class="nav-arrow"></i>
             </a>
             <div class="nav-submenu">
+                <a href="{% url 'free_digital_library' %}" class="nav-link {% if 'library/free-books' in request.path %}active{% endif %}">📖 Free Books & Notes</a>
                 <a href="{% url 'admin_library_overview' %}" class="nav-link {% if request.path == '/admin/library/' %}active{% endif %}">Overview</a>
                 <a href="{% url 'admin_library_catalog' %}" class="nav-link {% if 'library/catalog' in request.path %}active{% endif %}">Book Catalog</a>
                 <a href="{% url 'admin_library_issue' %}" class="nav-link {% if 'library/issue' in request.path %}active{% endif %}">Issue Desk</a>

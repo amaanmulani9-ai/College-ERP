@@ -480,16 +480,141 @@ def llms_txt(request):
 An advanced, glassmorphic multitenant ERP solution built on modern Python and Django. Designed for speed, security, and exceptional visual beauty.
 
 ## Core Features
-- **Online Admission Stepper:** Interactive multi-stage application forms.
-- **Finance & Online Checkout:** Ledger items, GST tracking, Razorpay integration.
 - **Smart ID Card Engine:** Flip animation glassmorphic digital ID cards with scanned QR verification.
 - **AI Suite:** Generates exam papers, timetables, auto-grades assignments.
-
-## Role Portals
-- **Admin**: custom fee configuration, certificate templates, session management.
-- **Staff / Faculty**: attendance logging, marksheets, leave approvals, classroom discussion.
-- **Student**: view courses, watch lessons, pay fees, fetch timetables.
-- **Parent**: monitor academic metrics, submit feedback, view calendars.
 """
     return HttpResponse(content, content_type="text/plain")
+
+
+def free_digital_library(request):
+    """Free Digital Library & Open Notes Reader accessible to everyone."""
+    category_filter = request.GET.get('category', 'All')
+    search_query = request.GET.get('q', '').strip().lower()
+
+    all_books = [
+        {
+            'id': 1,
+            'title': 'Python Programming & Data Structures',
+            'author': 'OpenStax & Academic Press',
+            'category': 'Computer Science',
+            'pages': '340 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://openstax.org/details/books/introduction-python-programming',
+            'download_url': 'https://open.umn.edu/opentextbooks/textbooks/python-for-everybody-exploring-data-in-python-3',
+            'description': 'Comprehensive textbook covering Python fundamentals, algorithms, data structures, and object-oriented design.',
+            'badge': 'FREE TEXTBOOK',
+            'color': 'linear-gradient(135deg, #0f5f6c, #14b8a6)'
+        },
+        {
+            'id': 2,
+            'title': 'Calculus & Multivariable Mathematics',
+            'author': 'OpenCourseWare Consortium',
+            'category': 'Mathematics',
+            'pages': '512 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://openstax.org/details/books/calculus-volume-1',
+            'download_url': 'https://openstax.org/details/books/calculus-volume-1',
+            'description': 'Full open-access textbook on single & multivariable calculus, derivatives, integrals, and vector analysis.',
+            'badge': 'MIT OPEN COURSE',
+            'color': 'linear-gradient(135deg, #6366f1, #a855f7)'
+        },
+        {
+            'id': 3,
+            'title': 'Database Management & SQL Systems',
+            'author': 'Stanford Educational Commons',
+            'category': 'Computer Science',
+            'pages': '285 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://open.umn.edu/opentextbooks/textbooks/relational-databases-and-microsoft-access-365-2021-edition',
+            'download_url': 'https://open.umn.edu/opentextbooks/textbooks/relational-databases-and-microsoft-access-365-2021-edition',
+            'description': 'Relational algebra, SQL query optimization, ER diagrams, indexing, normalization, and ACID transactions.',
+            'badge': 'FREE NOTES',
+            'color': 'linear-gradient(135deg, #3b82f6, #06b6d4)'
+        },
+        {
+            'id': 4,
+            'title': 'Principles of Micro & Macro Economics',
+            'author': 'OpenStax Economics Team',
+            'category': 'Business',
+            'pages': '420 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://openstax.org/details/books/principles-microeconomics-3e',
+            'download_url': 'https://openstax.org/details/books/principles-microeconomics-3e',
+            'description': 'Fundamental principles of supply & demand, market structures, fiscal policy, trade, and monetary economics.',
+            'badge': 'OPEN ACCESS',
+            'color': 'linear-gradient(135deg, #f59e0b, #d97706)'
+        },
+        {
+            'id': 5,
+            'title': 'University Physics: Mechanics & Waves',
+            'author': 'Dr. Samuel J. Ling et al.',
+            'category': 'Engineering',
+            'pages': '610 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://openstax.org/details/books/university-physics-volume-1',
+            'download_url': 'https://openstax.org/details/books/university-physics-volume-1',
+            'description': 'Classical mechanics, Newton laws, rotational kinematics, thermodynamics, and wave oscillations.',
+            'badge': 'FREE TEXTBOOK',
+            'color': 'linear-gradient(135deg, #ef4444, #dc2626)'
+        },
+        {
+            'id': 6,
+            'title': 'Organic Chemistry & Molecular Structures',
+            'author': 'Open Textbooks Network',
+            'category': 'Science',
+            'pages': '490 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://openstax.org/details/books/organic-chemistry',
+            'download_url': 'https://openstax.org/details/books/organic-chemistry',
+            'description': 'Functional groups, reaction mechanisms, stereochemistry, synthesis, and spectroscopic identification.',
+            'badge': 'FREE NOTES',
+            'color': 'linear-gradient(135deg, #10b981, #059669)'
+        },
+        {
+            'id': 7,
+            'title': 'Web Development & Full-Stack Engineering',
+            'author': 'Open Web Alliance',
+            'category': 'Computer Science',
+            'pages': '310 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://open.umn.edu/opentextbooks/textbooks/web-literacy',
+            'download_url': 'https://open.umn.edu/opentextbooks/textbooks/web-literacy',
+            'description': 'HTML5, CSS3, Modern JavaScript (ES6+), RESTful APIs, responsive design, and web deployment.',
+            'badge': 'FREE HANDBOOK',
+            'color': 'linear-gradient(135deg, #8b5cf6, #ec4899)'
+        },
+        {
+            'id': 8,
+            'title': 'Financial Accounting & Reporting Notes',
+            'author': 'Global Open Business Library',
+            'category': 'Business',
+            'pages': '360 Pages',
+            'format': 'PDF / Reader',
+            'read_url': 'https://openstax.org/details/books/principles-financial-accounting',
+            'download_url': 'https://openstax.org/details/books/principles-financial-accounting',
+            'description': 'Balance sheets, cash flow statements, ledger entries, auditing standards, and managerial accounting.',
+            'badge': 'OPEN ACCESS',
+            'color': 'linear-gradient(135deg, #0284c7, #0369a1)'
+        }
+    ]
+
+    # Filter by Category
+    if category_filter and category_filter != 'All':
+        all_books = [b for b in all_books if b['category'].lower() == category_filter.lower()]
+
+    # Filter by Search Query
+    if search_query:
+        all_books = [b for b in all_books if search_query in b['title'].lower() or search_query in b['category'].lower() or search_query in b['author'].lower() or search_query in b['description'].lower()]
+
+    categories = ['All', 'Computer Science', 'Mathematics', 'Engineering', 'Business', 'Science']
+
+    context = {
+        'page_title': 'Free Digital Library & Open Study Notes',
+        'books': all_books,
+        'categories': categories,
+        'selected_category': category_filter,
+        'search_query': search_query,
+    }
+    return render(request, 'main_app/free_digital_library.html', context)
+
 

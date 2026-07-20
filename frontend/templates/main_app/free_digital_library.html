@@ -1,0 +1,252 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    .library-hero {
+        background: linear-gradient(135deg, #083f49 0%, #0f5f6c 60%, #c99746 100%);
+        color: #ffffff;
+        border-radius: 18px;
+        padding: 36px 32px;
+        margin-bottom: 28px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 12px 36px rgba(15, 95, 108, 0.22);
+    }
+    .library-hero::before {
+        content: '';
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+        top: -60px;
+        right: -60px;
+    }
+    .library-hero h1 {
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+    .library-hero p {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.88);
+        max-width: 680px;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+    
+    .category-chips {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+    }
+    .category-chip {
+        padding: 8px 18px;
+        border-radius: 999px;
+        background: var(--sk-white, #ffffff);
+        border: 1px solid var(--border-color, #e2e8f0);
+        color: var(--text-main, #334155);
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none !important;
+        transition: all 200ms ease;
+    }
+    .category-chip:hover, .category-chip.active {
+        background: #0f5f6c;
+        color: #ffffff;
+        border-color: #0f5f6c;
+        box-shadow: 0 4px 14px rgba(15, 95, 108, 0.25);
+    }
+
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 22px;
+    }
+
+    .book-card {
+        background: var(--sk-white, #ffffff);
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 16px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    }
+    .book-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    .book-banner {
+        height: 130px;
+        padding: 20px;
+        color: #ffffff;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .book-badge {
+        align-self: flex-start;
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(8px);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .book-cat {
+        font-size: 12px;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    .book-content {
+        padding: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .book-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-title, #1e293b);
+        margin-bottom: 6px;
+        line-height: 1.4;
+    }
+    .book-author {
+        font-size: 12px;
+        color: var(--text-muted, #64748b);
+        font-weight: 500;
+        margin-bottom: 12px;
+    }
+    .book-desc {
+        font-size: 13px;
+        color: var(--text-muted, #475569);
+        line-height: 1.55;
+        margin-bottom: 16px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .book-meta-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 14px;
+        border-top: 1px solid var(--border-color, #f1f5f9);
+        margin-top: auto;
+    }
+    .book-pages {
+        font-size: 12px;
+        color: #94a3b8;
+        font-weight: 600;
+    }
+    
+    .btn-read {
+        background: #0f5f6c;
+        color: #ffffff !important;
+        border-radius: 8px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        border: none;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-read:hover {
+        background: #083f49;
+        transform: translateY(-1px);
+    }
+    .btn-download {
+        background: rgba(15, 95, 108, 0.08);
+        color: #0f5f6c !important;
+        border-radius: 8px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid rgba(15, 95, 108, 0.15);
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-download:hover {
+        background: rgba(15, 95, 108, 0.15);
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Hero Header -->
+        <div class="library-hero">
+            <h1><i class="fas fa-book-reader mr-2"></i> Free Digital Library & Open Study Notes</h1>
+            <p>Access 100% free open-access educational textbooks, lecture notes, reference guides, and learning resources across all major academic streams.</p>
+
+            <form method="GET" class="d-flex gap-2" style="max-width: 540px;">
+                {% if selected_category != 'All' %}
+                    <input type="hidden" name="category" value="{{ selected_category }}">
+                {% endif %}
+                <input type="text" name="q" class="form-control" placeholder="Search books by title, author, or subject..." value="{{ search_query }}" style="border-radius: 12px; padding: 12px 18px; border: none; font-size: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                <button type="submit" class="btn btn-warning" style="border-radius: 12px; padding: 0 24px; font-weight: 700; background: #c99746; border: none; color: #fff;">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </form>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="category-chips">
+            {% for cat in categories %}
+                <a href="?category={{ cat }}{% if search_query %}&q={{ search_query }}{% endif %}" class="category-chip {% if selected_category == cat %}active{% endif %}">
+                    {{ cat }}
+                </a>
+            {% endfor %}
+        </div>
+
+        <!-- Books Grid -->
+        {% if books %}
+        <div class="books-grid">
+            {% for book in books %}
+            <div class="book-card">
+                <div class="book-banner" style="background: {{ book.color }};">
+                    <span class="book-badge">{{ book.badge }}</span>
+                    <span class="book-cat"><i class="fas fa-bookmark mr-1"></i> {{ book.category }}</span>
+                </div>
+                <div class="book-content">
+                    <div>
+                        <div class="book-title">{{ book.title }}</div>
+                        <div class="book-author"><i class="fas fa-feather-alt mr-1"></i> {{ book.author }}</div>
+                        <div class="book-desc">{{ book.description }}</div>
+                    </div>
+                    <div class="book-meta-footer">
+                        <span class="book-pages"><i class="far fa-file-alt mr-1"></i> {{ book.pages }}</span>
+                        <div class="d-flex gap-2">
+                            <a href="{{ book.read_url }}" target="_blank" class="btn-read"><i class="fas fa-eye mr-1"></i> Read</a>
+                            <a href="{{ book.download_url }}" target="_blank" class="btn-download"><i class="fas fa-download"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card p-5 text-center" style="border-radius: 16px; border: 1px dashed var(--border-color);">
+            <i class="fas fa-book-open fa-3x mb-3 text-muted"></i>
+            <h4>No Educational Resources Found</h4>
+            <p class="text-muted">Try searching with a different keyword or select another category filter above.</p>
+            <a href="{% url 'free_digital_library' %}" class="btn btn-outline-primary mt-2" style="width: fit-content; margin: 0 auto; border-radius: 10px;">Clear Search Filters</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock content %}
