@@ -5,8 +5,8 @@
         background-color: var(--bg-sidebar);
         border-right: 1px solid var(--border-element);
         font-family: 'Outfit', sans-serif;
-        backdrop-filter: var(--glass-blur);
-        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         transition: background-color 0.3s ease, border-color 0.3s ease;
     }
     .sidebar-header {
@@ -19,24 +19,25 @@
         font-size: 11px;
         color: var(--text-muted);
         text-transform: uppercase;
-        font-weight: 600;
-        margin-bottom: 8px;
-        letter-spacing: 0.8px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        letter-spacing: 1.2px;
+        opacity: 0.85;
     }
     .campuspro-search {
         position: relative;
-        margin-bottom: 15px;
+        margin-bottom: 18px;
     }
     .campuspro-search input {
         width: 100%;
         border: 1px solid var(--border-element);
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.02);
-        padding: 8px 12px 8px 36px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.04);
+        padding: 10px 14px 10px 38px;
         font-size: 13px;
         color: var(--text-main);
         outline: none;
-        transition: all 0.2s ease;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .campuspro-search input::placeholder {
         color: var(--text-muted);
@@ -44,23 +45,27 @@
     }
     .campuspro-search input:focus {
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-        background: rgba(255, 255, 255, 0.05);
+        box-shadow: 0 0 0 4px rgba(15, 95, 108, 0.15), 0 4px 12px rgba(15, 95, 108, 0.08);
+        background: rgba(255, 255, 255, 0.08);
     }
     .campuspro-search i {
         position: absolute;
-        left: 12px;
+        left: 14px;
         top: 50%;
         transform: translateY(-50%);
         font-size: 13px;
         color: var(--text-muted);
+        transition: color 0.2s ease;
+    }
+    .campuspro-search input:focus + i {
+        color: var(--primary-color);
     }
     
     .nav-section {
         padding: 0 12px;
     }
     .nav-item {
-        margin: 0;
+        margin: 2px 0;
     }
     .nav-link {
         padding: 10px 14px;
@@ -69,8 +74,8 @@
         font-weight: 500;
         display: flex;
         align-items: center;
-        transition: color 180ms ease, background 180ms ease, transform 180ms ease, box-shadow 180ms ease;
-        border-radius: 10px;
+        transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 12px;
         text-decoration: none !important;
         position: relative;
         overflow: hidden;
@@ -85,7 +90,7 @@
         font-size: 16px;
         color: var(--text-muted);
         text-align: left;
-        transition: color 180ms ease, transform 180ms ease;
+        transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
     }
     .nav-text {
         flex: 1;
@@ -94,35 +99,37 @@
         font-size: 12px;
         color: var(--text-muted);
         font-weight: 400;
+        transition: transform 200ms ease;
     }
     /* Override arrow to be a plus/minus */
     .nav-item.has-submenu > .nav-link .nav-arrow::before {
-        content: "\f068"; /* FontAwesome minus if open, plus if closed */
+        content: "\f068";
         font-family: 'Font Awesome 5 Free';
         font-weight: 900;
     }
     .nav-item.has-submenu > .nav-link .nav-arrow::before {
-        content: "\f067"; /* default to plus */
+        content: "\f067";
     }
     .nav-item.has-submenu.open > .nav-link .nav-arrow::before {
-        content: "\f068"; /* minus when open */
+        content: "\f068";
     }
     
     .nav-link:hover {
-        background: rgba(99, 102, 241, 0.08);
+        background: rgba(15, 95, 108, 0.09);
         color: var(--primary-color);
-        transform: translateX(4px);
+        transform: translateX(5px);
+        box-shadow: 0 4px 12px rgba(15, 95, 108, 0.06);
     }
     .nav-link:hover .nav-icon {
         color: var(--primary-color);
-        transform: scale(1.08);
+        transform: scale(1.12);
     }
     
     .nav-link.active {
-        background: rgba(99, 102, 241, 0.12);
+        background: linear-gradient(135deg, rgba(15, 95, 108, 0.14) 0%, rgba(201, 151, 70, 0.08) 100%);
         color: var(--primary-color);
         font-weight: 600;
-        box-shadow: inset 3px 0 0 var(--primary-color);
+        box-shadow: inset 4px 0 0 var(--primary-color), 0 4px 16px rgba(15, 95, 108, 0.1);
     }
     .nav-link.active .nav-icon {
         color: var(--primary-color);
