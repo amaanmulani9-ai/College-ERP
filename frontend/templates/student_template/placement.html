@@ -1,0 +1,90 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block page_title %}
+Placement Portal
+{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">JSON Resume Builder</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="resumeForm">
+                            <div class="form-group">
+                                <label for="resumeData">Paste JSON Resume Data</label>
+                                <textarea id="resumeData" class="form-control" rows="10" placeholder='{"basics": {"name": "John Doe", "email": "john@example.com"}}'></textarea>
+                            </div>
+                            <button type="button" class="btn btn-success" onclick="saveResume()">Save JSON Resume</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Available Job Postings</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Company</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in jobs %}
+                                <tr>
+                                    <td>{{ job.title }}</td>
+                                    <td>{{ job.company.name }}</td>
+                                    <td>{{ job.description }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary">Apply Now</button>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No active job postings.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+function saveResume() {
+    const data = document.getElementById('resumeData').value;
+    fetch('/api/placement/resume/save/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ resume_data: JSON.parse(data) })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message || 'Resume saved successfully!');
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+{% endblock custom_js %}

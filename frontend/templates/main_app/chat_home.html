@@ -1,0 +1,215 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}Messaging{% endblock page_title %}
+{% block content %}
+<style>
+    .es-chat-container {
+        display: flex;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        height: 600px;
+        margin: 20px;
+        overflow: hidden;
+    }
+    
+    /* Left Sidebar */
+    .es-chat-sidebar {
+        width: 300px;
+        border-right: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+    }
+    .es-chat-header {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .es-chat-header h3 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    .es-btn-new {
+        background: #4f46e5;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .es-chat-search {
+        padding: 0 20px 20px 20px;
+    }
+    .es-chat-search-input {
+        position: relative;
+    }
+    .es-chat-search-input i {
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        color: #94a3b8;
+    }
+    .es-chat-search-input input {
+        width: 100%;
+        padding: 8px 15px;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        outline: none;
+        font-size: 13px;
+        color: #1e293b;
+    }
+    
+    /* Right Content */
+    .es-chat-main {
+        flex: 1;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        text-align: center;
+        position: relative;
+    }
+    .es-chat-main h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 15px;
+    }
+    .es-chat-main p {
+        color: #94a3b8;
+        font-size: 15px;
+        max-width: 600px;
+        line-height: 1.6;
+        margin-bottom: 40px;
+    }
+    
+    /* Illustration mock */
+    .es-chat-illustration {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        height: 300px;
+        margin-bottom: 30px;
+    }
+    .es-chat-blob {
+        position: absolute;
+        bottom: 0;
+        right: 40px;
+        width: 250px;
+        height: 250px;
+        background: #6b46c1;
+        border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+        z-index: 1;
+    }
+    .es-chat-person {
+        position: absolute;
+        bottom: 0;
+        right: 60px;
+        width: 200px;
+        height: 250px;
+        background: #94a3b8; /* placeholder for the person image */
+        border-radius: 10px;
+        z-index: 2;
+        /* Using a CSS placeholder since we don't have the exact image */
+        background-image: url('https://img.freepik.com/free-photo/young-beautiful-woman-using-laptop_23-2148110994.jpg?w=360');
+        background-size: cover;
+        background-position: center;
+        clip-path: polygon(0 10%, 100% 0, 100% 100%, 0% 100%);
+    }
+    .es-chat-bubble {
+        position: absolute;
+        background: white;
+        padding: 10px 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        font-size: 12px;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .es-chat-bubble img {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+    }
+    .es-chat-bubble.b1 { top: 20%; left: 10%; }
+    .es-chat-bubble.b2 { top: 40%; left: 30%; background: #4f46e5; color: white; }
+    .es-chat-bubble.b3 { top: 60%; left: 5%; }
+    .es-chat-bubble.b4 { top: 50%; right: 0; }
+
+    .es-encrypted {
+        position: absolute;
+        bottom: 20px;
+        color: #94a3b8;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-weight: 500;
+    }
+</style>
+
+<div class="content">
+    <div class="es-chat-container">
+        
+        <!-- Left Sidebar -->
+        <div class="es-chat-sidebar">
+            <div class="es-chat-header">
+                <h3>Chats</h3>
+                <button class="es-btn-new"><i class="fas fa-plus"></i> New Chat</button>
+            </div>
+            <div class="es-chat-search">
+                <div class="es-chat-search-input">
+                    <input type="text" placeholder="Search">
+                    <i class="fas fa-search"></i>
+                </div>
+            </div>
+            <!-- empty chat list -->
+        </div>
+
+        <!-- Right Content -->
+        <div class="es-chat-main">
+            <h2>Stay Connected!</h2>
+            <p>Effortless communication at your fingertips! CampusPro's built-in chatting system lets school admins, teachers, Students, and staff collaborate instantly.</p>
+            
+            <div class="es-chat-illustration">
+                <div class="es-chat-blob"></div>
+                <div class="es-chat-person"></div>
+                
+                <div class="es-chat-bubble b1">
+                    <img src="https://ui-avatars.com/api/?name=Sarah&background=random" alt="S">
+                    <div><strong>Hi Sarah! 👋</strong><br>Have you updated Grade 8 attendance?</div>
+                </div>
+                <div class="es-chat-bubble b2">
+                    <img src="https://ui-avatars.com/api/?name=Mohsin&background=random" alt="M">
+                    <div><strong>Hi Mohsin, 🙂</strong><br>Yes, updated yesterday. Check it!</div>
+                </div>
+                <div class="es-chat-bubble b3">
+                    <img src="https://ui-avatars.com/api/?name=Sarah&background=random" alt="S">
+                    <div>Thanks for your help, appreciating the quick response!</div>
+                </div>
+                <div class="es-chat-bubble b4">
+                    <i class="fas fa-graduation-cap" style="color:#4f46e5; font-size:16px;"></i>
+                    <strong>Chat</strong>
+                </div>
+            </div>
+
+            <div class="es-encrypted">
+                <i class="fas fa-lock"></i> end-to-end encrypted.
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

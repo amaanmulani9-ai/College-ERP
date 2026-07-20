@@ -1,0 +1,56 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card erpnext-card mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h4 class="mb-1"><i class="fas fa-folder-open text-info"></i> Downloads & Study Materials Hub</h4>
+                <p class="text-muted mb-0 small">Download lecture notes, handouts, and subject material published by your teachers.</p>
+            </div>
+            <span class="badge bg-info">{{ materials|length }} files</span>
+        </div>
+    </div>
+
+    <div class="card erpnext-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0"><i class="fas fa-folder-open text-info"></i> Downloads & Study Materials Hub</h5>
+            <a href="{% url 'student_lms_home' %}" class="btn btn-sm btn-outline-secondary">Back to LMS</a>
+        </div>
+        <div class="card-body">
+            {% if materials %}
+            <div class="row">
+                {% for material in materials %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border shadow-sm erpnext-card">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-secondary">{{ material.subject.name }}</span>
+                                <small class="text-muted">{{ material.created_at|date:"M d, Y" }}</small>
+                            </div>
+                            <h5 class="card-title mt-1">{{ material.title }}</h5>
+                            <p class="card-text text-muted small flex-grow-1">{{ material.description|default:"No description provided." }}</p>
+                            <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
+                                <small class="text-muted"><i class="fas fa-user-tie"></i> {{ material.staff.admin.first_name }}</small>
+                                <a href="{{ material.file.url }}" target="_blank" class="btn btn-sm btn-info text-white">
+                                    <i class="fas fa-download"></i> Download File
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-folder fa-3x text-muted mb-3"></i>
+                <h5>No Study Materials Available</h5>
+                <p class="text-muted mb-0">Your teachers have not uploaded any downloadable study materials or notes yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

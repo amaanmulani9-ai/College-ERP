@@ -1,0 +1,174 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<style>
+    :root {
+        --color-purple: #6c5ce7;
+        --color-cyan: #02aab0;
+        --color-teal: #00cdac;
+        --radius-2xl: 15px;
+        --shadow-2: rgba(0, 0, 0, 0.08) 0px 4px 15px 0px;
+    }
+    
+    .timetable-day-card {
+        background: #ffffff;
+        border-radius: var(--radius-2xl);
+        box-shadow: var(--shadow-2);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        margin-bottom: 24px;
+        overflow: hidden;
+    }
+    
+    .day-header {
+        background: linear-gradient(135deg, var(--color-purple) 0%, #a29bfe 100%);
+        color: #ffffff;
+        padding: 16px 24px;
+        font-weight: 700;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .day-header-today {
+        background: linear-gradient(135deg, var(--color-cyan) 0%, var(--color-teal) 100%);
+    }
+    
+    .slot-row {
+        display: flex;
+        align-items: center;
+        padding: 16px 24px;
+        border-bottom: 1px solid #eef2f6;
+        transition: background-color 0.2s;
+    }
+    .slot-row:last-child {
+        border-bottom: none;
+    }
+    .slot-row:hover {
+        background-color: #f8fafc;
+    }
+    
+    .slot-time {
+        min-width: 140px;
+        font-weight: 700;
+        color: #6c5ce7;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .slot-details {
+        flex: 1;
+        padding-left: 20px;
+        border-left: 2px solid #e2e8f0;
+    }
+    
+    .slot-subject {
+        font-weight: 700;
+        font-size: 16px;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+    
+    .slot-meta {
+        display: flex;
+        gap: 16px;
+        color: #64748b;
+        font-size: 13px;
+        flex-wrap: wrap;
+    }
+    
+    .slot-meta span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .empty-day {
+        padding: 24px;
+        color: #64748b;
+        text-align: center;
+        font-size: 14px;
+    }
+</style>
+
+<section class="content py-3">
+    <div class="container-fluid col-md-10 offset-md-1">
+        
+        <div class="mb-4">
+            <h5 class="font-weight-bold" style="color: #0f172a;"><i class="fas fa-calendar-alt mr-2 text-primary"></i> Child Class Routine</h5>
+            <p class="text-muted m-0">Weekly scheduled class times and rooms for course: <strong>{{ student.course.name }}</strong></p>
+        </div>
+        
+        <!-- Display days from Monday to Saturday -->
+        {% for day in timetable_by_day.keys %}
+        <div class="timetable-day-card">
+            <div class="day-header {% if day == today %}day-header-today{% endif %}">
+                <span><i class="far fa-calendar-check mr-2"></i> {{ day }}</span>
+                {% if day == today %}
+                <span class="badge bg-white text-dark py-1 px-3" style="font-size: 11px; border-radius: 50px;">Today's Classes</span>
+                {% endif %}
+            </div>
+            
+            <div>
+                {% for slot in timetable_by_day|slice:day %}
+                    <!-- Slice access in Django isn't standard dict lookup, but in our views we populated dictionary. 
+                         Wait! In parent_views.py, we have `timetable_by_day[day] = slots`!
+                         So we can retrieve the day slots by running lookup on the dictionary:
+                         We can do `{% for slot in timetable_by_day.day %}` but django template system doesn't do variable keys.
+                         Wait, how do we access keys? In parent_views.py we saved a dictionary.
+                         To iterate in django templates, we can do:
+                         `{% for day_name, slots in timetable_by_day.items %}` !
+                         This is standard and beautiful! Let's structure it like that! -->
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Correct loop for django templates dictionary items -->
+        {% for day_name, slots in timetable_by_day.items %}
+        <div class="timetable-day-card">
+            <div class="day-header {% if day_name == today %}day-header-today{% endif %}">
+                <span><i class="far fa-calendar-check mr-2"></i> {{ day_name }}</span>
+                {% if day_name == today %}
+                <span class="badge bg-white text-dark py-1 px-3" style="font-size: 11px; border-radius: 50px; font-weight: 700;">TODAY</span>
+                {% endif %}
+            </div>
+            
+            <div>
+                {% for slot in slots %}
+                <div class="slot-row">
+                    <div class="slot-time">
+                        <i class="far fa-clock"></i>
+                        {{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}
+                    </div>
+                    
+                    <div class="slot-details">
+                        <div class="slot-subject">{{ slot.subject.name }}</div>
+                        <div class="slot-meta">
+                            <span><i class="fas fa-door-open" style="color: #02aab0;"></i> Room: {{ slot.classroom }}</span>
+                            <span><i class="fas fa-user-tie" style="color: #6c5ce7;"></i> Teacher: {{ slot.subject.staff }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-day">
+                    <i class="fas fa-calendar-times mr-2 text-secondary"></i> No classes scheduled.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="timetable-day-card p-5 text-center text-muted">
+            <i class="fas fa-calendar-times fa-3x mb-3" style="opacity: 0.3;"></i>
+            <h5 class="font-weight-bold">No Timetable Set</h5>
+            <p class="mb-0">There is no class schedule published for this course yet.</p>
+        </div>
+        {% endfor %}
+        
+    </div>
+</section>
+{% endblock content %}

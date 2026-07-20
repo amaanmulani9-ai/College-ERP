@@ -1,0 +1,83 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Add Lesson Form -->
+        <div class="col-md-5">
+            <div class="card erpnext-card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-plus-circle text-primary"></i> Add Lesson to Course</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Lesson Title <span class="text-danger">*</span></label>
+                            <input type="text" name="title" class="form-control" required placeholder="e.g. Introduction to Syntax">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Order Number</label>
+                            <input type="number" name="order" class="form-control" value="1" min="1">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Video File (MP4/WebM)</label>
+                            <input type="file" name="video_file" class="form-control" accept="video/*">
+                            <small class="text-muted">Upload a video file from your computer.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">OR Video Embed URL</label>
+                            <input type="url" name="video_url" class="form-control" placeholder="https://www.youtube.com/embed/...">
+                            <small class="text-muted">Or provide an external video embed link.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Lesson Summary / Notes</label>
+                            <textarea name="description" class="form-control" rows="4"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100"><i class="fas fa-plus"></i> Add Lesson</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lessons List -->
+        <div class="col-md-7">
+            <div class="card erpnext-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0"><i class="fas fa-list text-primary"></i> Course Lessons</h5>
+                    <a href="{% url 'staff_lms_home' %}" class="btn btn-sm btn-outline-secondary">Back to LMS</a>
+                </div>
+                <div class="card-body">
+                    {% if lessons %}
+                    <div class="list-group">
+                        {% for lesson in lessons %}
+                        <div class="list-group-item d-flex justify-content-between align-items-start mb-2 border rounded shadow-sm">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold"><span class="badge bg-secondary me-2">#{{ lesson.order }}</span> {{ lesson.title }}</div>
+                                <p class="mb-1 text-muted small">{{ lesson.description|truncatewords:20 }}</p>
+                                {% if lesson.video_file %}
+                                <span class="badge bg-success small"><i class="fas fa-file-video"></i> Uploaded Video</span>
+                                {% elif lesson.video_url %}
+                                <span class="badge bg-info text-white small"><i class="fas fa-link"></i> External Link</span>
+                                {% endif %}
+                            </div>
+                            <span class="text-muted small">{{ lesson.created_at|date:"M d" }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No lessons added to this course yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

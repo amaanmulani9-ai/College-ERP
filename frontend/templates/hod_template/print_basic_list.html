@@ -1,0 +1,222 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap4.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; }
+
+.sk-breadcrumb-bar {
+    background: #fff; padding: 15px 25px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+.sk-breadcrumb-left { display: flex; align-items: center; gap: 8px; }
+.sk-breadcrumb-title { color: #4a235a; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.sk-breadcrumb-path { color: #b2bec3; font-size: 13px; }
+.sk-reload-btn {
+    color: #6c5ce7; font-size: 13px; font-weight: 600; text-decoration: none;
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border: 1px solid rgba(103,61,229,.2); border-radius: 8px;
+    transition: all 0.15s;
+}
+.sk-reload-btn:hover { background: rgba(108,92,231,0.08); text-decoration: none; color: #6c5ce7; }
+
+/* Filter Row */
+.sk-filter-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+}
+.sk-filter-group { display: flex; flex-direction: column; gap: 6px; }
+.sk-filter-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: #999;
+}
+.sk-filter-select {
+    padding: 10px 36px 10px 14px;
+    border: 1.5px solid #e8e0ff; border-radius: 10px;
+    font-family: 'Poppins', sans-serif; font-size: 13px; color: #2d3436;
+    background: #fff; outline: none; min-width: 240px;
+    appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    transition: border-color 0.2s;
+}
+.sk-filter-select:focus { border-color: #6c5ce7; }
+
+.sk-toggle-btns { display: flex; gap: 8px; }
+.sk-toggle-btn {
+    padding: 8px 16px; border: 1.5px solid #e8e0ff; border-radius: 8px;
+    font-size: 12px; font-weight: 600; color: #636e72; background: #fff;
+    cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+    text-decoration: none;
+}
+.sk-toggle-btn:hover, .sk-toggle-btn.active { border-color: #6c5ce7; color: #6c5ce7; }
+.sk-toggle-btn.active { background: rgba(108,92,231,0.06); }
+
+/* Table Card */
+.sk-table-card {
+    background: #fff; border-radius: 12px; padding: 25px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+}
+.sk-table-title {
+    font-size: 16px; font-weight: 700; color: #2d3436;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+}
+
+/* DataTable button overrides */
+.dt-buttons .btn {
+    background: #6c5ce7 !important; color: #fff !important;
+    border: none !important; border-radius: 6px !important;
+    font-family: 'Poppins', sans-serif !important; font-size: 12px !important;
+    font-weight: 600 !important; padding: 6px 14px !important;
+    margin-right: 6px !important;
+}
+.dt-buttons .btn:hover { background: #5530c5 !important; }
+
+/* Column visibility dropdown */
+.dt-button-collection .dropdown-menu {
+    border-radius: 10px !important; box-shadow: 0 6px 20px rgba(0,0,0,0.12) !important;
+    padding: 8px 0 !important;
+}
+.dt-button-collection .dt-button {
+    background: #6c5ce7 !important; color: #fff !important;
+    border-radius: 6px !important; margin: 3px 6px !important;
+    font-size: 12px !important; font-weight: 600 !important;
+}
+
+/* Table styling */
+table.dataTable thead th {
+    background: #f8f7ff !important; color: #4a235a !important;
+    font-size: 11px !important; font-weight: 700 !important;
+    text-transform: uppercase !important; letter-spacing: 0.5px !important;
+    border-bottom: 2px solid #e8e0ff !important;
+    padding: 12px 10px !important;
+}
+table.dataTable tbody td {
+    font-size: 13px !important; color: #2d3436 !important;
+    padding: 10px !important; vertical-align: middle !important;
+}
+table.dataTable tbody tr:hover { background: rgba(108,92,231,0.03) !important; }
+
+.dataTables_paginate .paginate_button.current {
+    background: #6c5ce7 !important; color: #fff !important;
+    border: none !important; border-radius: 6px !important;
+}
+
+@media print {
+    .sk-breadcrumb-bar, .sk-filter-row, .dt-buttons, .dataTables_filter, .dataTables_length { display: none !important; }
+}
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-left">
+                <div class="sk-breadcrumb-title"><i class="fas fa-user-graduate" style="color:#6c5ce7;"></i> Students</div>
+                <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right" style="font-size:10px;margin:0 10px;"></i> Print Basic List</div>
+            </div>
+            <a href="" class="sk-reload-btn"><i class="fas fa-sync-alt"></i> Reload</a>
+        </div>
+
+        <!-- Filter Row -->
+        <div class="sk-filter-row">
+            <div class="sk-filter-group">
+                <div class="sk-filter-label">Filter By Class</div>
+                <select class="sk-filter-select" id="classFilter" onchange="filterByClass()">
+                    <option value="">-- Select a class --</option>
+                    {% for course in courses %}
+                    <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"d" %}selected{% endif %}>{{ course.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="sk-toggle-btns">
+                <a href="{% url 'manage_student' %}" class="sk-toggle-btn active"><i class="fas fa-users"></i> 1 Students</a>
+                <a href="{% url 'manage_course' %}" class="sk-toggle-btn"><i class="fas fa-chalkboard"></i> All Classes</a>
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="sk-table-card">
+            <div class="sk-table-title"><i class="fas fa-list-alt" style="color:#6c5ce7;"></i> Student List</div>
+            <table id="studentTable" class="table table-bordered table-hover" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Sr</th>
+                        <th>Reg #</th>
+                        <th>Student Name</th>
+                        <th>Father Name</th>
+                        <th>Class</th>
+                        <th>Fee Remaining</th>
+                        <th>Phone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ student.registration_no|default:"—" }}</td>
+                        <td>{{ student.admin.first_name }} {{ student.admin.last_name }}</td>
+                        <td>—</td>
+                        <td>{{ student.course.name|default:"—" }}</td>
+                        <td>—</td>
+                        <td>{{ student.mobile|default:"—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block custom_js %}
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#studentTable').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print',
+            {
+                extend: 'colvis',
+                text: 'Column Visibility ▼'
+            }
+        ],
+        pageLength: 25,
+        order: [[0, 'asc']],
+        language: {
+            search: "Search:",
+            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+        }
+    });
+});
+
+function filterByClass() {
+    const courseId = document.getElementById('classFilter').value;
+    if (courseId) {
+        window.location.href = '?course=' + courseId;
+    } else {
+        window.location.href = '?';
+    }
+}
+</script>
+{% endblock custom_js %}

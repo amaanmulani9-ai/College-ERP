@@ -1,0 +1,184 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <!-- 3D Flippable Card Wrapper -->
+            <div class="id-card-wrapper mb-4">
+                <div class="id-card-inner" id="idCard">
+                    <!-- FRONT SIDE -->
+                    <div class="id-card-front card border-0 shadow-lg">
+                        <div class="card-glow"></div>
+                        <div class="card-content d-flex flex-column justify-content-between h-100 p-4">
+                            <!-- Logo and Header -->
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="logo-box bg-white rounded-circle p-1 shadow-sm d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; overflow: hidden;">
+                                        <img src="{% static 'image/logo.png' %}" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold mb-0 text-white" style="letter-spacing: 0.5px; font-size: 0.75rem;">CAMPUS PRO ERP</h6>
+                                        <small class="text-white-50 text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Smart Campus ID</small>
+                                    </div>
+                                </div>
+                                <span class="badge bg-warning text-dark border border-warning-50 small fw-bold">STAFF</span>
+                            </div>
+
+                            <!-- Staff Info -->
+                            <div class="row align-items-center my-3">
+                                <div class="col-4">
+                                    <div class="avatar-border p-1 bg-white rounded-3 shadow">
+                                        <img src="{% if staff.admin.profile_pic %}{{ staff.admin.profile_pic.url }}{% else %}https://cdn-icons-png.flaticon.com/512/3135/3135715.png{% endif %}" class="img-fluid rounded-3" style="width: 100%; height: 95px; object-fit: cover;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                                    </div>
+                                </div>
+                                <div class="col-8 text-white">
+                                    <h5 class="fw-bold mb-1">{{ staff.admin.get_full_name }}</h5>
+                                    <p class="mb-1 text-white-50 small"><i class="fas fa-briefcase me-1"></i> {{ staff.course.name }} Department</p>
+                                    <p class="mb-0 text-white-50 small"><i class="fas fa-id-card-alt me-1"></i> {{ employee_id }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Footer Card -->
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-white-10">
+                                <div class="text-white-50" style="font-size: 0.75rem;">
+                                    <div>Email Address</div>
+                                    <strong class="text-white">{{ staff.admin.email }}</strong>
+                                </div>
+                                <button type="button" class="btn btn-xs btn-outline-light" onclick="flipCard()">
+                                    Flip to Back <i class="fas fa-sync-alt ms-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BACK SIDE -->
+                    <div class="id-card-back card border-0 shadow-lg">
+                        <div class="card-content d-flex flex-column justify-content-between h-100 p-4 text-center">
+                            <div>
+                                <h6 class="fw-bold mb-3 text-white border-bottom border-white-10 pb-2">SCAN FOR CAMPUS VERIFICATION</h6>
+                                
+                                <!-- QR Code -->
+                                <div class="bg-white p-2 rounded-3 shadow-sm d-inline-block mb-3">
+                                    <img src="{% url 'generate_staff_qr' staff.id %}" style="width: 130px; height: 130px;">
+                                </div>
+                                
+                                <p class="text-white-50 small px-3">Scan this code at verification terminals or visitor desks to confirm staff identity.</p>
+                            </div>
+
+                            <!-- Barcode -->
+                            <div class="bg-white py-2 px-3 rounded-2 shadow-sm d-inline-block mx-auto mb-2" style="width: 90%;">
+                                <svg id="barcode"></svg>
+                            </div>
+
+                            <button type="button" class="btn btn-xs btn-outline-light mx-auto" onclick="flipCard()">
+                                Flip to Front <i class="fas fa-sync-alt ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-center text-muted small"><i class="fas fa-info-circle me-1"></i> Click "Flip Card" or tap the card to view the barcode and QR code for scanning.</p>
+        </div>
+    </div>
+</div>
+
+<!-- JsBarcode Library -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
+<script>
+    function flipCard() {
+        const card = document.getElementById('idCard');
+        card.classList.toggle('flipped');
+    }
+
+    // Double click to flip card too
+    document.getElementById('idCard').addEventListener('dblclick', flipCard);
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Generate Barcode using Employee ID
+        JsBarcode("#barcode", "{{ employee_id }}", {
+            format: "CODE128",
+            width: 1.5,
+            height: 35,
+            displayValue: true,
+            fontSize: 10,
+            margin: 0
+        });
+    });
+</script>
+
+<style>
+/* 3D Flipping Card Styling */
+.id-card-wrapper {
+    perspective: 1000px;
+    width: 100%;
+    height: 330px;
+}
+.id-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+    cursor: pointer;
+}
+.id-card-inner.flipped {
+    transform: rotateY(180deg);
+}
+
+.id-card-front, .id-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Card Front: Beautiful dark mesh with glowing radial fields */
+.id-card-front {
+    background: linear-gradient(135deg, rgba(20, 22, 32, 0.85) 0%, rgba(13, 14, 21, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+.card-glow {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, transparent 70%);
+    top: -100px;
+    right: -100px;
+    pointer-events: none;
+}
+
+/* Card Back: Dark mesh pattern matching card design standards */
+.id-card-back {
+    background: linear-gradient(135deg, rgba(13, 14, 21, 0.95) 0%, rgba(20, 22, 32, 0.85) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transform: rotateY(180deg);
+}
+
+.border-white-10 {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.btn-xs {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    border-radius: 8px;
+}
+.avatar-border {
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    background: rgba(255,255,255,0.03) !important;
+    border-radius: 12px !important;
+    padding: 3px !important;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2) !important;
+}
+</style>
+{% endblock content %}

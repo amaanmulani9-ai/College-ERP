@@ -1,553 +1,1028 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
 
-{% block page_title %}Dashboard{% endblock page_title %}
+{% block page_title %}Admin Dashboard | CAMPUS PRO ERP{% endblock page_title %}
 
 {% block breadcrumb %}
     <li class="breadcrumb-item active">Dashboard</li>
 {% endblock breadcrumb %}
 
+{% block custom_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   CampusPro Design System Tokens
+   ═══════════════════════════════════════════════════ */
+:root {
+    --sk-brand:        #0f5f6c;
+    --sk-brand-dark:   #083f49;
+    --sk-brand-light:  rgba(15,95,108,.10);
+    --sk-text-primary: #222222;
+    --sk-text-secondary: #ffffff;
+    --sk-text-muted:   #666666;
+    --sk-text-meta:    #8c8c8c;
+    --sk-surface:      #000000;
+    --sk-surface-base: #f3f3f3;
+    --sk-white:        #ffffff;
+
+    --sk-green:  #22c55e;  --sk-green-bg:  rgba(34,197,94,.10);
+    --sk-red:    #ef4444;  --sk-red-bg:    rgba(239,68,68,.10);
+    --sk-orange: #f97316;  --sk-orange-bg: rgba(249,115,22,.10);
+    --sk-blue:   #3b82f6;  --sk-blue-bg:   rgba(59,130,246,.10);
+    --sk-yellow: #eab308;  --sk-yellow-bg: rgba(234,179,8,.10);
+    --sk-purple: #a855f7;  --sk-purple-bg: rgba(168,85,247,.10);
+    --sk-teal:   #14b8a6;  --sk-teal-bg:   rgba(20,184,166,.10);
+
+    --r-sm: 3px; --r-md: 5px; --r-lg: 8px; --r-xl: 10px; --r-2xl: 15px;
+
+    --shadow-1: rgba(4,26,55,.16) 0px 1px 2.94px .06px;
+    --shadow-2: rgba(0,0,0,.13) 0px 0px 11px 0px;
+
+    --dur-fast: 150ms;
+    --dur-norm: 300ms;
+}
+.dark-mode {
+    --sk-text-primary: #e5e5e5;
+    --sk-text-muted:   #aaaaaa;
+    --sk-surface-base: #1a1a2e;
+    --sk-white:        #1e1e30;
+}
+
+/* ── Global Reset to Poppins ── */
+*, *::before, *::after { box-sizing: border-box; }
+body, .erpnext-main, .content-area { font-family: 'Poppins', sans-serif; font-size: 14px; line-height: 21px; }
+
+/* ── Utility ── */
+.sk-card {
+    background: var(--sk-white);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-1);
+    overflow: hidden;
+}
+.dark-mode .sk-card { background: #1e1e30; box-shadow: rgba(0,0,0,.3) 0 2px 10px; }
+
+.sk-card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid rgba(0,0,0,.05);
+}
+.dark-mode .sk-card-head { border-color: rgba(255,255,255,.05); }
+
+.sk-card-title {
+    font-size: 13px; font-weight: 600; color: var(--sk-text-primary);
+    display: flex; align-items: center; gap: 8px; margin: 0;
+}
+.sk-card-body { padding: 16px 20px; }
+
+.sk-badge {
+    display: inline-flex; align-items: center; padding: 2px 9px;
+    border-radius: 99px; font-size: 10px; font-weight: 600; font-family: 'Poppins', sans-serif;
+}
+
+/* ═══════════════════════════════════════════════════
+   1.  Welcome Banner
+   ═══════════════════════════════════════════════════ */
+.wb {
+    background: linear-gradient(135deg, #083f49 0%, #0f5f6c 58%, #c99746 100%);
+    border-radius: var(--r-2xl);
+    padding: 26px 30px;
+    margin-bottom: 22px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 10px 35px rgba(103,61,229,.35);
+}
+.wb::before, .wb::after {
+    content: ''; position: absolute; border-radius: 50%;
+    background: rgba(255,255,255,.06);
+}
+.wb::before { width: 220px; height: 220px; right: -40px; top: -80px; }
+.wb::after  { width: 140px; height: 140px; right: 100px; bottom: -60px; }
+.wb-left h2 { font-size: 19px; font-weight: 700; color: #fff; margin: 0 0 4px; }
+.wb-left p  { font-size: 12px; color: rgba(255,255,255,.75); margin: 0; }
+.wb-live { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.12);
+           border: 1px solid rgba(255,255,255,.2); border-radius: var(--r-lg);
+           padding: 6px 14px; color: #fff; font-size: 12px; font-weight: 500; margin-top: 10px;
+           width: fit-content; }
+.wb-live span.dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80;
+                    box-shadow: 0 0 6px #4ade80; animation: pulse 1.8s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.wb-actions { display: flex; gap: 8px; flex-wrap: wrap; z-index: 2; }
+.wb-btn {
+    background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25);
+    color: #fff; border-radius: var(--r-lg); padding: 7px 15px; font-size: 12px;
+    font-weight: 600; text-decoration: none; font-family: 'Poppins', sans-serif;
+    display: flex; align-items: center; gap: 6px; transition: all var(--dur-fast);
+    white-space: nowrap;
+}
+.wb-btn:hover { background: rgba(255,255,255,.24); color: #fff; transform: translateY(-1px); }
+.wb-btn.solid { background: #fff; color: var(--sk-brand); border-color: #fff; }
+.wb-btn.solid:hover { background: rgba(255,255,255,.92); color: var(--sk-brand); }
+
+/* ═══════════════════════════════════════════════════
+   2. Hero Stat Cards
+   ═══════════════════════════════════════════════════ */
+.hero-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.hero-card {
+    background: var(--sk-white);
+    border-radius: 14px;
+    padding: 22px 20px;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    border-top: 3px solid transparent;
+    display: flex; align-items: center; gap: 16px;
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+}
+.dark-mode .hero-card { background: #1e1e30; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25); }
+.hero-card:hover {
+    transform: translateY(-5px) scale(1.015);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.1);
+}
+.hero-card.c1 { border-color: var(--sk-brand); }
+.hero-card.c2 { border-color: var(--sk-green); }
+.hero-card.c3 { border-color: var(--sk-orange); }
+.hero-card.c4 { border-color: var(--sk-blue); }
+.hero-card.c5 { border-color: var(--sk-teal); }
+.hero-card.c6 { border-color: var(--sk-red); }
+.hero-card.c7 { border-color: var(--sk-yellow); }
+.hero-card.c8 { border-color: var(--sk-purple); }
+
+.hero-ico {
+    width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hero-card:hover .hero-ico {
+    transform: scale(1.1) rotate(3deg);
+}
+.c1 .hero-ico { background: var(--sk-brand-light); color: var(--sk-brand); box-shadow: 0 4px 12px rgba(15,95,108,0.15); }
+.c2 .hero-ico { background: var(--sk-green-bg);  color: var(--sk-green); box-shadow: 0 4px 12px rgba(34,197,94,0.15); }
+.c3 .hero-ico { background: var(--sk-orange-bg); color: var(--sk-orange); box-shadow: 0 4px 12px rgba(249,115,22,0.15); }
+.c4 .hero-ico { background: var(--sk-blue-bg);   color: var(--sk-blue); box-shadow: 0 4px 12px rgba(59,130,246,0.15); }
+.c5 .hero-ico { background: var(--sk-teal-bg);   color: var(--sk-teal); box-shadow: 0 4px 12px rgba(20,184,166,0.15); }
+.c6 .hero-ico { background: var(--sk-red-bg);    color: var(--sk-red); box-shadow: 0 4px 12px rgba(239,68,68,0.15); }
+.c7 .hero-ico { background: var(--sk-yellow-bg); color: var(--sk-yellow); box-shadow: 0 4px 12px rgba(234,179,8,0.15); }
+.c8 .hero-ico { background: var(--sk-purple-bg); color: var(--sk-purple); box-shadow: 0 4px 12px rgba(168,85,247,0.15); }
+
+.hero-num {
+    font-size: 28px; font-weight: 800; line-height: 1; color: var(--sk-text-primary);
+    letter-spacing: -0.6px;
+}
+.hero-lbl { font-size: 12px; color: var(--sk-text-muted); font-weight: 600; margin-top: 4px; }
+.hero-sub { font-size: 11px; color: var(--sk-text-meta); margin-top: 3px; }
+.hero-sub a { color: inherit; opacity: .85; text-decoration: none; transition: opacity 0.2s; }
+.hero-sub a:hover { opacity: 1; text-decoration: underline; }
+.hero-sub a:hover { opacity: 1; text-decoration: underline; }
+
+/* ═══════════════════════════════════════════════════
+   3. Pending Actions Widget
+   ═══════════════════════════════════════════════════ */
+.action-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 0; border-bottom: 1px solid rgba(0,0,0,.04);
+}
+.dark-mode .action-row { border-color: rgba(255,255,255,.05); }
+.action-row:last-child { border-bottom: none; padding-bottom: 0; }
+.action-ico {
+    width: 34px; height: 34px; border-radius: var(--r-md); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.action-text { flex: 1; }
+.action-name { font-size: 12px; font-weight: 600; color: var(--sk-text-primary); }
+.action-sub  { font-size: 10px; color: var(--sk-text-muted); }
+.action-count {
+    font-size: 18px; font-weight: 800; line-height: 1;
+}
+.action-link {
+    font-size: 10px; font-weight: 600; padding: 3px 10px;
+    border-radius: 99px; text-decoration: none; transition: all var(--dur-fast);
+    border: 1px solid currentColor;
+}
+.action-link:hover { opacity: .8; }
+
+/* ═══════════════════════════════════════════════════
+   4. Events Widget
+   ═══════════════════════════════════════════════════ */
+.event-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,.04);
+}
+.dark-mode .event-row { border-color: rgba(255,255,255,.05); }
+.event-row:last-child { border-bottom: none; }
+.event-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+.event-title { font-size: 12px; font-weight: 600; color: var(--sk-text-primary); }
+.event-date  { font-size: 10px; color: var(--sk-text-muted); margin-top: 1px; }
+.ev-exam    { background: var(--sk-red); }
+.ev-holiday { background: var(--sk-green); }
+.ev-event   { background: var(--sk-brand); }
+.ev-seminar { background: var(--sk-yellow); }
+.ev-deadline{ background: var(--sk-orange); }
+
+.event-badge-pill { font-size: 9px; font-weight: 700; padding: 1px 7px; border-radius: 99px; margin-left: 4px; }
+.ev-badge-exam     { background: var(--sk-red-bg);    color: var(--sk-red); }
+.ev-badge-holiday  { background: var(--sk-green-bg);  color: var(--sk-green); }
+.ev-badge-event    { background: var(--sk-brand-light); color: var(--sk-brand); }
+.ev-badge-seminar  { background: var(--sk-yellow-bg); color: var(--sk-yellow); }
+.ev-badge-deadline { background: var(--sk-orange-bg); color: var(--sk-orange); }
+
+/* ═══════════════════════════════════════════════════
+   5. Activity Tables
+   ═══════════════════════════════════════════════════ */
+.sk-table { width: 100%; font-size: 12px; border-collapse: collapse; }
+.sk-table th { font-size: 10px; text-transform: uppercase; letter-spacing: .5px;
+               color: var(--sk-text-meta); padding: 8px 12px; text-align: left;
+               background: var(--sk-surface-base); font-weight: 600; }
+.dark-mode .sk-table th { background: rgba(255,255,255,.04); color: #777; }
+.sk-table td { padding: 10px 12px; border-bottom: 1px solid rgba(0,0,0,.04); vertical-align: middle; color: var(--sk-text-primary); }
+.dark-mode .sk-table td { border-color: rgba(255,255,255,.05); color: #ddd; }
+.sk-table tr:last-child td { border-bottom: none; }
+.sk-table tr:hover td { background: rgba(103,61,229,.03); }
+.dark-mode .sk-table tr:hover td { background: rgba(103,61,229,.08); }
+
+.stu-avatar {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--sk-brand), #a855f7);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 11px; font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════
+   6. Quick Actions Grid
+   ═══════════════════════════════════════════════════ */
+.quick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
+.quick-tile {
+    background: var(--sk-white);
+    border: 1.5px solid rgba(0,0,0,.06);
+    border-radius: var(--r-xl);
+    padding: 18px 10px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--sk-text-muted);
+    font-family: 'Poppins', sans-serif;
+    transition: all var(--dur-fast);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.dark-mode .quick-tile { background: #1e1e30; border-color: rgba(255,255,255,.08); color: #aaa; }
+.quick-tile:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-2);
+    border-color: var(--sk-brand);
+    color: var(--sk-brand);
+    text-decoration: none;
+}
+.quick-tile i { font-size: 22px; }
+.quick-tile span { font-size: 11px; font-weight: 600; }
+
+/* ── Section Header ── */
+.section-head { font-size: 11px; font-weight: 700; color: var(--sk-text-meta);
+                text-transform: uppercase; letter-spacing: .6px; margin: 4px 0 14px; }
+
+.command-strip {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 22px;
+}
+.command-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: var(--r-xl);
+    background: var(--sk-white);
+    color: var(--sk-text-primary);
+    text-decoration: none;
+    box-shadow: var(--shadow-1);
+    transition: transform var(--dur-fast), box-shadow var(--dur-fast), border-color var(--dur-fast);
+    border: 1px solid rgba(0,0,0,.04);
+}
+.dark-mode .command-chip { background: #1e1e30; border-color: rgba(255,255,255,.05); }
+.command-chip:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
+.command-chip i { font-size: 16px; color: var(--sk-brand); width: 18px; text-align: center; }
+.command-chip span { font-size: 12px; font-weight: 600; }
+
+/* ── Responsive ── */
+@media (max-width:768px) {
+    .wb { flex-direction: column; align-items: flex-start; }
+    .wb-actions { display: none; }
+    .hero-grid { grid-template-columns: repeat(2, 1fr); }
+    .quick-grid { grid-template-columns: repeat(3, 1fr); }
+    .command-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+</style>
+{% endblock custom_css %}
+
 {% block content %}
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon primary">
-                <i class="fas fa-user-graduate"></i>
-            </div>
-            <div class="stat-number" style="color: var(--primary-color);">{{ total_students }}</div>
-            <p class="stat-label">Total Students</p>
-            <a href="{% url 'manage_student' %}" class="btn btn-primary btn-sm mt-2">
-                <i class="fas fa-eye"></i> View All
-            </a>
-        </div>
 
-        <div class="stat-card">
-            <div class="stat-icon success">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-number" style="color: var(--success-color);">{{ total_staff }}</div>
-            <p class="stat-label">Total Staff</p>
-            <a href="{% url 'manage_staff' %}" class="btn btn-primary btn-sm mt-2">
-                <i class="fas fa-eye"></i> View All
-            </a>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon warning">
-                <i class="fas fa-graduation-cap"></i>
-            </div>
-            <div class="stat-number" style="color: var(--warning-color);">{{ total_course }}</div>
-            <p class="stat-label">Total Courses</p>
-            <a href="{% url 'manage_course' %}" class="btn btn-primary btn-sm mt-2">
-                <i class="fas fa-eye"></i> View All
-            </a>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon danger">
-                <i class="fas fa-book"></i>
-            </div>
-            <div class="stat-number" style="color: var(--danger-color);">{{ total_subject }}</div>
-            <p class="stat-label">Total Subjects</p>
-            <a href="{% url 'manage_subject' %}" class="btn btn-primary btn-sm mt-2">
-                <i class="fas fa-eye"></i> View All
-            </a>
+<!-- ═══════════ WELCOME BANNER ═══════════ -->
+<div class="wb">
+    <div class="wb-left">
+        <h2>👋 Welcome back, {{ request.user.first_name|default:"Administrator" }}!</h2>
+        <p>{{ request.user.email }} &nbsp;·&nbsp; {% now "l, d F Y" %}</p>
+        <div class="wb-live">
+            <span class="dot"></span>
+            {{ today_attendance_sessions }} attendance session{{ today_attendance_sessions|pluralize }} recorded today
         </div>
     </div>
+    <div class="wb-actions">
+        <a href="{% url 'add_student' %}"          class="wb-btn solid"><i class="fas fa-user-plus"></i> Add Student</a>
+        <a href="{% url 'add_staff' %}"            class="wb-btn"><i class="fas fa-user-tie"></i> Add Staff</a>
+        <a href="{% url 'admin_analytics' %}"      class="wb-btn"><i class="fas fa-chart-line"></i> Analytics</a>
+        <a href="{% url 'admin_finance_dashboard' %}" class="wb-btn"><i class="fas fa-coins"></i> Finance</a>
+    </div>
+</div>
 
-    <!-- Charts Section -->
-    <div class="row">
-        <!-- Staff vs Students Chart -->
-        <div class="col-lg-6">
-            <div class="erpnext-card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-pie me-2"></i>
-                        Staff & Students Overview
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <canvas id="pieChart" style="height: 300px;"></canvas>
-                </div>
-            </div>
-        </div>
+<div class="command-strip">
+    <a href="{% url 'manage_student' %}" class="command-chip"><i class="fas fa-user-graduate"></i><span>Students</span></a>
+    <a href="{% url 'manage_staff' %}" class="command-chip"><i class="fas fa-user-tie"></i><span>Staff</span></a>
+    <a href="{% url 'manage_course' %}" class="command-chip"><i class="fas fa-layer-group"></i><span>Classes</span></a>
+    <a href="{% url 'admin_verification_center' %}" class="command-chip"><i class="fas fa-shield-alt"></i><span>Verification</span></a>
+    <a href="{% url 'admin_analytics' %}" class="command-chip"><i class="fas fa-chart-line"></i><span>Reports</span></a>
+    <a href="{% url 'admin_finance_dashboard' %}" class="command-chip"><i class="fas fa-coins"></i><span>Finance</span></a>
+</div>
 
-        <!-- Attendance per Subject Chart -->
-        <div class="col-lg-6">
-            <div class="erpnext-card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-bar me-2"></i>
-                        Attendance Per Subject
-                    </h3>
+<!-- ═══════════ SMART AI OPERATIONS STRIP ═══════════ -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="sk-card p-3 border-l-4 border-l-indigo-500 cursor-pointer transition-all hover:-translate-y-1 shadow-md" onclick="openPredictiveAnalyticsModal()" style="border-left: 4px solid #6366f1; cursor: pointer;">
+            <div class="d-flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-bold text-lg">
+                    <i class="fas fa-brain"></i>
                 </div>
-                <div class="card-body">
-                    <canvas id="barChart" style="height: 300px;"></canvas>
+                <div>
+                    <h6 class="m-0 font-bold text-sm text-indigo-400">Predictive Student Risk Radar</h6>
+                    <span class="text-xs text-slate-400">Click to view ML risk scores & recommended interventions &rarr;</span>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Student Attendance Overview -->
-    <div class="row">
-        <div class="col-12">
-            <div class="erpnext-card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-calendar-check me-2"></i>
-                        Student Attendance & Leave Overview
-                    </h3>
+    <div class="col-md-4 mb-3 mb-md-0">
+        <div class="sk-card p-3 border-l-4 border-l-emerald-500 cursor-pointer transition-all hover:-translate-y-1 shadow-md" onclick="openReceiptFraudModal(1)" style="border-left: 4px solid #10b981; cursor: pointer;">
+            <div class="d-flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold text-lg">
+                    <i class="fas fa-shield-check"></i>
                 </div>
-                <div class="card-body">
-                    <canvas id="barChart2" style="height: 400px;"></canvas>
+                <div>
+                    <h6 class="m-0 font-bold text-sm text-emerald-400">Fee Receipt Fraud Ledger</h6>
+                    <span class="text-xs text-slate-400">Click to view SHA-256 cryptographic verification audit &rarr;</span>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Course and Subject Distribution -->
-    <div class="row">
-        <!-- Students per Course -->
-        <div class="col-lg-6">
-            <div class="erpnext-card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-pie me-2"></i>
-                        Students Per Course
-                    </h3>
+    <div class="col-md-4">
+        <div class="sk-card p-3 border-l-4 border-l-purple-500 cursor-pointer transition-all hover:-translate-y-1 shadow-md" onclick="toggleCampusChatbot()" style="border-left: 4px solid #a855f7; cursor: pointer;">
+            <div class="d-flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center font-bold text-lg">
+                    <i class="fas fa-robot"></i>
                 </div>
-                <div class="card-body">
-                    <canvas id="pieChart2" style="height: 300px;"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Students per Subject -->
-        <div class="col-lg-6">
-            <div class="erpnext-card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-doughnut me-2"></i>
-                        Students Per Subject
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <canvas id="pieChart3" style="height: 300px;"></canvas>
+                <div>
+                    <h6 class="m-0 font-bold text-sm text-purple-400">24/7 AI Helpdesk Assistant</h6>
+                    <span class="text-xs text-slate-400">Click to launch live campus query assistant &rarr;</span>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Advanced Analytics Dashboard -->
-    <div class="row">
-        <!-- Monthly Enrollment Trend -->
-        <div class="col-12 mb-4">
-            <div class="erpnext-card">
-                <div class="card-header bg-dark text-white">
-                    <h3 class="card-title text-white">
-                        <i class="fas fa-chart-line me-2 text-primary"></i>
-                        Advanced Analytics: Monthly Enrollment Trend
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <canvas id="enrollmentTrendChart" style="height: 300px;"></canvas>
+<!-- ═══════════ HERO STAT CARDS ═══════════ -->
+<div class="hero-grid">
+    <div class="hero-card c1">
+        <div class="hero-ico"><i class="fas fa-user-graduate"></i></div>
+        <div>
+            <div class="hero-num" data-count="{{ total_students }}">0</div>
+            <div class="hero-lbl">Total Students</div>
+            <div class="hero-sub"><a href="{% url 'manage_student' %}">View all →</a></div>
+        </div>
+    </div>
+    <div class="hero-card c2">
+        <div class="hero-ico"><i class="fas fa-chalkboard-teacher"></i></div>
+        <div>
+            <div class="hero-num" data-count="{{ total_staff }}">0</div>
+            <div class="hero-lbl">Total Staff</div>
+            <div class="hero-sub"><a href="{% url 'manage_staff' %}">View all →</a></div>
+        </div>
+    </div>
+    <div class="hero-card c3">
+        <div class="hero-ico"><i class="fas fa-graduation-cap"></i></div>
+        <div>
+            <div class="hero-num" data-count="{{ total_course }}">0</div>
+            <div class="hero-lbl">Courses</div>
+            <div class="hero-sub"><a href="{% url 'manage_course' %}">View all →</a></div>
+        </div>
+    </div>
+    <div class="hero-card c4">
+        <div class="hero-ico"><i class="fas fa-book"></i></div>
+        <div>
+            <div class="hero-num" data-count="{{ total_subject }}">0</div>
+            <div class="hero-lbl">Subjects</div>
+            <div class="hero-sub"><a href="{% url 'manage_subject' %}">View all →</a></div>
+        </div>
+    </div>
+    <div class="hero-card c5">
+        <div class="hero-ico"><i class="fas fa-rupee-sign"></i></div>
+        <div>
+            <div class="hero-num">₹{{ total_fee_collected|floatformat:0 }}</div>
+            <div class="hero-lbl">Fee Collected</div>
+            <div class="hero-sub"><a href="{% url 'admin_finance_dashboard' %}">Finance →</a></div>
+        </div>
+    </div>
+    <div class="hero-card c6">
+        <div class="hero-ico"><i class="fas fa-exclamation-circle"></i></div>
+        <div>
+            <div class="hero-num">₹{{ total_fee_pending|floatformat:0 }}</div>
+            <div class="hero-lbl">Fee Pending</div>
+            <div class="hero-sub" style="color:var(--sk-red);">Outstanding dues</div>
+        </div>
+    </div>
+    <div class="hero-card c7">
+        <div class="hero-ico"><i class="fas fa-users"></i></div>
+        <div>
+            <div class="hero-num" data-count="{{ total_parents }}">0</div>
+            <div class="hero-lbl">Parents</div>
+            <div class="hero-sub"><a href="{% url 'manage_parent' %}">View all →</a></div>
+        </div>
+    </div>
+    <div class="hero-card c8">
+        <div class="hero-ico"><i class="fas fa-calendar-check"></i></div>
+        <div>
+            <div class="hero-num" data-count="{{ total_attendance }}">0</div>
+            <div class="hero-lbl">Attendance Sessions</div>
+            <div class="hero-sub">All time</div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ ROW A: Enrollment Trend + Gender Chart ═══════════ -->
+<div class="row mb-4">
+    <div class="col-lg-8 mb-3 mb-lg-0">
+        <div class="sk-card h-100">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-chart-line" style="color:var(--sk-brand)"></i> Monthly Enrollment Trend</h3>
+                <span class="sk-badge" style="background:var(--sk-brand-light);color:var(--sk-brand);">Students</span>
+            </div>
+            <div class="sk-card-body">
+                <div style="position: relative; height: 240px; width: 100%;">
+                    <canvas id="enrollmentTrendChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div class="row">
-        <!-- Pass/Fail Ratio -->
-        <div class="col-lg-6">
-            <div class="erpnext-card border-info">
-                <div class="card-header border-info">
-                    <h3 class="card-title text-info">
-                        <i class="fas fa-poll me-2"></i>
-                        Overall Pass/Fail Ratio
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <canvas id="passFailChart" style="height: 300px;"></canvas>
-                </div>
+    <div class="col-lg-4">
+        <div class="sk-card h-100">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-venus-mars" style="color:var(--sk-purple)"></i> Gender Distribution</h3>
             </div>
-        </div>
-
-        <!-- Fee Collection Stats -->
-        <div class="col-lg-6">
-            <div class="erpnext-card border-success">
-                <div class="card-header border-success">
-                    <h3 class="card-title text-success">
-                        <i class="fas fa-rupee-sign me-2"></i>
-                        Fee Collection Statistics
-                    </h3>
+            <div class="sk-card-body">
+                <div style="position: relative; height: 180px; width: 100%;">
+                    <canvas id="genderChart"></canvas>
                 </div>
-                <div class="card-body">
-                    <canvas id="feeCollectionChart" style="height: 300px;"></canvas>
+                <div class="row text-center mt-3">
+                    <div class="col-6">
+                        <div style="font-size:22px;font-weight:800;color:var(--sk-blue);">{{ male_students }}</div>
+                        <div style="font-size:10px;color:var(--sk-text-muted);">Male</div>
+                    </div>
+                    <div class="col-6">
+                        <div style="font-size:22px;font-weight:800;color:var(--sk-purple);">{{ female_students }}</div>
+                        <div style="font-size:10px;color:var(--sk-text-muted);">Female</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Staff Analytics -->
-    <div class="row">
-        <div class="col-12">
-            <div class="erpnext-card border-secondary">
-                <div class="card-header border-secondary d-flex justify-content-between align-items-center">
-                    <h3 class="card-title text-secondary m-0">
-                        <i class="fas fa-users-cog me-2"></i>
-                        Staff Performance Analytics
-                    </h3>
-                    <a href="{% url 'export_staff_analytics' %}" class="btn btn-sm btn-secondary float-right ml-auto">
-                        <i class="fas fa-download me-1"></i> Export to CSV
-                    </a>
+<!-- ═══════════ ROW B: Monthly Fee + Pass/Fail + Students by Course ═══════════ -->
+<div class="row mb-4">
+    <div class="col-lg-4 mb-3 mb-lg-0">
+        <div class="sk-card h-100">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-coins" style="color:var(--sk-teal)"></i> Monthly Fee Collection</h3>
+            </div>
+            <div class="sk-card-body">
+                <div style="position: relative; height: 190px; width: 100%;">
+                    <canvas id="monthlyFeeChart"></canvas>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Staff Name</th>
-                                    <th>Department</th>
-                                    <th>Subjects Taught</th>
-                                    <th>Attendance Sessions Taken</th>
-                                    <th>Results Published</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for stat in staff_analytics %}
-                                <tr>
-                                    <td><strong>{{ stat.name }}</strong></td>
-                                    <td>{{ stat.department }}</td>
-                                    <td><span class="badge bg-primary">{{ stat.subjects }}</span></td>
-                                    <td><span class="badge bg-info">{{ stat.attendance_taken }}</span></td>
-                                    <td><span class="badge bg-success">{{ stat.results_published }}</span></td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted">No staff records found.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                <div class="d-flex justify-content-between mt-3 pt-2" style="border-top:1px solid rgba(0,0,0,.05);">
+                    <div class="text-center">
+                        <div style="font-size:15px;font-weight:800;color:var(--sk-green);">₹{{ total_fee_collected|floatformat:0 }}</div>
+                        <div style="font-size:10px;color:var(--sk-text-muted);">Collected</div>
+                    </div>
+                    <div class="text-center">
+                        <div style="font-size:15px;font-weight:800;color:var(--sk-red);">₹{{ total_fee_pending|floatformat:0 }}</div>
+                        <div style="font-size:10px;color:var(--sk-text-muted);">Pending</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 mb-3 mb-lg-0">
+        <div class="sk-card h-100">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-poll" style="color:var(--sk-orange)"></i> Pass / Fail Ratio</h3>
+            </div>
+            <div class="sk-card-body">
+                <div style="position: relative; height: 190px; width: 100%;">
+                    <canvas id="passFailChart"></canvas>
+                </div>
+                <div class="row text-center mt-3">
+                    <div class="col-6">
+                        <div style="font-size:20px;font-weight:800;color:var(--sk-green);">{{ pass_count }}</div>
+                        <div style="font-size:10px;color:var(--sk-text-muted);">Passed</div>
+                    </div>
+                    <div class="col-6">
+                        <div style="font-size:20px;font-weight:800;color:var(--sk-red);">{{ fail_count }}</div>
+                        <div style="font-size:10px;color:var(--sk-text-muted);">Failed</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="sk-card h-100">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-chart-pie" style="color:var(--sk-brand)"></i> Students by Course</h3>
+            </div>
+            <div class="sk-card-body">
+                <div style="position: relative; height: 230px; width: 100%;">
+                    <canvas id="courseDonut"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ ROW B2: Institutional Noticeboard & Circulars Desk ═══════════ -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="sk-card">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-bullhorn" style="color:var(--sk-brand)"></i> Institutional Noticeboard & Circulars Desk</h3>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'admin_notify_student' %}" class="sk-badge" style="background:var(--sk-brand-light);color:var(--sk-brand);text-decoration:none;padding:5px 12px;"><i class="fas fa-paper-plane me-1"></i> Notify Students</a>
+                    <a href="{% url 'admin_notify_staff' %}" class="sk-badge" style="background:var(--sk-purple-bg);color:var(--sk-purple);text-decoration:none;padding:5px 12px;"><i class="fas fa-paper-plane me-1"></i> Notify Staff</a>
+                </div>
+            </div>
+            <div class="sk-card-body p-0">
+                {% if recent_notifs %}
+                <table class="sk-table">
+                    <thead><tr><th>Type & Recipient</th><th>Message / Circular</th><th>Date Sent</th></tr></thead>
+                    <tbody>
+                    {% for n in recent_notifs %}
+                    <tr>
+                        <td style="width:25%;">
+                            <span class="sk-badge {% if n.type == 'student' %}ev-badge-event{% else %}ev-badge-seminar{% endif %}">
+                                {{ n.recipient }}
+                            </span>
+                        </td>
+                        <td><strong>{{ n.message }}</strong></td>
+                        <td style="width:18%;color:var(--sk-text-muted);">{{ n.created_at|date:"d M Y, h:i A" }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-bullhorn" style="font-size:32px;color:#ddd;"></i>
+                    <p style="font-size:12px;color:var(--sk-text-muted);margin-top:8px;">No institutional broadcasts sent recently</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ ROW C: Events + Pending Actions + Recent Payments ═══════════ -->
+<div class="row mb-4">
+    <!-- Upcoming Events -->
+    <div class="col-lg-4 mb-3 mb-lg-0">
+        <div class="sk-card h-100">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-calendar-alt" style="color:var(--sk-brand)"></i> Upcoming Events</h3>
+                <a href="{% url 'admin_events' %}" style="font-size:10px;color:var(--sk-brand);font-weight:600;text-decoration:none;">View all</a>
+            </div>
+            <div class="sk-card-body">
+                {% if upcoming_events %}
+                    {% for ev in upcoming_events %}
+                    <div class="event-row">
+                        <div class="event-dot ev-{{ ev.event_type }}"></div>
+                        <div>
+                            <div class="event-title">
+                                {{ ev.title }}
+                                <span class="event-badge-pill ev-badge-{{ ev.event_type }}">{{ ev.get_event_type_display }}</span>
+                            </div>
+                            <div class="event-date"><i class="far fa-clock me-1"></i>{{ ev.date|date:"d M Y" }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-times" style="font-size:32px;color:#ddd;"></i>
+                        <p style="font-size:12px;color:var(--sk-text-muted);margin-top:8px;">No upcoming events</p>
+                        <a href="{% url 'admin_events' %}" class="sk-badge" style="background:var(--sk-brand-light);color:var(--sk-brand);">Add Event</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Actions -->
+    <div class="col-lg-4 mb-3 mb-lg-0">
+        <div class="sk-card h-100">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-tasks" style="color:var(--sk-orange)"></i> Pending Actions</h3>
+            </div>
+            <div class="sk-card-body">
+                <div class="action-row">
+                    <div class="action-ico" style="background:var(--sk-yellow-bg);color:var(--sk-yellow);">
+                        <i class="fas fa-calendar-times"></i>
+                    </div>
+                    <div class="action-text">
+                        <div class="action-name">Student Leaves</div>
+                        <div class="action-sub">Awaiting approval</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="action-count" style="color:var(--sk-yellow);">{{ pending_student_leaves }}</div>
+                        <a href="{% url 'view_student_leave' %}" class="action-link" style="color:var(--sk-yellow);">Review</a>
+                    </div>
+                </div>
+                <div class="action-row">
+                    <div class="action-ico" style="background:var(--sk-orange-bg);color:var(--sk-orange);">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div class="action-text">
+                        <div class="action-name">Staff Leaves</div>
+                        <div class="action-sub">Awaiting approval</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="action-count" style="color:var(--sk-orange);">{{ pending_staff_leaves }}</div>
+                        <a href="{% url 'view_staff_leave' %}" class="action-link" style="color:var(--sk-orange);">Review</a>
+                    </div>
+                </div>
+                <div class="action-row">
+                    <div class="action-ico" style="background:var(--sk-blue-bg);color:var(--sk-blue);">
+                        <i class="fas fa-comment-alt"></i>
+                    </div>
+                    <div class="action-text">
+                        <div class="action-name">Feedbacks</div>
+                        <div class="action-sub">Unreplied messages</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="action-count" style="color:var(--sk-blue);">{{ total_pending_feedbacks }}</div>
+                        <a href="{% url 'student_feedback' %}" class="action-link" style="color:var(--sk-blue);">Reply</a>
+                    </div>
+                </div>
+                <div class="action-row">
+                    <div class="action-ico" style="background:var(--sk-brand-light);color:var(--sk-brand);">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="action-text">
+                        <div class="action-name">Certificates</div>
+                        <div class="action-sub">Pending requests</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="action-count" style="color:var(--sk-brand);">{{ pending_certs }}</div>
+                        <a href="{% url 'admin_manage_certificates' %}" class="action-link" style="color:var(--sk-brand);">Manage</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="row">
-        <div class="col-12">
-            <div class="erpnext-card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-bolt me-2"></i>
-                        Quick Actions
-                    </h3>
+    <!-- Recent Payments -->
+    <div class="col-lg-4">
+        <div class="sk-card h-100">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-receipt" style="color:var(--sk-green)"></i> Recent Payments</h3>
+                <a href="{% url 'admin_finance_dashboard' %}" style="font-size:10px;color:var(--sk-green);font-weight:600;text-decoration:none;">View all</a>
+            </div>
+            <div class="sk-card-body p-0">
+                {% if recent_payments %}
+                <table class="sk-table">
+                    <thead><tr><th>Student</th><th>Amount</th><th>Date</th></tr></thead>
+                    <tbody>
+                    {% for p in recent_payments %}
+                    <tr>
+                        <td><strong>{{ p.fee_record.student.admin.first_name }} {{ p.fee_record.student.admin.last_name }}</strong></td>
+                        <td><span style="color:var(--sk-green);font-weight:700;">₹{{ p.amount_paid|floatformat:0 }}</span></td>
+                        <td style="color:var(--sk-text-muted);">{{ p.payment_date|date:"d M" }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-receipt" style="font-size:28px;color:#ddd;"></i>
+                    <p style="font-size:12px;color:var(--sk-text-muted);margin-top:8px;">No payments recorded yet</p>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'add_student' %}" class="btn btn-primary w-100">
-                                <i class="fas fa-user-plus mb-2"></i><br>
-                                Add Student
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'add_staff' %}" class="btn btn-primary w-100">
-                                <i class="fas fa-user-tie mb-2"></i><br>
-                                Add Staff
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'add_course' %}" class="btn btn-primary w-100">
-                                <i class="fas fa-graduation-cap mb-2"></i><br>
-                                Add Course
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'add_subject' %}" class="btn btn-primary w-100">
-                                <i class="fas fa-book-open mb-2"></i><br>
-                                Add Subject
-                            </a>
-                        </div>
-                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ ROW D: Recent Admissions + Course Stats ═══════════ -->
+<div class="row mb-4">
+    <!-- Recent Students -->
+    <div class="col-lg-7 mb-3 mb-lg-0">
+        <div class="sk-card">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-user-plus" style="color:var(--sk-brand)"></i> Recent Admissions</h3>
+                <a href="{% url 'manage_student' %}" style="font-size:10px;color:var(--sk-brand);font-weight:600;text-decoration:none;">View all</a>
+            </div>
+            <div class="sk-card-body p-0">
+                <table class="sk-table">
+                    <thead><tr><th>Student</th><th>Course</th><th>Session</th><th>Joined</th></tr></thead>
+                    <tbody>
+                    {% for s in recent_students %}
+                    <tr>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div class="stu-avatar">{{ s.admin.first_name|slice:":1" }}{{ s.admin.last_name|slice:":1" }}</div>
+                                <div>
+                                    <div style="font-weight:600;">{{ s.admin.first_name }} {{ s.admin.last_name }}</div>
+                                    <div style="font-size:10px;color:var(--sk-text-muted);">{{ s.admin.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{% if s.course %}{{ s.course.name }}{% else %}—{% endif %}</td>
+                        <td>{% if s.session %}{{ s.session }}{% else %}—{% endif %}</td>
+                        <td style="color:var(--sk-text-muted);">{{ s.admin.created_at|date:"d M Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center py-3" style="color:var(--sk-text-muted);">No students yet</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Stats -->
+    <div class="col-lg-5">
+        <div class="sk-card">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-layer-group" style="color:var(--sk-orange)"></i> Course Statistics</h3>
+            </div>
+            <div class="sk-card-body p-0">
+                <table class="sk-table">
+                    <thead><tr><th>Course</th><th>Students</th><th>Subjects</th></tr></thead>
+                    <tbody>
+                    {% for c in course_stats %}
+                    <tr>
+                        <td><strong>{{ c.name }}</strong></td>
+                        <td><span class="sk-badge" style="background:var(--sk-brand-light);color:var(--sk-brand);">{{ c.student_count }}</span></td>
+                        <td><span class="sk-badge" style="background:var(--sk-orange-bg);color:var(--sk-orange);">{{ c.subject_count }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="text-center py-3" style="color:var(--sk-text-muted);">No courses yet</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ ROW E: Attendance Charts ═══════════ -->
+<div class="row mb-4">
+    <div class="col-lg-7 mb-3 mb-lg-0">
+        <div class="sk-card">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-calendar-check" style="color:var(--sk-brand)"></i> Student Attendance & Leave Overview</h3>
+            </div>
+            <div class="sk-card-body">
+                <div style="position: relative; height: 260px; width: 100%;">
+                    <canvas id="attendanceChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
+    <div class="col-lg-5">
+        <div class="sk-card">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-chart-bar" style="color:var(--sk-teal)"></i> Attendance Per Subject</h3>
+            </div>
+            <div class="sk-card-body">
+                <div style="position: relative; height: 260px; width: 100%;">
+                    <canvas id="subjectAttendanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ Staff Analytics Table ═══════════ -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="sk-card">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-users-cog" style="color:var(--sk-purple)"></i> Staff Performance Analytics</h3>
+                <a href="{% url 'export_staff_analytics' %}" class="sk-badge" style="background:var(--sk-purple-bg);color:var(--sk-purple);text-decoration:none;">
+                    <i class="fas fa-download me-1"></i> Export CSV
+                </a>
+            </div>
+            <div class="sk-card-body p-0">
+                <table class="sk-table">
+                    <thead>
+                        <tr><th>#</th><th>Name</th><th>Department</th><th>Subjects</th><th>Sessions</th><th>Results</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in staff_analytics %}
+                        <tr>
+                            <td style="color:var(--sk-text-meta);">{{ forloop.counter }}</td>
+                            <td><strong>{{ stat.name }}</strong></td>
+                            <td style="color:var(--sk-text-muted);">{{ stat.department }}</td>
+                            <td><span class="sk-badge" style="background:var(--sk-brand-light);color:var(--sk-brand);">{{ stat.subjects }}</span></td>
+                            <td><span class="sk-badge" style="background:var(--sk-teal-bg);color:var(--sk-teal);">{{ stat.attendance_taken }}</span></td>
+                            <td><span class="sk-badge" style="background:var(--sk-green-bg);color:var(--sk-green);">{{ stat.results_published }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6" class="text-center py-4" style="color:var(--sk-text-muted);">No staff records found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════ Quick Actions ═══════════ -->
+<div class="section-head">Quick Actions</div>
+<div class="quick-grid mb-4">
+    <a href="{% url 'add_student' %}"              class="quick-tile"><i class="fas fa-user-plus"       style="color:var(--sk-brand)"></i><span>Add Student</span></a>
+    <a href="{% url 'add_staff' %}"                class="quick-tile"><i class="fas fa-user-tie"        style="color:var(--sk-green)"></i><span>Add Staff</span></a>
+    <a href="{% url 'add_parent' %}"               class="quick-tile"><i class="fas fa-users"           style="color:var(--sk-orange)"></i><span>Add Parent</span></a>
+    <a href="{% url 'add_course' %}"               class="quick-tile"><i class="fas fa-graduation-cap"  style="color:var(--sk-purple)"></i><span>Add Course</span></a>
+    <a href="{% url 'add_subject' %}"              class="quick-tile"><i class="fas fa-book-open"       style="color:var(--sk-teal)"></i><span>Add Subject</span></a>
+    <a href="{% url 'admin_manage_batches' %}"           class="quick-tile"><i class="fas fa-id-card"         style="color:var(--sk-blue)"></i><span>Batch IDs</span></a>
+    <a href="{% url 'view_student_leave' %}"       class="quick-tile"><i class="fas fa-calendar-times"  style="color:var(--sk-yellow)"></i><span>Stu. Leaves</span></a>
+    <a href="{% url 'view_staff_leave' %}"         class="quick-tile"><i class="fas fa-user-clock"      style="color:var(--sk-orange)"></i><span>Staff Leaves</span></a>
+    <a href="{% url 'admin_finance_dashboard' %}"  class="quick-tile"><i class="fas fa-rupee-sign"      style="color:var(--sk-green)"></i><span>Finance</span></a>
+    <a href="{% url 'admin_analytics' %}"          class="quick-tile"><i class="fas fa-chart-line"      style="color:var(--sk-brand)"></i><span>Analytics</span></a>
+    <a href="{% url 'admin_placement_dashboard' %}" class="quick-tile"><i class="fas fa-briefcase"      style="color:var(--sk-purple)"></i><span>Placement</span></a>
+    <a href="{% url 'admin_manage_certificates' %}"      class="quick-tile"><i class="fas fa-certificate"     style="color:var(--sk-orange)"></i><span>Certificates</span></a>
+</div>
+
 {% endblock content %}
 
 {% block custom_js %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Chart.js Configuration
-        Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
-        Chart.defaults.color = '#262626';
-        
-        // ERPNext-style color palette
-        const colors = {
-            primary: '#5e64ff',
-            success: '#28a745',
-            warning: '#ffc107',
-            danger: '#dc3545',
-            info: '#17a2b8',
-            light: '#f8f9fc',
-            dark: '#262626'
-        };
+document.addEventListener('DOMContentLoaded', function() {
 
-        // Staff vs Students Pie Chart
-        const pieCtx = document.getElementById('pieChart').getContext('2d');
-        new Chart(pieCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Students', 'Staff'],
-                datasets: [{
-                    data: [{{ total_students }}, {{ total_staff }}],
-                    backgroundColor: [colors.primary, colors.success],
-                    borderWidth: 0,
-                    cutout: '60%'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true
-                        }
-                    }
-                }
-            }
-        });
-
-        // Attendance per Subject Bar Chart
-        const barCtx = document.getElementById('barChart').getContext('2d');
-        new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: {{ subject_list|safe }},
-                datasets: [{
-                    label: 'Attendance',
-                    data: {{ attendance_list }},
-                    backgroundColor: colors.info,
-                    borderRadius: 4,
-                    borderSkipped: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#f1f3f4'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
-        });
-
-        // Student Attendance & Leave Overview
-        const barCtx2 = document.getElementById('barChart2').getContext('2d');
-        new Chart(barCtx2, {
-            type: 'bar',
-            data: {
-                labels: {{ student_name_list|safe }},
-                datasets: [{
-                    label: 'Present',
-                    data: {{ student_attendance_present_list }},
-                    backgroundColor: colors.success,
-                    borderRadius: 4,
-                    borderSkipped: false
-                }, {
-                    label: 'Absent/Leave',
-                    data: {{ student_attendance_leave_list }},
-                    backgroundColor: colors.danger,
-                    borderRadius: 4,
-                    borderSkipped: false
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            padding: 20,
-                            usePointStyle: true
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: '#f1f3f4'
-                        }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
-                    }
-                }
-            }
-        });
-
-        // Students per Course Pie Chart
-        const pieCtx2 = document.getElementById('pieChart2').getContext('2d');
-        new Chart(pieCtx2, {
-            type: 'doughnut',
-            data: {
-                labels: {{ course_name_list|safe }},
-                datasets: [{
-                    data: {{ student_count_list_in_course }},
-                    backgroundColor: [
-                        colors.primary, colors.success, colors.warning, 
-                        colors.danger, colors.info, '#6f42c1', '#fd7e14', '#20c997'
-                    ],
-                    borderWidth: 0,
-                    cutout: '60%'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            usePointStyle: true
-                        }
-                    }
-                }
-            }
-        });
-
-        // Students per Subject Pie Chart
-        const pieCtx3 = document.getElementById('pieChart3').getContext('2d');
-        new Chart(pieCtx3, {
-            type: 'doughnut',
-            data: {
-                labels: {{ subject_list|safe }},
-                datasets: [{
-                    data: {{ student_count_list_in_subject }},
-                    backgroundColor: [
-                        colors.danger, colors.success, colors.warning, 
-                        colors.info, colors.primary, '#6f42c1', '#20c997', '#fd7e14', '#e83e8c'
-                    ],
-                    borderWidth: 0,
-                    cutout: '60%'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            usePointStyle: true
-                        }
-                    }
-                }
-            }
-        });
-        
-        // --- Advanced Analytics Charts ---
-        
-        // 1. Enrollment Trend (Line Chart)
-        const trendCtx = document.getElementById('enrollmentTrendChart').getContext('2d');
-        new Chart(trendCtx, {
-            type: 'line',
-            data: {
-                labels: {{ enrollment_months|safe }},
-                datasets: [{
-                    label: 'New Enrollments',
-                    data: {{ enrollment_counts|safe }},
-                    borderColor: colors.primary,
-                    backgroundColor: 'rgba(94, 100, 255, 0.1)',
-                    borderWidth: 3,
-                    pointBackgroundColor: colors.primary,
-                    pointRadius: 4,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f1f3f4' } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
-
-        // 2. Pass/Fail Ratio (Pie Chart)
-        const pfCtx = document.getElementById('passFailChart').getContext('2d');
-        new Chart(pfCtx, {
-            type: 'pie',
-            data: {
-                labels: ['Passed', 'Failed'],
-                datasets: [{
-                    data: [{{ pass_count }}, {{ fail_count }}],
-                    backgroundColor: [colors.success, colors.danger],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { usePointStyle: true } }
-                }
-            }
-        });
-
-        // 3. Fee Collection (Bar Chart)
-        const feeCtx = document.getElementById('feeCollectionChart').getContext('2d');
-        new Chart(feeCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Collected', 'Pending'],
-                datasets: [{
-                    label: 'Amount in INR',
-                    data: [{{ total_fee_collected }}, {{ total_fee_pending }}],
-                    backgroundColor: [colors.success, colors.warning],
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#f1f3f4' } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
-        
+    // ── Counter Animation ──
+    document.querySelectorAll('.hero-num[data-count]').forEach(el => {
+        const target = parseInt(el.dataset.count) || 0;
+        if (target === 0) return;
+        let current = 0;
+        const step = Math.max(1, Math.ceil(target / 45));
+        const timer = setInterval(() => {
+            current = Math.min(current + step, target);
+            el.textContent = current.toLocaleString();
+            if (current >= target) clearInterval(timer);
+        }, 25);
     });
+
+    // ── CampusPro Palette ──
+    const isDark   = () => document.body.classList.contains('dark-mode');
+    const gridClr  = () => isDark() ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.05)';
+    const tickClr  = () => isDark() ? '#aaa' : '#888';
+    const BRAND    = '#0f5f6c';
+    const GREEN    = '#22c55e';
+    const RED      = '#ef4444';
+    const ORANGE   = '#f97316';
+    const BLUE     = '#3b82f6';
+    const TEAL     = '#14b8a6';
+    const YELLOW   = '#eab308';
+    const PURPLE   = '#a855f7';
+
+    Chart.defaults.font.family = "'Poppins', sans-serif";
+    Chart.defaults.font.size   = 11;
+
+    const baseOpts = (legend=true) => ({
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+            legend: legend ? {
+                labels: { color: tickClr(), usePointStyle: true, padding: 14, font: { size: 11 } }
+            } : { display: false }
+        }
+    });
+
+    // 1. Enrollment Trend
+    new Chart(document.getElementById('enrollmentTrendChart'), {
+        type: 'line',
+        data: {
+            labels: {{ enrollment_months|safe }},
+            datasets: [{
+                label: 'New Enrollments',
+                data: {{ enrollment_counts|safe }},
+                borderColor: BRAND, backgroundColor: 'rgba(103,61,229,.08)',
+                borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#fff',
+                pointBorderColor: BRAND, pointBorderWidth: 2,
+                fill: true, tension: 0.4
+            }]
+        },
+        options: {
+            ...baseOpts(false),
+            scales: {
+                y: { beginAtZero:true, grid:{color:gridClr()}, ticks:{color:tickClr()} },
+                x: { grid:{display:false}, ticks:{color:tickClr()} }
+            }
+        }
+    });
+
+    // 2. Gender Doughnut
+    new Chart(document.getElementById('genderChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Male', 'Female'],
+            datasets: [{ data: [{{ male_students }}, {{ female_students }}],
+                backgroundColor: [BLUE, PURPLE], borderWidth: 0, cutout: '70%' }]
+        },
+        options: { ...baseOpts(), plugins: { legend: { position:'bottom', labels:{ color:tickClr(), usePointStyle:true, padding:14, font:{size:11} } } } }
+    });
+
+    // 3. Monthly Fee Bar
+    new Chart(document.getElementById('monthlyFeeChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ fee_months_labels|safe }},
+            datasets: [{ label: 'Collected (₹)', data: {{ fee_months_collected|safe }},
+                backgroundColor: TEAL, borderRadius: 6, borderSkipped: false }]
+        },
+        options: {
+            ...baseOpts(false),
+            scales: {
+                y: { beginAtZero:true, grid:{color:gridClr()}, ticks:{color:tickClr()} },
+                x: { grid:{display:false}, ticks:{color:tickClr()} }
+            }
+        }
+    });
+
+    // 4. Pass/Fail
+    new Chart(document.getElementById('passFailChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Passed','Failed'],
+            datasets: [{ data:[{{ pass_count }},{{ fail_count }}],
+                backgroundColor:[GREEN,RED], borderWidth:0, cutout:'65%' }]
+        },
+        options: { ...baseOpts(), plugins:{ legend:{ position:'bottom', labels:{color:tickClr(), usePointStyle:true, padding:14, font:{size:11}} } } }
+    });
+
+    // 5. Students by Course
+    new Chart(document.getElementById('courseDonut'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ course_name_list|safe }},
+            datasets: [{ data:{{ student_count_list_in_course }},
+                backgroundColor:[BRAND,GREEN,ORANGE,BLUE,TEAL,YELLOW,PURPLE,RED],
+                borderWidth:0, cutout:'60%' }]
+        },
+        options: { ...baseOpts(), plugins:{ legend:{ position:'bottom', labels:{color:tickClr(), usePointStyle:true, padding:10, font:{size:10}} } } }
+    });
+
+    // 6. Student Attendance Grouped Bar
+    new Chart(document.getElementById('attendanceChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ student_name_list|safe }},
+            datasets: [
+                { label:'Present', data:{{ student_attendance_present_list }}, backgroundColor:GREEN, borderRadius:4, borderSkipped:false },
+                { label:'Absent/Leave', data:{{ student_attendance_leave_list }}, backgroundColor:RED, borderRadius:4, borderSkipped:false }
+            ]
+        },
+        options: {
+            ...baseOpts(),
+            scales: {
+                y: { beginAtZero:true, grid:{color:gridClr()}, ticks:{color:tickClr()} },
+                x: { grid:{display:false}, ticks:{color:tickClr()} }
+            }
+        }
+    });
+
+    // 7. Subject Attendance Bar
+    new Chart(document.getElementById('subjectAttendanceChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ subject_list|safe }},
+            datasets: [{ label:'Sessions', data:{{ attendance_list }},
+                backgroundColor: TEAL, borderRadius:6, borderSkipped:false }]
+        },
+        options: {
+            ...baseOpts(false),
+            scales: {
+                y: { beginAtZero:true, grid:{color:gridClr()}, ticks:{color:tickClr()} },
+                x: { grid:{display:false}, ticks:{color:tickClr()} }
+            }
+        }
+    });
+
+});
 </script>
 {% endblock custom_js %}

@@ -1,0 +1,100 @@
+
+.extracted-style-1 { " }
+.extracted-style-2 { " }
+.extracted-style-3 { " }
+.extracted-style-4 { " }
+.extracted-style-5 { " }
+.extracted-style-6 { " }
+.extracted-style-7 { " }
+.extracted-style-8 { " }
+
+
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb-bar {
+        background: transparent;
+        padding: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+    }
+    .sk-breadcrumb-title {
+        color: #6c5ce7;
+        font-weight: 600;
+        font-size: 15px;
+        margin-right: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .sk-breadcrumb-path {
+        color: #888;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .report-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        padding: 30px;
+        margin-bottom: 25px;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+    
+    .table thead th {
+        border-top: none;
+        border-bottom: 2px solid #f1f2f6;
+        color: #2f3640;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        padding: 15px;
+    }
+    
+    .table tbody td {
+        vertical-align: middle;
+        padding: 15px;
+        color: #576574;
+        font-size: 14px;
+        border-bottom: 1px solid #f1f2f6;
+    }
+
+    .staff-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+    }
+
+    .progress-bar-custom {
+        height: 8px;
+        border-radius: 4px;
+        background-color: #dfe6e9;
+        margin-top: 5px;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        border-radius: 4px;
+    }
+    
+    .progress-fill.good { background-color: #00b894; }
+    .progress-fill.average { background-color: #fdcb6e; }
+    .progress-fill.poor { background-color: #ff7675; }
+
+    .badge-attendance {
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .badge-present { background: rgba(0, 184, 148, 0.1); color: #00b894; }
+    .badge-absent { background: rgba(255, 118, 117, 0.1); color: #ff7675; }
+    

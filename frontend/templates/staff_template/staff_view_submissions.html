@@ -1,0 +1,143 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card erpnext-card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="card-title mb-0"><i class="fas fa-file-signature text-success"></i> {{ assignment.title }}</h5>
+                <p class="text-muted small mb-0">Subject: {{ assignment.subject.name }} | Due: {{ assignment.due_date|date:"M d, Y H:i" }}</p>
+            </div>
+            <a href="{% url 'staff_lms_home' %}" class="btn btn-sm btn-outline-secondary">Back to LMS</a>
+        </div>
+        <div class="card-body">
+            <p><strong>Instructions:</strong></p>
+            <div class="p-3 bg-light rounded mb-3">{{ assignment.description|safe }}</div>
+            {% if assignment.attachment %}
+            <a href="{{ assignment.attachment.url }}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fas fa-paperclip"></i> Download Staff Attachment</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card erpnext-card">
+        <div class="card-header">
+            <h5 class="card-title mb-0"><i class="fas fa-users text-primary"></i> Student Submissions ({{ submissions.count }})</h5>
+        </div>
+        <div class="card-body table-responsive">
+            {% if submissions %}
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Submitted On</th>
+                        <th>Submission Text</th>
+                        <th>Attachment</th>
+                        <th>Marks / Feedback</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in submissions %}
+                    <tr>
+                        <td><strong>{{ sub.student.admin.first_name }} {{ sub.student.admin.last_name }}</strong></td>
+                        <td>{{ sub.submitted_at|date:"M d, Y H:i" }}</td>
+                        <td style="max-width: 250px;">{{ sub.submission_text|truncatewords:15 }}</td>
+                        <td>
+                            {% if sub.attachment %}
+                            <a href="{{ sub.attachment.url }}" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i> View File</a>
+                            {% else %}
+                            <span class="text-muted small">No file</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if sub.marks_obtained > 0 %}
+                            <span class="badge bg-success">{{ sub.marks_obtained }} marks</span>
+                            <p class="small text-muted mb-0">{{ sub.feedback }}</p>
+                            {% else %}
+                            <span class="badge bg-warning">Not graded</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#gradeModal{{ sub.id }}">
+                                <i class="fas fa-check"></i> Grade
+                            </button>
+
+                            <!-- Grade Modal -->
+                            <div class="modal fade" id="gradeModal{{ sub.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="submission_id" value="{{ sub.id }}">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Grade Submission: {{ sub.student.admin.first_name }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3 text-end">
+                                                    <button type="button" class="btn btn-sm btn-outline-info" onclick="runAICheck('{{ sub.id }}')">
+                                                        <i class="fas fa-robot"></i> Run AI Check (Grade Draft)
+                                                    </button>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Marks Obtained</label>
+                                                    <input type="number" step="0.5" name="marks" id="marks-input-{{ sub.id }}" class="form-control" value="{{ sub.marks_obtained }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Feedback</label>
+                                                    <textarea name="feedback" id="feedback-input-{{ sub.id }}" class="form-control" rows="3">{{ sub.feedback }}</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary">Save Grade</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted">No students have submitted this assignment yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function runAICheck(subId) {
+        const marksInput = document.getElementById(`marks-input-${subId}`);
+        const feedbackInput = document.getElementById(`feedback-input-${subId}`);
+        
+        feedbackInput.value = "AI grading helper evaluating submission... Please wait.";
+        
+        fetch("{% url 'staff_ai_grade_assignment' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ submission_id: subId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                marksInput.value = data.score;
+                feedbackInput.value = data.feedback;
+            } else {
+                feedbackInput.value = "AI helper encountered error: " + data.message;
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            feedbackInput.value = "Unable to connect to AI server.";
+        });
+    }
+</script>
+{% endblock content %}

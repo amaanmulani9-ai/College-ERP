@@ -1,195 +1,701 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>College ERP - Login</title>
-
-    <!-- Favicon -->
+    <title>CAMPUS PRO ERP - Secure Login</title>
     <link rel="shortcut icon" href="{% static '/image/favicon1.ico' %}">
-
-    <!-- ERPNext Style CSS -->
-    <link rel="stylesheet" href="{% static 'dist/css/erpnext-style.css' %}">
-
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
-
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Google Recaptcha -->
+    {% if recaptcha_public_key %}
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    {% endif %}
+    <style>
+        :root{
+            --bg:#090a0f;
+            --panel:rgba(255,255,255,.04);
+            --panel-strong:rgba(255,255,255,.08);
+            --line:rgba(255,255,255,.08);
+            --text:#f8fafc;
+            --muted:rgba(244,247,251,.72);
+            --brand:#6366f1;
+            --brand2:#a855f7;
+            --accent:#06b6d4;
+        }
+        *{box-sizing:border-box}
+        body{
+            margin:0;
+            min-height:100vh;
+            font-family: 'Outfit', sans-serif;
+            color:var(--text);
+            background:
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.16), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.18), transparent 40%),
+                linear-gradient(135deg, #090a0f, #12131a 50%, #090a0f);
+        }
+        .login-shell{
+            min-height:100vh;
+            display:grid;
+            grid-template-columns: 1.15fr .85fr;
+        }
+        .login-visual{
+            padding:42px;
+            display:flex;
+            flex-direction:column;
+            justify-content:space-between;
+            border-right:1px solid rgba(255,255,255,.08);
+            animation: loginFadeUp .62s ease both;
+        }
+        .brand{
+            display:flex;
+            align-items:center;
+            gap:14px;
+        }
+        .brand-mark{
+            width:64px;height:64px;border-radius:18px;
+            display:grid;place-items:center;
+            background:#ffffff;
+            box-shadow:0 18px 35px rgba(99, 102, 241,.25);
+            overflow:hidden;
+            padding:6px;
+        }
+        .brand-mark img{
+            width:100%;
+            height:100%;
+            object-fit:contain;
+        }
+        .brand h1{
+            font-size:24px;
+            line-height:1.1;
+            margin:0;
+            font-weight:800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .brand p{margin:4px 0 0;color:var(--muted);font-size:13px}
+        .hero-copy{
+            max-width:560px;
+            margin-top:28px;
+        }
+        .hero-copy h2{
+            font-size:clamp(34px,4vw,58px);
+            line-height:.96;
+            letter-spacing:-.04em;
+            margin:0 0 16px;
+            font-weight:800;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-copy p{
+            max-width:520px;
+            color:var(--muted);
+            font-size:15px;
+            line-height:1.7;
+            margin:0 0 24px;
+        }
+        .hero-stats{
+            display:grid;
+            grid-template-columns:repeat(3,minmax(0,1fr));
+            gap:14px;
+            max-width:600px;
+        }
+        .hero-stat{
+            background:var(--panel);
+            border:1px solid var(--line);
+            border-radius:20px;
+            padding:20px;
+            backdrop-filter:blur(18px);
+            -webkit-backdrop-filter:blur(18px);
+            transition: all 0.3s ease;
+        }
+        .hero-stat:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+            background: var(--panel-strong);
+        }
+        .hero-stat .n{
+            font-size:28px;
+            font-weight:800;
+            line-height:1;
+            margin-bottom:8px;
+            background: linear-gradient(135deg, var(--brand), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-stat .t{font-size:12px;color:var(--muted);line-height:1.45}
+        .login-panel-wrap{
+            padding:28px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+        .login-panel{
+            width:min(100%,460px);
+            background:rgba(20, 22, 32, 0.65);
+            color:#e2e8f0;
+            border-radius:24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow:0 28px 80px rgba(0,0,0,0.5);
+            overflow:hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            animation: loginFadeUp .72s ease .08s both;
+        }
+        .login-panel-head{
+            padding:28px 28px 16px;
+            background: transparent;
+            border-bottom:1px solid rgba(255,255,255,0.06);
+        }
+        .login-panel-head h3{
+            margin:0 0 6px;
+            font-size:28px;
+            font-weight:800;
+            letter-spacing:-.03em;
+            color:#fff;
+        }
+        .login-panel-head p{
+            margin:0;
+            color:#94a3b8;
+            font-size:13px;
+            line-height:1.6;
+        }
+        .login-panel-body{padding:22px 28px 28px}
+        .message-stack{margin-bottom:16px}
+        .message-stack .alert{border-radius:14px;border:0}
+        .form-label{font-size:12px;font-weight:800;color:#94a3b8;margin-bottom:8px}
+        .field{
+            position:relative;
+            margin-bottom:14px;
+        }
+        .field .icon{
+            position:absolute;left:16px;top:50%;transform:translateY(-50%);
+            color:#64748b;font-size:14px;pointer-events:none;
+        }
+        .field input{
+            width:100%;
+            height:50px;
+            border-radius:12px;
+            border:1px solid rgba(255,255,255,0.08);
+            background:rgba(255, 255, 255, 0.03);
+            padding:0 42px 0 42px;
+            color:#fff;
+            outline:none;
+            transition:border-color .2s, box-shadow .2s, transform .2s;
+        }
+        .field input::placeholder {
+            color: #475569;
+        }
+        .field input:focus{
+            border-color:var(--brand);
+            box-shadow:0 0 0 4px rgba(99, 102, 241, 0.25);
+            background:rgba(255,255,255,0.05);
+        }
+        .field .toggle{
+            position:absolute;right:12px;top:50%;transform:translateY(-50%);
+            border:0;background:transparent;color:#94a3b8;padding:4px;font-size:15px;
+        }
+        .support-row{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            margin:8px 0 16px;
+            flex-wrap:wrap;
+        }
+        .remember{
+            display:flex;align-items:center;gap:8px;color:#94a3b8;font-size:13px;font-weight:500;
+        }
+        .remember input{
+            width:16px;height:16px;
+            background:rgba(255,255,255,0.03);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:4px;
+        }
+        .link{
+            color:var(--brand);
+            text-decoration:none;
+            font-size:13px;
+            font-weight:600;
+        }
+        .link:hover{text-decoration:underline;color:#818cf8}
+        .login-btn{
+            width:100%;
+            height:50px;
+            border:0;
+            border-radius:12px;
+            font-size:15px;
+            font-weight:700;
+            color:#fff;
+            background:linear-gradient(135deg,var(--brand),var(--brand2));
+            box-shadow:0 16px 30px rgba(99, 102, 241,.22);
+            transition:transform .2s, box-shadow .2s;
+        }
+        .login-btn:hover{transform:translateY(-2px);box-shadow:0 18px 36px rgba(99, 102, 241,.32)}
+        .login-mini{
+            margin-top:16px;
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:10px;
+        }
+        .mini-card{
+            background:rgba(255, 255, 255, 0.02);
+            border:1px solid rgba(255, 255, 255, 0.06);
+            border-radius:14px;
+            padding:12px 14px;
+            font-size:12px;
+            color:#94a3b8;
+        }
+        .demo-login-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .demo-login-btn:hover {
+            background:rgba(255,255,255,0.06);
+            border-color:var(--brand);
+            transform:translateY(-2px);
+            box-shadow:0 6px 15px rgba(99, 102, 241,.15);
+        }
+        .mini-card strong{display:block;font-size:12px;color:#fff;margin-bottom:4px}
+        .footer-note{
+            margin-top:18px;
+            text-align:center;
+            color:#475569;
+            font-size:12px;
+        }
+        @keyframes loginFadeUp{
+            from{opacity:0;transform:translateY(16px)}
+            to{opacity:1;transform:translateY(0)}
+        }
+        @media (prefers-reduced-motion: reduce){
+            *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+        }
+        @media (max-width: 992px){
+            .login-shell{grid-template-columns:1fr}
+            .login-visual{padding:28px 22px;border-right:0;border-bottom:1px solid rgba(255,255,255,.08)}
+            .login-panel-wrap{padding:22px}
+        }
+        @media (max-width: 640px){
+            .hero-stats{grid-template-columns:1fr}
+            .login-mini{grid-template-columns:1fr}
+            .login-panel{border-radius:20px}
+            .login-panel-body,.login-panel-head{padding-left:18px;padding-right:18px}
+        }
+    </style>
 </head>
-
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <div class="login-logo">
-                <h1 class="login-title">College ERP</h1>
-                <p class="login-subtitle">Education Management System</p>
-            </div>
-
-            <!-- Error Messages -->
-            {% if messages %}
-            {% for message in messages %}
-            {% if message.tags == 'error' %}
-            <div class="alert alert-danger text-center">
-                {{ message }}
-            </div>
-            {% endif %}
-            {% endfor %}
-            {% endif %}
-
-            <!-- Login Form -->
-            <form action="doLogin/" method="post" class="login-form">
-                {% csrf_token %}
-
-                <div class="form-group">
-                    <label for="email" class="form-label">
-                        <i class="fas fa-envelope"></i> Email Address
-                    </label>
-                    <input type="email" id="email" name="email" class="form-control"
-                        placeholder="Enter your email address" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="password" class="form-label">
-                        <i class="fas fa-lock"></i> Password
-                    </label>
-                    <input type="password" id="password" name="password" class="form-control"
-                        placeholder="Enter your password" required>
-                </div>
-
-                <!-- reCAPTCHA -->
-                <div class="form-group text-center">
-                    <div class="g-recaptcha" data-sitekey="6LfTGD4qAAAAAJLKy1TGJY7uuTh_T1cB5VikRWjF"></div>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="remember" name="remember" value="1">
-                        <label class="form-check-label" for="remember">
-                            Remember me
-                        </label>
+    <div class="login-shell">
+        <section class="login-visual">
+            <div>
+                <div class="brand">
+                    <div class="brand-mark"><img src="{% static 'image/logo.png' %}" alt="CAMPUS PRO ERP logo"></div>
+                    <div>
+                        <h1>CAMPUS PRO ERP</h1>
+                        <p>Unified campus operations for admin, staff, students, and parents</p>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-sign-in-alt"></i> Sign In
-                    </button>
+                <div class="hero-copy">
+                    <h2>Smart AI-Powered ERP for Modern Campus Management</h2>
+                    <p>
+                        Access AI predictive student analytics, 24/7 helpdesk chatbot support, automated attendance, and fraud-proof fee management in one unified workspace.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <div class="n">AI-Driven</div>
+                            <div class="t">Predictive analytics for student success & early retention</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="n">24/7</div>
+                            <div class="t">Automated AI chatbot support for student & staff queries</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="n">Zero-Fraud</div>
+                            <div class="t">Bank-grade verification for all fee receipts & ledger records</div>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="text-center">
-                    <a href="{% url 'password_reset' %}" class="text-decoration-none">
-                        Forgot your password?
-                    </a>
-                </div>
-            </form>
-
-            <!-- Footer -->
-            <div class="login-footer text-center mt-4">
-                <small class="text-muted">
-                    © 2024 College ERP System. All rights reserved.
-                </small>
             </div>
-        </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+                <div style="font-size:12px;color:rgba(244,247,251,.7);">
+                    Secure tenant-aware access for your institute
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <span class="mini-card" style="background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.12);">
+                        <strong style="color:#fff;">Admin</strong> Manage settings and reports
+                    </span>
+                    <span class="mini-card" style="background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.12);">
+                        <strong style="color:#fff;">Student</strong> View classes and results
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <section class="login-panel-wrap">
+            <div class="login-panel">
+                <div class="login-panel-head">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                        <div>
+                            <h3>Sign in</h3>
+                            <p>Use your institute email and password to continue.</p>
+                        </div>
+                        <!-- Locale Selectors -->
+                        <div style="display: flex; gap: 6px;">
+                            <!-- Country Select -->
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle font-weight-bold" type="button" id="loginCountryBtn" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px; font-size: 11px;">
+                                    <i class="fas fa-globe me-1"></i> {{ selected_country }}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="loginCountryBtn">
+                                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('IN', 'en')">🇮🇳 India (IN)</a></li>
+                                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('AE', 'ar')">🇦🇪 UAE (AE)</a></li>
+                                </ul>
+                            </div>
+                            <!-- Language Select -->
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle font-weight-bold" type="button" id="loginLangBtn" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 8px; font-size: 11px;">
+                                    <i class="fas fa-language me-1"></i> {{ selected_lang|upper }}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="loginLangBtn">
+                                    {% if selected_country == 'IN' %}
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('IN', 'en')">English (EN)</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('IN', 'hi')">हिन्दी (HI)</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('IN', 'bn')">বাংলা (BN)</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('IN', 'ta')">தமிழ் (TA)</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('IN', 'te')">తెలుగు (TE)</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('IN', 'mr')">मराठी (MR)</a></li>
+                                    {% else %}
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('AE', 'ar')">العربية (AR)</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="changeLocale('AE', 'en')">English (EN)</a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="login-panel-body">
+                    <div class="message-stack">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-danger">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <form action="{% url 'doLogin' %}" method="post">
+                        {% csrf_token %}
+                        {% if next_url %}
+                            <input type="hidden" name="next" value="{{ next_url|escape }}">
+                        {% endif %}
+                        <div class="field">
+                            <span class="icon"><i class="fas fa-envelope"></i></span>
+                            <input type="email" id="email" name="email" placeholder="Email address" autocomplete="username" required>
+                        </div>
+                        <div class="field">
+                            <span class="icon"><i class="fas fa-lock"></i></span>
+                            <input type="password" id="password" name="password" placeholder="Password" autocomplete="current-password" required>
+                            <button type="button" class="toggle" aria-label="Toggle password visibility"><i class="fas fa-eye"></i></button>
+                        </div>
+
+                        {% if recaptcha_public_key %}
+                        <div class="mb-3">
+                            <div class="g-recaptcha" data-sitekey="{{ recaptcha_public_key }}"></div>
+                        </div>
+                        {% endif %}
+
+                        <div class="support-row">
+                            <label class="remember">
+                                <input type="checkbox" id="remember" name="remember" value="1">
+                                Remember me
+                            </label>
+                            <a href="{% url 'password_reset' %}" class="link">Forgot password?</a>
+                        </div>
+
+                        <button type="submit" class="login-btn">Sign in</button>
+
+                        <div class="login-mini">
+                            <div class="mini-card demo-login-btn" data-email="admin@admin.com" data-password="admin123" style="cursor: pointer;">
+                                <strong><i class="fas fa-user-shield me-1" style="color: #0f5f6c;"></i> Admin</strong>
+                                Click to auto-fill
+                            </div>
+                            <div class="mini-card demo-login-btn" data-email="staffone@staff.com" data-password="staff123" style="cursor: pointer;">
+                                <strong><i class="fas fa-user-tie me-1" style="color: #c99746;"></i> Staff</strong>
+                                Click to auto-fill
+                            </div>
+                            <div class="mini-card demo-login-btn" data-email="studentone@student.com" data-password="student123" style="cursor: pointer;">
+                                <strong><i class="fas fa-user-graduate me-1" style="color: #0f9f7a;"></i> Student</strong>
+                                Click to auto-fill
+                            </div>
+                            <div class="mini-card demo-login-btn" data-email="parentone@parent.com" data-password="parent123" style="cursor: pointer;">
+                                <strong><i class="fas fa-user-friends me-1" style="color: #c99746;"></i> Parent</strong>
+                                Click to auto-fill
+                            </div>
+                            <div class="mini-card demo-login-btn" data-email="backoffice@backoffice.com" data-password="backoffice123" style="cursor: pointer; grid-column: span 2;">
+                                <strong><i class="fas fa-briefcase me-1" style="color: #0f5f6c;"></i> Back Office</strong>
+                                Click to auto-fill
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <a href="{% url 'online_registration' %}" class="link">Student registration</a>
+                        </div>
+                    </form>
+                    <div class="footer-note">CAMPUS PRO ERP</div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
-
     <script>
-        // Add some interactive effects
+        // --- Locale & Currency Localization Engine ---
+        function changeLocale(country, lang) {
+            fetch('/set_locale/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ country: country, lang: lang })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.reload();
+                }
+            });
+        }
+
+        const TRANSLATIONS = {
+            'hi': {
+                'Sign in': 'साइन इन करें',
+                'Use your institute email and password to continue.': 'जारी रखने के लिए अपने संस्थान के ईमेल और पासवर्ड का उपयोग करें।',
+                'Email address': 'ईमेल पता',
+                'Password': 'पासवर्ड',
+                'Remember me': 'मुझे याद रखें',
+                'Forgot password?': 'पासवर्ड भूल गए?',
+                'Student registration': 'छात्र पंजीकरण',
+                'Admin': 'व्यवस्थापक',
+                'Staff': 'कर्मचारी',
+                'Student': 'छात्र',
+                'Parent': 'अभिभावक',
+                'Back Office': 'बैक ऑफिस',
+                'Click to auto-fill': 'ऑटो-फिल करने के लिए क्लिक करें',
+                'CAMPUS PRO ERP': 'कैंपस प्रो ईआरपी',
+                'Unified campus operations for admin, staff, students, and parents': 'एडमिन, स्टाफ, छात्रों और अभिभावकों के लिए एकीकृत कैंपस संचालन',
+                'One login. Every campus role. Clean, fast, and ready for daily work.': 'एक लॉगिन। हर कैंपस भूमिका। साफ, तेज और दैनिक काम के लिए तैयार।',
+                'Move through finance, attendance, certificates, classrooms, notices, and support without hunting through disconnected screens.': 'बिना अलग-अलग स्क्रीन खोजे वित्त, उपस्थिति, प्रमाण पत्र, कक्षाओं, सूचनाओं और समर्थन के माध्यम से आगे बढ़ें।',
+                'Role workspaces connected from the same entry point': 'एक ही प्रवेश बिंदु से जुड़े भूमिका कार्यक्षेत्र',
+                'Responsive access on desktop, tablet, and mobile': 'डेस्कटॉप, टैबलेट और मोबाइल पर रिस्पॉन्सिव एक्सेस',
+                'Attendance, fees, messages, and module status in sync': 'उपस्थिति, फीस, संदेश और मॉड्यूल स्थिति सिंक में',
+                'Secure tenant-aware access for your institute': 'आपके संस्थान के लिए सुरक्षित किराएदार-जागरूक पहुंच'
+            },
+            'mr': {
+                'Sign in': 'साइन इन करा',
+                'Use your institute email and password to continue.': 'पुढे जाण्यासाठी तुमच्या संस्थेचा ईमेल आणि पासवर्ड वापरा.',
+                'Email address': 'ईमेल पत्ता',
+                'Password': 'पासवर्ड',
+                'Remember me': 'माझी आठवण ठेवा',
+                'Forgot password?': 'पासवर्ड विसरलात?',
+                'Student registration': 'विद्यार्थी नोंदणी',
+                'Admin': 'प्रशासक',
+                'Staff': 'कर्मचारी',
+                'Student': 'विद्यार्थी',
+                'Parent': 'पालक',
+                'Back Office': 'बॅक ऑफिस',
+                'Click to auto-fill': 'ऑटो-फिल करण्यासाठी क्लिक करा',
+                'CAMPUS PRO ERP': 'कॅम्पस प्रो ईआरपी',
+                'Unified campus operations for admin, staff, students, and parents': 'प्रशासक, कर्मचारी, विद्यार्थी आणि पालकांसाठी एकीकृत कॅम्पस संचालन',
+                'One login. Every campus role. Clean, fast, and ready for daily work.': 'एकच लॉगिन. प्रत्येक कॅम्पस भूमिका. स्वच्छ, जलद आणि दैनंदिन कामासाठी तयार.',
+                'Move through finance, attendance, certificates, classrooms, notices, and support without hunting through disconnected screens.': 'विविध स्क्रीन न शोधता वित्त, उपस्थिती, प्रमाणपत्रे, वर्गखोल्या, नोटीस आणि सपोर्ट याद्वारे पुढे जा.',
+                'Role workspaces connected from the same entry point': 'एकाच प्रवेश बिंदूवरून जोडलेले भूमिका कार्यक्षेत्र',
+                'Responsive access on desktop, tablet, and mobile': 'डेस्कटॉप, टॅब्लेट आणि मोबाईलवर सुलभ प्रवेश',
+                'Attendance, fees, messages, and module status in sync': 'उपस्थिती, शुल्क, संदेश आणि मॉड्यूल स्थिती समक्रमित',
+                'Secure tenant-aware access for your institute': 'तुमच्या संस्थेसाठी सुरक्षित प्रवेश'
+            },
+            'bn': {
+                'Sign in': 'সাইন ইন',
+                'Use your institute email and password to continue.': 'চালিয়ে যেতে আপনার ইনস্টিটিউটের ইমেল এবং পাসওয়ার্ড ব্যবহার করুন।',
+                'Email address': 'ইমেল ঠিকানা',
+                'Password': 'পাসওয়ার্ড',
+                'Remember me': 'মনে রাখুন',
+                'Forgot password?': 'পাসওয়ার্ড ভুলে গেছেন?',
+                'Student registration': 'ছাত্র নিবন্ধন',
+                'Admin': 'অ্যাডমিন',
+                'Staff': 'স্টাফ',
+                'Student': 'ছাত্র',
+                'Parent': 'অভিভাবক',
+                'Back Office': 'ব্যাক অফিস',
+                'Click to auto-fill': 'অটো-ফিল করতে ক্লিক করুন',
+                'CAMPUS PRO ERP': 'ক্যাম্পাস প্রো ইআরপি',
+                'Unified campus operations for admin, staff, students, and parents': 'অ্যাডমিন, স্টাফ, ছাত্র এবং অভিভাবকদের জন্য সমন্বিত ক্যাম্পাস কার্যক্রম',
+                'One login. Every campus role. Clean, fast, and ready for daily work.': 'একটি লগইন। প্রতিটি ক্যাম্পাস ভূমিকা। পরিচ্ছন্ন, দ্রুত এবং দৈনন্দিন কাজের জন্য প্রস্তুত।',
+                'Move through finance, attendance, certificates, classrooms, notices, and support without hunting through disconnected screens.': 'আলাদা স্ক্রিন না খুঁজে অর্থ, উপস্থিতি, শংসাপত্র, ক্লাসরুম, নোটিশ এবং সহায়তার মাধ্যমে এগিয়ে যান।',
+                'Role workspaces connected from the same entry point': 'একই প্রবেশ বিন্দু থেকে সংযুক্ত ভূমিকা কর্মক্ষেত্র',
+                'Responsive access on desktop, tablet, and mobile': 'ডেস্কটপ, ট্যাবলেট এবং মোবাইলে প্রতিক্রিয়াশীল অ্যাক্সেস',
+                'Attendance, fees, messages, and module status in sync': 'উপস্থিতি, ফি, বার্তা এবং মডিউল স্থিতি সিঙ্কে',
+                'Secure tenant-aware access for your institute': 'আপনার ইনস্টিটিউটের জন্য নিরাপদ ভাড়াটে-সচেতন অ্যাক্সেস'
+            },
+            'ta': {
+                'Sign in': 'உள்நுழைய',
+                'Use your institute email and password to continue.': 'தொடர உங்கள் நிறுவனத்தின் மின்னஞ்சல் மற்றும் கடவுச்சொல்லைப் பயன்படுத்தவும்.',
+                'Email address': 'மின்னஞ்சல் முகவரி',
+                'Password': 'கடவுச்சொல்',
+                'Remember me': 'என்னை நினைவில் கொள்',
+                'Forgot password?': 'கடவுச்சொல் மறந்துவிட்டதா?',
+                'Student registration': 'மாணவர் பதிவு',
+                'Admin': 'நிர்வாகி',
+                'Staff': 'பணியாளர்கள்',
+                'Student': 'மாணவர்',
+                'Parent': 'பெற்றோர்',
+                'Back Office': 'பின் அலுவலகம்',
+                'Click to auto-fill': 'தானாக நிரப்ப கிளிக் செய்க',
+                'CAMPUS PRO ERP': 'கேம்பஸ் ப்ரோ ஈஆர்பி',
+                'Unified campus operations for admin, staff, students, and parents': 'நிர்வாகம், பணியாளர்கள், மாணவர்கள் மற்றும் பெற்றோர்களுக்கான ஒருங்கிணைந்த வளாக செயல்பாடுகள்',
+                'One login. Every campus role. Clean, fast, and ready for daily work.': 'ஒரு உள்நுழைவு. ஒவ்வொரு வளாகப் பொறுப்பும். சுத்தமான, வேகமான மற்றும் தினசரி வேலைக்குத் தயாராக உள்ளது.',
+                'Move through finance, attendance, certificates, classrooms, notices, and support without hunting through disconnected screens.': 'தொடர்பற்ற திரைகளைத் தேடாமல் நிதி, வருகை, சான்றிதழ்கள், வகுப்பறைகள், அறிவிப்புகள் மற்றும் ஆதரவு ஆகியவற்றைக் கடந்து செல்லுங்கள்.',
+                'Role workspaces connected from the same entry point': 'ஒரே நுழைவுப் புள்ளியிலிருந்து இணைக்கப்பட்ட பணி இடைவெளிகள்',
+                'Responsive access on desktop, tablet, and mobile': 'டெஸ்க்டாப், டேப்லெட் மற்றும் மொபைலில் பதிலளிக்கக்கூடிய அணுகல்',
+                'Attendance, fees, messages, and module status in sync': 'வருகை, கட்டணம், செய்திகள் மற்றும் தொகுதி நிலை ஒத்திசைவில் உள்ளது',
+                'Secure tenant-aware access for your institute': 'உங்கள் நிறுவனத்திற்கான பாதுகாப்பான குத்தகைதாரர்-அறிந்த அணுகல்'
+            },
+            'te': {
+                'Sign in': 'సైన్ ఇన్',
+                'Use your institute email and password to continue.': 'కొనసాగించడానికి మీ ఇన్స్టిట్యూట్ ఇమెయిల్ మరియు పాస్‌వర్డ్ ఉపయోగించండి.',
+                'Email address': 'ఇమెయిల్ చిరునామా',
+                'Password': 'పాస్‌వర్డ్',
+                'Remember me': 'నన్ను గుర్తుంచుకో',
+                'Forgot password?': 'పాస్‌వర్డ్ మర్చిపోయారా?',
+                'Student registration': 'విద్యార్థి నమోదు',
+                'Admin': 'అడ్మిన్',
+                'Staff': 'సిబ్బంది',
+                'Student': 'విద్యార్థి',
+                'Parent': 'తల్లిదండ్రులు',
+                'Back Office': 'బ్యాక్ ఆఫీస్',
+                'Click to auto-fill': 'ఆటో-ఫిల్ చేయడానికి క్లిక్ చేయండి',
+                'CAMPUS PRO ERP': 'క్యాంపస్ ప్రో ఈఆర్‌పి',
+                'Unified campus operations for admin, staff, students, and parents': 'అడ్మిన్, సిబ్బంది, విద్యార్థులు మరియు తల్లిదండ్రుల కోసం ఏకీకృత క్యాంపస్ కార్యకలాపాలు',
+                'One login. Every campus role. Clean, fast, and ready for daily work.': 'ఒక లాగిన్. ప్రతి క్యాంపస్ పాత్ర. శుభ్రంగా, వేగంగా మరియు రోజువారీ పని కోసం సిద్ధంగా ఉంది.',
+                'Move through finance, attendance, certificates, classrooms, notices, and support without hunting through disconnected screens.': 'విడివిడిగా ఉండే స్క్రీన్‌లను వెతకకుండా ఫైనాన్స్, హాజరు, సర్టిఫికెట్లు, క్లాస్‌రూమ్‌లు, నోటీసులు మరియు సపోర్ట్ ద్వారా ముందుకు సాగండి.',
+                'Role workspaces connected from the same entry point': 'ఒకే ఎంట్రీ పాయింట్ నుండి కనెక్ట్ చేయబడిన పాత్ర వర్క్‌స్పేస్‌లు',
+                'Responsive access on desktop, tablet, and mobile': 'డెస్క్‌టాప్, టాబ్లెట్ మరియు మొబైల్‌లో రెస్పాన్సివ్ యాక్సెస్',
+                'Attendance, fees, messages, and module status in sync': 'హాజరు, ఫీజులు, సందేశాలు మరియు మాడ్యూల్ స్థితి సమకాలీకరణలో ఉన్నాయి',
+                'Secure tenant-aware access for your institute': 'మీ ఇన్స్టిట్యూట్ కోసం సురక్షితమైన యాక్సెస్'
+            },
+            'ar': {
+                'Sign in': 'تسجيل الدخول',
+                'Use your institute email and password to continue.': 'استخدم البريد الإلكتروني للمعهد وكلمة المرور للمتابعة.',
+                'Email address': 'البريد الإلكتروني',
+                'Password': 'كلمة المرور',
+                'Remember me': 'تذكرني',
+                'Forgot password?': 'هل نسيت كلمة المرور؟',
+                'Student registration': 'تسجيل الطلاب',
+                'Admin': 'مدير النظام',
+                'Staff': 'الموظف',
+                'Student': 'الطالب',
+                'Parent': 'ولي الأمر',
+                'Back Office': 'المكتب الخلفي',
+                'Click to auto-fill': 'انقر للتعبئة التلقائية',
+                'CAMPUS PRO ERP': 'كامبوس برو إي آر بي',
+                'Unified campus operations for admin, staff, students, and parents': 'عمليات جامعية موحدة للمشرفين والموظفين والطلاب وأولياء الأمور',
+                'One login. Every campus role. Clean, fast, and ready for daily work.': 'تسجيل دخول واحد. كل الأدوار الجامعية. نظيف وسريع وجاهز للعمل اليومي.',
+                'Move through finance, attendance, certificates, classrooms, notices, and support without hunting through disconnected screens.': 'تنقل عبر المالية والحضور والشهادات والفصول الدراسية والإشعارات والدعم دون البحث عبر الشاشات المنفصلة.',
+                'Role workspaces connected from the same entry point': 'مساحات عمل الأدوار متصلة من نفس نقطة الدخول',
+                'Responsive access on desktop, tablet, and mobile': 'وصول متجاوب على الأجهزة المكتبية واللوحية والهواتف',
+                'Attendance, fees, messages, and module status in sync': 'الحضور والرسوم والرسائل وحالة الوحدة قيد المزامنة',
+                'Secure tenant-aware access for your institute': 'وصول آمن لمعهدك'
+            }
+        };
+
+        function translatePage(lang) {
+            if (!lang || lang === 'en') return;
+            const map = TRANSLATIONS[lang];
+            if (!map) return;
+            
+            function walk(node) {
+                if (node.nodeType === 3) {
+                    let val = node.nodeValue.trim();
+                    if (map[val]) {
+                        node.nodeValue = map[val];
+                    } else {
+                        for (let key in map) {
+                            if (val === key) {
+                                node.nodeValue = map[key];
+                                break;
+                            }
+                        }
+                    }
+                } else if (node.nodeType === 1 && (node.tagName === 'INPUT' || node.tagName === 'TEXTAREA')) {
+                    let placeholder = node.getAttribute('placeholder');
+                    if (placeholder && map[placeholder.trim()]) {
+                        node.setAttribute('placeholder', map[placeholder.trim()]);
+                    }
+                } else {
+                    for (let child of node.childNodes) {
+                        walk(child);
+                    }
+                }
+            }
+            walk(document.body);
+            
+            if (lang === 'ar') {
+                document.documentElement.dir = 'rtl';
+                document.body.style.textAlign = 'right';
+            } else {
+                document.documentElement.dir = 'ltr';
+                document.body.style.textAlign = 'left';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
-            // Add focus effects to form inputs
-            const inputs = document.querySelectorAll('.form-control');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function () {
-                    this.style.transform = 'scale(1.02)';
-                    this.style.transition = 'transform 0.2s ease';
+            translatePage("{{ selected_lang }}");
+
+            const remember = document.getElementById('remember');
+            const saved = localStorage.getItem('rememberMe');
+            if (remember && saved === 'true') remember.checked = true;
+            if (remember) {
+                remember.addEventListener('change', function () {
+                    localStorage.setItem('rememberMe', this.checked);
                 });
-
-                input.addEventListener('blur', function () {
-                    this.style.transform = 'scale(1)';
-                });
-            });
-
-            // Add hover effect to login button
-            const loginBtn = document.querySelector('.btn-primary');
-            loginBtn.addEventListener('mouseenter', function () {
-                this.style.transform = 'translateY(-2px)';
-                this.style.boxShadow = '0 4px 12px rgba(94, 100, 255, 0.4)';
-            });
-
-            loginBtn.addEventListener('mouseleave', function () {
-                this.style.transform = 'translateY(0)';
-                this.style.boxShadow = 'none';
-            });
-
-            // Animate login card on load
-            const loginCard = document.querySelector('.login-card');
-            loginCard.style.animation = 'fadeIn 0.6s ease';
-
-            // Remember Me functionality
-            const rememberCheckbox = document.getElementById('remember');
-
-            // Load saved remember me state
-            if (localStorage.getItem('rememberMe') === 'true') {
-                rememberCheckbox.checked = true;
             }
 
-            // Save remember me state when checkbox changes
-            rememberCheckbox.addEventListener('change', function () {
-                localStorage.setItem('rememberMe', this.checked);
-            });
+            const password = document.getElementById('password');
+            const toggle = document.querySelector('.toggle');
+            if (password && toggle) {
+                toggle.addEventListener('click', function () {
+                    const isHidden = password.type === 'password';
+                    password.type = isHidden ? 'text' : 'password';
+                    toggle.innerHTML = isHidden ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+                });
+            }
 
-            // Show tooltip on remember me checkbox hover
-            rememberCheckbox.addEventListener('mouseenter', function () {
-                this.title = 'Keep me logged in for 30 days';
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const passwordInputs = document.querySelectorAll('input[type="password"]');
-            passwordInputs.forEach(input => {
-                // Create wrapper
-                const wrapper = document.createElement('div');
-                wrapper.style.position = 'relative';
-                wrapper.style.display = 'flex';
-                wrapper.style.alignItems = 'center';
-                
-                input.parentNode.insertBefore(wrapper, input);
-                wrapper.appendChild(input);
-                
-                // Create icon
-                const icon = document.createElement('i');
-                icon.className = 'fas fa-eye';
-                icon.style.position = 'absolute';
-                icon.style.right = '10px';
-                icon.style.cursor = 'pointer';
-                icon.style.color = '#888';
-                icon.style.zIndex = '10';
-                
-                icon.addEventListener('click', function() {
-                    if (input.type === 'password') {
-                        input.type = 'text';
-                        icon.className = 'fas fa-eye-slash';
-                    } else {
-                        input.type = 'password';
-                        icon.className = 'fas fa-eye';
+            // Quick demo login auto-filler
+            document.querySelectorAll('.demo-login-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const email = this.getAttribute('data-email');
+                    const passwordVal = this.getAttribute('data-password');
+                    
+                    const emailField = document.getElementById('email');
+                    const passField = document.getElementById('password');
+                    
+                    if (emailField && passField) {
+                        emailField.value = email;
+                        passField.value = passwordVal;
+                        
+                        // Flash inputs with color to indicate auto-fill action
+                        [emailField, passField].forEach(f => {
+                            f.style.transform = 'scale(1.02)';
+                            f.style.borderColor = '#c99746';
+                            setTimeout(() => {
+                                f.style.transform = 'none';
+                                f.style.borderColor = 'rgba(15,95,108,.16)';
+                            }, 250);
+                        });
                     }
                 });
-                
-                wrapper.appendChild(icon);
             });
         });
     </script>
 </body>
-
 </html>

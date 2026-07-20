@@ -1,0 +1,457 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block custom_css %}
+<style>
+    .report-container {
+        font-family: 'Poppins', sans-serif;
+    }
+    .profile-sidebar {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        padding: 30px 20px;
+        text-align: center;
+    }
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(108, 92, 231, 0.1);
+        margin-bottom: 15px;
+    }
+    .profile-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+    .info-list {
+        text-align: left;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .info-item {
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f2f6;
+        font-size: 13px;
+    }
+    .info-label {
+        color: #747d8c;
+        font-weight: 500;
+        margin-bottom: 2px;
+    }
+    .info-value {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+    
+    .report-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        padding: 20px 25px;
+        margin-bottom: 25px;
+    }
+    .report-card-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+    }
+    .report-card-title span {
+        background: #6c5ce7;
+        color: #fff;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        margin-right: 10px;
+    }
+    
+    .circle-progress-wrap {
+        display: flex;
+        gap: 30px;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .circle-progress {
+        text-align: center;
+    }
+    .circle-box {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: 6px solid #f1f2f6;
+        border-top-color: #ff7675;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        color: #ff7675;
+        margin: 0 auto 8px;
+    }
+    .circle-label {
+        font-size: 11px;
+        color: #747d8c;
+    }
+    
+    .badge-bar {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .report-badge {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 20px;
+        background: #f1f2f6;
+        color: #747d8c;
+        border: 1px solid #ced6e0;
+    }
+    
+    .stat-boxes {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+    }
+    .stat-box {
+        border-radius: 8px;
+        padding: 15px;
+        color: #fff;
+    }
+    .stat-box-title {
+        font-size: 11px;
+        text-transform: uppercase;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+    .stat-box-val {
+        font-size: 18px;
+        font-weight: 700;
+        margin-top: 5px;
+    }
+    .stat-box-meta {
+        font-size: 10px;
+        margin-top: 2px;
+        opacity: 0.8;
+    }
+    
+    .test-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .test-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px;
+        border: 1px solid #f1f2f6;
+        border-radius: 8px;
+    }
+    .test-subject {
+        font-size: 14px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .test-meta {
+        font-size: 11px;
+        color: #747d8c;
+        margin-top: 2px;
+    }
+    .test-score-circle {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        border: 4px solid #f1f2f6;
+        border-top-color: #2ed573;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        color: #2ed573;
+    }
+    
+    .empty-report-state {
+        text-align: center;
+        padding: 30px 10px;
+    }
+    .empty-report-state img {
+        width: 100px;
+        margin-bottom: 15px;
+        opacity: 0.8;
+    }
+    .empty-report-state p {
+        font-size: 12px;
+        color: #747d8c;
+        margin: 0;
+    }
+    
+    .get-pdf-btn {
+        background: #fff;
+        border: 1px solid #ced6e0;
+        color: #6c5ce7;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 8px 18px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .get-pdf-btn:hover {
+        background: #6c5ce7;
+        color: #fff;
+        border-color: #6c5ce7;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid report-container pb-5">
+    <!-- Top Action Breadcrumb Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4 bg-white p-3 rounded-lg shadow-sm">
+        <div class="breadcrumbs" style="font-size: 14px; font-weight: 500; color: #747d8c;">
+            <span style="color: #6c5ce7; font-weight: 600;"><i class="fas fa-graduation-cap"></i> Students</span> &gt; Student Report
+        </div>
+        <button class="btn get-pdf-btn" onclick="window.print()"><i class="far fa-file-pdf mr-1"></i> Get PDF</button>
+    </div>
+
+    <div class="row">
+        <!-- LEFT: Profile Info -->
+        <div class="col-md-4 mb-4">
+            <div class="profile-sidebar">
+                {% if student.admin.profile_pic %}
+                    <img class="profile-avatar" src="{{ student.admin.profile_pic }}" alt="{{ student.admin.first_name }}">
+                {% else %}
+                    <img class="profile-avatar" src="{% static 'images/default_profile.png' %}" alt="Default Profile">
+                {% endif %}
+                <h4 class="profile-name">{{ student.admin.first_name }} {{ student.admin.last_name }}</h4>
+                
+                <ul class="info-list">
+                    <li class="info-item">
+                        <div class="info-label">Registration No</div>
+                        <div class="info-value">{{ student.registration_no|default:student.unique_student_code|default:"?" }}</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Date of Admission</div>
+                        <div class="info-value">{{ student.admission_date|date:"d F, Y"|default:"?" }}</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Class</div>
+                        <div class="info-value">{{ student.course.name|default:"?" }}</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Batch / Semester</div>
+                        <div class="info-value">{{ student.batch_year }} Batch / Sem {{ student.current_semester }}</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Verification Status</div>
+                        <div class="info-value">{{ student.verification_status }}</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Family</div>
+                        <div class="info-value">?</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Discount in Fee</div>
+                        <div class="info-value">{{ student.discount_in_fee|default:"0" }} %</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Date Of Birth</div>
+                        <div class="info-value">{{ student.dob|date:"d F, Y"|default:"?" }}</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Gender</div>
+                        <div class="info-value">{% if student.admin.gender == 'M' %}Male{% elif student.admin.gender == 'F' %}Female{% else %}?{% endif %}</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Any Identification Mark?</div>
+                        <div class="info-value">{{ student.identification_mark|default:"?" }}</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Blood Group</div>
+                        <div class="info-value">{{ student.blood_group|default:"?" }}</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Disease If Any?</div>
+                        <div class="info-value">{{ student.disease|default:"?" }}</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Student Birth Form ID / NIC</div>
+                        <div class="info-value">{{ student.cnic|default:"?" }}</div>
+                    </li>
+                    <li class="info-item">
+                        <div class="info-label">Cast</div>
+                        <div class="info-value">{{ student.cast|default:"?" }}</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- RIGHT: Reports Section Cards -->
+        <div class="col-md-8">
+            <!-- 1. Attendance Report -->
+            <div class="report-card">
+                <div class="report-card-title">
+                    <span>1</span> Attendance Report
+                </div>
+                <div class="circle-progress-wrap">
+                    <div class="circle-progress">
+                        <div class="circle-box">0%</div>
+                        <div class="circle-label">Overall</div>
+                    </div>
+                    <div class="circle-progress">
+                        <div class="circle-box" style="border-top-color: #ff7675; color: #ff7675;">0%</div>
+                        <div class="circle-label">Jul 2026</div>
+                    </div>
+                </div>
+                <div class="badge-bar">
+                    <span class="report-badge">Today: NOT MARKED</span>
+                    <span class="report-badge">Yesterday: NOT MARKED</span>
+                </div>
+                <div class="stat-boxes">
+                    <div class="stat-box" style="background: #3498db;">
+                        <div class="stat-box-title">Presents</div>
+                        <div class="stat-box-val">0</div>
+                        <div class="stat-box-meta">This Month</div>
+                    </div>
+                    <div class="stat-box" style="background: #9b59b6;">
+                        <div class="stat-box-title">Leaves</div>
+                        <div class="stat-box-val">0</div>
+                        <div class="stat-box-meta">This Month</div>
+                    </div>
+                    <div class="stat-box" style="background: #e74c3c;">
+                        <div class="stat-box-title">Absents</div>
+                        <div class="stat-box-val">0</div>
+                        <div class="stat-box-meta">This Month</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Class Tests Report -->
+            <div class="report-card">
+                <div class="report-card-title">
+                    <span>2</span> Class Tests Report
+                </div>
+                <div class="test-list">
+                    {% for subject in subjects %}
+                    <div class="test-item">
+                        <div>
+                            <div class="test-subject"><i class="fas fa-book mr-1 text-primary"></i> {{ subject.name }}</div>
+                            <div class="test-meta">
+                                Total Class Tests (0) &nbsp;|&nbsp; Total Marks (0) &nbsp;|&nbsp; Obtained Marks (0)
+                            </div>
+                        </div>
+                        <div class="test-score-circle">0%</div>
+                    </div>
+                    {% empty %}
+                    <div class="test-item">
+                        <div>
+                            <div class="test-subject"><i class="fas fa-book mr-1 text-primary"></i> Java</div>
+                            <div class="test-meta">
+                                Total Class Tests (0) &nbsp;|&nbsp; Total Marks (0) &nbsp;|&nbsp; Obtained Marks (0)
+                            </div>
+                        </div>
+                        <div class="test-score-circle">0%</div>
+                    </div>
+                    <div class="test-item">
+                        <div>
+                            <div class="test-subject"><i class="fas fa-book mr-1 text-primary"></i> Python</div>
+                            <div class="test-meta">
+                                Total Class Tests (0) &nbsp;|&nbsp; Total Marks (0) &nbsp;|&nbsp; Obtained Marks (0)
+                            </div>
+                        </div>
+                        <div class="test-score-circle">0%</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 3. Examination Report -->
+            <div class="report-card">
+                <div class="report-card-title">
+                    <span>3</span> Examination Report
+                </div>
+                <div class="empty-report-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="180" style="margin-bottom:15px;">
+                        <!-- Desk -->
+                        <rect x="60" y="140" width="180" height="8" rx="3" fill="#e8e0ff"/>
+                        <rect x="80" y="148" width="8" height="40" rx="2" fill="#d5c8ff"/>
+                        <rect x="212" y="148" width="8" height="40" rx="2" fill="#d5c8ff"/>
+                        <!-- Computer Monitor -->
+                        <rect x="110" y="85" width="80" height="55" rx="6" fill="#6c5ce7"/>
+                        <rect x="115" y="90" width="70" height="42" rx="3" fill="#a29bfe"/>
+                        <rect x="140" y="140" width="20" height="5" rx="2" fill="#6c5ce7"/>
+                        <!-- Chart bars on screen -->
+                        <rect x="125" y="110" width="8" height="18" rx="2" fill="#fff" opacity="0.7"/>
+                        <rect x="137" y="100" width="8" height="28" rx="2" fill="#fff" opacity="0.8"/>
+                        <rect x="149" y="105" width="8" height="23" rx="2" fill="#fff" opacity="0.6"/>
+                        <rect x="161" y="95" width="8" height="33" rx="2" fill="#fff" opacity="0.9"/>
+                        <rect x="173" y="108" width="8" height="20" rx="2" fill="#fff" opacity="0.5"/>
+                        <!-- Person body -->
+                        <circle cx="80" cy="80" r="18" fill="#f8c9b4"/>
+                        <ellipse cx="80" cy="72" rx="20" ry="14" fill="#4a235a"/>
+                        <rect x="65" y="98" width="30" height="42" rx="8" fill="#6c5ce7"/>
+                        <!-- Book on desk -->
+                        <rect x="200" y="128" width="30" height="12" rx="2" fill="#ff7675" transform="rotate(-8 215 134)"/>
+                        <rect x="202" y="130" width="26" height="8" rx="1" fill="#fab1a0" transform="rotate(-8 215 134)"/>
+                        <!-- Decorative dots -->
+                        <circle cx="250" cy="60" r="4" fill="#a29bfe" opacity="0.4"/>
+                        <circle cx="40" cy="120" r="3" fill="#ff7675" opacity="0.4"/>
+                        <circle cx="260" cy="100" r="5" fill="#fdcb6e" opacity="0.3"/>
+                    </svg>
+                    <p style="font-size:13px; color:#636e72; margin:0;"><i class="fas fa-exclamation-circle" style="color:#fdcb6e; margin-right:5px;"></i> No Record Found.</p>
+                </div>
+            </div>
+
+            <!-- 4. Fee Report -->
+            <div class="report-card">
+                <div class="report-card-title">
+                    <span>4</span> Fee Report
+                </div>
+                <div class="empty-report-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="180" style="margin-bottom:15px;">
+                        <!-- Desk -->
+                        <rect x="60" y="140" width="180" height="8" rx="3" fill="#e8e0ff"/>
+                        <rect x="80" y="148" width="8" height="40" rx="2" fill="#d5c8ff"/>
+                        <rect x="212" y="148" width="8" height="40" rx="2" fill="#d5c8ff"/>
+                        <!-- Computer Monitor -->
+                        <rect x="110" y="85" width="80" height="55" rx="6" fill="#6c5ce7"/>
+                        <rect x="115" y="90" width="70" height="42" rx="3" fill="#a29bfe"/>
+                        <rect x="140" y="140" width="20" height="5" rx="2" fill="#6c5ce7"/>
+                        <!-- Dollar signs on screen -->
+                        <text x="135" y="118" font-family="Poppins,sans-serif" font-size="22" font-weight="700" fill="#fff" opacity="0.8">$</text>
+                        <text x="155" y="112" font-family="Poppins,sans-serif" font-size="14" font-weight="600" fill="#fff" opacity="0.5">$</text>
+                        <!-- Person body -->
+                        <circle cx="80" cy="80" r="18" fill="#f8c9b4"/>
+                        <ellipse cx="80" cy="72" rx="20" ry="14" fill="#4a235a"/>
+                        <rect x="65" y="98" width="30" height="42" rx="8" fill="#ff7675"/>
+                        <!-- Papers on desk -->
+                        <rect x="195" y="125" width="25" height="15" rx="2" fill="#fdcb6e"/>
+                        <rect x="198" y="128" width="19" height="2" rx="1" fill="#f39c12"/>
+                        <rect x="198" y="133" width="12" height="2" rx="1" fill="#f39c12"/>
+                        <!-- Decorative dots -->
+                        <circle cx="250" cy="60" r="4" fill="#a29bfe" opacity="0.4"/>
+                        <circle cx="40" cy="120" r="3" fill="#ff7675" opacity="0.4"/>
+                        <circle cx="260" cy="100" r="5" fill="#fdcb6e" opacity="0.3"/>
+                    </svg>
+                    <p style="font-size:13px; color:#636e72; margin:0;"><i class="fas fa-exclamation-circle" style="color:#fdcb6e; margin-right:5px;"></i> No Record Found.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

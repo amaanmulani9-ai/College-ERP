@@ -1,0 +1,78 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Assignment Details -->
+        <div class="col-md-5 mb-4">
+            <div class="card erpnext-card h-100 shadow-sm">
+                <div class="card-header">
+                    <span class="badge bg-secondary mb-1">{{ assignment.subject.name }}</span>
+                    <h5 class="card-title mb-0">{{ assignment.title }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-3">
+                        <i class="fas fa-clock text-warning"></i> Due: <strong>{{ assignment.due_date|date:"M d, Y H:i" }}</strong> | 
+                        <i class="fas fa-user-tie"></i> Posted by: {{ assignment.staff.admin.first_name }} {{ assignment.staff.admin.last_name }}
+                    </p>
+                    <h6>Instructions:</h6>
+                    <div class="p-3 bg-light rounded mb-3">{{ assignment.description|safe }}</div>
+                    {% if assignment.attachment %}
+                    <a href="{{ assignment.attachment.url }}" target="_blank" class="btn btn-outline-info w-100">
+                        <i class="fas fa-paperclip"></i> Download Reference Attachment
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Submission Form -->
+        <div class="col-md-7 mb-4">
+            <div class="card erpnext-card shadow">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0"><i class="fas fa-file-upload text-primary"></i> Your Submission</h5>
+                    {% if submission %}
+                    <span class="badge bg-success"><i class="fas fa-check"></i> Submitted on {{ submission.submitted_at|date:"M d, Y H:i" }}</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if submission and submission.marks_obtained > 0 %}
+                    <div class="alert alert-success">
+                        <h6 class="alert-heading"><i class="fas fa-award"></i> Graded: {{ submission.marks_obtained }} Marks</h6>
+                        <p class="mb-0"><strong>Teacher Feedback:</strong> {{ submission.feedback|default:"No written feedback provided." }}</p>
+                    </div>
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Submission Text / Notes <span class="text-danger">*</span></label>
+                            <textarea name="submission_text" class="form-control" rows="8" required placeholder="Type your answer, paste code, or provide notes for the instructor...">{% if submission %}{{ submission.submission_text }}{% endif %}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Upload File Attachment (Optional)</label>
+                            {% if submission and submission.attachment %}
+                            <div class="mb-2">
+                                <a href="{{ submission.attachment.url }}" target="_blank" class="badge bg-info text-decoration-none p-2"><i class="fas fa-file"></i> Current Attachment</a>
+                            </div>
+                            {% endif %}
+                            <input type="file" name="attachment" class="form-control">
+                            <small class="text-muted">Attach PDF, ZIP, code file, or report document.</small>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'student_assignments' %}" class="btn btn-secondary">Back to List</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {% if submission %}Update Submission{% else %}Submit Assignment{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: college-erp-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    # Enables wildcard SSL via cert-manager if deployed
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  rules:
+    # Catch-all for multi-tenant domains
+    - host: "*.youreduerp.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: college-erp-svc
+                port:
+                  number: 80
+  # tls:
+  #   - hosts:
+  #       - "*.youreduerp.com"
+  #     secretName: erp-wildcard-tls

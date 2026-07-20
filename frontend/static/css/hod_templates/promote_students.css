@@ -1,0 +1,104 @@
+
+*, *::before, *::after { box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; }
+
+.sk-breadcrumb-bar {
+    background: #fff; padding: 15px 25px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+.sk-breadcrumb-left { display: flex; align-items: center; gap: 8px; }
+.sk-breadcrumb-title { color: #4a235a; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.sk-breadcrumb-path { color: #b2bec3; font-size: 13px; }
+.sk-reload-btn {
+    color: #6c5ce7; font-size: 13px; font-weight: 600; text-decoration: none;
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border: 1px solid rgba(103,61,229,.2); border-radius: 8px;
+    transition: all 0.15s;
+}
+.sk-reload-btn:hover { background: rgba(108,92,231,0.08); text-decoration: none; color: #6c5ce7; }
+
+/* Table Card */
+.sk-table-card {
+    background: #fff; border-radius: 12px; padding: 25px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+}
+.sk-table-title {
+    font-size: 16px; font-weight: 700; color: #2d3436;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+}
+
+/* Filter Row */
+.sk-filter-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+}
+.sk-filter-left { display: flex; gap: 15px; flex-wrap: wrap; }
+.sk-filter-group { display: flex; flex-direction: column; gap: 6px; }
+.sk-filter-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: #999;
+}
+.sk-filter-select {
+    padding: 10px 36px 10px 14px;
+    border: 1.5px solid #e8e0ff; border-radius: 10px;
+    font-family: 'Poppins', sans-serif; font-size: 13px; color: #2d3436;
+    background: #fff; outline: none; min-width: 240px;
+    appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    transition: border-color 0.2s;
+}
+.sk-filter-select:focus { border-color: #6c5ce7; }
+
+.sk-search-wrapper {
+    position: relative;
+    display: flex; align-items: center;
+    align-self: flex-end;
+}
+.sk-search-input {
+    padding: 10px 14px 10px 40px;
+    border: 1.5px solid #e8e0ff; border-radius: 10px;
+    font-family: 'Poppins', sans-serif; font-size: 13px;
+    width: 280px; outline: none; transition: border-color 0.2s;
+}
+.sk-search-input:focus { border-color: #6c5ce7; }
+.sk-search-icon {
+    position: absolute; left: 14px; color: #b2bec3; font-size: 13px;
+}
+
+/* Table styling */
+table.sk-table { width: 100%; border-collapse: collapse; }
+table.sk-table thead th {
+    background: #f8f7ff; color: #4a235a;
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 2px solid #e8e0ff;
+    padding: 12px 10px; text-align: left;
+}
+table.sk-table tbody td {
+    font-size: 13px; color: #2d3436;
+    padding: 12px 10px; border-bottom: 1px solid #f1f2f6;
+    vertical-align: middle;
+}
+table.sk-table tbody tr:hover { background: rgba(108,92,231,0.03); }
+
+/* Checkbox */
+.sk-checkbox {
+    width: 18px; height: 18px; cursor: pointer; accent-color: #6c5ce7;
+}
+
+/* Promote Action Bar */
+.sk-promote-bar {
+    display: flex; justify-content: flex-end; margin-top: 25px;
+}
+.sk-promote-btn {
+    background: #6c5ce7; color: #fff; padding: 12px 24px;
+    border: none; border-radius: 10px; font-family: 'Poppins', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    transition: background 0.2s;
+}
+.sk-promote-btn:hover { background: #5530c5; }

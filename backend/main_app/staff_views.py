@@ -1,7 +1,11 @@
+from django.contrib.auth.decorators import login_required
+from .decorators import admin_required, staff_required, student_required
 import json
 
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
+from django.core.mail import send_mail
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import (HttpResponseRedirect, get_object_or_404,redirect, render)
 from django.urls import reverse
@@ -12,6 +16,8 @@ from .models import *
 from . import forms, models
 from datetime import date
 
+@login_required(login_url='/')
+@staff_required
 def staff_home(request):
     staff = get_object_or_404(Staff, admin=request.user)
     total_students = Student.objects.filter(course=staff.course).count()
@@ -20,12 +26,30 @@ def staff_home(request):
     total_subject = subjects.count()
     attendance_list = Attendance.objects.filter(subject__in=subjects)
     total_attendance = attendance_list.count()
-    attendance_list = []
-    subject_list = []
-    for subject in subjects:
-        attendance_count = Attendance.objects.filter(subject=subject).count()
-        subject_list.append(subject.name)
-        attendance_list.append(attendance_count)
+    from django.db.models import Count
+    import datetime as dt
+    subjects_with_attendance = subjects.annotate(attendance_count=Count('attendance', distinct=True))
+    subject_list = [subject.name for subject in subjects_with_attendance]
+    attendance_list = [subject.attendance_count for subject in subjects_with_attendance]
+
+    try:
+        notifications = NotificationStaff.objects.filter(staff=staff).order_by('-created_at')[:6]
+    except Exception:
+        notifications = []
+    try:
+        recent_leaves = LeaveReportStaff.objects.filter(staff=staff).order_by('-date')[:5]
+    except Exception:
+        recent_leaves = []
+    try:
+        recent_attendance = Attendance.objects.filter(subject__in=subjects).order_by('-date')[:5]
+    except Exception:
+        recent_attendance = []
+    try:
+        today_weekday = dt.datetime.now().weekday()
+        today_lectures = Timetable.objects.filter(subject__in=subjects, day_of_week=today_weekday).select_related('subject', 'course').order_by('start_time')
+    except Exception:
+        today_lectures = []
+
     context = {
         'page_title': 'Staff Panel - ' + str(staff.admin.first_name) + ' ' + str(staff.admin.last_name[:1]) + ' (' + str(staff.course) + ')',
         'total_students': total_students,
@@ -33,11 +57,17 @@ def staff_home(request):
         'total_leave': total_leave,
         'total_subject': total_subject,
         'subject_list': subject_list,
-        'attendance_list': attendance_list
+        'attendance_list': attendance_list,
+        'notifications': notifications,
+        'recent_leaves': recent_leaves,
+        'recent_attendance': recent_attendance,
+        'today_lectures': today_lectures,
     }
     return render(request, "staff_template/erpnext_staff_home.html", context)
 
 
+@login_required(login_url='/')
+@staff_required
 def staff_take_attendance(request):
     staff = get_object_or_404(Staff, admin=request.user)
     subjects = Subject.objects.filter(staff_id=staff)
@@ -52,6 +82,8 @@ def staff_take_attendance(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@staff_required
 def get_students(request):
     subject_id = request.POST.get('subject')
     session_id = request.POST.get('session')
@@ -73,6 +105,8 @@ def get_students(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@staff_required
 def save_attendance(request):
     student_data = request.POST.get('student_ids')
     date = request.POST.get('date')
@@ -91,38 +125,17 @@ def save_attendance(request):
             attendance_report.save()
             
             # Check for low attendance (< 75%)
-            total_classes = Attendance.objects.filter(subject=subject, session=session).count()
-            if total_classes > 0:
-                present_classes = AttendanceReport.objects.filter(
-                    student=student, 
-                    attendance__subject=subject, 
-                    attendance__session=session, 
-                    status=True
-                ).count()
-                
-                percentage = (present_classes / total_classes) * 100
-                
-                if percentage < 75.0:
-                    try:
-                        from django.core.mail import send_mail
-                        from django.conf import settings
-                        subject_email = f"URGENT: Low Attendance Warning - {subject.name}"
-                        message = f"Dear {student.admin.first_name},\n\nYour attendance in {subject.name} has fallen to {percentage:.1f}%, which is below the required 75% threshold.\n\nPlease ensure you attend upcoming classes to avoid academic penalties.\n\nRegards,\nAdmin Office"
-                        send_mail(
-                            subject_email,
-                            message,
-                            settings.EMAIL_HOST_USER,
-                            [student.admin.email],
-                            fail_silently=True,
-                        )
-                    except Exception:
-                        pass
+            # NOTE: Moved to a background task / cron job to avoid slowing down attendance saving
+            # and spamming students on every single save.
+            pass
     except Exception as e:
         return HttpResponse("False")
 
     return HttpResponse("OK")
 
 
+@login_required(login_url='/')
+@staff_required
 def staff_update_attendance(request):
     staff = get_object_or_404(Staff, admin=request.user)
     subjects = Subject.objects.filter(staff_id=staff)
@@ -137,6 +150,8 @@ def staff_update_attendance(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@staff_required
 def get_student_attendance(request):
     attendance_date_id = request.POST.get('attendance_date_id')
     try:
@@ -154,31 +169,41 @@ def get_student_attendance(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@staff_required
 def update_attendance(request):
     student_data = request.POST.get('student_ids')
     date = request.POST.get('date')
     students = json.loads(student_data)
     try:
         attendance = get_object_or_404(Attendance, id=date)
-
-        for student_dict in students:
-            student = get_object_or_404(
-                Student, admin_id=student_dict.get('id'))
-            attendance_report = get_object_or_404(AttendanceReport, student=student, attendance=attendance)
-            attendance_report.status = student_dict.get('status')
-            attendance_report.save()
+        
+        student_admin_ids = [s.get('id') for s in students]
+        status_map = {int(s.get('id')): s.get('status') for s in students}
+        
+        reports = AttendanceReport.objects.filter(
+            attendance=attendance, 
+            student__admin_id__in=student_admin_ids
+        )
+        
+        for report in reports:
+            report.status = status_map.get(report.student.admin_id)
+            
+        AttendanceReport.objects.bulk_update(reports, ['status'])
     except Exception as e:
         return HttpResponse("False")
 
     return HttpResponse("OK")
 
 
+@login_required(login_url='/')
+@staff_required
 def staff_apply_leave(request):
     form = LeaveReportStaffForm(request.POST or None)
     staff = get_object_or_404(Staff, admin_id=request.user.id)
     context = {
         'form': form,
-        'leave_history': LeaveReportStaff.objects.filter(staff=staff),
+        'leave_history': LeaveReportStaff.objects.filter(staff=staff).select_related('staff__admin'),
         'page_title': 'Apply for Leave'
     }
     if request.method == 'POST':
@@ -197,6 +222,8 @@ def staff_apply_leave(request):
     return render(request, "staff_template/staff_apply_leave.html", context)
 
 
+@login_required(login_url='/')
+@staff_required
 def staff_feedback(request):
     form = FeedbackStaffForm(request.POST or None)
     staff = get_object_or_404(Staff, admin_id=request.user.id)
@@ -220,6 +247,8 @@ def staff_feedback(request):
     return render(request, "staff_template/staff_feedback.html", context)
 
 
+@login_required(login_url='/')
+@staff_required
 def staff_view_profile(request):
     staff = get_object_or_404(Staff, admin=request.user)
     form = StaffEditForm(request.POST or None, request.FILES or None,instance=staff)
@@ -234,9 +263,9 @@ def staff_view_profile(request):
                 gender = form.cleaned_data.get('gender')
                 passport = request.FILES.get('profile_pic') or None
                 admin = staff.admin
-                if password != None:
+                if password is not None:
                     admin.set_password(password)
-                if passport != None:
+                if passport is not None:
                     fs = FileSystemStorage()
                     filename = fs.save(passport.name, passport)
                     passport_url = fs.url(filename)
@@ -261,6 +290,8 @@ def staff_view_profile(request):
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@staff_required
 def staff_fcmtoken(request):
     token = request.POST.get('token')
     try:
@@ -272,6 +303,8 @@ def staff_fcmtoken(request):
         return HttpResponse("False")
 
 
+@login_required(login_url='/')
+@staff_required
 def staff_view_notification(request):
     staff = get_object_or_404(Staff, admin=request.user)
     notifications = NotificationStaff.objects.filter(staff=staff)
@@ -282,6 +315,8 @@ def staff_view_notification(request):
     return render(request, "staff_template/staff_view_notification.html", context)
 
 
+@login_required(login_url='/')
+@staff_required
 def staff_add_result(request):
     staff = get_object_or_404(Staff, admin=request.user)
     subjects = Subject.objects.filter(staff=staff)
@@ -299,45 +334,27 @@ def staff_add_result(request):
             exam = request.POST.get('exam')
             student = get_object_or_404(Student, id=student_id)
             subject = get_object_or_404(Subject, id=subject_id)
+            result, created = StudentResult.objects.update_or_create(
+                student=student, subject=subject,
+                defaults={'exam': exam, 'test': test}
+            )
+            
             try:
-                data = StudentResult.objects.get(
-                    student=student, subject=subject)
-                data.exam = exam
-                data.test = test
-                data.save()
+                subject_text = f"Result {'Published' if created else 'Updated'} for {subject.name}"
+                message = f"Hello {student.admin.first_name},\n\nYour result for {subject.name} has been {'published' if created else 'updated'}.\nExam Score: {exam}\nTest Score: {test}\n\nPlease login to your portal to view more details.\n\nRegards,\nCollege ERP System"
+                send_mail(subject_text, message, settings.EMAIL_HOST_USER, [student.admin.email], fail_silently=True)
+            except Exception as e:
+                print("Email error:", e)
                 
-                # Send Email Notification for Result Update
-                try:
-                    from django.core.mail import send_mail
-                    from django.conf import settings
-                    subject_text = f"Result Updated for {subject.name}"
-                    message = f"Hello {student.admin.first_name},\n\nYour result for {subject.name} has been updated.\nExam Score: {exam}\nTest Score: {test}\n\nPlease login to your portal to view more details.\n\nRegards,\nCollege ERP System"
-                    send_mail(subject_text, message, settings.EMAIL_HOST_USER, [student.admin.email])
-                except Exception as e:
-                    print("Email error:", e)
-                    
-                messages.success(request, "Scores Updated")
-            except:
-                result = StudentResult(student=student, subject=subject, test=test, exam=exam)
-                result.save()
-                
-                # Send Email Notification for New Result
-                try:
-                    from django.core.mail import send_mail
-                    from django.conf import settings
-                    subject_text = f"New Result Published for {subject.name}"
-                    message = f"Hello {student.admin.first_name},\n\nA new result for {subject.name} has been published.\nExam Score: {exam}\nTest Score: {test}\n\nPlease login to your portal to view more details.\n\nRegards,\nCollege ERP System"
-                    send_mail(subject_text, message, settings.EMAIL_HOST_USER, [student.admin.email])
-                except Exception as e:
-                    print("Email error:", e)
-                    
-                messages.success(request, "Scores Saved")
+            messages.success(request, "Scores Saved" if created else "Scores Updated")
         except Exception as e:
             messages.warning(request, "Error Occured While Processing Form")
     return render(request, "staff_template/staff_add_result.html", context)
 
 
 @csrf_exempt
+@login_required(login_url='/')
+@staff_required
 def fetch_student_result(request):
     try:
         subject_id = request.POST.get('subject')
@@ -354,6 +371,8 @@ def fetch_student_result(request):
         return HttpResponse('False')
 
 #library
+@login_required(login_url='/')
+@staff_required
 def add_book(request):
     if request.method == "POST":
         name = request.POST['name']
@@ -374,6 +393,8 @@ def add_book(request):
 #issue book
 
 
+@login_required(login_url='/')
+@staff_required
 def issue_book(request):
     form = forms.IssueBookForm()
     if request.method == "POST":
@@ -387,9 +408,17 @@ def issue_book(request):
             return render(request, "staff_template/issue_book.html", {'obj':obj, 'alert':alert})
     return render(request, "staff_template/issue_book.html", {'form':form})
 
+@login_required(login_url='/')
+@staff_required
 def view_issued_book(request):
     issued_books = IssuedBook.objects.all().order_by('-issued_date')
     details = []
+    
+    isbns = [loan.isbn for loan in issued_books]
+    student_emails = [loan.student_id for loan in issued_books]
+    
+    books_dict = {str(book.isbn): book.name for book in Book.objects.filter(isbn__in=isbns)}
+    users_dict = {user.email: f"{user.first_name} {user.last_name} ({user.email})" for user in CustomUser.objects.filter(email__in=student_emails)}
     
     for loan in issued_books:
         # Calculate fine
@@ -397,20 +426,10 @@ def view_issued_book(request):
         fine = max(0, (days - 14) * 5)
         
         # Fetch book details
-        book_name = "Unknown Book"
-        try:
-            book = Book.objects.get(isbn=loan.isbn)
-            book_name = book.name
-        except Book.DoesNotExist:
-            pass
+        book_name = books_dict.get(loan.isbn, "Unknown Book")
             
         # Fetch student details
-        student_name = loan.student_id  # fallback to email/id
-        try:
-            user = CustomUser.objects.get(email=loan.student_id)
-            student_name = f"{user.first_name} {user.last_name} ({user.email})"
-        except CustomUser.DoesNotExist:
-            pass
+        student_name = users_dict.get(loan.student_id, loan.student_id)
             
         details.append({
             'book_name': book_name,
@@ -428,6 +447,8 @@ def view_issued_book(request):
     return render(request, "staff_template/view_issued_book.html", context)
 
 
+@login_required(login_url='/')
+@staff_required
 def staff_view_timetable(request):
     staff = get_object_or_404(Staff, admin=request.user)
     course = staff.course
@@ -441,6 +462,8 @@ def staff_view_timetable(request):
     return render(request, "staff_template/staff_timetable.html", context)
 
 
+@login_required(login_url='/')
+@staff_required
 def staff_manage_registrations(request):
     staff = get_object_or_404(Staff, admin=request.user)
     registrations = StudentRegistration.objects.filter(
@@ -454,6 +477,8 @@ def staff_manage_registrations(request):
     return render(request, "staff_template/manage_registrations.html", context)
 
 
+@login_required(login_url='/')
+@staff_required
 def staff_view_registration(request, reg_id):
     staff = get_object_or_404(Staff, admin=request.user)
     registration = get_object_or_404(
@@ -469,6 +494,8 @@ def staff_view_registration(request, reg_id):
     return render(request, "hod_template/view_registration.html", context)
 
 
+@login_required(login_url='/')
+@staff_required
 def staff_events_calendar(request):
     from .models import CollegeEvent
     import json
@@ -498,6 +525,8 @@ def staff_events_calendar(request):
     }
     return render(request, 'student_template/student_events_calendar.html', context)
 
+@login_required(login_url='/')
+@staff_required
 def staff_manage_exams(request):
     staff = get_object_or_404(Staff, admin=request.user)
     exams = Exam.objects.filter(staff=staff).order_by('-created_at')
@@ -507,6 +536,8 @@ def staff_manage_exams(request):
     }
     return render(request, 'staff_template/manage_exams.html', context)
 
+@login_required(login_url='/')
+@staff_required
 def staff_create_exam(request):
     staff = get_object_or_404(Staff, admin=request.user)
     if request.method == 'POST':
@@ -526,6 +557,8 @@ def staff_create_exam(request):
     }
     return render(request, 'staff_template/create_exam.html', context)
 
+@login_required(login_url='/')
+@staff_required
 def staff_add_question(request, exam_id):
     staff = get_object_or_404(Staff, admin=request.user)
     exam = get_object_or_404(Exam, id=exam_id, staff=staff)
@@ -558,6 +591,8 @@ def staff_add_question(request, exam_id):
     return render(request, 'staff_template/add_question.html', context)
 
 
+@login_required(login_url='/')
+@staff_required
 def staff_manage_parent(request):
     staff = get_object_or_404(Staff, admin=request.user)
     # Get parents of students in the staff's course
@@ -567,3 +602,227 @@ def staff_manage_parent(request):
         'page_title': 'Manage Parents'
     }
     return render(request, "staff_template/staff_manage_parent.html", context)
+
+
+# --- Version 2.0 LMS Views ---
+
+@login_required(login_url='/')
+@staff_required
+def staff_lms_home(request):
+    staff = get_object_or_404(Staff, admin=request.user)
+    courses = VideoCourse.objects.filter(staff=staff).order_by('-created_at')
+    assignments = Assignment.objects.filter(staff=staff).order_by('-due_date')
+    materials = StudyMaterial.objects.filter(staff=staff).order_by('-created_at')
+    context = {
+        'page_title': 'LMS Dashboard',
+        'courses': courses,
+        'assignments': assignments,
+        'materials': materials,
+    }
+    return render(request, "staff_template/staff_lms_home.html", context)
+
+@login_required(login_url='/')
+@staff_required
+def staff_add_course(request):
+    staff = get_object_or_404(Staff, admin=request.user)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        category_id = request.POST.get('category')
+        subject_id = request.POST.get('subject')
+        description = request.POST.get('description')
+        thumbnail = request.FILES.get('thumbnail')
+        
+        category = get_object_or_404(CourseCategory, id=category_id)
+        subject = get_object_or_404(Subject, id=subject_id, staff=staff)
+        
+        course = VideoCourse.objects.create(
+            title=title, category=category, subject=subject, staff=staff,
+            description=description, thumbnail=thumbnail
+        )
+        messages.success(request, f"Course '{title}' created successfully!")
+        return redirect(reverse('staff_manage_lessons', args=[course.id]))
+        
+    categories = CourseCategory.objects.all()
+    subjects = Subject.objects.filter(staff=staff)
+    context = {
+        'page_title': 'Add New Video Course',
+        'categories': categories,
+        'subjects': subjects,
+    }
+    return render(request, "staff_template/staff_add_course.html", context)
+
+@login_required(login_url='/')
+@staff_required
+def staff_manage_lessons(request, course_id):
+    staff = get_object_or_404(Staff, admin=request.user)
+    course = get_object_or_404(VideoCourse, id=course_id, staff=staff)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        video_file = request.FILES.get('video_file')
+        video_url = request.POST.get('video_url')
+        order = request.POST.get('order', 0)
+        
+        VideoLesson.objects.create(
+            course=course, title=title, description=description,
+            video_file=video_file, video_url=video_url, order=order
+        )
+        messages.success(request, "Lesson added successfully!")
+        return redirect(reverse('staff_manage_lessons', args=[course.id]))
+        
+    lessons = course.lessons.all().order_by('order')
+    context = {
+        'page_title': f'Manage Lessons: {course.title}',
+        'course': course,
+        'lessons': lessons,
+    }
+    return render(request, "staff_template/staff_manage_lessons.html", context)
+
+@login_required(login_url='/')
+@staff_required
+def staff_add_assignment(request):
+    staff = get_object_or_404(Staff, admin=request.user)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        subject_id = request.POST.get('subject')
+        description = request.POST.get('description')
+        attachment = request.FILES.get('attachment')
+        due_date = request.POST.get('due_date')
+        
+        subject = get_object_or_404(Subject, id=subject_id, staff=staff)
+        
+        Assignment.objects.create(
+            title=title, subject=subject, staff=staff,
+            description=description, attachment=attachment, due_date=due_date
+        )
+        messages.success(request, "Assignment published successfully!")
+        return redirect(reverse('staff_lms_home'))
+        
+    subjects = Subject.objects.filter(staff=staff)
+    context = {
+        'page_title': 'Publish New Assignment',
+        'subjects': subjects,
+    }
+    return render(request, "staff_template/staff_add_assignment.html", context)
+
+@login_required(login_url='/')
+@staff_required
+def staff_view_submissions(request, assignment_id):
+    staff = get_object_or_404(Staff, admin=request.user)
+    assignment = get_object_or_404(Assignment, id=assignment_id, staff=staff)
+    submissions = assignment.submissions.all().select_related('student__admin')
+    if request.method == 'POST':
+        sub_id = request.POST.get('submission_id')
+        marks = request.POST.get('marks')
+        feedback = request.POST.get('feedback')
+        sub = get_object_or_404(AssignmentSubmission, id=sub_id, assignment=assignment)
+        sub.marks_obtained = float(marks)
+        sub.feedback = feedback
+        sub.save()
+        messages.success(request, "Graded successfully!")
+        return redirect(reverse('staff_view_submissions', args=[assignment.id]))
+        
+    context = {
+        'page_title': f'Submissions: {assignment.title}',
+        'assignment': assignment,
+        'submissions': submissions,
+    }
+    return render(request, "staff_template/staff_view_submissions.html", context)
+
+@login_required(login_url='/')
+@staff_required
+def staff_add_material(request):
+    staff = get_object_or_404(Staff, admin=request.user)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        subject_id = request.POST.get('subject')
+        file = request.FILES.get('file')
+        description = request.POST.get('description')
+        
+        subject = get_object_or_404(Subject, id=subject_id, staff=staff)
+        
+        StudyMaterial.objects.create(
+            title=title, subject=subject, staff=staff,
+            file=file, description=description
+        )
+        messages.success(request, "Study Material uploaded successfully!")
+        return redirect(reverse('staff_lms_home'))
+        
+    subjects = Subject.objects.filter(staff=staff)
+    context = {
+        'page_title': 'Upload Study Material',
+        'subjects': subjects,
+    }
+    return render(request, "staff_template/staff_add_material.html", context)
+
+
+# --- Version 2.5 Live Learning Views (Virtual Classroom) ---
+
+@login_required(login_url='/')
+@staff_required
+def staff_live_classes(request):
+    staff = get_object_or_404(Staff, admin=request.user)
+    live_classes = LiveClass.objects.filter(staff=staff).order_by('-scheduled_at')
+    
+    context = {
+        'page_title': 'Live Virtual Classrooms',
+        'live_classes': live_classes,
+    }
+    return render(request, "staff_template/staff_live_classes.html", context)
+
+@login_required(login_url='/')
+@staff_required
+def staff_schedule_live_class(request):
+    staff = get_object_or_404(Staff, admin=request.user)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        subject_id = request.POST.get('subject')
+        scheduled_at = request.POST.get('scheduled_at')
+        duration_minutes = request.POST.get('duration_minutes', 60)
+        description = request.POST.get('description')
+        
+        subject = get_object_or_404(Subject, id=subject_id, staff=staff)
+        
+        LiveClass.objects.create(
+            title=title, subject=subject, staff=staff,
+            scheduled_at=scheduled_at, duration_minutes=duration_minutes,
+            description=description, is_active=True
+        )
+        messages.success(request, f"Live class '{title}' scheduled successfully!")
+        return redirect(reverse('staff_live_classes'))
+        
+    subjects = Subject.objects.filter(staff=staff)
+    context = {
+        'page_title': 'Schedule Live Virtual Class',
+        'subjects': subjects,
+    }
+    return render(request, "staff_template/staff_schedule_live_class.html", context)
+
+@login_required(login_url='/')
+@staff_required
+def staff_host_live_class(request, class_id):
+    staff = get_object_or_404(Staff, admin=request.user)
+    live_class = get_object_or_404(LiveClass, id=class_id, staff=staff)
+    attendances = live_class.attendances.all().order_by('-joined_at')
+    
+    context = {
+        'page_title': f"Host: {live_class.title}",
+        'live_class': live_class,
+        'attendances': attendances,
+    }
+    return render(request, "staff_template/staff_host_live_class.html", context)
+
+@login_required(login_url='/')
+@staff_required
+def staff_end_live_class(request, class_id):
+    staff = get_object_or_404(Staff, admin=request.user)
+    live_class = get_object_or_404(LiveClass, id=class_id, staff=staff)
+    live_class.is_active = False
+    live_class.save()
+    
+    # Set left_at for all open attendances
+    from django.utils import timezone
+    live_class.attendances.filter(left_at__isnull=True).update(left_at=timezone.now())
+    
+    messages.success(request, f"Live class '{live_class.title}' ended. Attendance records saved!")
+    return redirect(reverse('staff_live_classes'))

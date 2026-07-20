@@ -1,0 +1,647 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>CampusPro - Next-Gen AI-Powered College ERP</title>
+    <meta name="description" content="CampusPro is a next-generation cloud-based College ERP web application integrating AI predictive analytics, fee receipt fraud detection, and 24/7 helpdesk chatbots.">
+    <link rel="canonical" href="https://college-erp-web.onrender.com{{ request.path }}">
+    <meta name="robots" content="index, follow">
+    <link rel="shortcut icon" href="{% static '/image/favicon1.ico' %}">
+
+    <!-- Schema.org JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "CampusPro",
+      "applicationCategory": "EducationalApplication, BusinessApplication",
+      "operatingSystem": "All",
+      "description": "An advanced, glassmorphic multitenant ERP solution with AI predictive analytics, automated attendance, fee fraud detection, and student helpdesk.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "CampusPro",
+        "url": "https://college-erp-web.onrender.com/"
+      }
+    }
+    </script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#6366f1",
+                        secondary: "#a855f7",
+                        accent: "#06b6d4",
+                        darkBg: "#07080d",
+                        cardBg: "rgba(255, 255, 255, 0.03)",
+                        lineColor: "rgba(255, 255, 255, 0.06)",
+                    },
+                    fontFamily: {
+                        sans: ["Outfit", "sans-serif"],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background: 
+                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15), transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(168, 85, 247, 0.18), transparent 45%),
+                linear-gradient(135deg, #07080d, #0d0f17 50%, #07080d);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .text-gradient-cyan {
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-highlight {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        .hero-pattern {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+    </style>
+</head>
+<body class="bg-darkBg text-slate-100 font-sans antialiased selection:bg-primary selection:text-white">
+
+    <!-- TopNavBar -->
+    <nav class="fixed top-0 w-full z-50 bg-[#07080d]/65 backdrop-blur-xl border-b border-lineColor shadow-sm transition-all duration-300" id="main-nav">
+        <div class="max-w-7xl mx-auto px-8 flex justify-between items-center h-20">
+            <!-- Logo -->
+            <a class="text-xl font-bold flex items-center gap-3 text-white" href="#">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/30 border border-white/10">
+                    <span class="material-symbols-outlined text-white text-xl">school</span>
+                </div>
+                <span class="tracking-tight font-extrabold text-gradient">CAMPUSPRO</span>
+            </a>
+            
+            <!-- Desktop Nav Links -->
+            <div class="hidden md:flex items-center gap-8">
+                <a class="text-[15px] font-semibold text-slate-400 hover:text-primary transition-colors duration-200" href="#problem">Challenges</a>
+                <a class="text-[15px] font-semibold text-slate-400 hover:text-primary transition-colors duration-200" href="#modules">Core Modules</a>
+                <a class="text-[15px] font-semibold text-primary border-b-2 border-primary pb-1" href="#smart-features">Smart AI Features</a>
+                <a class="text-[15px] font-semibold text-slate-400 hover:text-primary transition-colors duration-200" href="#portals">Role Portals</a>
+                <a class="text-[15px] font-semibold text-slate-400 hover:text-primary transition-colors duration-200" href="{% url 'online_registration' %}">Admissions</a>
+            </div>
+            
+            <!-- Actions -->
+            <div class="hidden md:flex items-center gap-4">
+                <a class="text-[15px] font-semibold text-slate-300 hover:text-primary transition-colors" href="{% url 'login_page' %}">Login</a>
+                <a class="bg-primary hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl text-[15px] font-semibold transition-all hover:-translate-y-0.5 shadow-lg shadow-primary/20 border border-white/10" href="{% url 'login_page' %}">Book a Live Demo</a>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden text-slate-300 p-2">
+                <span class="material-symbols-outlined text-2xl">menu</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="pt-20">
+        <!-- Hero Section -->
+        <section class="relative pt-24 pb-20 md:pb-32 overflow-hidden">
+            <div class="absolute inset-0 hero-pattern pointer-events-none opacity-40"></div>
+            <div class="max-w-7xl mx-auto px-8 relative z-10 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8">
+                    <span class="bg-primary text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded-full">AI-Powered</span>
+                    <span class="text-xs font-bold text-slate-300">Next-Gen College ERP Platform</span>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-extrabold max-w-4xl mx-auto mb-6 text-white leading-tight tracking-tight">
+                    Run a Smarter, Zero-Chaos Campus with <span class="text-gradient">AI-Powered ERP</span>
+                </h1>
+                <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mb-10 leading-relaxed font-normal">
+                    Stop losing administrative hours to manual work. Combine seamless campus operations with predictive student analytics, 24/7 AI assistance, and instant fee fraud detection.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+                    <a class="w-full sm:w-auto bg-primary hover:bg-indigo-500 text-white px-8 py-4 rounded-xl font-bold transition-all hover:-translate-y-1 shadow-xl shadow-primary/25 flex items-center justify-center gap-2 border border-white/10 text-base" href="{% url 'login_page' %}">
+                        Book Your Live Campus Demo
+                        <span class="material-symbols-outlined text-xl">arrow_forward</span>
+                    </a>
+                    <a class="w-full sm:w-auto bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 px-8 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 group text-base" href="{% url 'online_registration' %}">
+                        <span class="material-symbols-outlined text-xl group-hover:text-white">rocket_launch</span>
+                        Start Free Trial
+                    </a>
+                </div>
+                
+                <!-- Dashboard Preview -->
+                <div class="relative max-w-5xl mx-auto">
+                    <div class="absolute inset-0 bg-gradient-to-t from-darkBg via-transparent to-transparent z-10 h-full w-full pointer-events-none"></div>
+                    <div class="glass-panel rounded-2xl p-3 md:p-5 rotate-1 hover:rotate-0 transition-transform duration-500">
+                        <div class="mockup-header flex items-center justify-between pb-3 border-b border-white/5 mb-4">
+                            <div class="mockup-dots flex gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full" style="background: #ef4444;"></span>
+                                <span class="w-2.5 h-2.5 rounded-full" style="background: #eab308;"></span>
+                                <span class="w-2.5 h-2.5 rounded-full" style="background: #22c55e;"></span>
+                            </div>
+                            <div class="text-xs text-slate-400 font-mono">campuspro-smart-analytics-dashboard</div>
+                            <div><i class="fas fa-cog text-slate-500 text-sm"></i></div>
+                        </div>
+                        <div class="bg-black/40 rounded-xl p-6 border border-white/5 text-left">
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Predictive Academic Insights</span>
+                                    <h3 class="text-2xl md:text-3xl font-extrabold text-white mt-1">94.2% Student Retention</h3>
+                                </div>
+                                <span class="badge bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full text-xs px-3 py-1 font-bold">+18.5% Early Interventions</span>
+                            </div>
+                            <div class="mb-6 h-[140px] relative">
+                                <svg viewBox="0 0 400 100" class="w-full h-full">
+                                    <defs>
+                                        <linearGradient id="svgGlow" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#6366f1" stop-opacity="0.3"/>
+                                            <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <line x1="0" y1="20" x2="400" y2="20" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                                    <line x1="0" y1="50" x2="400" y2="50" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                                    <line x1="0" y1="80" x2="400" y2="80" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                                    <path d="M 0 80 Q 80 40, 160 60 T 320 20 L 400 35 L 400 100 L 0 100 Z" fill="url(#svgGlow)"/>
+                                    <path d="M 0 80 Q 80 40, 160 60 T 320 20 L 400 35" fill="none" stroke="#6366f1" stroke-width="3" stroke-linecap="round"/>
+                                    <circle cx="160" cy="60" r="4" fill="#a855f7" stroke="#ffffff" stroke-width="1"/>
+                                    <circle cx="320" cy="20" r="4" fill="#06b6d4" stroke="#ffffff" stroke-width="1"/>
+                                </svg>
+                            </div>
+                            <div class="grid grid-cols-3 pt-4 border-t border-white/5 text-center">
+                                <div>
+                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">AI Helpdesk Tickets</div>
+                                    <div class="text-white font-extrabold mt-1 text-sm md:text-base">80% Resolved Instantly</div>
+                                </div>
+                                <div class="border-x border-white/5">
+                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Fee Receipt Verifications</div>
+                                    <div class="text-emerald-400 font-extrabold mt-1 text-sm md:text-base">100% Verified</div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Admin Hours Saved</div>
+                                    <div class="text-white font-extrabold mt-1 text-sm md:text-base">20+ Hrs / Week</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Social Proof Marquee -->
+        <section class="py-12 border-y border-white/5 bg-white/[0.01] overflow-hidden" id="stats">
+            <div class="max-w-7xl mx-auto px-8 text-center mb-8">
+                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Built for forward-thinking college administrators, IT heads & finance directors</p>
+            </div>
+            <div class="flex flex-wrap justify-center items-center gap-12 max-w-7xl mx-auto px-8 opacity-60">
+                <span class="text-lg font-bold text-slate-400 flex items-center gap-2"><span class="material-symbols-outlined">menu_book</span> Oxford Acad.</span>
+                <span class="text-lg font-bold text-slate-400 flex items-center gap-2"><span class="material-symbols-outlined">public</span> Global High</span>
+                <span class="text-lg font-bold text-slate-400 flex items-center gap-2"><span class="material-symbols-outlined">local_library</span> Pioneer Inst.</span>
+                <span class="text-lg font-bold text-slate-400 flex items-center gap-2"><span class="material-symbols-outlined">architecture</span> Design School</span>
+            </div>
+        </section>
+
+        <!-- Problem & Agitation Section (PAS Framework) -->
+        <section class="py-24 max-w-7xl mx-auto px-8" id="problem">
+            <div class="text-center mb-16">
+                <span class="text-xs font-bold text-rose-400 uppercase tracking-widest mb-3 block">The Real Pain Points</span>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+                    Is Your Campus Trapped in Administrative Chaos?
+                </h2>
+                <p class="text-slate-400 max-w-2xl mx-auto mt-4 text-base">
+                    Running a modern college with decade-old software is a constant downhill battle. Daily bottlenecks slow down administrators, frustrate students, and drain university budgets.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <!-- Problem 1 -->
+                <div class="glass-panel p-8 rounded-2xl border-l-4 border-l-rose-500">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 text-xl flex-shrink-0">
+                            <span class="material-symbols-outlined">schedule</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">Endless Manual Attendance</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed">
+                                Teachers waste 10–15 minutes of every lecture taking roll call manually instead of teaching, creating massive data backlogs and reporting gaps.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Problem 2 -->
+                <div class="glass-panel p-8 rounded-2xl border-l-4 border-l-amber-500">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-xl flex-shrink-0">
+                            <span class="material-symbols-outlined">receipt_long</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">Fee Receipt Fraud & Audit Nightmares</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed">
+                                Unverified paper receipts, mismatched payment entries, and financial leakages cost colleges thousands every term during audits.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Problem 3 -->
+                <div class="glass-panel p-8 rounded-2xl border-l-4 border-l-purple-500">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-xl flex-shrink-0">
+                            <span class="material-symbols-outlined">trending_down</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">Reactive Student Interventions</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed">
+                                You only find out a student is failing or dropping out when it's already too late to intervene, lowering institution retention metrics.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Problem 4 -->
+                <div class="glass-panel p-8 rounded-2xl border-l-4 border-l-cyan-500">
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 text-xl flex-shrink-0">
+                            <span class="material-symbols-outlined">support_agent</span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white mb-2">Overwhelmed Helpdesks</h3>
+                            <p class="text-slate-400 text-sm leading-relaxed">
+                                Administrative staff get drowned in the exact same 50 questions about schedules, fees, and exams every single day.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Line Callout -->
+            <div class="glass-card-highlight p-6 rounded-2xl text-center max-w-3xl mx-auto border border-primary/30">
+                <p class="text-base text-slate-200 font-semibold">
+                    <strong class="text-primary font-bold">Bottom Line:</strong> Disconnected, legacy systems waste over <span class="text-white font-extrabold underline decoration-primary">20+ administrative hours every week</span> and put your institution's financial integrity at risk.
+                </p>
+            </div>
+        </section>
+
+        <!-- Core Modules Section -->
+        <section class="py-20 max-w-7xl mx-auto px-8" id="modules">
+            <div class="text-center mb-16">
+                <span class="text-xs font-bold text-primary uppercase tracking-widest mb-3 block">Foundational Power</span>
+                <h2 class="text-3xl font-extrabold text-white tracking-tight">The Core Operational Modules</h2>
+                <p class="text-slate-400 max-w-xl mx-auto mt-3 text-sm">
+                    Everything your campus needs in one connected platform.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Module 1: SIS -->
+                <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-primary text-2xl mb-6">
+                            <span class="material-symbols-outlined">badge</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">1. Student Information System (SIS)</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                            Manage every phase of the student lifecycle—from initial admission to graduation—with single-click record access, automated transcript generation, and centralized parent portals.
+                        </p>
+                    </div>
+                    <ul class="space-y-2 text-xs font-medium text-slate-300 pt-4 border-t border-white/5">
+                        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span> Centralized Lifecycle Database</li>
+                        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span> One-Click Transcripts & Records</li>
+                    </ul>
+                </div>
+
+                <!-- Module 2: Attendance -->
+                <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-secondary text-2xl mb-6">
+                            <span class="material-symbols-outlined">how_to_reg</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">2. Automated Attendance</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                            Eliminate attendance roll-call delay. Digital tracking, facial recognition options, and automated instant notifications keep parents and faculty updated in real time.
+                        </p>
+                    </div>
+                    <ul class="space-y-2 text-xs font-medium text-slate-300 pt-4 border-t border-white/5">
+                        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span> Zero-Time Roll Call Delay</li>
+                        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span> Real-Time Parent Alerts</li>
+                    </ul>
+                </div>
+
+                <!-- Module 3: Finance -->
+                <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-accent text-2xl mb-6">
+                            <span class="material-symbols-outlined">payments</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">3. Finance & Fees Tracking</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                            Automate tuition billing, track installment plans, reconcile ledger balances instantly, and send automated payment reminders to eliminate overdue fees.
+                        </p>
+                    </div>
+                    <ul class="space-y-2 text-xs font-medium text-slate-300 pt-4 border-t border-white/5">
+                        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span> Automated Tuition Billing</li>
+                        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span> Instant Ledger Reconciliation</li>
+                    </ul>
+                </div>
+
+                <!-- Module 4: Digital Library -->
+                <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between hover:-translate-y-1 transition-all duration-300">
+                    <div>
+                        <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-2xl mb-6">
+                            <span class="material-symbols-outlined">menu_book</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">4. Free Digital Library & Notes</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                            Provide 100,000+ open-access textbooks, IIT NPTEL notes, SWAYAM resources, and NCERT school material. Complete with dynamic APIs and live search counts.
+                        </p>
+                    </div>
+                    <ul class="space-y-2 text-xs font-medium text-slate-300 pt-4 border-t border-white/5">
+                        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span> Live Multi-API Deduplication</li>
+                        <li class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span> Indian Open Courseware Access</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Smart Features Spotlight Section -->
+        <section class="py-24 max-w-7xl mx-auto px-8 relative" id="smart-features">
+            <div class="text-center mb-16">
+                <span class="text-xs font-bold text-accent uppercase tracking-widest mb-3 block">Unique Selling Proposition</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
+                    The "Smart Features" <span class="text-gradient-cyan">Spotlight</span>
+                </h2>
+                <p class="text-slate-300 max-w-2xl mx-auto text-base">
+                    While generic ERPs only store static data, CampusPro integrates advanced AI and predictive analytics to manage student lifecycles and campus finances proactively.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1: Predictive Analytics -->
+                <div class="glass-panel p-8 rounded-3xl relative overflow-hidden group hover:border-primary/50 transition-all duration-300">
+                    <div class="w-16 h-16 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-primary text-3xl mb-6">
+                        <span class="material-symbols-outlined">insights</span>
+                    </div>
+                    <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest block mb-1">AI Intelligence</span>
+                    <h3 class="text-2xl font-bold text-white mb-4">Predictive Student Analytics</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-6">
+                        Spot at-risk students before they fall behind. Machine learning models continuously analyze attendance trends, quiz performance, and assignment submittals to flag early intervention alerts for faculty.
+                    </p>
+                    <div class="bg-white/5 rounded-xl p-4 border border-white/5 text-xs text-slate-300">
+                        <div class="font-bold text-emerald-400 mb-1">Impact Highlight:</div>
+                        Boost institution student retention rates by up to <strong class="text-white">35%</strong>.
+                    </div>
+                </div>
+
+                <!-- Feature 2: AI Chatbot -->
+                <div class="glass-panel p-8 rounded-3xl relative overflow-hidden group hover:border-secondary/50 transition-all duration-300">
+                    <div class="w-16 h-16 rounded-2xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-secondary text-3xl mb-6">
+                        <span class="material-symbols-outlined">smart_toy</span>
+                    </div>
+                    <span class="text-xs font-bold text-purple-400 uppercase tracking-widest block mb-1">Automated Support</span>
+                    <h3 class="text-2xl font-bold text-white mb-4">24/7 AI Helpdesk Chatbot</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-6">
+                        Instant answers for students, zero extra work for staff. Handles thousands of queries regarding exam timetables, fee balances, room allocations, and campus events 24/7.
+                    </p>
+                    <div class="bg-white/5 rounded-xl p-4 border border-white/5 text-xs text-slate-300">
+                        <div class="font-bold text-purple-400 mb-1">Impact Highlight:</div>
+                        Reduces manual administrative support tickets by over <strong class="text-white">80%</strong>.
+                    </div>
+                </div>
+
+                <!-- Feature 3: Fraud Detection -->
+                <div class="glass-panel p-8 rounded-3xl relative overflow-hidden group hover:border-accent/50 transition-all duration-300">
+                    <div class="w-16 h-16 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-accent text-3xl mb-6">
+                        <span class="material-symbols-outlined">verified_user</span>
+                    </div>
+                    <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest block mb-1">Financial Integrity</span>
+                    <h3 class="text-2xl font-bold text-white mb-4">Fee Receipt Fraud Detection</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-6">
+                        Bank-grade security for every campus transaction. Automated verification cross-checks digital and bank receipts against transaction hashes to stop forged fee submissions instantly.
+                    </p>
+                    <div class="bg-white/5 rounded-xl p-4 border border-white/5 text-xs text-slate-300">
+                        <div class="font-bold text-cyan-400 mb-1">Impact Highlight:</div>
+                        Eliminates financial leakages and internal/external payment tampering completely.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dedicated Roles Section -->
+        <section class="py-20 max-w-7xl mx-auto px-8" id="portals">
+            <div class="text-center mb-16">
+                <span class="text-xs font-bold text-primary uppercase tracking-widest mb-3 block">Role-Based Gateways</span>
+                <h2 class="text-3xl font-extrabold text-white tracking-tight">Dedicated Portal Interfaces</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Admin Card -->
+                <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between hover:-translate-y-1 transition-all duration-300 group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-primary text-xl mb-6">
+                            <span class="material-symbols-outlined">shield</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-3">Administrator</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                            Manage institution databases, control user accounts, configure sessions, customize fee models, and coordinate certificate templates.
+                        </p>
+                    </div>
+                    <a href="{% url 'login_page' %}" class="text-xs font-bold text-white flex items-center gap-2 group-hover:text-primary transition-colors">
+                        Access Admin Portal
+                        <span class="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+                    </a>
+                </div>
+                
+                <!-- Staff Card -->
+                <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between hover:-translate-y-1 transition-all duration-300 group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-secondary text-xl mb-6">
+                            <span class="material-symbols-outlined">person</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-3">Faculty Portal</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                            Log classroom attendance, manage test results, verify student details, manage leave applications, and interact with the AI assistant.
+                        </p>
+                    </div>
+                    <a href="{% url 'login_page' %}" class="text-xs font-bold text-white flex items-center gap-2 group-hover:text-secondary transition-colors">
+                        Access Staff Portal
+                        <span class="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+                    </a>
+                </div>
+                
+                <!-- Student Card -->
+                <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between hover:-translate-y-1 transition-all duration-300 group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-accent text-xl mb-6">
+                            <span class="material-symbols-outlined">school</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-3">Student Portal</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                            View customized academic calendars, fetch timetables, pay fees online via secure checkout, track results, and review placement metrics.
+                        </p>
+                    </div>
+                    <a href="{% url 'login_page' %}" class="text-xs font-bold text-white flex items-center gap-2 group-hover:text-accent transition-colors">
+                        Access Student Portal
+                        <span class="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+                    </a>
+                </div>
+                
+                <!-- Parent Card -->
+                <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between hover:-translate-y-1 transition-all duration-300 group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-xl mb-6">
+                            <span class="material-symbols-outlined">group</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-3">Parent Portal</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                            Monitor student attendance logs, view performance marks, submit feedback records, track class timetables, and verify fee structures.
+                        </p>
+                    </div>
+                    <a href="{% url 'login_page' %}" class="text-xs font-bold text-white flex items-center gap-2 group-hover:text-emerald-400 transition-colors">
+                        Access Parent Portal
+                        <span class="material-symbols-outlined text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final Push & Migration Section -->
+        <section class="py-20 max-w-7xl mx-auto px-8">
+            <div class="glass-panel p-12 rounded-3xl bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-transparent border border-white/10">
+                <div class="text-center max-w-3xl mx-auto mb-12">
+                    <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-3 block">Seamless Onboarding</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Switching ERPs Doesn't Have to Be Painful</h2>
+                    <p class="text-slate-300 text-base leading-relaxed">
+                        Concerned about data migration? Don't be. Our specialized onboarding team handles your entire data import—migrating student databases, fee archives, and course records seamlessly with zero downtime.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="bg-black/30 p-6 rounded-2xl border border-white/5 text-center">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mx-auto mb-4">
+                            <span class="material-symbols-outlined text-2xl">lock</span>
+                        </div>
+                        <h4 class="font-bold text-white mb-1">100% Data Protection</h4>
+                        <p class="text-xs text-slate-400">Enterprise-grade encryption keeps all your institutional records safe during transit.</p>
+                    </div>
+                    <div class="bg-black/30 p-6 rounded-2xl border border-white/5 text-center">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mx-auto mb-4">
+                            <span class="material-symbols-outlined text-2xl">speed</span>
+                        </div>
+                        <h4 class="font-bold text-white mb-1">48-Hour Onboarding</h4>
+                        <p class="text-xs text-slate-400">Get staff trained and operational without disrupting ongoing classes or semester exams.</p>
+                    </div>
+                    <div class="bg-black/30 p-6 rounded-2xl border border-white/5 text-center">
+                        <div class="w-12 h-12 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center justify-center text-secondary mx-auto mb-4">
+                            <span class="material-symbols-outlined text-2xl">headset_mic</span>
+                        </div>
+                        <h4 class="font-bold text-white mb-1">24/7 Account Support</h4>
+                        <p class="text-xs text-slate-400">Hands-on technical assistance and dedicated support managers every step of the way.</p>
+                    </div>
+                </div>
+
+                <div class="text-center pt-6 border-t border-white/5">
+                    <h3 class="text-2xl font-bold text-white mb-6">Ready to Upgrade Your Institution to a Smart Campus?</h3>
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <a href="{% url 'login_page' %}" class="w-full sm:w-auto bg-primary hover:bg-indigo-500 text-white px-8 py-4 rounded-xl font-bold transition-all hover:-translate-y-0.5 shadow-xl shadow-primary/25 border border-white/10 flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined">rocket_launch</span>
+                            Start Your Free Campus Trial
+                        </a>
+                        <a href="{% url 'login_page' %}" class="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-slate-300 px-8 py-4 rounded-xl font-bold transition-all border border-white/10 flex items-center justify-center gap-2">
+                            Book a Live Demo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-black/40 border-t border-white/5 w-full py-16">
+            <div class="max-w-7xl mx-auto px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1">
+                    <a class="text-lg font-bold text-white mb-6 block flex items-center gap-3" href="#">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-secondary flex items-center justify-center border border-white/10">
+                            <span class="material-symbols-outlined text-white text-base">school</span>
+                        </div>
+                        <span class="text-gradient font-extrabold">CAMPUSPRO</span>
+                    </a>
+                    <p class="text-sm text-slate-400 leading-relaxed mb-6">
+                        An advanced, glassmorphic multitenant ERP solution built on modern Python and Django. Designed for speed, security, and exceptional visual beauty.
+                    </p>
+                    <div class="flex gap-3">
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all"><i class="fab fa-github"></i></a>
+                        <a href="#" class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-4">LEGAL</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a class="text-slate-400 hover:text-white transition-colors" href="#">Privacy Policy</a></li>
+                        <li><a class="text-slate-400 hover:text-white transition-colors" href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-4">RESOURCES</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a class="text-slate-400 hover:text-white transition-colors" href="#">Support Center</a></li>
+                        <li><a class="text-slate-400 hover:text-white transition-colors" href="#">Documentation</a></li>
+                        <li><a class="text-slate-400 hover:text-white transition-colors" href="{% url 'health_check' %}">API Status</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-widest mb-4">GET THE APP</h4>
+                    <div class="flex flex-col gap-3">
+                        <a class="inline-flex items-center gap-3 bg-white/5 hover:bg-white/10 px-4 py-2.5 rounded-xl transition-colors text-white border border-white/10" href="#">
+                            <span class="material-symbols-outlined text-2xl">android</span>
+                            <div class="text-left">
+                                <span class="text-[10px] block leading-none text-slate-400">Get it on</span>
+                                <span class="font-bold text-xs leading-none">Google Play</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="max-w-7xl mx-auto px-8 mt-16 pt-8 border-t border-white/5 text-center">
+                <p class="text-xs text-slate-500">
+                    &copy; 2026 CampusPro. All rights reserved. The world's leading school management platform.
+                </p>
+            </div>
+        </footer>
+    </main>
+</body>
+</html>

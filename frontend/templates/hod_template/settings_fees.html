@@ -1,0 +1,240 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block custom_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --sk-brand:        #3b1fb5; /* Slightly darker purple for buttons in this view */
+    --sk-brand-light:  rgba(103,61,229,.10);
+    --sk-text-primary: #222222;
+    --sk-text-muted:   #666666;
+    --sk-text-meta:    #8c8c8c;
+    --sk-white:        #ffffff;
+    --r-md: 8px;
+    --r-xl: 12px;
+    --dur-fast: 150ms;
+}
+body { font-family: 'Poppins', sans-serif; background-color: #f7f9fa; }
+
+/* Dark Mode */
+.dark-mode body, .dark-mode .content-wrapper, .dark-mode .main-footer { background-color: #000000 !important; }
+.dark-mode .sk-breadcrumb-bar { background: #1a1a1a; color: #a3a3a3; border: 1px solid #333; box-shadow: none; }
+.dark-mode .sk-breadcrumb-bar span { color: #ffffff; }
+.dark-mode .sk-card { background: #1a1a1a; border: 1px solid #333; box-shadow: none; }
+.dark-mode .sk-input { background: #222; border-color: #444; color: #fff; }
+.dark-mode .sk-input:focus { border-color: #673de5; }
+.dark-mode .sk-label { color: #a3a3a3; }
+
+/* Breadcrumb Bar */
+.sk-breadcrumb-bar {
+    background: var(--sk-white);
+    border-radius: var(--r-md);
+    padding: 12px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sk-text-muted);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+.sk-breadcrumb-left {
+    display: flex;
+    align-items: center;
+}
+.sk-breadcrumb-bar i { color: #673de5; margin-right: 8px; font-size: 14px; }
+.sk-breadcrumb-bar span { color: var(--sk-text-primary); font-weight: 600; margin-left: 6px; }
+
+/* Card */
+.sk-card {
+    background: var(--sk-white);
+    border-radius: var(--r-xl);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+    padding: 30px;
+    border: none;
+}
+.sk-card-title {
+    color: #3b1fb5;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+/* Form Elements */
+.sk-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--sk-text-meta);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: block;
+}
+.sk-label .req { color: #ef4444; }
+.sk-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--r-md);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--sk-text-primary);
+    transition: all var(--dur-fast);
+    background: #fff;
+    margin-bottom: 16px;
+}
+.sk-input:focus {
+    outline: none;
+    border-color: #673de5;
+    box-shadow: 0 0 0 3px var(--sk-brand-light);
+}
+.sk-input[readonly] { background: #f8fafc; color: #94a3b8; }
+
+/* Buttons */
+.sk-btn-primary {
+    background: #673de5;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all var(--dur-fast);
+}
+.sk-btn-primary:hover { background: #5530c5; transform: translateY(-1px); }
+
+.sk-btn-dark {
+    background: #1e1b4b;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.sk-btn-dark:hover { background: #151336; }
+
+.sk-btn-danger-outline {
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    background: transparent;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 11px;
+    cursor: pointer;
+    margin-top: 24px;
+}
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="sk-breadcrumb-bar">
+    <div class="sk-breadcrumb-left">
+        <i class="fas fa-cog"></i> General Settings &gt; <span>Fee Particulars</span>
+    </div>
+    <div>
+        <button class="sk-btn-dark">
+            <i class="fas fa-undo-alt"></i> Reset to Default
+        </button>
+    </div>
+</div>
+
+<div class="sk-card">
+    <div class="sk-card-title"><i class="fas fa-list-ul"></i> Change Fee Particulars</div>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label class="sk-label">FEE PARTICULARS FOR <span class="req">*</span></label>
+                <select class="sk-input">
+                    <option>All Students</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Render Existing Fees matching the CampusPro UI -->
+        {% for fee in fees %}
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <label class="sk-label">PARTICULAR LABEL <span class="req">*</span></label>
+                <input type="text" class="sk-input" value="{{ fee.label }}" readonly>
+            </div>
+            <div class="col-md-5">
+                <label class="sk-label">PREFIX AMOUNT {% if not fee.is_fixed %}<span class="req">*</span>{% endif %}</label>
+                <input type="text" class="sk-input" value="{% if fee.is_fixed %}[FIXED]{% else %}{{ fee.amount|default:'0' }}{% endif %}" readonly>
+            </div>
+            <div class="col-md-1">
+                <form method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="fee_id" value="{{ fee.id }}">
+                    <button type="submit" name="delete_fee" class="sk-btn-danger-outline" onclick="return confirm('Delete this fee?');" title="Delete"><i class="fas fa-trash"></i></button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <label class="sk-label">PARTICULAR LABEL <span class="req">*</span></label>
+                <input type="text" class="sk-input" value="MONTHLY TUITION FEE" readonly>
+            </div>
+            <div class="col-md-6">
+                <label class="sk-label">PREFIX AMOUNT</label>
+                <input type="text" class="sk-input" value="[FIXED]" readonly>
+            </div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <label class="sk-label">PARTICULAR LABEL <span class="req">*</span></label>
+                <input type="text" class="sk-input" value="ADMISSION FEE" readonly>
+            </div>
+            <div class="col-md-6">
+                <label class="sk-label">PREFIX AMOUNT <span class="req">*</span></label>
+                <input type="text" class="sk-input" value="0" readonly>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Add New Fee Form inline -->
+        <hr style="border-top: 1px dashed #e2e8f0; margin: 30px 0;">
+        <h6 style="color:var(--sk-brand); font-size:12px; font-weight:600; margin-bottom:15px;"><i class="fas fa-plus"></i> ADD NEW FEE PARTICULAR</h6>
+        <div class="row align-items-end">
+            <div class="col-md-5">
+                <label class="sk-label">NEW PARTICULAR LABEL</label>
+                <input type="text" class="sk-input" name="label" placeholder="e.g. TRANSPORT" style="margin-bottom:0;" required>
+            </div>
+            <div class="col-md-4">
+                <label class="sk-label">PREFIX AMOUNT</label>
+                <input type="number" step="0.01" class="sk-input" name="amount" placeholder="e.g. 500" style="margin-bottom:0;" required>
+            </div>
+            <div class="col-md-3">
+                <div style="font-size:11px; margin-bottom:8px; font-weight:600; color:var(--sk-text-meta);">FIXED AMOUNT?</div>
+                <label class="switch" style="display:inline-flex; align-items:center; gap:8px;">
+                    <input type="checkbox" name="is_fixed" style="width:16px;height:16px;"> Yes
+                </label>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <button type="submit" name="add_fee" class="sk-btn-primary">
+                <i class="fas fa-check"></i> Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

@@ -1,0 +1,232 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<style>
+    :root {
+        --color-cyan: #02aab0;
+        --color-teal: #00cdac;
+        --color-purple: #6c5ce7;
+        --color-success: #10b981;
+        --color-error: #ef4444;
+        --radius-2xl: 15px;
+        --shadow-2: rgba(0, 0, 0, 0.08) 0px 4px 15px 0px;
+    }
+    
+    .financials-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    @media(max-width: 768px) {
+        .financials-grid { grid-template-columns: 1fr; }
+    }
+    
+    .fin-stat-card {
+        border-radius: var(--radius-2xl);
+        padding: 22px 26px;
+        color: #ffffff;
+        box-shadow: var(--shadow-2);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .grad-cyan-teal { background: linear-gradient(135deg, var(--color-cyan) 0%, var(--color-teal) 100%); }
+    .grad-purple-pink { background: linear-gradient(135deg, var(--color-purple) 0%, #a29bfe 100%); }
+    .grad-red-orange { background: linear-gradient(135deg, var(--color-error) 0%, #ff7675 100%); }
+    
+    .fin-label {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.9;
+        margin-bottom: 4px;
+    }
+    .fin-val {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0;
+    }
+    .fin-icon {
+        font-size: 32px;
+        opacity: 0.3;
+    }
+    
+    .fee-card {
+        background: #ffffff;
+        border-radius: var(--radius-2xl);
+        padding: 24px;
+        box-shadow: var(--shadow-2);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        margin-bottom: 24px;
+    }
+    
+    .badge-status {
+        font-weight: 700;
+        font-size: 11px;
+        padding: 5px 11px;
+        border-radius: 6px;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+    .badge-paid { background-color: rgba(16, 185, 129, 0.12); color: var(--color-success); border: 1px solid rgba(16, 185, 129, 0.2); }
+    .badge-unpaid { background-color: rgba(239, 68, 68, 0.12); color: var(--color-error); border: 1px solid rgba(239, 68, 68, 0.2); }
+    .badge-partial { background-color: rgba(245, 158, 11, 0.12); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.2); }
+    
+    .table-responsive {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #eef2f6;
+    }
+    
+    .fee-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .fee-table th {
+        background-color: #f8fafc;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 12px 18px;
+        text-align: left;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .fee-table td {
+        padding: 14px 18px;
+        font-size: 14px;
+        color: #1e293b;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .fee-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .fee-table tr:hover td {
+        background-color: #f8fafc;
+    }
+</style>
+
+<section class="content py-3">
+    <div class="container-fluid col-md-10 offset-md-1">
+        
+        <!-- Financial Widgets -->
+        <div class="financials-grid">
+            <div class="fin-stat-card grad-cyan-teal">
+                <div>
+                    <div class="fin-label">Total Billed Fees</div>
+                    <h3 class="fin-val">${{ total_fees|floatformat:2 }}</h3>
+                </div>
+                <i class="fas fa-file-invoice-dollar fin-icon"></i>
+            </div>
+            
+            <div class="fin-stat-card grad-purple-pink">
+                <div>
+                    <div class="fin-label">Total Paid Fees</div>
+                    <h3 class="fin-val">${{ total_paid|floatformat:2 }}</h3>
+                </div>
+                <i class="fas fa-hand-holding-usd fin-icon"></i>
+            </div>
+            
+            <div class="fin-stat-card {% if total_due > 0 %}grad-red-orange{% else %}grad-cyan-teal{% endif %}">
+                <div>
+                    <div class="fin-label">Remaining Balance Due</div>
+                    <h3 class="fin-val">${{ total_due|floatformat:2 }}</h3>
+                </div>
+                <i class="fas fa-exclamation-triangle fin-icon"></i>
+            </div>
+        </div>
+        
+        <!-- Invoices List -->
+        <div class="fee-card">
+            <h5 class="font-weight-bold mb-3" style="color: #0f172a;"><i class="fas fa-file-alt mr-2 text-primary"></i> Fee Invoices</h5>
+            <div class="table-responsive">
+                <table class="fee-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Invoice Date</th>
+                            <th>Due Date</th>
+                            <th>Total Amount</th>
+                            <th>Amount Paid</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in fee_records %}
+                        <tr>
+                            <td class="font-weight-bold" style="color: #1e293b;">{{ invoice.category }}</td>
+                            <td>{{ invoice.created_at|date:"M d, Y" }}</td>
+                            <td class="font-weight-bold">{{ invoice.due_date|date:"M d, Y" }}</td>
+                            <td>${{ invoice.amount|floatformat:2 }}</td>
+                            <td class="text-success">${{ invoice.amount_paid|floatformat:2 }}</td>
+                            <td>
+                                {% if invoice.status == 'Paid' %}
+                                <span class="badge-status badge-paid"><i class="fas fa-check mr-1"></i> Paid</span>
+                                {% elif invoice.status == 'Partial' %}
+                                <span class="badge-status badge-partial"><i class="fas fa-adjust mr-1"></i> Partial</span>
+                                {% else %}
+                                <span class="badge-status badge-unpaid"><i class="fas fa-times mr-1"></i> Unpaid</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-folder-open fa-3x mb-3" style="opacity: 0.3;"></i>
+                                <p class="mb-0">No invoices generated for this student yet.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Payments Log -->
+        <div class="fee-card">
+            <h5 class="font-weight-bold mb-3" style="color: #0f172a;"><i class="fas fa-receipt mr-2 text-primary"></i> Payment Transactions History</h5>
+            <div class="table-responsive">
+                <table class="fee-table">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Fee Category</th>
+                            <th>Payment Date</th>
+                            <th>Payment Method</th>
+                            <th>Amount Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td class="font-weight-bold text-primary">{{ payment.transaction_id }}</td>
+                            <td>{{ payment.fee_record.category }}</td>
+                            <td>{{ payment.payment_date|date:"F d, Y H:i" }}</td>
+                            <td><span class="badge bg-light text-dark p-2 border">{{ payment.payment_method }}</span></td>
+                            <td class="font-weight-bold text-success">+${{ payment.amount_paid|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="fas fa-credit-card fa-3x mb-3" style="opacity: 0.3;"></i>
+                                <p class="mb-0">No payment transaction records found.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock content %}

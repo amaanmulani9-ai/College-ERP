@@ -1,48 +1,229 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
-{% block page_title %}{{page_title}}{% endblock page_title %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    .sk-breadcrumb-bar {
+        background: #fff;
+        padding: 15px 25px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .sk-breadcrumb-title {
+        color: #4a235a;
+        font-weight: 600;
+        font-size: 14px;
+        margin-right: 15px;
+    }
+    .sk-breadcrumb-path {
+        color: #b2bec3;
+        font-size: 13px;
+    }
+    .sk-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 25px;
+    }
+    .sk-subject-card {
+        width: 320px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        padding: 25px;
+        position: relative;
+        transition: 0.3s;
+        border-left: 4px solid transparent;
+        display: flex;
+        flex-direction: column;
+    }
+    .sk-subject-card:hover {
+        border-left-color: #6c5ce7;
+    }
+    .sk-subject-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 25px;
+    }
+    .sk-subject-card-name {
+        font-weight: 700;
+        font-size: 18px;
+        color: #4a235a;
+    }
+    
+    .sk-subjects-count {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .sk-subjects-icon {
+        width: 45px;
+        height: 45px;
+        background: #f1f2f6;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c5ce7;
+        font-size: 20px;
+    }
+    .sk-subjects-text {
+        display: flex;
+        flex-direction: column;
+    }
+    .sk-subjects-number {
+        font-weight: 700;
+        font-size: 24px;
+        color: #2d3436;
+        line-height: 1;
+    }
+    .sk-subjects-label {
+        font-size: 10px;
+        color: #a4b0be;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .sk-update-btn {
+        background: #0984e3;
+        color: #fff;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 20px;
+        width: max-content;
+    }
+    .sk-update-btn:hover {
+        background: #074b83;
+        color: #fff;
+    }
+
+    .sk-subject-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border-top: 1px solid #f1f2f6;
+        padding-top: 15px;
+    }
+    .sk-subject-item {
+        font-size: 13px;
+        color: #636e72;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+    }
+    .sk-subject-item i {
+        font-size: 8px;
+        color: #b2bec3;
+        margin-right: 10px;
+    }
+
+    /* Add card */
+    .sk-add-card {
+        width: 320px;
+        border: 2px dashed #a29bfe;
+        border-radius: 12px;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        text-decoration: none;
+        transition: 0.3s;
+        min-height: 350px;
+    }
+    .sk-add-card:hover {
+        background: rgba(108, 92, 231, 0.02);
+    }
+    .sk-add-icon {
+        background: #6c5ce7;
+        color: white;
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+    }
+    .sk-add-title {
+        color: #2d3436;
+        font-weight: 700;
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    .sk-add-subtitle {
+        color: #a4b0be;
+        font-size: 12px;
+    }
+</style>
+{% endblock custom_css %}
 
 {% block content %}
-
 <section class="content">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                        <table id="example2" class="table table-bordered table-hover">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Subject</th>
-                                    <th>Staff</th>
-                                    <th>Course</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for subject in subjects %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>{{subject.name}}</td>
-                                    <td>{{subject.staff.admin}}</td>
-                                    <td>{{subject.course.name}}</td>
-                                    <td>
-                                        <a href="{% url 'edit_subject' subject.id %}" class="btn btn-info">Edit</a> -
-                                        <a href="{% url 'delete_subject' subject.id %}" onclick="return confirm('Are you sure you want to delete this ?')" class="btn btn-danger">Delete</a> 
+        <!-- Breadcrumb -->
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-title"><i class="fas fa-book-open" style="margin-right:8px;"></i> Subjects</div>
+            <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right" style="font-size:10px;margin-right:10px;color:#b2bec3;"></i> Classes With Subjects</div>
+        </div>
 
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="sk-grid">
+            {% for group in course_groups %}
+            <div class="sk-subject-card">
+                <div class="sk-subject-card-header">
+                    <div class="sk-subject-card-name">{{ group.course.name }}</div>
+                </div>
+                
+                <div class="sk-subjects-count">
+                    <div class="sk-subjects-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="sk-subjects-text">
+                        <div class="sk-subjects-number">{{ group.count }}</div>
+                        <div class="sk-subjects-label">SUBJECTS</div>
                     </div>
                 </div>
+
+                <a href="{% url 'edit_subject' group.course.id %}" class="sk-update-btn">Update Subjects</a>
+                
+                <ul class="sk-subject-list">
+                    {% for subject in group.subjects %}
+                    <li class="sk-subject-item"><i class="fas fa-circle"></i> {{ subject.name }}{% if subject.subject_code %} [{{ subject.subject_code }}]{% endif %} ({{ subject.marks }} Marks)</li>
+                    {% endfor %}
+                </ul>
             </div>
+            {% endfor %}
+
+            <!-- Add Card -->
+            <a href="{% url 'add_subject' %}" class="sk-add-card">
+                <div class="sk-add-icon"><i class="fas fa-plus"></i></div>
+                <div class="sk-add-title">Assign Subjects</div>
+                <div class="sk-add-subtitle">Add subjects to a new or existing class</div>
+            </a>
         </div>
     </div>
 </section>

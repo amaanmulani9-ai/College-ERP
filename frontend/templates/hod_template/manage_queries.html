@@ -1,0 +1,212 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<style>
+    :root {
+        --color-purple: #6c5ce7;
+        --color-cyan: #02aab0;
+        --radius-2xl: 15px;
+        --shadow-2: rgba(0, 0, 0, 0.08) 0px 4px 15px 0px;
+    }
+    
+    .queries-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 24px;
+    }
+    @media(max-width: 992px) {
+        .queries-grid { grid-template-columns: 1fr; }
+    }
+    
+    .desk-card {
+        background: #ffffff;
+        border-radius: var(--radius-2xl);
+        padding: 24px;
+        box-shadow: var(--shadow-2);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        margin-bottom: 24px;
+        height: fit-content;
+    }
+    
+    .form-control-custom {
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        padding: 10px 14px;
+        font-size: 14px;
+        color: #1e293b;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control-custom:focus {
+        border-color: var(--color-purple);
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+    }
+    
+    .table-responsive {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #eef2f6;
+    }
+    
+    .desk-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .desk-table th {
+        background-color: #f8fafc;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 12px 18px;
+        text-align: left;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    .desk-table td {
+        padding: 14px 18px;
+        font-size: 14px;
+        color: #1e293b;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: top;
+    }
+    .desk-table tr:hover td {
+        background-color: #f8fafc;
+    }
+</style>
+
+<div class="container-fluid py-3">
+    <div class="queries-grid">
+        <!-- Left panel: Add Query -->
+        <div class="desk-card">
+            <h5 class="font-weight-bold mb-3" style="color: #0f172a;"><i class="fas fa-plus-circle mr-2 text-primary"></i> Add Admission Query</h5>
+            <form method="POST" action="{% url 'manage_queries' %}">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Name</label>
+                    <input type="text" class="form-control-custom" name="name" placeholder="Enquirer Name" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Phone</label>
+                    <input type="text" class="form-control-custom" name="phone" placeholder="Phone Number" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Email</label>
+                    <input type="email" class="form-control-custom" name="email" placeholder="Email Address">
+                </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Source</label>
+                    <input type="text" class="form-control-custom" name="source" placeholder="Website, Walk-in, Ad...">
+                </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Description / Notes</label>
+                    <textarea class="form-control-custom" name="description" rows="3" placeholder="Additional details..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 font-weight-bold" style="border-radius: 8px;"><i class="fas fa-save mr-2"></i> Save Query</button>
+            </form>
+        </div>
+        
+        <!-- Right panel: Queries list -->
+        <div class="desk-card">
+            <h5 class="font-weight-bold mb-3" style="color: #0f172a;"><i class="fas fa-list-alt mr-2 text-primary"></i> Active Admission Desk Enquiries</h5>
+            
+            <div class="table-responsive">
+                <table class="desk-table">
+                    <thead>
+                        <tr>
+                            <th>Enquirer Details</th>
+                            <th>Source</th>
+                            <th>Status</th>
+                            <th>Follow Up</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for q in queries %}
+                        <tr>
+                            <td>
+                                <strong>{{ q.name }}</strong>
+                                <br><small class="text-muted"><i class="fas fa-phone mr-1"></i> {{ q.phone }}</small>
+                                {% if q.email %}<br><small class="text-muted"><i class="fas fa-envelope mr-1"></i> {{ q.email }}</small>{% endif %}
+                                {% if q.description %}<br><small class="text-indigo"><i class="fas fa-info-circle mr-1"></i> {{ q.description }}</small>{% endif %}
+                            </td>
+                            <td><span class="badge bg-light text-dark border">{{ q.source|default:"Walk-in" }}</span></td>
+                            <td>
+                                {% if q.status == 'Active' %}
+                                    <span class="badge bg-success-light text-success border border-success p-2" style="border-radius: 6px;"><i class="fas fa-check-circle mr-1"></i> Active</span>
+                                {% else %}
+                                    <span class="badge bg-light text-secondary border p-2" style="border-radius: 6px;"><i class="fas fa-times-circle mr-1"></i> Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if q.follow_up_date %}
+                                    <span class="font-weight-bold text-primary"><i class="far fa-calendar-alt mr-1"></i> {{ q.follow_up_date|date:"M d, Y" }}</span>
+                                {% else %}
+                                    <span class="text-muted">Not Set</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <!-- Toggle Status Action -->
+                                    <form method="POST" action="{% url 'manage_queries' %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="query_id" value="{{ q.id }}">
+                                        <input type="hidden" name="action" value="toggle_status">
+                                        <button type="submit" class="btn btn-sm {% if q.status == 'Active' %}btn-outline-danger{% else %}btn-outline-success{% endif %}" title="Toggle Active/Inactive">
+                                            <i class="fas fa-power-off"></i>
+                                        </button>
+                                    </form>
+                                    
+                                    <!-- Follow Up Action Modal trigger -->
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#followUpModal{{ q.id }}" title="Schedule Follow-up">
+                                        <i class="fas fa-calendar-plus"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Follow Up Modal -->
+                                <div class="modal fade" id="followUpModal{{ q.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content" style="border-radius: 12px; border: none;">
+                                            <div class="modal-header border-bottom-0">
+                                                <h5 class="modal-title font-weight-bold">Schedule Follow-up</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <form method="POST" action="{% url 'manage_queries' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="query_id" value="{{ q.id }}">
+                                                <input type="hidden" name="action" value="save_follow_up">
+                                                <div class="modal-body">
+                                                    <div class="form-group mb-3">
+                                                        <label class="font-weight-bold text-muted small mb-1">Follow up Date</label>
+                                                        <input type="date" class="form-control-custom" name="follow_up_date" value="{{ q.follow_up_date|date:'Y-m-d' }}" required>
+                                                    </div>
+                                                    <div class="form-group mb-3">
+                                                        <label class="font-weight-bold text-muted small mb-1">Notes / Remarks</label>
+                                                        <textarea class="form-control-custom" name="description" rows="3" placeholder="Enquiry notes...">{{ q.description }}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer border-top-0">
+                                                    <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-primary font-weight-bold">Save Changes</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center py-4 text-muted">No queries logged.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

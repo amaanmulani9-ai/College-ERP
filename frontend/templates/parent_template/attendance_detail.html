@@ -1,0 +1,195 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<style>
+    :root {
+        --color-purple: #6c5ce7;
+        --color-teal: #00cdac;
+        --color-success: #10b981;
+        --color-error: #ef4444;
+        --radius-2xl: 15px;
+        --shadow-2: rgba(0, 0, 0, 0.08) 0px 4px 15px 0px;
+    }
+    
+    .attendance-card {
+        background: #ffffff;
+        border-radius: var(--radius-2xl);
+        padding: 20px 24px;
+        box-shadow: var(--shadow-2);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        margin-bottom: 24px;
+    }
+    
+    .subject-progress-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+    
+    .subject-prog-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 16px 20px;
+        border: 1px solid #eef2f6;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+    }
+    
+    .progress-bar-wrapper {
+        background-color: #f1f5f9;
+        border-radius: 100px;
+        height: 10px;
+        width: 100%;
+        overflow: hidden;
+        margin: 10px 0;
+    }
+    
+    .progress-bar-fill {
+        height: 100%;
+        border-radius: 100px;
+        background: linear-gradient(90deg, var(--color-purple), var(--color-teal));
+        transition: width 0.6s ease;
+    }
+    
+    .badge-present {
+        background-color: rgba(16, 185, 129, 0.12);
+        color: var(--color-success);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 6px;
+    }
+    
+    .badge-absent {
+        background-color: rgba(239, 68, 68, 0.12);
+        color: var(--color-error);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 6px;
+    }
+    
+    .table-responsive {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #eef2f6;
+    }
+    
+    .attendance-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .attendance-table th {
+        background-color: #f8fafc;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 12px 18px;
+        text-align: left;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .attendance-table td {
+        padding: 14px 18px;
+        font-size: 14px;
+        color: #1e293b;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .attendance-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .attendance-table tr:hover td {
+        background-color: #f8fafc;
+    }
+    
+    .stat-badge {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-left: 6px;
+    }
+    .stat-present { background: rgba(16, 185, 129, 0.1); color: var(--color-success); }
+    .stat-absent { background: rgba(239, 68, 68, 0.1); color: var(--color-error); }
+</style>
+
+<section class="content py-3">
+    <div class="container-fluid col-md-10 offset-md-1">
+        
+        <!-- Subject Overview Cards -->
+        <h5 class="mb-3 font-weight-bold" style="color: #0f172a;"><i class="fas fa-chart-line mr-2 text-primary"></i> Subject-Wise Attendance Rates</h5>
+        <div class="subject-progress-grid">
+            {% for summary in subject_summary %}
+            <div class="subject-prog-card">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="font-weight-bold" style="color: #1e293b; font-size: 14px;">{{ summary.subject }}</span>
+                    <span class="font-weight-bold" style="color: #6c5ce7; font-size: 15px;">{{ summary.pct }}%</span>
+                </div>
+                <div class="progress-bar-wrapper">
+                    <div class="progress-bar-fill" style="width: {{ summary.pct }}%;"></div>
+                </div>
+                <div class="d-flex justify-content-between text-muted" style="font-size: 12px;">
+                    <span>Present: <strong>{{ summary.present }}</strong></span>
+                    <span>Absent: <strong>{{ summary.absent }}</strong></span>
+                    <span>Total: <strong>{{ summary.total }}</strong></span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="attendance-card w-100 py-4 text-center text-muted">
+                <i class="fas fa-info-circle fa-2x mb-2 text-secondary"></i>
+                <p class="mb-0">No subject attendance reports found for this student.</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Attendance History Log -->
+        <div class="attendance-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="font-weight-bold m-0" style="color: #0f172a;"><i class="fas fa-list mr-2 text-primary"></i> Chronological Attendance Logs</h5>
+                <span class="badge bg-light text-dark border p-2" style="font-size: 13px;"><i class="far fa-user mr-1 text-primary"></i> Student: {{ student.admin.get_full_name }}</span>
+            </div>
+            <div class="table-responsive">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Subject</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in attendance_data %}
+                        <tr>
+                            <td class="font-weight-bold">{{ record.attendance.date|date:"F d, Y" }}</td>
+                            <td>{{ record.attendance.subject.name }}</td>
+                            <td>
+                                {% if record.status %}
+                                <span class="badge-present"><i class="fas fa-check mr-1"></i> Present</span>
+                                {% else %}
+                                <span class="badge-absent"><i class="fas fa-times mr-1"></i> Absent</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-5 text-muted">
+                                <i class="fas fa-calendar-times fa-3x mb-3" style="opacity: 0.3;"></i>
+                                <p class="mb-0">No daily attendance logs found.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+</section>
+{% endblock content %}

@@ -1,0 +1,32 @@
+databases:
+  - name: college-erp-db
+    databaseName: college_erp
+    plan: free
+
+services:
+  - type: web
+    name: college-erp-web
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python backend/manage.py collectstatic --noinput && python backend/manage.py migrate_schemas && python setup_tenants.py && python create_default_admin.py"
+    startCommand: "gunicorn college_management_system.wsgi:application --bind 0.0.0.0:$PORT --chdir backend"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: college-erp-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: college-erp-redis
+          property: connectionString
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+
+
+  - type: redis
+    name: college-erp-redis
+    ipAllowList: [] # only allow internal connections
+    plan: free

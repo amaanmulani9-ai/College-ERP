@@ -1,0 +1,174 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block page_title %}Finance Dashboard{% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Finance</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row">
+        <!-- Invoices List -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">My Invoices</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fee Type</th>
+                                    <th>Amount</th>
+                                    <th>GST %</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in invoices %}
+                                <tr>
+                                    <td>#{{ invoice.id }}</td>
+                                    <td>{{ invoice.fee_type.name }}</td>
+                                    <td>INR {{ invoice.amount }}</td>
+                                    <td>{{ invoice.gst_percentage }}%</td>
+                                    <td>{{ invoice.due_date }}</td>
+                                    <td>
+                                        {% if invoice.is_paid %}
+                                            <span class="badge bg-success">Paid</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Unpaid</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if not invoice.is_paid %}
+                                            <button class="btn btn-sm btn-primary" onclick="initiateRazorpayPayment('{{ invoice.id }}')">
+                                                Pay Now
+                                            </button>
+                                        {% else %}
+                                            <button class="btn btn-sm btn-outline-success" disabled>Completed</button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">No invoices found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Scholarships & Payments -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Active Scholarships</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for scholarship in scholarships %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ scholarship.name }}
+                                <span class="badge bg-success rounded-pill">{{ scholarship.discount_percentage }}% OFF</span>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-muted text-center">No active scholarships.</li>
+                        {% endfor %}
+                    </ul>
+                    <small class="text-muted mt-2 d-block">Note: Discounts are automatically applied at checkout.</small>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Recent Payments</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for payment in payments %}
+                            <li class="list-group-item">
+                                <strong>Inv #{{ payment.invoice.id }}</strong> - INR {{ payment.amount_paid }}
+                                <br><small class="text-muted">{{ payment.gateway }} • {{ payment.status }}</small>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-muted text-center">No payments made yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+<!-- Razorpay Checkout Script (Mocked Implementation for UI demo) -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    function initiateRazorpayPayment(invoiceId) {
+        // Step 1: Call our backend API to generate Razorpay order
+        fetch("{% url 'razorpay_checkout' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ invoice_id: invoiceId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Step 2: Initialize Razorpay Widget
+                var options = {
+                    "key": "{{ razorpay_key }}", 
+                    "amount": data.amount, 
+                    "currency": data.currency,
+                    "name": data.name,
+                    "description": data.description,
+                    "order_id": data.order_id, 
+                    "handler": function (response) {
+                        // Step 3: Handle successful payment (mock webhook call here for UI demo)
+                        alert("Payment successful! Transaction ID: " + response.razorpay_payment_id);
+                        
+                        // Mocking the webhook for immediate UI feedback in demo mode
+                        fetch("{% url 'razorpay_webhook' %}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: JSON.stringify({ 
+                                invoice_id: invoiceId, 
+                                transaction_id: response.razorpay_payment_id,
+                                amount_paid: data.amount / 100 
+                            })
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    },
+                    "theme": {
+                        "color": "#1e3a8a"
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
+            } else {
+                alert("Error initializing payment: " + data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Network error occurred.");
+        });
+    }
+</script>
+{% endblock custom_js %}

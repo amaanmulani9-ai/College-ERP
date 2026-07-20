@@ -1,0 +1,285 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb-bar {
+        background: transparent;
+        padding: 0 0 20px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fff;
+        padding: 15px 25px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .sk-breadcrumb-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .sk-breadcrumb-title {
+        color: #6c5ce7;
+        font-weight: 600;
+        font-size: 15px;
+    }
+    .sk-breadcrumb-path {
+        color: #2c3e50;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-add-homework {
+        background: #6c5ce7;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        display: flex;
+        align-items: flex-end;
+        gap: 20px;
+    }
+    .form-group-filter {
+        flex: 1;
+        margin: 0;
+    }
+    .form-group-filter label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #b2bec3;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        display: block;
+    }
+    .form-control-filter {
+        border-radius: 8px;
+        border: 1px solid #dfe6e9;
+        padding: 12px 15px;
+        font-size: 14px;
+        color: #2c3e50;
+        width: 100%;
+        background: #fff;
+    }
+    .form-control-filter:focus {
+        border-color: #6c5ce7;
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.1);
+    }
+    .btn-search {
+        background: #6c5ce7;
+        color: #fff;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 200px;
+    }
+
+    .empty-state-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 60px 20px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .empty-state-card i {
+        font-size: 50px;
+        color: #dfe6e9;
+        margin-bottom: 15px;
+    }
+    .empty-state-card p {
+        color: #7f8fa6;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    .modal-content {
+        background: #fff;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 700px;
+        overflow: hidden;
+    }
+    .modal-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #f1f2f6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .modal-header h3 {
+        color: #2c3e50;
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0;
+    }
+    .modal-close {
+        background: none;
+        border: none;
+        color: #b2bec3;
+        font-size: 20px;
+        cursor: pointer;
+    }
+    .modal-body {
+        padding: 25px;
+    }
+    .form-group label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #b2bec3;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+    .form-group label span { color: #6c5ce7; }
+    .modal-footer {
+        padding: 15px 25px;
+        background: #f8f9fa;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+    .btn-close {
+        border: 1px solid #dfe6e9;
+        background: #fff;
+        color: #6c5ce7;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .btn-submit {
+        background: #6c5ce7;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-left">
+                <div class="sk-breadcrumb-title">Homework</div>
+                <div style="color:#dfe6e9;">|</div>
+                <div class="sk-breadcrumb-path"><i class="fas fa-home" style="color:#b2bec3;"></i> - Homeworks</div>
+            </div>
+            <button class="btn-add-homework" onclick="document.getElementById('homeworkModal').style.display='flex'"><i class="fas fa-plus"></i> Add Homework</button>
+        </div>
+
+        <div class="filter-card">
+            <div class="form-group-filter">
+                <label>HOMEWORK DATE</label>
+                <input type="date" class="form-control-filter" value="2026-07-08">
+            </div>
+            <div class="form-group-filter">
+                <label>CLASS</label>
+                <select class="form-control-filter">
+                    <option>All Classes</option>
+                </select>
+            </div>
+            <div class="form-group-filter">
+                <label>TEACHER</label>
+                <select class="form-control-filter" style="border-color:#6c5ce7;">
+                    <option>All Teachers</option>
+                </select>
+            </div>
+            <button class="btn-search"><i class="fas fa-search"></i> Search</button>
+        </div>
+
+        <div class="empty-state-card">
+            <i class="fas fa-clipboard-list"></i>
+            <p>No homework found for the selected filters.</p>
+        </div>
+
+    </div>
+</section>
+
+<!-- Add Homework Modal -->
+<div class="modal-overlay" id="homeworkModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add Homework or Assignment</h3>
+            <button class="modal-close" onclick="document.getElementById('homeworkModal').style.display='none'">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label>HOMEWORK DATE<span>*</span></label>
+                    <input type="date" class="form-control-filter" value="2026-07-08">
+                </div>
+                <div class="col-md-6 form-group">
+                    <label>SET BY<span>*</span></label>
+                    <select class="form-control-filter">
+                        <option>Admin</option>
+                    </select>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label>CLASS<span>*</span></label>
+                    <select class="form-control-filter">
+                        <option>--Select Class--</option>
+                    </select>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label>SUBJECT<span>*</span></label>
+                    <select class="form-control-filter">
+                        <option>--Select Subject--</option>
+                    </select>
+                </div>
+                <div class="col-md-12 form-group">
+                    <label>HOMEWORK DETAIL<span>*</span></label>
+                    <textarea class="form-control-filter" rows="4"></textarea>
+                </div>
+                <div class="col-md-12 form-group">
+                    <label>ATTACHMENT (IMAGE OR PDF)</label>
+                    <input type="file" class="form-control-filter" style="padding:8px;">
+                    <small style="color:#b2bec3; font-size:11px;">Max file size: 100KB. Allowed: JPG, PNG, GIF, WEBP, PDF.</small>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-close" onclick="document.getElementById('homeworkModal').style.display='none'">Close</button>
+            <button class="btn-submit"><i class="fas fa-plus"></i> Add Homework</button>
+        </div>
+    </div>
+</div>
+{% endblock content %}

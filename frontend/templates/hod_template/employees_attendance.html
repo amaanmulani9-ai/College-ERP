@@ -1,0 +1,154 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb-bar {
+        background: transparent;
+        padding: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+    }
+    .sk-breadcrumb-title {
+        color: #6c5ce7;
+        font-weight: 600;
+        font-size: 15px;
+        margin-right: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .sk-breadcrumb-title i { font-size: 14px; }
+    .sk-breadcrumb-path {
+        color: #888;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .center-card-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    
+    .attendance-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        width: 100%;
+        max-width: 700px;
+        padding: 40px;
+    }
+
+    .tab-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 40px;
+        background: #f8f9fa;
+        padding: 5px;
+        border-radius: 8px;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .tab-btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: #7f8fa6;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+    }
+
+    .tab-btn i { font-size: 14px; }
+
+    .tab-btn.active {
+        background: #fff;
+        border: 1px solid #dfe6e9;
+        color: #6c5ce7;
+    }
+
+    .form-group label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #b2bec3;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #dfe6e9;
+        padding: 12px 15px;
+        font-size: 14px;
+        color: #2d3436;
+        height: auto;
+    }
+    .form-control:focus {
+        border-color: #6c5ce7;
+        box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.1);
+    }
+
+    .submit-btn {
+        background: #6c5ce7;
+        color: #fff;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        margin-top: 15px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .submit-btn:hover { background: #5b4bc4; }
+
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-title"><i class="far fa-calendar-check"></i> Attendance</div>
+            <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right" style="font-size:10px;"></i> Mark or Update Employees Attendance</div>
+        </div>
+
+        <div class="center-card-wrapper">
+            <div class="attendance-card">
+                <div class="tab-buttons">
+                    <button class="tab-btn active"><i class="fas fa-edit"></i> Manual Attendance</button>
+                    <button class="tab-btn"><i class="fas fa-barcode"></i> Card Scanning</button>
+                </div>
+
+                <div class="form-group">
+                    <label>DATE</label>
+                    <input type="date" class="form-control" value="2026-07-08">
+                </div>
+
+                <div class="text-center mt-4">
+                    <button class="submit-btn"><i class="fas fa-check"></i> Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

@@ -1,0 +1,263 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb-bar {
+        background: transparent;
+        padding: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+        background: #fff;
+        padding: 15px 25px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .sk-breadcrumb-title {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 15px;
+    }
+    .sk-breadcrumb-path {
+        color: #2c3e50;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .exam-container {
+        display: flex;
+        gap: 25px;
+    }
+
+    /* Left Panel: Form */
+    .form-panel {
+        flex: 1;
+        max-width: 400px;
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .form-title {
+        color: #2c3e50;
+        font-weight: 700;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    .form-legend {
+        display: flex;
+        gap: 15px;
+        font-size: 10px;
+        color: #b2bec3;
+        text-transform: uppercase;
+        margin-bottom: 30px;
+    }
+    .form-legend span {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .dot-req { width:8px; height:8px; border-radius:50%; background:#6c5ce7; }
+    .dot-opt { width:8px; height:8px; border-radius:50%; background:#b2bec3; }
+
+    .form-group-rounded {
+        width: 100%;
+        margin-bottom: 25px;
+        position: relative;
+    }
+    .form-group-rounded label {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        background: #6c5ce7;
+        color: #fff;
+        padding: 2px 10px;
+        border-radius: 15px;
+        font-size: 11px;
+        font-weight: 600;
+        z-index: 1;
+    }
+    .form-control-rounded {
+        width: 100%;
+        border-radius: 25px;
+        border: 1px solid #6c5ce7;
+        padding: 12px 20px;
+        font-size: 14px;
+        color: #2c3e50;
+        background: transparent;
+    }
+    .form-control-rounded:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.1);
+    }
+    .btn-save {
+        background: #f39c12;
+        color: #fff;
+        border: none;
+        padding: 12px 35px;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Right Panel: Table */
+    .table-panel {
+        flex: 2;
+        background: #fff;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .table-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        font-size: 13px;
+        color: #2c3e50;
+    }
+    .table-controls select, .table-controls input {
+        border: 1px solid #dfe6e9;
+        padding: 5px 10px;
+        border-radius: 6px;
+        margin-left: 5px;
+    }
+    .table-controls input {
+        border-radius: 15px;
+    }
+    
+    .exam-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .exam-table th {
+        background: #f1f2f6;
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 12px 15px;
+        text-align: left;
+    }
+    .exam-table th:first-child { border-radius: 8px 0 0 8px; }
+    .exam-table th:last-child { border-radius: 0 8px 8px 0; text-align: center; }
+    
+    .exam-table td {
+        padding: 15px;
+        border-bottom: 1px solid #f1f2f6;
+        color: #7f8fa6;
+        font-size: 13px;
+    }
+    .exam-table td.empty-row {
+        text-align: center;
+        padding: 30px;
+    }
+
+    .table-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        font-size: 13px;
+        color: #b2bec3;
+    }
+    .pagination {
+        display: flex;
+        gap: 10px;
+        color: #6c5ce7;
+        cursor: pointer;
+    }
+
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-title">Exams</div>
+            <div style="color:#dfe6e9; margin: 0 15px;">|</div>
+            <div class="sk-breadcrumb-path"><i class="fas fa-home" style="color:#b2bec3;"></i> - Create New Exam</div>
+        </div>
+
+        <div class="exam-container">
+            
+            <div class="form-panel">
+                <div class="form-title">Add New Exam</div>
+                <div class="form-legend">
+                    <span><div class="dot-req"></div> Required*</span>
+                    <span><div class="dot-opt"></div> Optional</span>
+                </div>
+
+                <div class="form-group-rounded">
+                    <label>Examination Name*</label>
+                    <input type="text" class="form-control-rounded" placeholder="Name Of the Exam*">
+                </div>
+                <div class="form-group-rounded">
+                    <label>Start Date*</label>
+                    <input type="date" class="form-control-rounded">
+                </div>
+                <div class="form-group-rounded">
+                    <label>End Date*</label>
+                    <input type="date" class="form-control-rounded">
+                </div>
+
+                <button class="btn-save"><i class="fas fa-save"></i> Save Exam</button>
+            </div>
+
+            <div class="table-panel">
+                <div class="table-controls">
+                    <div>
+                        Show 
+                        <select>
+                            <option>10</option>
+                        </select> 
+                        entries
+                    </div>
+                    <div>
+                        Search: <input type="text">
+                    </div>
+                </div>
+
+                <table class="exam-table">
+                    <thead>
+                        <tr>
+                            <th>Exam Name</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Publish</th>
+                            <th style="text-align:center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5" class="empty-row">No data available in table</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="table-footer">
+                    <div>Showing 0 to 0 of 0 entries</div>
+                    <div class="pagination">
+                        <span>Previous</span>
+                        <span>Next</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock content %}

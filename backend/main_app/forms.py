@@ -10,7 +10,8 @@ class FormSettings(forms.ModelForm):
         super(FormSettings, self).__init__(*args, **kwargs)
         # Here make some changes such as:
         for field in self.visible_fields():
-            field.field.widget.attrs['class'] = 'form-control'
+            existing_class = field.field.widget.attrs.get('class', '')
+            field.field.widget.attrs['class'] = f'form-control {existing_class}'.strip()
 
 
 class CustomUserForm(FormSettings):
@@ -18,12 +19,12 @@ class CustomUserForm(FormSettings):
     gender = forms.ChoiceField(choices=[('M', 'Male'), ('F', 'Female')])
     first_name = forms.CharField(required=True)
     last_name = forms.CharField(required=True)
-    address = forms.CharField(widget=forms.Textarea)
+    address = forms.CharField(widget=forms.Textarea, required=False)
     password = forms.CharField(widget=forms.PasswordInput)
     widget = {
         'password': forms.PasswordInput(),
     }
-    profile_pic = forms.ImageField()
+    profile_pic = forms.ImageField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(CustomUserForm, self).__init__(*args, **kwargs)
@@ -38,6 +39,8 @@ class CustomUserForm(FormSettings):
 
     def clean_email(self, *args, **kwargs):
         formEmail = self.cleaned_data['email'].lower()
+        if "@" not in formEmail:
+            raise forms.ValidationError("Please enter a valid email address.")
         if self.instance.pk is None:  # Insert
             if CustomUser.objects.filter(email=formEmail).exists():
                 raise forms.ValidationError(
@@ -51,6 +54,22 @@ class CustomUserForm(FormSettings):
 
         return formEmail
 
+    def clean_password(self):
+        password = self.cleaned_data.get('password') or ''
+        if self.instance.pk is None and len(password) < 8:
+            raise forms.ValidationError("Password must be at least 8 characters long.")
+        return password
+
+    def clean_profile_pic(self):
+        image = self.cleaned_data.get('profile_pic')
+        if image:
+            content_type = getattr(image, 'content_type', '')
+            if content_type and not content_type.startswith('image/'):
+                raise forms.ValidationError("Profile picture must be an image file.")
+            if getattr(image, 'size', 0) > 2 * 1024 * 1024:
+                raise forms.ValidationError("Profile picture must be under 2MB.")
+        return image
+
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'email', 'gender',  'password','profile_pic', 'address' ]
@@ -60,10 +79,44 @@ class StudentForm(CustomUserForm):
     def __init__(self, *args, **kwargs):
         super(StudentForm, self).__init__(*args, **kwargs)
 
+    def clean_batch_year(self):
+        batch_year = self.cleaned_data.get('batch_year')
+        if batch_year and (batch_year < 2000 or batch_year > datetime.today().year + 1):
+            raise forms.ValidationError("Batch year must be a realistic academic year.")
+        return batch_year
+
+    def clean_current_semester(self):
+        semester = self.cleaned_data.get('current_semester')
+        course = self.cleaned_data.get('course')
+        if course and semester and semester > course.total_semesters:
+            raise forms.ValidationError(
+                f"{course.name} allows only {course.total_semesters} semester(s)."
+            )
+        return semester
+
+    def clean_admission_date(self):
+        admission_date = self.cleaned_data.get('admission_date')
+        if admission_date and admission_date > datetime.today().date():
+            raise forms.ValidationError("Admission date cannot be in the future.")
+        return admission_date
+
+    def clean_registration_no(self):
+        reg = (self.cleaned_data.get('registration_no') or '').strip()
+        if reg:
+            qs = Student.objects.filter(registration_no__iexact=reg)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise forms.ValidationError("This registration number already exists.")
+        return reg
+
     class Meta(CustomUserForm.Meta):
         model = Student
         fields = CustomUserForm.Meta.fields + \
-            ['course', 'session']
+            ['course', 'session', 'batch_year', 'current_semester', 'admission_date', 'expected_completion_date', 'verification_status', 'verification_notes', 'division', 'registration_no', 'discount_in_fee', 'mobile', 'dob', 'cnic', 'orphan', 'cast', 'osc', 
+             'identification_mark', 'previous_school', 'religion', 'blood_group', 'previous_roll_no', 'disease', 'additional_note', 'siblings',
+             'father_name', 'father_nic', 'father_occupation', 'father_education', 'father_mobile', 'father_profession', 'father_income',
+             'mother_name', 'mother_nic', 'mother_occupation', 'mother_education', 'mother_mobile', 'mother_profession', 'mother_income']
 
 
 class AdminForm(CustomUserForm):
@@ -78,11 +131,14 @@ class AdminForm(CustomUserForm):
 class StaffForm(CustomUserForm):
     def __init__(self, *args, **kwargs):
         super(StaffForm, self).__init__(*args, **kwargs)
+        self.fields['last_name'].required = False
+        self.fields['password'].required = False
+        self.fields['course'].required = False
 
     class Meta(CustomUserForm.Meta):
         model = Staff
         fields = CustomUserForm.Meta.fields + \
-            ['course' ]
+            ['course', 'mobile_number']
 
 
 class CourseForm(FormSettings):
@@ -90,7 +146,7 @@ class CourseForm(FormSettings):
         super(CourseForm, self).__init__(*args, **kwargs)
 
     class Meta:
-        fields = ['name']
+        fields = ['name', 'monthly_fees', 'class_teacher', 'university_name', 'degree_level', 'total_semesters']
         model = Course
 
 
@@ -101,7 +157,7 @@ class SubjectForm(FormSettings):
 
     class Meta:
         model = Subject
-        fields = ['name', 'staff', 'course']
+        fields = ['name', 'subject_code', 'staff', 'course']
 
 
 class SessionForm(FormSettings):
@@ -110,11 +166,20 @@ class SessionForm(FormSettings):
 
     class Meta:
         model = Session
-        fields = '__all__'
+        fields = ['start_year', 'end_year', 'batch_label', 'is_active']
         widgets = {
             'start_year': DateInput(attrs={'type': 'date'}),
             'end_year': DateInput(attrs={'type': 'date'}),
         }
+
+    def clean(self):
+        cleaned = super().clean()
+        start_year = cleaned.get('start_year')
+        end_year = cleaned.get('end_year')
+        if start_year and end_year and end_year <= start_year:
+            raise forms.ValidationError("Batch end year must be after start year.")
+        return cleaned
+
 
 
 class LeaveReportStaffForm(FormSettings):
@@ -167,7 +232,11 @@ class StudentEditForm(CustomUserForm):
 
     class Meta(CustomUserForm.Meta):
         model = Student
-        fields = CustomUserForm.Meta.fields 
+        fields = CustomUserForm.Meta.fields + \
+            ['course', 'session', 'division', 'registration_no', 'discount_in_fee', 'mobile', 'dob', 'cnic', 'orphan', 'cast', 'osc', 
+             'identification_mark', 'previous_school', 'religion', 'blood_group', 'previous_roll_no', 'disease', 'additional_note', 'siblings',
+             'father_name', 'father_nic', 'father_occupation', 'father_education', 'father_mobile', 'father_profession', 'father_income',
+             'mother_name', 'mother_nic', 'mother_occupation', 'mother_education', 'mother_mobile', 'mother_profession', 'mother_income'] 
 
 
 class StaffEditForm(CustomUserForm):
@@ -176,7 +245,7 @@ class StaffEditForm(CustomUserForm):
 
     class Meta(CustomUserForm.Meta):
         model = Staff
-        fields = CustomUserForm.Meta.fields
+        fields = CustomUserForm.Meta.fields + ['mobile_number']
 
 
 class EditResultForm(FormSettings):
@@ -191,17 +260,12 @@ class EditResultForm(FormSettings):
         model = StudentResult
         fields = ['session_year', 'subject', 'student', 'test', 'exam']
 
-#todos
-# class TodoForm(forms.ModelForm):
-#     class Meta:
-#         model=Todo
-#         fields=["title","is_finished"]
-
-#issue book
 
 class IssueBookForm(forms.Form):
     isbn2 = forms.ModelChoiceField(queryset=models.Book.objects.all(), empty_label="Book Name [ISBN]", to_field_name="isbn", label="Book (Name and ISBN)")
     name2 = forms.ModelChoiceField(queryset=models.Student.objects.all(), empty_label="Name ", to_field_name="", label="Student Details")
-    
-    isbn2.widget.attrs.update({'class': 'form-control'})
-    name2.widget.attrs.update({'class':'form-control'})
+
+    def __init__(self, *args, **kwargs):
+        super(IssueBookForm, self).__init__(*args, **kwargs)
+        self.fields['isbn2'].widget.attrs.update({'class': 'form-control'})
+        self.fields['name2'].widget.attrs.update({'class': 'form-control'})

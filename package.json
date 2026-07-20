@@ -1,0 +1,10 @@
+{
+  "name": "college-erp",
+  "version": "1.0.0",
+  "description": "College ERP Management System",
+  "private": true,
+  "scripts": {},
+  "devDependencies": {
+    "@reticlehq/core": "^1.3.0"
+  }
+}

@@ -1,7 +1,7 @@
 {
-  "name": "Patkar College ERP",
-  "short_name": "College ERP",
-  "description": "Student & Staff Management System for Patkar College",
+  "name": "CAMPUS PRO ERP",
+  "short_name": "CAMPUS PRO",
+  "description": "Integrated school and college management system",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

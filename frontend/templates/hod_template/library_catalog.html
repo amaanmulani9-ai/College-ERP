@@ -1,0 +1,57 @@
+{% extends 'hod_template/library_overview.html' %}
+
+{% block page_title %}Book Catalog{% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'admin_home' %}">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="{% url 'admin_library_overview' %}">Library</a></li>
+<li class="breadcrumb-item active">Catalog</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="lux-page">
+    <div class="lux-band">
+        <div><h2>Book catalog</h2><p>Search, add, and manage the library collection.</p></div>
+        <div class="lux-actions"><a class="lux-btn secondary" href="{% url 'admin_library_overview' %}"><i class="fas fa-arrow-left"></i> Overview</a></div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4 mb-3">
+            <div class="lux-panel">
+                <div class="lux-head"><h3>Add Book</h3></div>
+                <div class="lux-body">
+                    <form method="post">{% csrf_token %}
+                        <input class="form-control mb-2" name="name" placeholder="Book name" required>
+                        <input class="form-control mb-2" name="author" placeholder="Author" required>
+                        <input class="form-control mb-2" name="isbn" placeholder="ISBN" required>
+                        <input class="form-control mb-3" name="category" placeholder="Category" required>
+                        <button class="lux-btn" type="submit"><i class="fas fa-plus"></i> Add to Catalog</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8 mb-3">
+            <div class="lux-panel">
+                <div class="lux-head">
+                    <h3>Catalog</h3>
+                    <form method="get" style="display:flex;gap:8px;">
+                        <input class="form-control form-control-sm" name="q" value="{{ query }}" placeholder="Search books">
+                        <button class="btn btn-sm btn-dark" type="submit">Search</button>
+                    </form>
+                </div>
+                <div class="lux-body p-0">
+                    <table class="lux-table">
+                        <thead><tr><th>Name</th><th>Author</th><th>ISBN</th><th>Category</th></tr></thead>
+                        <tbody>
+                        {% for book in books %}
+                        <tr><td><strong>{{ book.name }}</strong></td><td>{{ book.author }}</td><td>{{ book.isbn }}</td><td><span class="lux-pill">{{ book.category }}</span></td></tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center py-4">No books found.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

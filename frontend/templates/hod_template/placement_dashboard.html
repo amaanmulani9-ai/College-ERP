@@ -1,0 +1,72 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block page_title %}
+Admin Placement Dashboard
+{% endblock page_title %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Placement Statistics Overview</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="placementChart" style="width: 100%; height:400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block custom_js %}
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.2/dist/echarts.min.js"></script>
+<script>
+    var chartDom = document.getElementById('placementChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+        title: {
+            text: 'Placement Offers by Company',
+            subtext: 'Current Academic Year',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left'
+        },
+        series: [
+            {
+                name: 'Offers',
+                type: 'pie',
+                radius: '50%',
+                data: [
+                    { value: {{ placement_stats.google|default:10 }}, name: 'Google' },
+                    { value: {{ placement_stats.amazon|default:15 }}, name: 'Amazon' },
+                    { value: {{ placement_stats.microsoft|default:8 }}, name: 'Microsoft' },
+                    { value: {{ placement_stats.tcs|default:45 }}, name: 'TCS' },
+                    { value: {{ placement_stats.infosys|default:30 }}, name: 'Infosys' }
+                ],
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+
+    option && myChart.setOption(option);
+</script>
+{% endblock custom_js %}

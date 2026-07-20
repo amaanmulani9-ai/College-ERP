@@ -3,51 +3,75 @@
 {% block page_title %}{{page_title}}{% endblock page_title %}
 {% block content %}
 
-<section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <!-- general form elements -->
-                <div class="card card-dark">
-                    <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
-                    </div>
-
-
-                    <!-- /.card-header -->
-                    <!-- form start -->
-                    <div class="card-body">
-
-
-
-                       
-
-
-                        <div class="form-group table">
-              <table class="table table-bordered">
-                  <tr>
-                      <th>#</th>
-                      <th>Date</th>
-                      <th>Message</th>
-                  </tr>
-                  {% for notification in  notifications %}
-                    <tr>
-                        <td>{{forloop.counter}}</td>
-                        <td>{{notification.created_at}}</td>
-                        <td>{{notification.message}}</td>
-                    </tr>
-                  {% endfor %}
-              </table>
+<div class="container-fluid py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Stats overview widget -->
+            <div class="row mb-4">
+                <div class="col-md-4 col-sm-6">
+                    <div class="erpnext-card p-4 d-flex align-items-center justify-content-between">
+                        <div>
+                            <h3 class="fw-bold mb-0 text-white">{{ notifications|length }}</h3>
+                            <span class="text-white-50 small">Total Notifications</span>
                         </div>
-                   
+                        <div class="p-3 rounded-circle" style="background: rgba(99, 102, 241, 0.15); color: var(--primary-color); width: 52px; height: 52px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-bell fa-lg"></i>
+                        </div>
                     </div>
-                    <!-- /.card-body -->
+                </div>
+            </div>
 
-                <!-- /.card -->
-
+            <!-- Main Glass Card container -->
+            <div class="erpnext-card overflow-hidden">
+                <div class="card-header border-bottom border-white-10 py-4 px-4 d-flex justify-content-between align-items-center">
+                    <h4 class="card-title fw-bold mb-0 text-white">
+                        <i class="fas fa-bullhorn me-2 text-primary-color"></i> System Bulletins & Notifications
+                    </h4>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="divide-y">
+                        {% for notification in notifications %}
+                        <div class="notification-item p-4 d-flex gap-3" style="border-bottom: 1px solid rgba(255,255,255,0.06); transition: all 0.3s ease;">
+                            <div class="flex-shrink-0 mt-1 d-flex align-items-center justify-content-center rounded-circle" style="width: 48px; height: 48px; background: rgba(99, 102, 241, 0.1); color: var(--primary-color); flex-shrink: 0;">
+                                <i class="fas fa-envelope-open-text fa-lg"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="badge bg-white-10 text-white-50 border border-white-10 small">SYSTEM UPDATE</span>
+                                    <small class="text-white-50"><i class="far fa-clock me-1"></i> {{ notification.created_at }}</small>
+                                </div>
+                                <p class="mb-0 text-white" style="font-size: 0.95rem; line-height: 1.5;">
+                                    {{ notification.message }}
+                                </p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-5 text-white-50">
+                            <i class="fas fa-bell-slash fa-3x mb-3 text-muted"></i>
+                            <p class="mb-0">No notifications found at this time.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</section>
-{% endblock content %}
+</div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.style.transform = 'translateX(6px)';
+                item.style.background = 'rgba(255, 255, 255, 0.02)';
+            });
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = 'translateX(0)';
+                item.style.background = 'transparent';
+            });
+        });
+    });
+</script>
+
+{% endblock content %}
