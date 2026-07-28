@@ -253,6 +253,7 @@
                 <i class="nav-arrow"></i>
             </a>
             <div class="nav-submenu">
+                <a href="{% url 'institution_onboarding_wizard' %}" class="nav-link {% if 'onboarding' in request.path %}active{% endif %}" style="color: #38bdf8; font-weight: 700;">🚀 Onboarding Wizard</a>
                 <a href="{% url 'admin_settings_profile' %}" class="nav-link {% if 'settings/profile' in request.path %}active{% endif %}">Institute Profile</a>
                 <a href="{% url 'admin_settings_fees' %}" class="nav-link {% if 'settings/fees' in request.path %}active{% endif %}">Fees Particulars</a>
                 <a href="{% url 'admin_settings_fees_structure' %}" class="nav-link {% if 'settings/fees-structure' in request.path %}active{% endif %}">Fees Structure</a>
@@ -561,6 +562,7 @@
                 <a href="{% url 'admin_finance_dashboard' %}" class="nav-link {% if 'finance' in request.path %}active{% endif %}">Fee Collection Report</a>
                 <a href="{% url 'admin_students_info_report' %}" class="nav-link {% if 'reports/students-info' in request.path %}active{% endif %}">Student Progress Report</a>
                 <a href="{% url 'account_statement' %}" class="nav-link {% if 'accounts/statement' in request.path %}active{% endif %}">Accounts Report</a>
+                <a href="{% url 'naac_report' %}" class="nav-link {% if 'naac-report' in request.path %}active{% endif %}">🏅 NAAC & NIRF Accreditation</a>
                 <a href="{% url 'admin_analytics' %}" class="nav-link {% if 'analytics' in request.path %}active{% endif %}">Customised Reports</a>
             </div>
         </div>

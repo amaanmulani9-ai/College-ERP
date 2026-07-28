@@ -733,14 +733,35 @@ def student_placements(request):
     student = get_object_or_404(Student, admin=request.user)
     drives = PlacementDrive.objects.all().order_by('-drive_date')
     
+    # Calculate student academic and attendance profile for placement eligibility
+    from .analytics_engine import calculate_student_risk
+    student_profile = calculate_student_risk(student)
+    
     # Get all registrations for this student
     registrations = PlacementRegistration.objects.filter(student=student)
     reg_map = {reg.drive_id: reg.status for reg in registrations}
     
-    # Pre-calculate registration state for each drive
+    # Pre-calculate registration state and eligibility for each drive
     for drive in drives:
         drive.is_applied = drive.id in reg_map
         drive.application_status = reg_map.get(drive.id)
+        
+        # Evaluate Automated Placement Eligibility Criteria
+        is_eligible = True
+        eligibility_reason = "Eligible for drive"
+        
+        if student_profile["attendance_pct"] < 60.0:
+            is_eligible = False
+            eligibility_reason = f"Attendance ({student_profile['attendance_pct']}%) is below minimum placement threshold (60%)"
+        elif "70%" in drive.eligibility and student_profile["academic_avg"] < 70.0:
+            is_eligible = False
+            eligibility_reason = f"Academic score ({student_profile['academic_avg']}%) is below required 70% criteria"
+        elif "7.5" in drive.eligibility and student_profile["academic_avg"] < 75.0:
+            is_eligible = False
+            eligibility_reason = f"CGPA equivalent ({student_profile['academic_avg']}%) is below 7.5 CGPA required"
+            
+        drive.is_eligible = is_eligible
+        drive.eligibility_reason = eligibility_reason
         
     applied_drive_ids = list(reg_map.keys())
     
@@ -753,16 +774,23 @@ def student_placements(request):
         if drive.id in applied_drive_ids:
             messages.warning(request, "You have already applied for this placement drive.")
         else:
+            # Check eligibility before registration
+            target_drive = next((d for d in drives if d.id == drive.id), drive)
+            if hasattr(target_drive, 'is_eligible') and not target_drive.is_eligible:
+                messages.error(request, f"Cannot apply: {target_drive.eligibility_reason}")
+                return redirect(reverse('student_placements'))
+                
             PlacementRegistration.objects.create(
                 student=student,
                 drive=drive,
                 resume_url=resume_url or "https://drive.google.com/file/d/sample_resume/view"
             )
-            messages.success(request, f"Successfully applied for '{drive.company_name}' drive!")
+            messages.success(request, f"Successfully verified eligibility and applied for '{drive.company_name}' drive!")
             return redirect(reverse('student_placements'))
             
     context = {
         'drives': drives,
+        'student_profile': student_profile,
         'applied_drive_ids': applied_drive_ids,
         'page_title': "Campus Placements Portal"
     }
@@ -796,6 +824,7 @@ def student_ai_chat(request):
                 reply = f"🎓 **Attendance Overview:**\n"
                 reply += f"Your overall attendance is **{overall}%** ({total_pres} present out of {total_att} total lectures).\n\n"
                 reply += "Here is your subject-wise breakdown:\n"
+
                 
                 for subject in subjects:
                     pres = subject.present_count

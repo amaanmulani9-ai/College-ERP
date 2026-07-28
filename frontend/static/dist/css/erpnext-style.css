@@ -1102,18 +1102,33 @@ body {
   }
 }
 
-/* Responsive Design */
+/* Responsive Design & Mobile Native UI */
 @media (max-width: 768px) {
   .erpnext-sidebar {
     transform: translateX(-100%);
+    width: 280px !important;
+    z-index: 1200;
   }
   
   .erpnext-main {
     margin-left: 0;
+    padding: 12px;
+    padding-bottom: 80px; /* Room for mobile bottom bar */
   }
   
   .sidebar-open .erpnext-sidebar {
     transform: translateX(0);
+  }
+
+  /* Table responsiveness on mobile phones */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 16px;
+  }
+
+  .table {
+    min-width: 600px; /* Ensures table columns don't crunch unreadably */
   }
   
   .stats-grid {
@@ -1123,7 +1138,63 @@ body {
   .navbar-brand {
     font-size: 18px;
   }
+
+  /* Touch-friendly buttons and inputs */
+  .btn, .form-control, .form-select {
+    min-height: 44px;
+    font-size: 14px;
+  }
+
+  /* Mobile Native Bottom Navigation Bar */
+  .mobile-bottom-bar {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+    z-index: 1050;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .dark-mode .mobile-bottom-bar {
+    background: #1e293b;
+    border-top-color: #334155;
+  }
+
+  .mobile-bottom-bar a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 600;
+    flex: 1;
+    height: 100%;
+  }
+
+  .mobile-bottom-bar a i {
+    font-size: 18px;
+    margin-bottom: 3px;
+  }
+
+  .mobile-bottom-bar a.active, .mobile-bottom-bar a:hover {
+    color: #0284c7;
+  }
 }
+
+@media (min-width: 769px) {
+  .mobile-bottom-bar {
+    display: none !important;
+  }
+}
+
 
 /* Animation and transitions */
 .fade-in {

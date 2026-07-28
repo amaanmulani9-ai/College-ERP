@@ -41,6 +41,9 @@ urlpatterns = [
     path("library/free-books/", views.free_digital_library, name='free_digital_library'),
     path("admin/analytics/", analytics_views.admin_analytics, name='admin_analytics'),
     path("admin/analytics/export/<str:report_type>/", analytics_views.export_analytics_report, name='export_analytics_report'),
+    path("admin/naac-report/", hod_views.naac_report_view, name='naac_report'),
+    path("admin/naac-report/export/", hod_views.export_naac_report_csv, name='export_naac_report_csv'),
+    path("api/biometric-punch/", mobile_api_views.api_biometric_punch, name='api_biometric_punch'),
     path("metrics", analytics_views.prometheus_metrics, name='prometheus_metrics'),
     path("api/mobile/login/", mobile_api_views.mobile_login, name='mobile_login'),
     path("api/mobile/timetable/", mobile_api_views.get_user_timetable, name='mobile_timetable'),
@@ -448,5 +451,10 @@ urlpatterns = [
     # --- Certificate Templates ---
     path("admin/manage_certificate_templates/", hod_views.manage_certificate_templates, name='manage_certificate_templates'),
 
+    # --- SaaS Onboarding Wizard ---
+    path("onboarding/", hod_views.institution_onboarding_wizard, name='institution_onboarding_wizard'),
 
+    # --- Realtime Sync Engine Stream ---
+    path("api/realtime-stream/", mobile_api_views.realtime_events_stream, name='realtime_events_stream'),
 ]
+

@@ -390,6 +390,61 @@ body, .erpnext-main, .content-area { font-family: 'Poppins', sans-serif; font-si
     </div>
 </div>
 
+<!-- ═══════════ AI STUDENT RISK & RETENTION ANALYTICS ═══════════ -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="sk-card" style="border-top: 3px solid #ef4444;">
+            <div class="sk-card-head">
+                <h3 class="sk-card-title"><i class="fas fa-exclamation-triangle text-danger"></i> AI Predictive Student Risk & Retention Radar</h3>
+                <div>
+                    <span class="badge badge-danger px-2 py-1 font-weight-bold">High Risk: {{ ai_risk_analytics.high_risk_count }}</span>
+                    <span class="badge badge-warning px-2 py-1 font-weight-bold ml-1">Moderate Risk: {{ ai_risk_analytics.moderate_risk_count }}</span>
+                    <span class="badge badge-success px-2 py-1 font-weight-bold ml-1">Safe: {{ ai_risk_analytics.safe_count }}</span>
+                    <a href="{% url 'naac_report' %}" class="btn btn-sm btn-outline-primary ml-2"><i class="fas fa-award mr-1"></i>NAAC Report</a>
+                </div>
+            </div>
+            <div class="sk-card-body p-0">
+                {% if ai_risk_analytics.high_risk_students %}
+                <table class="sk-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Course / Sem</th>
+                            <th>Attendance</th>
+                            <th>Academic Avg</th>
+                            <th>Pending Fees</th>
+                            <th>Risk Factors</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stu in ai_risk_analytics.high_risk_students %}
+                        <tr>
+                            <td><strong>{{ stu.name }}</strong> <br><small class="text-muted">{{ stu.student_code }}</small></td>
+                            <td>{{ stu.course }} (Sem {{ stu.semester }})</td>
+                            <td><span class="badge badge-danger">{{ stu.attendance_pct }}%</span></td>
+                            <td><span class="badge badge-warning">{{ stu.academic_avg }}%</span></td>
+                            <td class="text-danger font-weight-bold">₹{{ stu.pending_fees|floatformat:2 }}</td>
+                            <td>
+                                {% for factor in stu.risk_factors %}
+                                    <span class="badge badge-light border text-danger text-xs mb-1">{{ factor }}</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center py-3 text-success">
+                    <i class="fas fa-check-circle fa-2x mb-1"></i>
+                    <p class="mb-0 font-weight-bold">No High Risk Students Flagged! All active students maintain acceptable attendance and academic standing.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- ═══════════ HERO STAT CARDS ═══════════ -->
 <div class="hero-grid">
     <div class="hero-card c1">

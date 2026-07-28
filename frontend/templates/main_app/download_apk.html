@@ -1,0 +1,83 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}Download Mobile App (Android APK){% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid py-4" style="max-width: 800px;">
+
+    <!-- Top Banner Card -->
+    <div class="card erpnext-card shadow-sm border-0 mb-4" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white; border-radius: 16px;">
+        <div class="card-body p-4 text-center">
+            <div style="width: 72px; height: 72px; border-radius: 20px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 36px; box-shadow: 0 8px 20px rgba(0,0,0,0.15);">
+                📱
+            </div>
+            <h2 class="font-weight-bold mb-2">CampusPro College ERP App</h2>
+            <p class="mb-3 opacity-9" style="font-size: 15px;">Official Mobile Application for Students, Faculty, and Staff</p>
+            <span class="badge bg-white text-dark px-3 py-2" style="font-size: 13px; font-weight: 700; border-radius: 50px;">
+                v2.4.0 • Realtime Mobile Sync Enabled
+            </span>
+        </div>
+    </div>
+
+    <!-- Installation Method 1: Instant PWA APK (Recommended) -->
+    <div class="card erpnext-card shadow-sm border-0 mb-4" style="border-radius: 16px;">
+        <div class="card-header bg-transparent border-bottom p-4">
+            <h5 class="card-title text-primary mb-0 font-weight-bold">
+                <i class="fas fa-mobile-alt mr-2"></i> Method 1: Instant Mobile App Install (No Parse Error)
+            </h5>
+        </div>
+        <div class="card-body p-4">
+            <p class="text-muted mb-4">You can install the official ERP App directly onto any Android phone in 1 tap without downloading external APK files:</p>
+
+            <div class="d-flex align-items-center mb-3 p-3 rounded" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                <div class="badge bg-primary text-white p-3 mr-3" style="font-size: 16px; border-radius: 12px; min-width: 40px; text-align: center;">1</div>
+                <div>
+                    <h6 class="font-weight-bold mb-1">Open ERP Website in Chrome on Android</h6>
+                    <small class="text-muted">Open Chrome browser on your Android mobile phone and go to this web portal.</small>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center mb-3 p-3 rounded" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                <div class="badge bg-primary text-white p-3 mr-3" style="font-size: 16px; border-radius: 12px; min-width: 40px; text-align: center;">2</div>
+                <div>
+                    <h6 class="font-weight-bold mb-1">Tap 3-Dots Menu ➔ "Add to Home Screen" / "Install App"</h6>
+                    <small class="text-muted">Tap the 3 vertical dots at the top right of Chrome and select <strong>Install App</strong> or <strong>Add to Home Screen</strong>.</small>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center p-3 rounded" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+                <div class="badge bg-success text-white p-3 mr-3" style="font-size: 16px; border-radius: 12px; min-width: 40px; text-align: center;">3</div>
+                <div>
+                    <h6 class="font-weight-bold mb-1 text-success">Done! App Icon Appears on Mobile Screen</h6>
+                    <small class="text-success">The <strong>CampusPro ERP</strong> app icon will instantly appear on your mobile home screen with full offline and push notification support!</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Installation Method 2: Android Studio Build Project -->
+    <div class="card erpnext-card shadow-sm border-0 mb-4" style="border-radius: 16px;">
+        <div class="card-header bg-transparent border-bottom p-4">
+            <h5 class="card-title text-secondary mb-0 font-weight-bold">
+                <i class="fas fa-tools mr-2"></i> Method 2: Build Native Android APK Project
+            </h5>
+        </div>
+        <div class="card-body p-4">
+            <p class="text-muted mb-3">The complete native Android Java source code has been created in your project folder:</p>
+
+            <div class="p-3 mb-3 rounded" style="background: #1e293b; color: #38bdf8; font-family: monospace; font-size: 13px;">
+                College-ERP-main/android_apk/
+            </div>
+
+            <h6 class="font-weight-bold mb-2">Steps to compile APK in Android Studio:</h6>
+            <ol class="pl-3 text-muted" style="font-size: 14px; line-height: 1.8;">
+                <li>Open <strong>Android Studio</strong> on your laptop.</li>
+                <li>Click <strong>Open Project</strong> and select the <code class="text-primary">android_apk</code> directory.</li>
+                <li>Click <strong>Build ➔ Build Bundle(s) / APK(s) ➔ Build APK(s)</strong>.</li>
+                <li>The compiled, 100% valid <code class="text-success">app-debug.apk</code> file will be saved under <code class="text-dark">android_apk/app/build/outputs/apk/debug/</code>.</li>
+            </ol>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}

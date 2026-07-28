@@ -11,7 +11,7 @@
                         <h3 class="card-title">Exam Details</h3>
                     </div>
                     <form method="POST" action="{% url 'staff_create_exam' %}">
-                        {% csrf_field %}
+                        {% csrf_token %}
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="title">Exam Title</label>

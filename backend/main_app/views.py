@@ -363,6 +363,12 @@ def discussion_board(request):
                 message=message_text
             )
             msg.save()
+            from main_app.mobile_api_views import trigger_realtime_event
+            trigger_realtime_event('chat_message', {
+                'sender': f"{user.first_name} {user.last_name}",
+                'subject': active_subject.name,
+                'message': message_text[:50]
+            })
             messages.success(request, "Message posted to discussion board!")
             return redirect(f"{reverse('discussion_board')}?subject_id={active_subject.id}")
             
@@ -792,4 +798,27 @@ def free_digital_library(request):
         'has_prev': page > 1,
     }
     return render(request, 'main_app/free_digital_library.html', context)
+
+
+def download_android_apk(request):
+    """
+    Direct Android APK Download & Installation Portal Endpoint.
+    """
+    if request.GET.get('download') == 'file':
+        apk_path = os.path.join(settings.BASE_DIR, 'android_apk', 'CampusPro_College_ERP.apk')
+        if os.path.exists(apk_path):
+            with open(apk_path, 'rb') as f:
+                response = HttpResponse(f.read(), content_type='application/vnd.android.package-archive')
+                response['Content-Disposition'] = 'attachment; filename="CampusPro_College_ERP.apk"'
+                return response
+    
+    context = {
+        'page_title': 'Download CampusPro Mobile App (Android APK)',
+        'app_name': 'CampusPro College ERP',
+        'version': 'v2.4.0 (Latest Release)',
+        'size': '14.8 MB',
+        'requirements': 'Android 7.0 (API 24) or higher'
+    }
+    return render(request, 'main_app/download_apk.html', context)
+
 

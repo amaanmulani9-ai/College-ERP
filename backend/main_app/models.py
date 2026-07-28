@@ -497,6 +497,45 @@ class FeePayment(models.Model):
         return f"Payment of {self.amount_paid} for {self.fee_record.category} (TXN: {self.transaction_id})"
 
 
+class InstitutionProfile(models.Model):
+    INSTITUTION_TYPES = [
+        ('School', 'School'),
+        ('College', 'College'),
+    ]
+    SESSION_CYCLES = [
+        ('April to March', 'April to March'),
+        ('March to February', 'March to February'),
+        ('January to December', 'January to December'),
+        ('May to April', 'May to April'),
+        ('June to May', 'June to May'),
+        ('July to June', 'July to June'),
+        ('August to July', 'August to July'),
+    ]
+    FEE_TYPES = [
+        ('Monthly', 'Monthly'),
+        ('Quarterly', 'Quarterly'),
+        ('Yearly', 'Yearly'),
+    ]
+    
+    institution_type = models.CharField(max_length=20, choices=INSTITUTION_TYPES, default='College')
+    session_cycle = models.CharField(max_length=50, choices=SESSION_CYCLES, default='April to March')
+    institution_name = models.CharField(max_length=255, default='CampusPro ERP Institute')
+    logo = models.ImageField(upload_to='institution_logos/', blank=True, null=True)
+    email = models.EmailField(default='admin@college.edu')
+    email_verified = models.BooleanField(default=True)
+    website_url = models.URLField(blank=True, default='')
+    affiliation_number = models.CharField(max_length=100, blank=True, default='')
+    address = models.TextField(blank=True, default='')
+    fee_structure_type = models.CharField(max_length=20, choices=FEE_TYPES, default='Monthly')
+    allow_fee_installments = models.BooleanField(default=True)
+    principal_signature = models.ImageField(upload_to='signatures/', blank=True, null=True)
+    is_onboarding_completed = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.institution_name} ({self.institution_type})"
+
+
 class Timetable(models.Model):
     DAY_CHOICES = [
         (0, 'Monday'),

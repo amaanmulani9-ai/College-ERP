@@ -14,7 +14,7 @@
                         </div>
                     </div>
                     <form method="POST" action="{% url 'submit_exam' exam.id %}" id="examForm">
-                        {% csrf_field %}
+                        {% csrf_token %}
                         <div class="card-body">
                             {% for q in questions %}
                             <div class="mb-4 p-3 border rounded">

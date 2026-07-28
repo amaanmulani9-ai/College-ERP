@@ -103,32 +103,7 @@
             <p class="text-muted m-0">Weekly scheduled class times and rooms for course: <strong>{{ student.course.name }}</strong></p>
         </div>
         
-        <!-- Display days from Monday to Saturday -->
-        {% for day in timetable_by_day.keys %}
-        <div class="timetable-day-card">
-            <div class="day-header {% if day == today %}day-header-today{% endif %}">
-                <span><i class="far fa-calendar-check mr-2"></i> {{ day }}</span>
-                {% if day == today %}
-                <span class="badge bg-white text-dark py-1 px-3" style="font-size: 11px; border-radius: 50px;">Today's Classes</span>
-                {% endif %}
-            </div>
-            
-            <div>
-                {% for slot in timetable_by_day|slice:day %}
-                    <!-- Slice access in Django isn't standard dict lookup, but in our views we populated dictionary. 
-                         Wait! In parent_views.py, we have `timetable_by_day[day] = slots`!
-                         So we can retrieve the day slots by running lookup on the dictionary:
-                         We can do `{% for slot in timetable_by_day.day %}` but django template system doesn't do variable keys.
-                         Wait, how do we access keys? In parent_views.py we saved a dictionary.
-                         To iterate in django templates, we can do:
-                         `{% for day_name, slots in timetable_by_day.items %}` !
-                         This is standard and beautiful! Let's structure it like that! -->
-                {% endfor %}
-            </div>
-        </div>
-        {% endfor %}
-
-        <!-- Correct loop for django templates dictionary items -->
+        <!-- Weekly timetable by day -->
         {% for day_name, slots in timetable_by_day.items %}
         <div class="timetable-day-card">
             <div class="day-header {% if day_name == today %}day-header-today{% endif %}">

@@ -1,56 +1,41 @@
-const CACHE_NAME = 'college-erp-v1';
-const urlsToCache = [
+const CACHE_NAME = 'campuspro-erp-v1';
+const ASSETS_TO_CACHE = [
   '/',
   '/static/dist/css/adminlte.min.css',
-  '/static/plugins/fontawesome-free/css/all.min.css',
-  '/static/dist/js/adminlte.min.js',
-  '/offline/'
+  '/static/dist/css/erpnext-style.css',
+  '/static/image/logo.png',
+  '/static/plugins/fontawesome-free/css/all.min.css'
 ];
 
-// Install event - Cache core assets
-self.addEventListener('install', event => {
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
   );
+  self.skipWaiting();
 });
 
-// Activate event - Clean up old caches
-self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then((keys) => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
           }
         })
       );
     })
   );
+  self.clients.claim();
 });
 
-// Fetch event - Serve from cache, fallback to network, fallback to offline page
-self.addEventListener('fetch', event => {
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() => {
-        return caches.match('/offline/');
-      })
-    );
-  } else {
-    event.respondWith(
-      caches.match(event.request)
-        .then(response => {
-          if (response) {
-            return response;
-          }
-          return fetch(event.request);
-        })
-    );
-  }
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+  event.respondWith(
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
+    })
+  );
 });

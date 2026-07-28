@@ -205,6 +205,21 @@ def admin_home(request):
     except Exception:
         recent_notifs = []
 
+    # 13. AI Student Risk & Retention Analytics Integration
+    try:
+        from .analytics_engine import generate_system_risk_analytics
+        ai_risk_analytics = generate_system_risk_analytics()
+    except Exception:
+        ai_risk_analytics = {
+            "total_evaluated": total_students,
+            "high_risk_count": 0,
+            "moderate_risk_count": 0,
+            "safe_count": total_students,
+            "high_risk_pct": 0.0,
+            "high_risk_students": [],
+            "moderate_risk_students": [],
+        }
+
     course_stats = courses_with_counts
 
     context = {
@@ -249,8 +264,54 @@ def admin_home(request):
         "female_students": female_students,
         "today_attendance_sessions": today_attendance_sessions,
         "recent_notifs": recent_notifs,
+        "ai_risk_analytics": ai_risk_analytics,
     }
     return render(request, 'hod_template/home_content.html', context)
+
+
+@login_required(login_url='/')
+@admin_required
+def naac_report_view(request):
+    from .naac_nirf_reports import generate_naac_nirf_data
+    naac_data = generate_naac_nirf_data()
+    context = {
+        'page_title': 'NAAC & NIRF Accreditation Report',
+        'naac': naac_data,
+    }
+    return render(request, 'hod_template/naac_report.html', context)
+
+
+@login_required(login_url='/')
+@admin_required
+def export_naac_report_csv(request):
+    import csv
+    from .naac_nirf_reports import generate_naac_nirf_data
+    
+    naac = generate_naac_nirf_data()
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="naac_nirf_accreditation_report.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['NAAC / NIRF Category Metric', 'Value / Aggregate Status'])
+    
+    # Overview
+    for k, v in naac['summary'].items():
+        writer.writerow([f"Summary: {k.replace('_', ' ').title()}", v])
+        
+    # Criteria details
+    for crit_key in ['criteria_1_curricular', 'criteria_2_teaching_learning', 'criteria_3_research',
+                    'criteria_4_infrastructure', 'criteria_5_student_support', 'criteria_6_governance',
+                    'criteria_7_institutional_values']:
+        section = naac.get(crit_key, {})
+        title = section.get('title', crit_key)
+        writer.writerow([])
+        writer.writerow([f"--- {title} ---", ""])
+        for k, v in section.items():
+            if k not in ['title', 'courses_list']:
+                writer.writerow([k.replace('_', ' ').title(), v])
+                
+    return response
+
 
 @login_required(login_url='/')
 @admin_required
@@ -3071,3 +3132,74 @@ def admin_staff_login_credentials(request):
         'staffs': staffs
     }
     return render(request, 'hod_template/manage_staff_login.html', context)
+
+
+@login_required(login_url='/')
+@admin_required
+def institution_onboarding_wizard(request):
+    """
+    7-Step Institution Onboarding & Setup Wizard.
+    Modeled after MyLeadingCampus SaaS onboarding workflow.
+    """
+    from main_app.models import InstitutionProfile
+    profile, created = InstitutionProfile.objects.get_or_create(id=1)
+    
+    if request.method == "POST":
+        if request.content_type == 'application/json':
+            try:
+                import json
+                data = json.loads(request.body)
+                if 'institution_type' in data:
+                    profile.institution_type = data.get('institution_type', profile.institution_type)
+                if 'session_cycle' in data:
+                    profile.session_cycle = data.get('session_cycle', profile.session_cycle)
+                if 'institution_name' in data:
+                    profile.institution_name = data.get('institution_name', profile.institution_name)
+                if 'website_url' in data:
+                    profile.website_url = data.get('website_url', profile.website_url)
+                if 'affiliation_number' in data:
+                    profile.affiliation_number = data.get('affiliation_number', profile.affiliation_number)
+                if 'address' in data:
+                    profile.address = data.get('address', profile.address)
+                if 'fee_structure_type' in data:
+                    profile.fee_structure_type = data.get('fee_structure_type', profile.fee_structure_type)
+                if 'allow_fee_installments' in data:
+                    profile.allow_fee_installments = bool(data.get('allow_fee_installments'))
+                if 'is_completed' in data:
+                    profile.is_onboarding_completed = bool(data.get('is_completed'))
+                profile.save()
+                return JsonResponse({'status': 'success', 'message': 'Onboarding data saved successfully'})
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+        else:
+            profile.institution_type = request.POST.get('institution_type', profile.institution_type)
+            profile.session_cycle = request.POST.get('session_cycle', profile.session_cycle)
+            profile.institution_name = request.POST.get('institution_name', profile.institution_name)
+            profile.website_url = request.POST.get('website_url', profile.website_url)
+            profile.affiliation_number = request.POST.get('affiliation_number', profile.affiliation_number)
+            profile.address = request.POST.get('address', profile.address)
+            profile.fee_structure_type = request.POST.get('fee_structure_type', profile.fee_structure_type)
+            profile.allow_fee_installments = request.POST.get('allow_fee_installments') == 'Yes'
+            
+            if 'logo' in request.FILES:
+                profile.logo = request.FILES['logo']
+            if 'principal_signature' in request.FILES:
+                profile.principal_signature = request.FILES['principal_signature']
+                
+            profile.is_onboarding_completed = True
+            profile.save()
+            messages.success(request, "🎉 Institution Onboarding & Campus Setup Completed Successfully!")
+            return redirect(reverse('admin_home'))
+
+    context = {
+        'profile': profile,
+        'page_title': 'Institution Onboarding Setup',
+        'institution_types': ['School', 'College'],
+        'session_cycles': [
+            'April to March', 'March to February', 'January to December',
+            'May to April', 'June to May', 'July to June', 'August to July'
+        ],
+        'fee_types': ['Monthly', 'Quarterly', 'Yearly']
+    }
+    return render(request, 'hod_template/institution_onboarding.html', context)
+

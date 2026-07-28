@@ -377,6 +377,30 @@
             {% block content %}{% endblock content %}
         </div>
     </main>
+
+    <!-- Mobile Native Bottom Navigation Bar -->
+    <nav class="mobile-bottom-bar" aria-label="Mobile Navigation Bar">
+        <a href="{% if user.user_type == '1' %}{% url 'admin_home' %}{% elif user.user_type == '2' %}{% url 'staff_home' %}{% else %}{% url 'student_home' %}{% endif %}" class="{% if '/home/' in request.path %}active{% endif %}">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="{% url 'free_digital_library' %}" class="{% if 'library/free-books' in request.path %}active{% endif %}">
+            <i class="fas fa-book-reader"></i>
+            <span>Library</span>
+        </a>
+        <a href="{% url 'chat_home' %}" class="{% if 'chat' in request.path %}active{% endif %}">
+            <i class="fas fa-comments"></i>
+            <span>Chat</span>
+        </a>
+        <a href="{% url 'discussion_board' %}" class="{% if 'discussion' in request.path %}active{% endif %}">
+            <i class="fas fa-users"></i>
+            <span>Board</span>
+        </a>
+        <a href="{% url 'download_android_apk' %}" class="{% if 'download-apk' in request.path %}active{% endif %}" style="color: #0284c7; font-weight: 700;">
+            <i class="fas fa-mobile-alt"></i>
+            <span>App</span>
+        </a>
+    </nav>
    
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -1503,6 +1527,18 @@
         });
     </script>
 
+    <!-- Service Worker Registration for PWA / Mobile APK -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(reg => console.log('PWA Service Worker registered:', reg.scope))
+                    .catch(err => console.log('Service Worker failed:', err));
+            });
+        }
+    </script>
+    <!-- Realtime Mobile & Web Sync Client Engine -->
+    <script src="{% static 'js/realtime_sync.js' %}"></script>
     <!-- Global Smart AI Components -->
     {% include "main_app/ai_chatbot_widget.html" %}
     {% include "main_app/predictive_analytics_modal.html" %}
