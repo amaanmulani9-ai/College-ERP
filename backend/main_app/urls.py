@@ -456,5 +456,8 @@ urlpatterns = [
 
     # --- Realtime Sync Engine Stream ---
     path("api/realtime-stream/", mobile_api_views.realtime_events_stream, name='realtime_events_stream'),
+
+    # --- Android APK Download & Installation Portal ---
+    path("download-apk/", views.download_android_apk, name='download_android_apk'),
 ]
 
