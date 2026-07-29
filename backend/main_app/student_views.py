@@ -17,11 +17,11 @@ from .forms import *
 from .models import *
 
 
-@login_required(login_url='/')
+@login_required(login_url='/login/')
 @student_required
 def student_home(request):
-    student = get_object_or_404(Student, admin=request.user)
-    total_subject = Subject.objects.filter(course=student.course).count()
+    student, _ = Student.objects.get_or_create(admin=request.user)
+    total_subject = Subject.objects.filter(course=student.course).count() if student.course else 0
     total_attendance = AttendanceReport.objects.filter(student=student).count()
     total_present = AttendanceReport.objects.filter(student=student, status=True).count()
     if total_attendance == 0:
@@ -30,7 +30,7 @@ def student_home(request):
         percent_present = math.floor((total_present/total_attendance) * 100)
         percent_absent = math.ceil(100 - percent_present)
 
-    subjects = Subject.objects.filter(course=student.course)
+    subjects = Subject.objects.filter(course=student.course) if student.course else Subject.objects.none()
     subject_name = []
     data_present = []
     data_absent = []

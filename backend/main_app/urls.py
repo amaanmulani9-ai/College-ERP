@@ -25,6 +25,11 @@ urlpatterns = [
     path("llms.txt", views.llms_txt, name="llms_txt"),
     path("", views.landing_page, name='landing_page'),
     path("login/", views.login_page, name='login_page'),
+    path("register/", views.institution_signup, name='register'),
+    path("signup/", views.institution_signup, name='signup'),
+    path("api/signup/check_user/", views.check_signup_availability, name='check_signup_availability'),
+    path("api/auth/send_otp/", views.send_verification_otp, name='send_verification_otp'),
+    path("api/auth/verify_otp/", views.verify_otp_and_register, name='verify_otp_and_register'),
     path("healthz/", views.health_check, name='health_check'),
     path('offline/', views.offline, name='offline'),
     path('student/register/', views.online_registration, name='online_registration'),
@@ -459,5 +464,6 @@ urlpatterns = [
 
     # --- Android APK Download & Installation Portal ---
     path("download-apk/", views.download_android_apk, name='download_android_apk'),
+    path("download-apk/CampusPro_College_ERP.apk", views.download_android_apk, name='download_android_apk_file'),
 ]
 

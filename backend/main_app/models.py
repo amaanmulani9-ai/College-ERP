@@ -11,6 +11,17 @@ from django.core.exceptions import ValidationError
 
 
 
+class Institution(models.Model):
+    name = models.CharField(max_length=200)
+    code = models.CharField(max_length=100, unique=True)
+    admin_user = models.OneToOneField('CustomUser', on_delete=models.CASCADE, related_name='managed_institution', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
 class CustomUserManager(UserManager):
     def _create_user(self, email, password, **extra_fields):
         email = self.normalize_email(email)

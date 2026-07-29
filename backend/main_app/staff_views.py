@@ -16,11 +16,11 @@ from .models import *
 from . import forms, models
 from datetime import date
 
-@login_required(login_url='/')
+@login_required(login_url='/login/')
 @staff_required
 def staff_home(request):
-    staff = get_object_or_404(Staff, admin=request.user)
-    total_students = Student.objects.filter(course=staff.course).count()
+    staff, _ = Staff.objects.get_or_create(admin=request.user)
+    total_students = Student.objects.filter(course=staff.course).count() if staff.course else Student.objects.count()
     total_leave = LeaveReportStaff.objects.filter(staff=staff).count()
     subjects = Subject.objects.filter(staff=staff)
     total_subject = subjects.count()

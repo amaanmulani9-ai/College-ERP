@@ -15,14 +15,17 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import android.webkit.WebResourceRequest;
+import android.webkit.URLUtil;
+
 public class MainActivity extends Activity {
 
     private WebView mWebView;
     private ValueCallback<Uri[]> mFilePathCallback;
     private final static int FILECHOOSER_RESULTCODE = 1;
 
-    // Change this to your deployed ERP domain or local IP (e.g. http://192.168.1.100:8000)
-    public static final String ERP_PORTAL_URL = "https://college-erp-web.onrender.com/";
+    // Direct Login URL for native app (bypasses landing page)
+    public static final String ERP_PORTAL_URL = "https://college-erp-web.onrender.com/login/?app=true";
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -50,9 +53,36 @@ public class MainActivity extends Activity {
 
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                if (request != null && request.getUrl() != null) {
+                    String url = request.getUrl().toString();
+                    if (url.startsWith("http://") || url.startsWith("https://")) {
+                        return false; // Allow standard HTTP/HTTPS links to load within WebView
+                    }
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        startActivity(intent);
+                        return true;
+                    } catch (Exception e) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @SuppressWarnings("deprecation")
+            @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
+                if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
+                    return false; // Allow standard HTTP/HTTPS links to load within WebView
+                }
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(intent);
+                    return true;
+                } catch (Exception e) {
+                    return true;
+                }
             }
         });
 

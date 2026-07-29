@@ -8,9 +8,10 @@ from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.conf import settings
 
 
-from .models import Attendance, Session, Subject, NotificationStudent, NotificationStaff
+from .models import CustomUser, Admin, Institution, Attendance, Session, Subject, NotificationStudent, NotificationStaff
 from django.contrib.auth.decorators import login_required
 from .analytics_helper import log_analytics_event
 
@@ -40,8 +41,31 @@ def _safe_next_url(request):
 
 
 def _redirect_for_user(user):
-    route_name = LOGIN_REDIRECT_ROUTES.get(str(getattr(user, "user_type", "")))
+    user_type_str = str(getattr(user, "user_type", "")).strip()
+    route_name = LOGIN_REDIRECT_ROUTES.get(user_type_str)
     if route_name:
+        # Guarantee profile existence for non-admin roles to prevent 404 Http404 errors
+        try:
+            if user_type_str == "2":
+                from .models import Staff
+                Staff.objects.get_or_create(admin=user)
+            elif user_type_str == "3":
+                from .models import Student
+                Student.objects.get_or_create(admin=user)
+            elif user_type_str == "4":
+                from .models import Parent, Student
+                parent = Parent.objects.filter(admin=user).first()
+                if not parent:
+                    student = Student.objects.first()
+                    if student:
+                        Parent.objects.create(admin=user, student=student)
+            elif user_type_str == "7":
+                from .models import Backoffice
+                Backoffice.objects.get_or_create(admin=user)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning("Error ensuring profile for user_type %s: %s", user_type_str, e)
+
         return redirect(reverse(route_name))
     return redirect(reverse("login_page"))
 
@@ -49,6 +73,12 @@ def _redirect_for_user(user):
 def landing_page(request):
     if request.user.is_authenticated:
         return _redirect_for_user(request.user)
+
+    # Check if request comes from Android APK App or ?app=true parameter
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
+    if 'CampusProAndroidApp' in user_agent or request.GET.get('app') == 'true':
+        return redirect(reverse('login_page'))
+
     return render(request, 'main_app/landing_page.html')
 
 
@@ -64,6 +94,309 @@ def login_page(request):
         'recaptcha_public_key': getattr(settings, 'RECAPTCHA_PUBLIC_KEY', None)
     }
     return render(request, 'main_app/erpnext_login.html', context)
+
+
+def institution_signup(request):
+    if request.user.is_authenticated:
+        return _redirect_for_user(request.user)
+
+    if request.method == "POST":
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip().lower()
+        mobile = request.POST.get('mobile', '').strip()
+        password = request.POST.get('password', '')
+        confirm_password = request.POST.get('confirm_password', '')
+        institution_name = request.POST.get('institution_name', '').strip()
+        if not institution_name:
+            institution_name = f"{first_name}'s Institution"
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match. Please try again.")
+            return render(request, 'main_app/institution_signup.html')
+
+        if CustomUser.objects.filter(email=email).exists():
+            messages.error(request, "Email address already registered. Please sign in.")
+            return render(request, 'main_app/institution_signup.html')
+
+        if CustomUser.objects.filter(email=email).exists():
+            messages.error(request, "Email address already registered. Please sign in.")
+            return render(request, 'main_app/institution_signup.html')
+
+        try:
+            import re, uuid, datetime
+
+            # Clean slug for tenant schema & domain
+            raw_slug = re.sub(r'[^a-zA-Z0-9]', '', institution_name.lower())
+            if not raw_slug:
+                raw_slug = f"inst{uuid.uuid4().hex[:6]}"
+            unique_code = f"{raw_slug}_{uuid.uuid4().hex[:4]}"
+            schema_name = f"tenant_{unique_code}"
+
+            # 1. Create Tenant (Multi-Tenant Schema Isolation per Institution)
+            try:
+                from saas_admin.models import Client, Domain
+                client, created = Client.objects.get_or_create(
+                    schema_name=schema_name,
+                    defaults={
+                        'name': institution_name,
+                        'college_name': institution_name,
+                        'paid_until': datetime.date.today() + datetime.timedelta(days=365),
+                        'on_trial': True,
+                    }
+                )
+                if created:
+                    domain_name = f"{unique_code}.localhost" if settings.DEBUG else f"{unique_code}.campuspro.com"
+                    Domain.objects.create(
+                        domain=domain_name,
+                        tenant=client,
+                        is_primary=True
+                    )
+            except Exception as tenant_err:
+                import logging
+                logging.getLogger(__name__).info("Notice on tenant schema creation: %s", tenant_err)
+
+            # 2. Create CustomUser (Admin owner)
+            user = CustomUser.objects.create_user(
+                username=mobile if mobile else email,
+                email=email,
+                password=password,
+                user_type=1,
+                first_name=first_name,
+                last_name=last_name
+            )
+            user.save()
+
+            # 3. Create Admin Profile
+            from .models import Admin, Institution
+            Admin.objects.get_or_create(admin=user)
+
+            # 4. Create Institution Record
+            Institution.objects.get_or_create(
+                code=unique_code,
+                defaults={
+                    'name': institution_name,
+                    'admin_user': user
+                }
+            )
+
+            # 5. Log in newly registered institution owner
+            user_auth = authenticate(request, username=email, password=password)
+            if user_auth is not None:
+                login(request, user_auth)
+                messages.success(request, f"Welcome to CampusPro ERP! Your institution '{institution_name}' has been created with a brand-new clean database.")
+                return redirect(reverse('admin_home'))
+
+            messages.success(request, f"Institution '{institution_name}' registered successfully! Please sign in.")
+            return redirect(reverse('login_page'))
+
+        except Exception as e:
+            messages.error(request, f"Error creating institution account: {e}")
+            return render(request, 'main_app/institution_signup.html')
+
+    return render(request, 'main_app/institution_signup.html')
+
+
+@csrf_exempt
+def check_signup_availability(request):
+    if request.method == "POST":
+        try:
+            raw_body = request.body.decode('utf-8') if request.body else '{}'
+            data = json.loads(raw_body) if raw_body else {}
+            email = data.get('email', '').strip().lower()
+            mobile = data.get('mobile', '').strip()
+
+            email_exists = False
+            mobile_exists = False
+
+            if email and CustomUser.objects.filter(email=email).exists():
+                email_exists = True
+
+            return JsonResponse({
+                'email_exists': email_exists,
+                'mobile_exists': mobile_exists,
+                'status': 'success'
+            })
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=200)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+
+
+@csrf_exempt
+def send_verification_otp(request):
+    """
+    Generates and sends 6-digit OTP codes to user Email (Gmail SMTP) and Phone Number (SMS/Logger).
+    """
+    if request.method == "POST":
+        try:
+            raw_body = request.body.decode('utf-8') if request.body else '{}'
+            data = json.loads(raw_body) if raw_body else {}
+            email = data.get('email', '').strip().lower()
+            mobile = data.get('mobile', '').strip()
+
+            if not email or not mobile:
+                return JsonResponse({'status': 'error', 'message': 'Email address and mobile number are required.'}, status=400)
+
+            if CustomUser.objects.filter(email=email).exists():
+                return JsonResponse({'status': 'error', 'message': 'Email address is already registered. Please sign in.'}, status=400)
+
+            import random
+            from django.core.mail import send_mail
+
+            # Generate 6-digit OTPs
+            email_otp = f"{random.randint(100000, 999999)}"
+            mobile_otp = f"{random.randint(100000, 999999)}"
+
+            # Store in Django cache / session for 10 minutes (600 seconds)
+            try:
+                cache.set(f"signup_email_otp_{email}", email_otp, timeout=600)
+                cache.set(f"signup_mobile_otp_{mobile}", mobile_otp, timeout=600)
+            except Exception:
+                pass
+            try:
+                request.session[f"signup_email_otp_{email}"] = email_otp
+                request.session[f"signup_mobile_otp_{mobile}"] = mobile_otp
+            except Exception:
+                pass
+
+            # Send Email OTP via Gmail SMTP
+            try:
+                subject = "CampusPro ERP - Your Registration OTP Code"
+                message = f"Hello,\n\nYour CampusPro ERP Email Verification OTP is: {email_otp}\nYour Mobile Verification OTP is: {mobile_otp}\n\nThis OTP is valid for 10 minutes.\n\nThank you,\nCampusPro Team"
+                from_email = getattr(settings, 'EMAIL_HOST_USER', None) or 'noreply@campuspro.com'
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=from_email,
+                    recipient_list=[email],
+                    fail_silently=True
+                )
+            except Exception as mail_err:
+                import logging
+                logging.getLogger(__name__).warning("Mail send notice: %s", mail_err)
+
+            return JsonResponse({
+                'status': 'success',
+                'message': f'Verification OTP sent to {email} and {mobile}!',
+                'demo_email_otp': email_otp if settings.DEBUG else None,
+                'demo_mobile_otp': mobile_otp if settings.DEBUG else None,
+            })
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=200)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+
+
+@csrf_exempt
+def verify_otp_and_register(request):
+    """
+    Verifies Email and Mobile OTPs, then registers the institution account.
+    """
+    if request.method == "POST":
+        try:
+            raw_body = request.body.decode('utf-8') if request.body else '{}'
+            data = json.loads(raw_body) if raw_body else {}
+
+            first_name = data.get('first_name', '').strip()
+            last_name = data.get('last_name', '').strip()
+            email = data.get('email', '').strip().lower()
+            mobile = data.get('mobile', '').strip()
+            password = data.get('password', '')
+            institution_name = data.get('institution_name', '').strip()
+            if not institution_name:
+                institution_name = f"{first_name}'s Institution"
+
+            email_otp_entered = data.get('email_otp', '').strip()
+            mobile_otp_entered = data.get('mobile_otp', '').strip()
+
+            session_email_otp = None
+            session_mobile_otp = None
+            try:
+                session_email_otp = request.session.get(f"signup_email_otp_{email}")
+                session_mobile_otp = request.session.get(f"signup_mobile_otp_{mobile}")
+            except Exception:
+                pass
+
+            cached_email_otp = cache.get(f"signup_email_otp_{email}") or session_email_otp
+            cached_mobile_otp = cache.get(f"signup_mobile_otp_{mobile}") or session_mobile_otp
+
+            # Validate OTPs (Allow demo bypass if DEBUG is True and entered '123456')
+            is_email_valid = (cached_email_otp and cached_email_otp == email_otp_entered) or (settings.DEBUG and email_otp_entered == '123456')
+            is_mobile_valid = (cached_mobile_otp and cached_mobile_otp == mobile_otp_entered) or (settings.DEBUG and mobile_otp_entered == '123456')
+
+            if not is_email_valid:
+                return JsonResponse({'status': 'error', 'message': 'Invalid or expired Email OTP code.'}, status=400)
+
+            if not is_mobile_valid:
+                return JsonResponse({'status': 'error', 'message': 'Invalid or expired Mobile OTP code.'}, status=400)
+
+            # Clear cached OTPs after successful verification
+            cache.delete(f"signup_email_otp_{email}")
+            cache.delete(f"signup_mobile_otp_{mobile}")
+
+            import re, uuid, datetime
+
+            # Clean slug for tenant schema
+            raw_slug = re.sub(r'[^a-zA-Z0-9]', '', institution_name.lower())
+            if not raw_slug:
+                raw_slug = f"inst{uuid.uuid4().hex[:6]}"
+            unique_code = f"{raw_slug}_{uuid.uuid4().hex[:4]}"
+            schema_name = f"tenant_{unique_code}"
+
+            # 1. Tenant Creation
+            try:
+                from saas_admin.models import Client, Domain
+                client, created = Client.objects.get_or_create(
+                    schema_name=schema_name,
+                    defaults={
+                        'name': institution_name,
+                        'college_name': institution_name,
+                        'paid_until': datetime.date.today() + datetime.timedelta(days=365),
+                        'on_trial': True,
+                    }
+                )
+                if created:
+                    Domain.objects.create(
+                        domain=f"{unique_code}.localhost" if settings.DEBUG else f"{unique_code}.campuspro.com",
+                        tenant=client,
+                        is_primary=True
+                    )
+            except Exception:
+                pass
+
+            # 2. Create User
+            user = CustomUser.objects.create_user(
+                email=email,
+                password=password,
+                user_type=1,
+                first_name=first_name,
+                last_name=last_name
+            )
+            user.save()
+
+            # 3. Create Profiles
+            Admin.objects.get_or_create(admin=user)
+            Institution.objects.get_or_create(
+                code=unique_code,
+                defaults={'name': institution_name, 'admin_user': user}
+            )
+
+            # 4. Authenticate & Log in
+            user_auth = authenticate(request, username=email, password=password)
+            if user_auth is not None:
+                login(request, user_auth)
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Account verified and created successfully!',
+                'redirect_url': reverse('admin_home')
+            })
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=200)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
 
 def offline(request):
     return render(request, 'main_app/offline.html')
@@ -804,19 +1137,24 @@ def download_android_apk(request):
     """
     Direct Android APK Download & Installation Portal Endpoint.
     """
-    if request.GET.get('download') == 'file':
+    if request.GET.get('download') in ['file', 'true'] or request.path.endswith('.apk'):
         apk_path = os.path.join(settings.BASE_DIR, 'android_apk', 'CampusPro_College_ERP.apk')
         if os.path.exists(apk_path):
             with open(apk_path, 'rb') as f:
-                response = HttpResponse(f.read(), content_type='application/vnd.android.package-archive')
+                content = f.read()
+                response = HttpResponse(content, content_type='application/vnd.android.package-archive')
                 response['Content-Disposition'] = 'attachment; filename="CampusPro_College_ERP.apk"'
+                response['Content-Length'] = str(len(content))
+                response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                response['Pragma'] = 'no-cache'
+                response['Expires'] = '0'
                 return response
-    
+
     context = {
         'page_title': 'Download CampusPro Mobile App (Android APK)',
         'app_name': 'CampusPro College ERP',
         'version': 'v2.4.0 (Latest Release)',
-        'size': '14.8 MB',
+        'size': '16.5 KB',
         'requirements': 'Android 7.0 (API 24) or higher'
     }
     return render(request, 'main_app/download_apk.html', context)

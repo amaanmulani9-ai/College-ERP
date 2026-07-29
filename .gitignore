@@ -37,3 +37,6 @@ node_modules/
 .coverage
 .reticle.json
 scratch/
+.gradle/
+android_apk/.gradle/
+android_apk/build_out/
