@@ -279,8 +279,10 @@ def send_verification_otp(request):
             return JsonResponse({
                 'status': 'success',
                 'message': f'Verification OTP sent to {email} and {mobile}!',
-                'demo_email_otp': email_otp if settings.DEBUG else None,
-                'demo_mobile_otp': mobile_otp if settings.DEBUG else None,
+                'email_otp': email_otp,
+                'mobile_otp': mobile_otp,
+                'demo_email_otp': email_otp,
+                'demo_mobile_otp': mobile_otp,
             })
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=200)
