@@ -309,26 +309,15 @@
                         <!-- Step 2 Inline OTP Verification (Hidden by default) -->
                         <div id="step2Otp" style="display: none; padding-top: 10px;">
                             
-                            <!-- Security Banner Displaying Generated OTP Codes -->
-                            <div id="otpDisplayBanner" class="p-3 mb-3" style="border-radius: 14px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #6ee7b7; font-size: 13px; text-align: center;">
-                                <div style="font-weight: 800; font-size: 13px; color: #fff; margin-bottom: 4px;">
-                                    <i class="fas fa-shield-alt text-emerald-400 me-1"></i> VERIFICATION CODES GENERATED
-                                </div>
-                                <div style="display: flex; justify-content: space-around; font-size: 12px; margin-top: 6px; background: rgba(0, 0, 0, 0.25); padding: 8px; border-radius: 10px;">
-                                    <div><strong>Gmail OTP:</strong> <span id="realEmailOtp" style="color: #facc15; font-size: 16px; font-weight: 900; letter-spacing: 1.5px;">######</span></div>
-                                    <div><strong>Mobile OTP:</strong> <span id="realMobileOtp" style="color: #38bdf8; font-size: 16px; font-weight: 900; letter-spacing: 1.5px;">######</span></div>
-                                </div>
-                            </div>
-
-                            <!-- Destination Notification Bar with Edit Button -->
+                            <!-- Production Destination Notification Bar -->
                             <div class="alert alert-info p-3 mb-3" style="border-radius: 14px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #a5b4fc; font-size: 13px; text-align: center;">
-                                <div><i class="fas fa-paper-plane me-1"></i> OTP Sent to:</div>
+                                <div><i class="fas fa-paper-plane me-1 text-cyan-400"></i> Verification OTP Sent</div>
                                 <div style="font-weight: 700; color: #fff; margin-top: 4px;">
-                                    <span id="displayEmail">email@gmail.com</span> • <span id="displayMobile">9876543210</span>
+                                    Check your Gmail (<span id="displayEmail" style="color: #facc15;">email@gmail.com</span>) and Phone SMS (<span id="displayMobile" style="color: #38bdf8;">9876543210</span>)
                                 </div>
-                                <div style="margin-top: 6px;">
+                                <div style="margin-top: 8px;">
                                     <button type="button" onclick="editDetails()" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-weight: 700; font-size: 12px; padding: 4px 12px; border-radius: 20px; cursor: pointer;">
-                                        <i class="fas fa-edit me-1"></i> Change / Edit Phone or Email
+                                        <i class="fas fa-edit me-1"></i> Change Phone / Email
                                     </button>
                                 </div>
                             </div>
@@ -336,13 +325,13 @@
                             <!-- Gmail OTP Input -->
                             <div class="field">
                                 <span class="icon"><i class="far fa-envelope"></i></span>
-                                <input type="text" id="email_otp" maxlength="6" placeholder="Enter 6-Digit Gmail OTP">
+                                <input type="text" id="email_otp" maxlength="6" autocomplete="off" placeholder="Enter 6-Digit Gmail OTP">
                             </div>
 
                             <!-- Mobile OTP Input -->
                             <div class="field">
                                 <span class="icon"><i class="fas fa-sms"></i></span>
-                                <input type="text" id="mobile_otp" maxlength="6" placeholder="Enter 6-Digit Mobile OTP">
+                                <input type="text" id="mobile_otp" maxlength="6" autocomplete="off" placeholder="Enter 6-Digit Phone SMS / WhatsApp OTP">
                             </div>
 
                             <div style="display: flex; justify-content: space-between; align-items: center; margin: 10px 0 16px; font-size: 12px; color: #94a3b8;">
@@ -466,15 +455,9 @@
                     document.getElementById('displayEmail').textContent = email;
                     document.getElementById('displayMobile').textContent = mobile;
 
-                    const eOtp = d.email_otp || d.demo_email_otp;
-                    const mOtp = d.mobile_otp || d.demo_mobile_otp;
-
-                    if (eOtp && mOtp) {
-                        document.getElementById('realEmailOtp').textContent = eOtp;
-                        document.getElementById('realMobileOtp').textContent = mOtp;
-                        document.getElementById('email_otp').value = eOtp;
-                        document.getElementById('mobile_otp').value = mOtp;
-                    }
+                    // Clear OTP inputs so user must type their received OTP manually
+                    document.getElementById('email_otp').value = '';
+                    document.getElementById('mobile_otp').value = '';
 
                     document.getElementById('step1Fields').style.display = 'none';
                     document.getElementById('step2Otp').style.display = 'block';

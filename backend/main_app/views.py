@@ -275,14 +275,19 @@ def send_verification_otp(request):
             except Exception as mail_err:
                 import logging
                 logging.getLogger(__name__).warning("Mail send notice: %s", mail_err)
+            # Dispatch SMS / WhatsApp OTP via Fast2SMS / Twilio Gateway (if SMS_API_KEY configured)
+            sms_api_key = getattr(settings, 'SMS_API_KEY', None)
+            if sms_api_key:
+                try:
+                    sms_url = f"https://www.fast2sms.com/dev/bulkV2?authorization={sms_api_key}&variables_values={mobile_otp}&route=otp&numbers={mobile}"
+                    requests.get(sms_url, timeout=5)
+                except Exception as sms_err:
+                    import logging
+                    logging.getLogger(__name__).warning("SMS dispatch notice: %s", sms_err)
 
             return JsonResponse({
                 'status': 'success',
-                'message': f'Verification OTP sent to {email} and {mobile}!',
-                'email_otp': email_otp,
-                'mobile_otp': mobile_otp,
-                'demo_email_otp': email_otp,
-                'demo_mobile_otp': mobile_otp,
+                'message': f'Verification OTP sent to your Email ({email}) and Phone ({mobile}). Please check your inbox and messages.',
             })
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=200)
