@@ -296,3 +296,39 @@ def backoffice_profile(request):
         'backoffice': backoffice,
     }
     return render(request, 'backoffice_template/profile.html', context)
+
+
+@backoffice_required
+def backoffice_document_verification(request):
+    """View & verify student uploaded registration documents with side-by-side OCR match scores."""
+    registrations = StudentRegistration.objects.select_related('student__admin', 'student__course').order_by('-created_at')
+
+    status_filter = request.GET.get('status')
+    if status_filter:
+        registrations = registrations.filter(ocr_status=status_filter)
+
+    context = {
+        'page_title': 'Document OCR Verification',
+        'registrations': registrations[:50],
+        'pending_count': StudentRegistration.objects.filter(ocr_status='Pending').count(),
+        'verified_count': StudentRegistration.objects.filter(ocr_status='Verified').count(),
+        'flagged_count': StudentRegistration.objects.filter(ocr_status='Flagged').count(),
+    }
+    return render(request, 'backoffice_template/document_verification.html', context)
+
+
+@backoffice_required
+def run_document_ocr_trigger(request, reg_id):
+    """Trigger DocumentOCRService manually for a specific student registration."""
+    reg = get_object_or_404(StudentRegistration, id=reg_id)
+    ocr_status = reg.run_ocr_verification()
+
+    if ocr_status == 'Verified':
+        messages.success(request, f"OCR Verification Passed (Score: {reg.ocr_score}%). Document format & info matched!")
+    elif ocr_status == 'Flagged':
+        messages.warning(request, f"OCR Verification Flagged for Review (Score: {reg.ocr_score}%). Check mismatch reasons.")
+    else:
+        messages.error(request, f"OCR Verification Failed (Score: {reg.ocr_score}%). Reasons: {reg.ocr_mismatch_reasons}")
+
+    return redirect('backoffice_document_verification')
+

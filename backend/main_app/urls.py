@@ -30,8 +30,14 @@ urlpatterns = [
     path("api/signup/check_user/", views.check_signup_availability, name='check_signup_availability'),
     path("api/auth/send_otp/", views.send_verification_otp, name='send_verification_otp'),
     path("api/auth/verify_otp/", views.verify_otp_and_register, name='verify_otp_and_register'),
+    path("api/auth/firebase_phone_verify/", views.verify_firebase_phone_token, name='verify_firebase_phone_token'),
     path("healthz/", views.health_check, name='health_check'),
+
+    path("verify/credential/", views.public_verify_credential, name='public_verify_credential_index'),
+    path("verify/credential/<str:hash_code>/", views.public_verify_credential, name='public_verify_credential'),
+
     path('offline/', views.offline, name='offline'),
+
     path('student/register/', views.online_registration, name='online_registration'),
     path("get_attendance", views.get_attendance, name='get_attendance'),
     path("firebase-messaging-sw.js", views.showFirebaseJS, name='showFirebaseJS'),
@@ -49,7 +55,9 @@ urlpatterns = [
     path("admin/naac-report/", hod_views.naac_report_view, name='naac_report'),
     path("admin/naac-report/export/", hod_views.export_naac_report_csv, name='export_naac_report_csv'),
     path("api/biometric-punch/", mobile_api_views.api_biometric_punch, name='api_biometric_punch'),
+    path("api/attendance/facial-punch/", mobile_api_views.api_facial_attendance_punch, name='api_facial_attendance_punch'),
     path("metrics", analytics_views.prometheus_metrics, name='prometheus_metrics'),
+
     path("api/mobile/login/", mobile_api_views.mobile_login, name='mobile_login'),
     path("api/mobile/timetable/", mobile_api_views.get_user_timetable, name='mobile_timetable'),
     path("api/mobile/attendance/", mobile_api_views.get_user_attendance, name='mobile_attendance'),
@@ -85,12 +93,15 @@ urlpatterns = [
     # --- Backoffice URLs ---
     path("backoffice/home/", backoffice_views.backoffice_home, name='backoffice_home'),
     path("backoffice/admissions/", backoffice_views.backoffice_admissions, name='backoffice_admissions'),
+    path("backoffice/documents/", backoffice_views.backoffice_document_verification, name='backoffice_document_verification'),
+    path("backoffice/documents/ocr/<int:reg_id>/", backoffice_views.run_document_ocr_trigger, name='run_document_ocr_trigger'),
     path("backoffice/fees/", backoffice_views.backoffice_fees, name='backoffice_fees'),
     path("backoffice/certificates/", backoffice_views.backoffice_certificates, name='backoffice_certificates'),
     path("backoffice/certificates/<int:cert_id>/update/", backoffice_views.backoffice_update_certificate, name='backoffice_update_certificate'),
     path("backoffice/leaves/", backoffice_views.backoffice_leaves, name='backoffice_leaves'),
     path("backoffice/reports/", backoffice_views.backoffice_reports, name='backoffice_reports'),
     path("backoffice/profile/", backoffice_views.backoffice_profile, name='backoffice_profile'),
+
     path("admin/export_staff_analytics/", hod_views.export_staff_analytics, name='export_staff_analytics'),
     path("staff/add", hod_views.add_staff, name='add_staff'),
     path("staff/add/", hod_views.add_staff, name='add_staff_slash'),

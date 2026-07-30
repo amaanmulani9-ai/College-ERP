@@ -52,3 +52,8 @@ chromadb>=0.4.24
 django-tenants>=3.6.1
 qrcode>=7.4.2
 PyJWT==2.8.0
+razorpay>=1.4.0
+pdfplumber>=0.10.0
+pytesseract>=0.3.10
+
+

@@ -254,3 +254,75 @@ def realtime_events_stream(request):
     return response
 
 
+@csrf_exempt
+def api_facial_attendance_punch(request):
+    """
+    Local Facial Recognition Attendance Endpoint.
+    Receives camera frame base64 string or image upload, matches face against student profile photos,
+    and logs attendance in AttendanceReport.
+    Payload: {"image_base64": "data:image/jpeg;base64,...", "subject_id": 1}
+    """
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
+
+    try:
+        raw_body = request.body.decode('utf-8') if request.body else '{}'
+        data = json.loads(raw_body) if raw_body else {}
+        image_input = data.get('image_base64') or data.get('image')
+        subject_id = data.get('subject_id')
+
+        if not image_input:
+            return JsonResponse({'status': 'error', 'message': 'Camera image input is required'}, status=400)
+
+        from main_app.face_recognition_service import FaceRecognitionService
+        from main_app.models import Student, Attendance, AttendanceReport, Subject, Session
+        from datetime import date as dt_date
+
+        students_qs = Student.objects.select_related('admin', 'course', 'session').all()
+        match_result = FaceRecognitionService.match_scanned_face(image_input, students_qs)
+
+        if not match_result.get('matched'):
+            return JsonResponse({
+                'status': 'error',
+                'matched': False,
+                'confidence': match_result.get('confidence', 0),
+                'message': match_result.get('message', 'No matching student face detected')
+            }, status=404)
+
+        matched_student = match_result['student']
+        confidence = match_result['confidence']
+
+        # Subject and session mapping
+        subject = Subject.objects.filter(id=subject_id).first() if subject_id else None
+        if not subject and matched_student.course:
+            subject = Subject.objects.filter(course=matched_student.course).first()
+        session = matched_student.session or Session.objects.first()
+
+        if subject and session:
+            att_obj, _ = Attendance.objects.get_or_create(session=session, subject=subject, date=dt_date.today())
+            rep_obj, _ = AttendanceReport.objects.get_or_create(student=matched_student, attendance=att_obj, defaults={'status': True})
+            if not rep_obj.status:
+                rep_obj.status = True
+                rep_obj.save()
+
+        trigger_realtime_event('facial_attendance_punch', {
+            'student': matched_student.admin.get_full_name(),
+            'student_code': matched_student.unique_student_code,
+            'confidence': confidence,
+            'status': 'Present'
+        })
+
+        return JsonResponse({
+            'status': 'success',
+            'matched': True,
+            'confidence': confidence,
+            'student_id': matched_student.id,
+            'student_name': matched_student.admin.get_full_name(),
+            'course': matched_student.course.name if matched_student.course else 'N/A',
+            'message': f"Facial Match Verified! Marked Present for {matched_student.admin.get_full_name()} ({confidence}% match)."
+        })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+

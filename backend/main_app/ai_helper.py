@@ -58,27 +58,70 @@ if GEMINI_API_KEY and genai:
 
 def generate_ollama_response(prompt, system_prompt=None, response_format=None):
     """
-    Sends requests to the Google Gemini API (replaces old local Ollama).
+    Unified AI generation dispatcher supporting Gemini API, OpenAI API, and local Ollama.
     """
-    if not GEMINI_API_KEY or not genai:
-        print("[GEMINI] No GEMINI_API_KEY found or google.generativeai not loaded. Falling back to internal engine.")
-        return ""
-        
-    try:
-        # We use gemini-1.5-flash as it is extremely fast and generous on the free tier
-        model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_prompt)
-        
-        # Configure output format if requested
-        generation_config = genai.types.GenerationConfig()
-        if response_format == "json":
-            generation_config.response_mime_type = "application/json"
+    openai_key = os.environ.get('OPENAI_API_KEY')
+    gemini_key = os.environ.get('GEMINI_API_KEY')
+    ollama_host = os.environ.get('OLLAMA_HOST', OLLAMA_URL)
+
+    # 1. Try Gemini API if key configured
+    if gemini_key and genai:
+        try:
+            model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_prompt)
+            generation_config = genai.types.GenerationConfig()
+            if response_format == "json":
+                generation_config.response_mime_type = "application/json"
+            response = model.generate_content(prompt, generation_config=generation_config)
+            if response and response.text:
+                return response.text.strip()
+        except Exception as e:
+            print(f"[AI HELPER] Gemini API notice: {e}")
+
+    # 2. Try OpenAI API if key configured
+    if openai_key:
+        try:
+            headers = {
+                "Authorization": f"Bearer {openai_key}",
+                "Content-Type": "application/json"
+            }
+            messages_payload = []
+            if system_prompt:
+                messages_payload.append({"role": "system", "content": system_prompt})
+            messages_payload.append({"role": "user", "content": prompt})
             
-        response = model.generate_content(prompt, generation_config=generation_config)
-        return response.text.strip()
-    except Exception as e:
-        print(f"[GEMINI] Connection failed: {str(e)}")
-        
+            payload = {
+                "model": os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo"),
+                "messages": messages_payload,
+                "temperature": 0.7
+            }
+            if response_format == "json":
+                payload["response_format"] = {"type": "json_object"}
+
+            res = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload, timeout=10)
+            if res.status_code == 200:
+                res_data = res.json()
+                return res_data['choices'][0]['message']['content'].strip()
+        except Exception as e:
+            print(f"[AI HELPER] OpenAI API notice: {e}")
+
+    # 3. Try Local Ollama endpoint
+    if ollama_host:
+        try:
+            payload = {
+                "model": os.environ.get('OLLAMA_MODEL', DEFAULT_MODEL),
+                "prompt": f"{system_prompt}\n\n{prompt}" if system_prompt else prompt,
+                "stream": False
+            }
+            if response_format == "json":
+                payload["format"] = "json"
+            res = requests.post(f"{ollama_host}/api/generate", json=payload, timeout=5)
+            if res.status_code == 200:
+                return res.json().get('response', '').strip()
+        except Exception:
+            pass
+
     return ""
+
 
 # ----------------- Structured AI Generators -----------------
 def ai_generate_quiz(subject_name):

@@ -134,6 +134,13 @@ class Student(models.Model):
     unique_student_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
     division = models.CharField(max_length=50, blank=True, null=True, help_text="Batch or Division (e.g. Batch A)")
     id_card_code = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    verification_hash = models.CharField(max_length=64, blank=True, null=True, unique=True)
+    qr_code_image = models.ImageField(upload_to='qrcodes/id_cards/', blank=True, null=True)
+    digital_signature_timestamp = models.DateTimeField(null=True, blank=True)
+    face_features_vector = models.TextField(blank=True, null=True, help_text="JSON encoded 64-dim facial vector")
+    face_registered = models.BooleanField(default=False)
+
+
 
     # CampusPro student admission fields
     registration_no = models.CharField(max_length=50, blank=True, null=True)
@@ -201,11 +208,15 @@ class Student(models.Model):
             self.unique_student_code = self._make_student_code()
         if not self.id_card_code:
             self.id_card_code = self._make_id_card_code()
+        if not self.verification_hash:
+            from main_app.digital_verification_service import DigitalVerificationService
+            self.verification_hash = DigitalVerificationService.generate_hash('IDCARD', self.id or uuid.uuid4().hex)
         if self.admission_date and self.course and not self.expected_completion_date:
             self.expected_completion_date = self.admission_date.replace(year=self.admission_date.year + max(1, self.course.total_semesters // 2))
         if self.course and self.current_semester and self.current_semester >= self.course.total_semesters:
             self.is_passed_out = True
         super().save(*args, **kwargs)
+
 
     @property
     def academic_year_label(self):
@@ -617,11 +628,22 @@ class CertificateRequest(models.Model):
     reason = models.TextField()
     status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='Pending')
     approved_date = models.DateField(blank=True, null=True)
+    verification_hash = models.CharField(max_length=64, blank=True, null=True, unique=True)
+    qr_code_image = models.ImageField(upload_to='qrcodes/certificates/', blank=True, null=True)
+    digital_signature_timestamp = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        if not self.verification_hash:
+            from main_app.digital_verification_service import DigitalVerificationService
+            import uuid
+            self.verification_hash = DigitalVerificationService.generate_hash('CERTIFICATE', self.id or uuid.uuid4().hex)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.student} - {self.certificate_type} ({self.status})"
+
 
 
 # --- Registration Portal Models ---
@@ -693,7 +715,7 @@ class StudentRegistration(models.Model):
     student_phone = models.CharField(max_length=50, default="")
     student_email = models.EmailField(default="")
     
-    # Document Uploads
+    # Document Uploads & OCR Verification
     aadhar_file = models.FileField(upload_to='student_documents/aadhar/', null=True, blank=True)
     marksheet_file = models.FileField(upload_to='student_documents/marksheet/', null=True, blank=True)
     document_status = models.CharField(
@@ -703,6 +725,65 @@ class StudentRegistration(models.Model):
     )
     document_verified_at = models.DateTimeField(null=True, blank=True)
     document_verified_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='verified_registrations')
+
+    # OCR Engine Fields
+    ocr_status = models.CharField(
+        max_length=20,
+        choices=[('Pending', 'Pending'), ('Verified', 'Verified'), ('Flagged', 'Flagged'), ('Rejected', 'Rejected')],
+        default='Pending'
+    )
+    ocr_score = models.IntegerField(default=0)
+    ocr_extracted_text = models.TextField(blank=True, null=True)
+    ocr_mismatch_reasons = models.TextField(blank=True, null=True)
+    ocr_processed_at = models.DateTimeField(null=True, blank=True)
+
+    def run_ocr_verification(self):
+        """Runs DocumentOCRService on uploaded documents and updates OCR scores."""
+        from main_app.document_ocr_service import DocumentOCRService
+        from django.utils import timezone
+
+        total_score = 0
+        reasons = []
+        extracted_snippets = []
+
+        expected_name = f"{self.first_name} {self.surname}".strip()
+
+        # 1. OCR Aadhaar Card
+        if self.aadhar_file:
+            try:
+                txt = DocumentOCRService.extract_text_from_file(self.aadhar_file.path, self.aadhar_file.name)
+                val = DocumentOCRService.validate_aadhaar(txt, expected_name=expected_name, expected_dob=self.dob)
+                total_score += val['score']
+                if val['reasons']:
+                    reasons.extend([f"Aadhaar: {r}" for r in val['reasons']])
+                extracted_snippets.append(f"--- AADHAAR OCR ---\n{txt[:400]}")
+            except Exception as e:
+                reasons.append(f"Aadhaar OCR processing notice: {e}")
+
+        # 2. OCR Marksheet
+        if self.marksheet_file:
+            try:
+                txt = DocumentOCRService.extract_text_from_file(self.marksheet_file.path, self.marksheet_file.name)
+                val = DocumentOCRService.extract_marksheet_summary(txt)
+                total_score = (total_score + val['score']) // 2 if self.aadhar_file else val['score']
+                extracted_snippets.append(f"--- MARKSHEET OCR ---\n{txt[:400]}")
+            except Exception as e:
+                reasons.append(f"Marksheet OCR processing notice: {e}")
+
+        self.ocr_score = max(0, min(100, total_score))
+        self.ocr_mismatch_reasons = "\n".join(reasons)
+        self.ocr_extracted_text = "\n\n".join(extracted_snippets)
+        self.ocr_processed_at = timezone.now()
+
+        if self.ocr_score >= 80:
+            self.ocr_status = 'Verified'
+        elif self.ocr_score >= 50:
+            self.ocr_status = 'Flagged'
+        else:
+            self.ocr_status = 'Pending'
+        self.save()
+        return self.ocr_status
+
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

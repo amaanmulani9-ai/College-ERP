@@ -227,13 +227,15 @@ _is_testing = (
     os.environ.get('DJANGO_SETTINGS_MODULE') == 'college_management_system.test_settings'
     or 'pytest' in sys.modules
     or 'test' in sys.argv
+    or any('test_settings' in arg for arg in sys.argv)
 )
 
+
+_fallback_sqlite = False
 if _using_postgres and not _is_testing:
     try:
         import psycopg2
         parsed_db = dj_database_url.parse(_database_url)
-        # Fast 3-second timeout check
         conn = psycopg2.connect(
             dbname=parsed_db.get('NAME', ''),
             user=parsed_db.get('USER', ''),
@@ -244,34 +246,53 @@ if _using_postgres and not _is_testing:
         )
         conn.close()
     except Exception as e:
-        print("\n" + "="*60)
-        print("!!! CRITICAL DATABASE ERROR !!!")
-        print("="*60)
-        print(f"Could not connect to the PostgreSQL database at: {parsed_db.get('HOST', 'Unknown')}")
-        print(f"Error Details: {e}")
-        print("-" * 60)
-        print("The College ERP uses 'django-tenants', which strictly requires PostgreSQL.")
-        print("If you are using Supabase, it might be paused or unreachable.")
-        print("Please check your .env file or start a local Postgres server.")
-        print("="*60 + "\n")
-        sys.exit(1)
+        if DEBUG:
+            print("\n" + "="*60)
+            print("[NOTICE] PostgreSQL database not reachable on localhost.")
+            print("[NOTICE] Switching to local SQLite database (db.sqlite3) for local development.")
+            print("="*60 + "\n")
+            _using_postgres = False
+            _fallback_sqlite = True
+            _database_url = f'sqlite:///{BASE_DIR / "db.sqlite3"}'
+        else:
+            print("\n" + "="*60)
+            print("!!! CRITICAL DATABASE ERROR !!!")
+            print("="*60)
+            print(f"Could not connect to the PostgreSQL database at: {parsed_db.get('HOST', 'Unknown')}")
+            print(f"Error Details: {e}")
+            print("="*60 + "\n")
+            sys.exit(1)
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=_database_url,
-        conn_max_age=600 if _using_postgres else 0,
-        conn_health_checks=_using_postgres,
-        ssl_require=_using_postgres and not DEBUG,
-        engine='django_tenants.postgresql_backend',
-    ),
-    'legacy_sqlite': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if _fallback_sqlite or not _using_postgres:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
-DATABASE_ROUTERS = (
-    'django_tenants.routers.TenantSyncRouter',
-)
+    MIDDLEWARE = [m for m in MIDDLEWARE if 'django_tenants' not in m]
+    INSTALLED_APPS = [app for app in INSTALLED_APPS if app != 'django_tenants']
+    DATABASE_ROUTERS = ()
+
+else:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=_database_url,
+            conn_max_age=600 if _using_postgres else 0,
+            conn_health_checks=_using_postgres,
+            ssl_require=_using_postgres and not DEBUG,
+            engine='django_tenants.postgresql_backend',
+        ),
+        'legacy_sqlite': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+    DATABASE_ROUTERS = (
+        'django_tenants.routers.TenantSyncRouter',
+    )
+
+
 
 
 # Password validation

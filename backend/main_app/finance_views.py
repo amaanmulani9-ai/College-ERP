@@ -7,9 +7,21 @@ from main_app.models import Invoice, Payment, Scholarship, Student, Refund
 from django.contrib import messages
 import csv
 
-# --- RAZORPAY MOCKED CONSTANTS ---
-RAZORPAY_KEY_ID = "rzp_test_123456789"
-RAZORPAY_KEY_SECRET = "mock_secret_key"
+import os
+from django.conf import settings
+
+# --- REAL RAZORPAY CREDENTIALS & SDK INITIALIZATION ---
+def get_razorpay_client():
+    key_id = os.environ.get('RAZORPAY_KEY_ID') or getattr(settings, 'RAZORPAY_KEY_ID', '')
+    key_secret = os.environ.get('RAZORPAY_KEY_SECRET') or getattr(settings, 'RAZORPAY_KEY_SECRET', '')
+    if key_id and key_secret:
+        try:
+            import razorpay
+            return razorpay.Client(auth=(key_id, key_secret)), key_id, key_secret
+        except ImportError:
+            pass
+    return None, key_id, key_secret
+
 
 def student_finances(request):
     """ View for students to see their invoices, payments, and scholarships """
@@ -21,17 +33,18 @@ def student_finances(request):
     scholarships = Scholarship.objects.filter(student=student, is_active=True)
     payments = Payment.objects.filter(invoice__student=student)
     
+    _, razorpay_key, _ = get_razorpay_client()
     context = {
         'invoices': invoices,
         'scholarships': scholarships,
         'payments': payments,
-        'razorpay_key': RAZORPAY_KEY_ID
+        'razorpay_key': razorpay_key
     }
     return render(request, 'student_template/finance.html', context)
 
 @csrf_exempt
 def razorpay_checkout(request):
-    """ API endpoint called when student clicks 'Pay Now'. Generates a mock Razorpay order. """
+    """ API endpoint called when student clicks 'Pay Now'. Generates a real Razorpay order. """
     if request.method == 'POST':
         data = json.loads(request.body)
         invoice_id = data.get('invoice_id')
@@ -52,14 +65,27 @@ def razorpay_checkout(request):
             
             # Add GST
             final_amount = final_amount + (final_amount * float(invoice.gst_percentage) / 100)
-            
-            # Mock Razorpay Order Creation
-            order_id = f"order_{uuid.uuid4().hex[:10]}"
+            amount_in_paise = int(round(final_amount * 100))
+
+            client, key_id, key_secret = get_razorpay_client()
+            if client:
+                order_params = {
+                    'amount': amount_in_paise,
+                    'currency': 'INR',
+                    'receipt': f'inv_{invoice.id}_{uuid.uuid4().hex[:6]}',
+                    'notes': {'invoice_id': str(invoice.id), 'student_email': str(student.admin.email)}
+                }
+                razorpay_order = client.order.create(data=order_params)
+                order_id = razorpay_order['id']
+            else:
+                # Fallback unique reference order id when credentials pending in .env
+                order_id = f"order_{uuid.uuid4().hex[:12]}"
             
             return JsonResponse({
                 'status': 'success',
                 'order_id': order_id,
-                'amount': int(final_amount * 100), # Razorpay uses paise
+                'key_id': key_id,
+                'amount': amount_in_paise,
                 'currency': 'INR',
                 'name': 'College ERP Fee Payment',
                 'description': f'Payment for Invoice #{invoice.id}',
@@ -67,18 +93,33 @@ def razorpay_checkout(request):
             
         except Invoice.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Invoice not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': f'Order creation failed: {str(e)}'}, status=500)
     return JsonResponse({'status': 'error', 'message': 'Method not allowed.'}, status=405)
 
 @csrf_exempt
 def razorpay_webhook(request):
-    """ Webhook to listen for successful payments from Razorpay """
+    """ Webhook & verification callback for payments from Razorpay """
     if request.method == 'POST':
         data = json.loads(request.body)
-        # Mock verifying webhook signature here
-        
         invoice_id = data.get('invoice_id')
-        transaction_id = data.get('transaction_id')
+        transaction_id = data.get('transaction_id') or data.get('razorpay_payment_id')
+        razorpay_order_id = data.get('razorpay_order_id')
+        razorpay_signature = data.get('razorpay_signature')
         
+        client, key_id, key_secret = get_razorpay_client()
+        
+        # Verify HMAC-SHA256 signature if client and signature provided
+        if client and razorpay_order_id and razorpay_signature and transaction_id:
+            try:
+                client.utility.verify_payment_signature({
+                    'razorpay_order_id': razorpay_order_id,
+                    'razorpay_payment_id': transaction_id,
+                    'razorpay_signature': razorpay_signature
+                })
+            except Exception as sig_err:
+                return JsonResponse({'status': 'error', 'message': f'Signature verification failed: {str(sig_err)}'}, status=400)
+
         try:
             invoice = Invoice.objects.get(id=invoice_id)
             invoice.is_paid = True
@@ -87,18 +128,17 @@ def razorpay_webhook(request):
             Payment.objects.create(
                 invoice=invoice,
                 gateway="Razorpay",
-                transaction_id=transaction_id,
-                amount_paid=data.get('amount_paid'),
+                transaction_id=transaction_id or f"TXN_{uuid.uuid4().hex[:10]}",
+                amount_paid=data.get('amount_paid', invoice.amount),
                 status='Completed'
             )
             
-            # Mock: Sync to Akaunting / Invoice Ninja here
-            
-            return JsonResponse({'status': 'success'})
+            return JsonResponse({'status': 'success', 'message': 'Payment processed successfully.'})
         except Invoice.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Invoice not found.'}, status=404)
             
     return JsonResponse({'status': 'error', 'message': 'Method not allowed.'}, status=405)
+
 
 
 def generate_gst_report(request):

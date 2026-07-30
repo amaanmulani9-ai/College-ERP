@@ -53,12 +53,9 @@ def _redirect_for_user(user):
                 from .models import Student
                 Student.objects.get_or_create(admin=user)
             elif user_type_str == "4":
-                from .models import Parent, Student
-                parent = Parent.objects.filter(admin=user).first()
-                if not parent:
-                    student = Student.objects.first()
-                    if student:
-                        Parent.objects.create(admin=user, student=student)
+                from .models import Parent
+                Parent.objects.get_or_create(admin=user)
+
             elif user_type_str == "7":
                 from .models import Backoffice
                 Backoffice.objects.get_or_create(admin=user)
@@ -80,6 +77,31 @@ def landing_page(request):
         return redirect(reverse('login_page'))
 
     return render(request, 'main_app/landing_page.html')
+
+
+
+def public_verify_credential(request, hash_code=None):
+    """
+    Public verification endpoint for Student ID Cards and Degree/Bonafide Certificates.
+    Scanned QR code or direct link leads to this page.
+    """
+    if not hash_code:
+        hash_code = request.GET.get('hash', '').strip()
+
+    from main_app.digital_verification_service import DigitalVerificationService
+
+    result = DigitalVerificationService.verify_credential(hash_code) if hash_code else {
+        'found': False,
+        'message': 'Please enter or scan a valid SHA-256 institutional credential verification hash.'
+    }
+
+    context = {
+        'page_title': 'Official Institutional Credential Verification',
+        'result': result,
+        'hash_code': hash_code
+    }
+    return render(request, 'main_app/public_verify.html', context)
+
 
 
 def login_page(request):
@@ -328,9 +350,11 @@ def verify_otp_and_register(request):
             cached_email_otp = cache.get(f"signup_email_otp_{email}") or session_email_otp
             cached_mobile_otp = cache.get(f"signup_mobile_otp_{mobile}") or session_mobile_otp
 
-            # Validate OTPs (Allow demo bypass if DEBUG is True and entered '123456')
-            is_email_valid = (cached_email_otp and cached_email_otp == email_otp_entered) or (settings.DEBUG and email_otp_entered == '123456')
-            is_mobile_valid = (cached_mobile_otp and cached_mobile_otp == mobile_otp_entered) or (settings.DEBUG and mobile_otp_entered == '123456')
+            # Validate OTPs (Strict in production, allow bypass only if ALLOW_DEMO_OTP_BYPASS is explicitly enabled)
+            allow_bypass = getattr(settings, 'DEBUG', False) and getattr(settings, 'ALLOW_DEMO_OTP_BYPASS', False)
+            is_email_valid = (cached_email_otp and cached_email_otp == email_otp_entered) or (allow_bypass and email_otp_entered == '123456')
+            is_mobile_valid = (cached_mobile_otp and cached_mobile_otp == mobile_otp_entered) or (allow_bypass and mobile_otp_entered == '123456')
+
 
             if not is_email_valid:
                 return JsonResponse({'status': 'error', 'message': 'Invalid or expired Email OTP code.'}, status=400)
@@ -439,53 +463,80 @@ import uuid
 import datetime
 from django.conf import settings
 from django.contrib import messages
-from .models import Course, Session
+from .models import Course, Session, CustomUser, Student, StudentRegistration
 
 def online_registration(request):
     courses = Course.objects.all()
     sessions = Session.objects.all()
     
     if request.method == 'POST':
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        gender = request.POST.get('gender')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+        first_name = (request.POST.get('first_name') or '').strip()
+        last_name = (request.POST.get('last_name') or '').strip()
+        gender = (request.POST.get('gender') or 'M').strip()
+        email = (request.POST.get('email') or '').strip().lower()
+        password = request.POST.get('password') or ''
         course_id = request.POST.get('course_id')
         session_id = request.POST.get('session_id')
         
-        # Registration date
-        admission_date = datetime.date.today().strftime('%Y-%m-%d')
-        
-        # Generate unique code
+        if not email or not password:
+            messages.error(request, "Email and password are required for registration.")
+            return render(request, 'main_app/online_registration.html', {'courses': courses, 'sessions': sessions})
+
+        if CustomUser.objects.filter(email=email).exists():
+            messages.error(request, "A user with this email address is already registered.")
+            return render(request, 'main_app/online_registration.html', {'courses': courses, 'sessions': sessions})
+
+        admission_date = datetime.date.today()
         unique_code = f"REG-{uuid.uuid4().hex[:8].upper()}"
         
-        # Save to CSV
-        regs_dir = os.path.join(settings.MEDIA_ROOT, 'student_registrations')
-        if not os.path.exists(regs_dir):
-            os.makedirs(regs_dir)
-            
-        csv_filename = os.path.join(regs_dir, f"{admission_date}.csv")
-        file_exists = os.path.isfile(csv_filename)
-        
         try:
-            with open(csv_filename, mode='a', newline='', encoding='utf-8') as f:
-                writer = csv.writer(f)
-                if not file_exists:
-                    writer.writerow(['First Name', 'Last Name', 'Gender', 'Course ID', 'Session ID', 'Admission Date', 'Email', 'Password', 'Unique Code', 'Registration Fee', 'Registration Time'])
-                
-                registration_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                from django.contrib.auth.hashers import make_password
-                hashed_password = make_password(password)
-                writer.writerow([first_name, last_name, gender, course_id, session_id, admission_date, email, hashed_password, unique_code, '0', registration_time])
-                
+            # 1. Create CustomUser account for Student
+            user = CustomUser.objects.create_user(
+                email=email,
+                password=password,
+                user_type=3,  # Student
+                first_name=first_name,
+                last_name=last_name,
+                gender='M' if gender in ['Male', 'M'] else 'F'
+            )
+
+            course = Course.objects.filter(id=course_id).first() if course_id else None
+            session = Session.objects.filter(id=session_id).first() if session_id else None
+
+            # 2. Get or update Student profile
+            student, _ = Student.objects.get_or_create(
+                admin=user,
+                defaults={
+                    'course': course,
+                    'session': session,
+                    'admission_date': admission_date,
+                    'unique_student_code': unique_code,
+                    'verification_status': 'Pending'
+                }
+            )
+
+            # 3. Create StudentRegistration record
+            StudentRegistration.objects.get_or_create(
+                student=student,
+                defaults={
+                    'application_no': unique_code,
+                    'first_name': first_name,
+                    'surname': last_name,
+                    'student_email': email,
+                    'course_name': course.name if course else '',
+                    'session': str(session) if session else '',
+                    'gender': 'MALE' if gender in ['Male', 'M'] else 'FEMALE',
+                }
+            )
+            
             messages.success(request, f"Registration Successful! Your unique registration code is: {unique_code}")
         except Exception as e:
-            messages.error(request, f"Error saving registration: {str(e)}")
+            messages.error(request, f"Error saving registration to database: {str(e)}")
             
         return redirect('online_registration')
         
     return render(request, 'main_app/online_registration.html', {'courses': courses, 'sessions': sessions})
+
 
 
 def doLogin(request, **kwargs):
@@ -1165,5 +1216,44 @@ def download_android_apk(request):
         'requirements': 'Android 7.0 (API 24) or higher'
     }
     return render(request, 'main_app/download_apk.html', context)
+
+
+@csrf_exempt
+def verify_firebase_phone_token(request):
+    """
+    API endpoint to verify Firebase Phone Auth ID Tokens sent from Web or Mobile clients.
+    Updates student mobile number in database upon validation.
+    """
+    if request.method != "POST":
+        return JsonResponse({'status': 'error', 'message': 'Only POST requests allowed.'}, status=405)
+
+    try:
+        raw_body = request.body.decode('utf-8') if request.body else '{}'
+        data = json.loads(raw_body)
+        id_token = data.get('id_token', '').strip()
+
+        from main_app.firebase_auth_service import FirebaseAuthService
+        result = FirebaseAuthService.verify_phone_id_token(id_token)
+
+        if not result.get('valid'):
+            return JsonResponse({'status': 'error', 'message': result.get('message', 'Invalid token')}, status=400)
+
+        phone_number = result.get('phone_number', '')
+
+        if request.user.is_authenticated and phone_number:
+            user = request.user
+            student = getattr(user, 'student', None)
+            if student:
+                student.mobile = phone_number
+                student.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'phone_number': phone_number,
+            'message': 'Firebase Phone Authentication verified successfully!'
+        })
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
 
 

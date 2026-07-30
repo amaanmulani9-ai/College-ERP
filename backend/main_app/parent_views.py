@@ -31,12 +31,19 @@ def parent_required(view_func):
 def parent_home(request):
     parent = Parent.objects.filter(admin=request.user).first()
     if not parent:
-        student = Student.objects.first()
-        if student:
-            parent = Parent.objects.create(admin=request.user, student=student)
-        else:
-            return render(request, 'parent_template/home_content.html', {'page_title': 'Parent Dashboard'})
+        parent = Parent.objects.create(admin=request.user)
     student = parent.student
+
+    if not student:
+        context = {
+            'page_title': 'Parent Dashboard',
+            'parent': parent,
+            'student': None,
+            'unlinked_notice': True,
+            'message': 'No student child account is currently linked to your parent profile. Please contact the college administration to link your child.'
+        }
+        return render(request, 'parent_template/home_content.html', context)
+
 
     # --- Attendance Stats ---
     total_attendance = AttendanceReport.objects.filter(student=student).count()
@@ -123,6 +130,9 @@ def parent_home(request):
 def parent_attendance_detail(request):
     parent = get_object_or_404(Parent, admin=request.user)
     student = parent.student
+    if not student:
+        messages.warning(request, "No student account is linked to your parent profile yet.")
+        return redirect('parent_home')
 
     attendance_data = AttendanceReport.objects.filter(
         student=student
@@ -162,6 +172,9 @@ def parent_attendance_detail(request):
 def parent_fee_view(request):
     parent = get_object_or_404(Parent, admin=request.user)
     student = parent.student
+    if not student:
+        messages.warning(request, "No student account is linked to your parent profile yet.")
+        return redirect('parent_home')
 
     fee_records = FeeRecord.objects.filter(student=student).order_by('-created_at')
     payments = FeePayment.objects.filter(fee_record__student=student).order_by('-payment_date')
@@ -186,6 +199,9 @@ def parent_fee_view(request):
 def parent_results_view(request):
     parent = get_object_or_404(Parent, admin=request.user)
     student = parent.student
+    if not student:
+        messages.warning(request, "No student account is linked to your parent profile yet.")
+        return redirect('parent_home')
 
     results = StudentResult.objects.filter(student=student).select_related('subject')
     online_results = OnlineExamResult.objects.filter(student=student).order_by('-submitted_at')
@@ -208,14 +224,20 @@ def parent_results_view(request):
 def parent_timetable(request):
     parent = get_object_or_404(Parent, admin=request.user)
     student = parent.student
+    if not student:
+        messages.warning(request, "No student account is linked to your parent profile yet.")
+        return redirect('parent_home')
 
     days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
     timetable_by_day = {}
-    for i, day in enumerate(days):
-        slots = Timetable.objects.filter(
-            course=student.course, day_of_week=i
-        ).select_related('subject').order_by('start_time')
-        if slots.exists():
+    if student.course:
+        for i, day in enumerate(days):
+            slots = Timetable.objects.filter(
+                course=student.course, day_of_week=i
+            ).select_related('subject').order_by('start_time')
+            if slots.exists():
+                timetable_by_day[day] = slots
+
             timetable_by_day[day] = slots
 
     context = {
