@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.9.0] - 2026-07-31
+
+### Added
+
+#### **TASK-009: Enterprise Parent & Guardian Management System**
+- Created `Parent` model with auto-generated tenant-isolated `PAR-XXXXXXXX` code, relationship type
+  (`father`, `mother`, `guardian`, `grandfather`, `grandmother`, `uncle`, `aunt`, `sibling`, `other`),
+  occupation, employer name, annual income, education level, and portal/notification toggles.
+- Implemented `StudentParentLink` many-to-many through model with `is_primary_contact`,
+  `is_emergency_contact`, and `can_pickup` flags — a single parent can be linked to multiple students (siblings).
+- Built `ParentDocument` model supporting full upload, type classification, and staff review
+  workflow (`pending → approved / rejected / expired`).
+- Added `ParentCommunicationPreference` model with per-channel toggles (email, SMS, push, WhatsApp)
+  and per-event subscriptions (attendance alerts, fee reminders, exam results, announcements,
+  disciplinary notices, event invitations).
+- Created `ParentActivityLog` model providing a complete tamper-evident audit trail of all parent
+  lifecycle actions.
+- Implemented service layer (`services.py`): `create_parent`, `verify_parent`, `soft_delete_parent`,
+  `restore_parent`, `link_student_to_parent`, `unlink_student_from_parent` — all side-effect-free
+  and audit-logged.
+- Built `ParentViewSet` REST API with custom actions: `verify`, `restore`, `link-student`,
+  `unlink-student`, `activity-log`.
+- Built `ParentDocumentViewSet` REST API with `review` action for staff document approval.
+- Added `ParentDashboardSummaryView` endpoint (`/api/parents/dashboard/`) returning aggregate counts:
+  total, verified, unverified, portal-enabled, relationship breakdown, pending documents.
+- Registered `apps.parents` in both `SHARED_APPS` and `TENANT_APPS` ensuring full multi-tenant
+  schema isolation.
+- Generated Django migration `0001_initial.py` covering all five parent models.
+- Built Django Admin interfaces with inlines: student links, documents, communication preferences,
+  activity log — all with full search and filter support.
+- Added `apps/parents/urls.py` mounted at `/api/parents/` and `/api/parent-documents/`.
+
+#### **Frontend — Parent Portal**
+- Created `parentService.ts` typed API client covering all parent endpoints (CRUD, verify, restore,
+  link-student, unlink-student, document upload/review, dashboard stats, activity log).
+- Built `ParentListPage.tsx` with search, create form (inline), verify action, soft-delete, and
+  rich dark glassmorphism UI.
+- Built `ParentDetailsPage.tsx` with four-tab interface: Overview, Students (with inline link/unlink
+  UI), Documents (status badges), Activity Log.
+- Registered routes `/parents` and `/parents/:id` in the React Router.
+- Added **Parent Portal** section to the sidebar with `HeartHandshake` icon.
+
+### Fixed
+- Added `*.tsbuildinfo` to `.gitignore` to prevent TypeScript incremental build artefacts from being tracked.
+
+---
+
 ## [0.8.0] - 2026-07-31
 
 ### Added
