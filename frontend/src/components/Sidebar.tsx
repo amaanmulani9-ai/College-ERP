@@ -111,6 +111,17 @@ export const Sidebar: React.FC = () => {
     { label: "Eligibility Checker", path: "/scholarships/eligibility", icon: CheckSquare },
   ];
 
+  const libraryItems = [
+    { label: "Library Dashboard", path: "/library", icon: LayoutDashboard },
+    { label: "Book Catalog", path: "/library/books", icon: BookOpen },
+    { label: "Book Categories", path: "/library/categories", icon: Layers },
+    { label: "Authors & Publishers", path: "/library/authors-publishers", icon: Edit3 },
+    { label: "Issue Book", path: "/library/issue", icon: FilePlus },
+    { label: "Return Book", path: "/library/return", icon: CheckSquare },
+    { label: "Reservations Queue", path: "/library/reservations", icon: History },
+    { label: "Fine Report", path: "/library/fines", icon: FileText },
+  ];
+
   return (
     <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between overflow-y-auto">
       <div>
@@ -443,6 +454,30 @@ export const Sidebar: React.FC = () => {
               Scholarship Management
             </div>
             {scholarshipItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    isActive
+                      ? "bg-indigo-600/15 text-indigo-400 border border-indigo-500/20"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="space-y-1">
+            <div className="px-3 py-1 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
+              Library Management
+            </div>
+            {libraryItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
               return (

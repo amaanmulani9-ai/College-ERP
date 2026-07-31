@@ -84,12 +84,21 @@ import PaymentHistoryPage from "./pages/PaymentHistoryPage";
 import TransactionDetailsPage from "./pages/TransactionDetailsPage";
 import RefundHistoryPage from "./pages/RefundHistoryPage";
 
-import ScholarshipDashboardPage from "./pages/ScholarshipDashboardPage";
-import ScholarshipTypesPage from "./pages/ScholarshipTypesPage";
-import StudentScholarshipsPage from "./pages/StudentScholarshipsPage";
-import ScholarshipApplicationsPage from "./pages/ScholarshipApplicationsPage";
-import ScholarshipRenewalsPage from "./pages/ScholarshipRenewalsPage";
-import EligibilityCheckerPage from "./pages/EligibilityCheckerPage";
+import { ScholarshipDashboardPage } from "./pages/ScholarshipDashboardPage";
+import { ScholarshipTypesPage } from "./pages/ScholarshipTypesPage";
+import { StudentScholarshipsPage } from "./pages/StudentScholarshipsPage";
+import { ScholarshipApplicationsPage } from "./pages/ScholarshipApplicationsPage";
+import { ScholarshipRenewalsPage } from "./pages/ScholarshipRenewalsPage";
+import { EligibilityCheckerPage } from "./pages/EligibilityCheckerPage";
+
+import { LibraryDashboardPage } from "./pages/LibraryDashboardPage";
+import { BooksPage } from "./pages/BooksPage";
+import { BookCategoriesPage } from "./pages/BookCategoriesPage";
+import { AuthorsPublishersPage } from "./pages/AuthorsPublishersPage";
+import { IssueBookPage } from "./pages/IssueBookPage";
+import { ReturnBookPage } from "./pages/ReturnBookPage";
+import { ReservationsPage } from "./pages/ReservationsPage";
+import { FineReportPage } from "./pages/FineReportPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -208,6 +217,16 @@ export const App: React.FC = () => {
             <Route path="/scholarships/applications" element={<ScholarshipApplicationsPage />} />
             <Route path="/scholarships/renewals" element={<ScholarshipRenewalsPage />} />
             <Route path="/scholarships/eligibility" element={<EligibilityCheckerPage />} />
+
+            {/* Library Management Routes */}
+            <Route path="/library" element={<LibraryDashboardPage />} />
+            <Route path="/library/books" element={<BooksPage />} />
+            <Route path="/library/categories" element={<BookCategoriesPage />} />
+            <Route path="/library/authors-publishers" element={<AuthorsPublishersPage />} />
+            <Route path="/library/issue" element={<IssueBookPage />} />
+            <Route path="/library/return" element={<ReturnBookPage />} />
+            <Route path="/library/reservations" element={<ReservationsPage />} />
+            <Route path="/library/fines" element={<FineReportPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

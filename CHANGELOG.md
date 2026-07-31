@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v0.19.0] - 2026-08-01
+
+### Added
+- **Enterprise Library Management System (`apps/library/`)**:
+  - Models: `BookCategory`, `Author`, `Publisher`, `Book`, `BookIssue`, `Reservation`, `LibraryAuditLog`.
+  - Unique ISBN & Barcode validation per tenant.
+  - LibraryService: `add_book()`, `issue_book()`, `return_book()`, `reserve_book()`, `calculate_fine()`, `lost_book()`, `damaged_book()`, `book_history()`.
+  - Circulation Engine: Copy inventory management, borrower loan limits (3 for students, 5 for staff), check-in return workflow.
+  - Overdue Fine Calculator: Dynamic ₹10.00/day fine calculation for late returns.
+  - Reservations Queue: Holds & hold fulfillment upon return.
+  - Penalties: Lost book replacement cost & damaged book penalty assessment.
+  - REST APIs: `/api/library/issue/`, `/api/library/return/`, `/api/library/reserve/`, `/api/library/history/`, `/api/library/fines/`, `/api/library/lost/`, `/api/library/damaged/`.
+  - Permissions: `IsLibrarianOrAdmin`, `IsStudentOrLibrarian`.
+  - Django Admin: Catalog management, circulation logs & read-only audit log.
+  - Frontend Pages: `LibraryDashboardPage`, `BooksPage`, `BookCategoriesPage`, `AuthorsPublishersPage`, `IssueBookPage`, `ReturnBookPage`, `ReservationsPage`, `FineReportPage`.
+  - Sidebar Navigation: Library Management section added.
+  - TypeScript Service: `libraryService.ts`.
+  - Test Suite (`tests/test_library.py`) — 9 unit & integration tests passing (100%).
+  - Documentation (`docs/library.md`).
+
 ## [v0.18.0] - 2026-08-01
 
 ### Added
