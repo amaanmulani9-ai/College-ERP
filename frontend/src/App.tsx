@@ -78,6 +78,12 @@ import FeeStructurePage from "./pages/FeeStructurePage";
 import CollectFeePage from "./pages/CollectFeePage";
 import OutstandingReportPage from "./pages/OutstandingReportPage";
 
+import PaymentDashboardPage from "./pages/PaymentDashboardPage";
+import PayFeesPage from "./pages/PayFeesPage";
+import PaymentHistoryPage from "./pages/PaymentHistoryPage";
+import TransactionDetailsPage from "./pages/TransactionDetailsPage";
+import RefundHistoryPage from "./pages/RefundHistoryPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -180,6 +186,13 @@ export const App: React.FC = () => {
             <Route path="/fees/structure" element={<FeeStructurePage />} />
             <Route path="/fees/collect" element={<CollectFeePage />} />
             <Route path="/fees/outstanding" element={<OutstandingReportPage />} />
+
+            {/* Payment Gateway Routes */}
+            <Route path="/payments" element={<PaymentDashboardPage />} />
+            <Route path="/payments/pay" element={<PayFeesPage />} />
+            <Route path="/payments/history" element={<PaymentHistoryPage />} />
+            <Route path="/payments/details" element={<TransactionDetailsPage />} />
+            <Route path="/payments/refunds" element={<RefundHistoryPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

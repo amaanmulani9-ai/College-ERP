@@ -1,7 +1,7 @@
 # Project Status: Enterprise College ERP
 
-**Current Version:** `v0.16.0`  
-**Overall Completion:** `98%`  
+**Current Version:** `v0.17.0`  
+**Overall Completion:** `100%`  
 **Status Date:** August 1, 2026  
 
 ---
@@ -67,8 +67,9 @@ gantt
 - [x] TASK-014 Enterprise Result Management System (`v0.14.0`)
 - [x] TASK-015 Enterprise Certificate & Transcript Management (`v0.15.0`)
 - [x] TASK-016 Enterprise Fee Management System (`v0.16.0`)
+- [x] TASK-017 Enterprise Payment Gateway Integration (`v0.17.0`)
 
-Current Status: **Phase 16 (v0.16.0) Released** — Fee Categories, Fee Structures, Student Fee Assignment, Installments, Fine Engine, Fee Collection, Receipt Generation, Outstanding Report, Waiver & Scholarship Mapping implemented.
+Current Status: **Phase 17 (v0.17.0) Released** — Razorpay Order Creation, HMAC Signature Verification, Auto Fee Receipt Generation, Webhook Deduplication, Gateway Refunds, History APIs, Audit Trail, and 5 React Payment pages.
 
 ---
 

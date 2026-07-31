@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v0.17.0] - 2026-08-01
+
+### Added
+- **Enterprise Payment Gateway Integration (`apps/payments/`)**:
+  - Models: `PaymentGateway`, `PaymentOrder`, `PaymentTransaction`, `WebhookLog`, `Refund`, `PaymentAuditLog`.
+  - Provider Abstraction Layer (`BaseGateway`, `RazorpayGateway`, `GatewayFactory`, with stubs for Stripe, PhonePe, UPI).
+  - Razorpay Integration: Order creation (paise conversion), HMAC-SHA256 signature verification, webhook processing with event deduplication, and refund API.
+  - PaymentService: atomic operations for `create_order`, `verify_payment`, `capture_payment`, `refund`, `payment_history`, and `webhook_handler`.
+  - Auto Fee Receipt Generation via FeeService integration upon payment verification.
+  - Business Rules: Min ₹1 / Max ₹500,000 bounds, duplicate active order prevention, refund amount caps.
+  - REST APIs: `/api/payments/create-order/`, `/api/payments/verify/`, `/api/payments/history/`, `/api/payments/refund/`, `/api/payments/webhook/razorpay/`.
+  - Permission Classes: `IsPaymentOfficerOrAdmin`, `IsStudentOrPaymentOfficer`.
+  - Django Admin: read-only audit inlines, transaction and refund management.
+  - Frontend Pages: `PaymentDashboardPage`, `PayFeesPage`, `PaymentHistoryPage`, `TransactionDetailsPage`, `RefundHistoryPage`.
+  - Sidebar Navigation: Payment Gateway section added.
+  - TypeScript Service: `paymentService.ts`.
+  - Unit & Integration Test Suite (`tests/test_payments.py`) — 13 tests passing.
+  - System Documentation (`docs/payments.md`).
+
 ## [v0.16.0] - 2026-08-01
 
 ### Added
