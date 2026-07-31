@@ -100,6 +100,14 @@ import { ReturnBookPage } from "./pages/ReturnBookPage";
 import { ReservationsPage } from "./pages/ReservationsPage";
 import { FineReportPage } from "./pages/FineReportPage";
 
+import { HostelDashboardPage } from "./pages/HostelDashboardPage";
+import { HostelsPage } from "./pages/HostelsPage";
+import { BlocksRoomsPage } from "./pages/BlocksRoomsPage";
+import { StudentAllocationPage } from "./pages/StudentAllocationPage";
+import { VisitorRegisterPage } from "./pages/VisitorRegisterPage";
+import { HostelMaintenancePage } from "./pages/HostelMaintenancePage";
+import { VacancyReportPage } from "./pages/VacancyReportPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -227,6 +235,15 @@ export const App: React.FC = () => {
             <Route path="/library/return" element={<ReturnBookPage />} />
             <Route path="/library/reservations" element={<ReservationsPage />} />
             <Route path="/library/fines" element={<FineReportPage />} />
+
+            {/* Hostel Management Routes */}
+            <Route path="/hostel" element={<HostelDashboardPage />} />
+            <Route path="/hostel/buildings" element={<HostelsPage />} />
+            <Route path="/hostel/blocks-rooms" element={<BlocksRoomsPage />} />
+            <Route path="/hostel/allocations" element={<StudentAllocationPage />} />
+            <Route path="/hostel/visitors" element={<VisitorRegisterPage />} />
+            <Route path="/hostel/maintenance" element={<HostelMaintenancePage />} />
+            <Route path="/hostel/vacancy" element={<VacancyReportPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

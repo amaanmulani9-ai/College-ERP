@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v0.20.0] - 2026-08-01
+
+### Added
+- **Enterprise Hostel Management System (`apps/hostel/`)**:
+  - Models: `Hostel`, `Block`, `Floor`, `Room`, `Bed`, `Warden`, `HostelAllocation`, `Visitor`, `MaintenanceRequest`, `HostelAuditLog`.
+  - HostelService: `allocate_bed()`, `transfer_room()`, `check_in()`, `check_out()`, `visitor_entry()`, `maintenance_request()`, `vacant_rooms()`, `occupied_rooms()`.
+  - Fee Management Integration: Auto-assigns `StudentFee` under category `HOSTEL_FEE` upon bed allocation.
+  - Business Rules: One active hostel allocation per student, room capacity enforcement, vacant bed validation, room transfers with automatic bed state updates.
+  - REST APIs: `/api/hostel/allocate/`, `/api/hostel/transfer/`, `/api/hostel/check-in/`, `/api/hostel/check-out/`, `/api/hostel/vacant/`, `/api/hostel/occupied/`.
+  - Permissions: `IsWardenOrAdmin`, `IsStudentOrHostelStaff`.
+  - Django Admin: Hostel building, room inventory, warden assignment & allocation management.
+  - Frontend Pages: `HostelDashboardPage`, `HostelsPage`, `BlocksRoomsPage`, `StudentAllocationPage`, `VisitorRegisterPage`, `HostelMaintenancePage`, `VacancyReportPage`.
+  - Sidebar Navigation: Hostel Management section added.
+  - TypeScript Service: `hostelService.ts`.
+  - Test Suite (`tests/test_hostel.py`) — 9 unit & integration tests passing (100%).
+  - Documentation (`docs/hostel.md`).
+
 ## [v0.19.0] - 2026-08-01
 
 ### Added
