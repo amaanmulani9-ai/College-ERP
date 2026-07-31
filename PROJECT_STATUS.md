@@ -64,8 +64,9 @@ gantt
 - [x] TASK-011 Enterprise Timetable Management System (`v0.11.0`)
 - [x] TASK-012 Enterprise Attendance Management System (`v0.12.0`)
 - [x] TASK-013 Enterprise Examination Management System (`v0.13.0`)
+- [x] TASK-014 Enterprise Result Management System (`v0.14.0`)
 
-Current Status: **Phase 13 (v0.13.0) Released** — Full Examination Types, Schedules, Hall Ticket Generation, Exam Attendance & Invigilator Duty Assignments implemented.
+Current Status: **Phase 14 (v0.14.0) Released** — Full Result Schemes, Marks Entry, Automatic Grade Calculation, SGPA/CGPA Engine, Merit Ranks & Result Publishing implemented.
 
 ---
 

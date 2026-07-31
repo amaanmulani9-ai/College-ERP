@@ -63,6 +63,11 @@ import { ExamDashboardPage } from "./pages/ExamDashboardPage";
 import { ExamSchedulePage } from "./pages/ExamSchedulePage";
 import { HallTicketPage } from "./pages/HallTicketPage";
 
+import { ResultDashboardPage } from "./pages/ResultDashboardPage";
+import { MarksEntryPage } from "./pages/MarksEntryPage";
+import { PublishResultPage } from "./pages/PublishResultPage";
+import { StudentResultPage } from "./pages/StudentResultPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -147,6 +152,12 @@ export const App: React.FC = () => {
             <Route path="/examinations" element={<ExamDashboardPage />} />
             <Route path="/examinations/schedules" element={<ExamSchedulePage />} />
             <Route path="/examinations/hall-tickets" element={<HallTicketPage />} />
+
+            {/* Result Management Routes */}
+            <Route path="/results" element={<ResultDashboardPage />} />
+            <Route path="/results/entry" element={<MarksEntryPage />} />
+            <Route path="/results/publish" element={<PublishResultPage />} />
+            <Route path="/results/student" element={<StudentResultPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

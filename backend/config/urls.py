@@ -18,6 +18,7 @@ urlpatterns = [
     path("api/timetable/", include("apps.timetable.urls")),
     path("api/attendance/", include("apps.attendance.urls")),
     path("api/examinations/", include("apps.examinations.urls")),
+    path("api/results/", include("apps.results.urls")),
 ]
 
 if settings.DEBUG:

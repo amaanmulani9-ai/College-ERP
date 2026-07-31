@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v0.14.0] - 2026-08-01
+
+### Added
+- **Enterprise Result Management System (`apps/results/`)**:
+  - Models for `ResultScheme`, `StudentResult`, `SemesterResult`, and `ResultAuditLog`.
+  - Automatic Grade & Credit Point calculation engine (`A+` to `F`, Grade Points 10.0 to 0.0).
+  - SGPA and CGPA computation services.
+  - Merit rank list generation for batch semester results.
+  - Batch semester result publishing pipeline with status updates.
+  - Transcript preview API and audit trail loggers.
+  - Frontend React pages: `ResultDashboardPage`, `MarksEntryPage`, `PublishResultPage`, `StudentResultPage`.
+  - Comprehensive unit test suite (`tests/test_results.py`).
+  - System documentation (`docs/results.md`).
+
 ## [v0.13.0] - 2026-08-01
 
 ### Added
