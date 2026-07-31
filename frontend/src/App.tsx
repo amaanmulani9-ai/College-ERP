@@ -44,6 +44,13 @@ import { EmployeeStatisticsPage } from "./pages/EmployeeStatisticsPage";
 import { ParentListPage } from "./pages/ParentListPage";
 import { ParentDetailsPage } from "./pages/ParentDetailsPage";
 
+import { AdmissionsDashboardPage } from "./pages/AdmissionsDashboardPage";
+import { ApplicationListPage } from "./pages/ApplicationListPage";
+import { ApplicationDetailsPage } from "./pages/ApplicationDetailsPage";
+import { CreateApplicationPage } from "./pages/CreateApplicationPage";
+import { DocumentVerificationPage } from "./pages/DocumentVerificationPage";
+import { SeatMatrixPage } from "./pages/SeatMatrixPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -105,6 +112,14 @@ export const App: React.FC = () => {
             {/* Parent & Guardian Management Routes */}
             <Route path="/parents" element={<ParentListPage />} />
             <Route path="/parents/:id" element={<ParentDetailsPage />} />
+
+            {/* Admissions Management Routes */}
+            <Route path="/admissions" element={<AdmissionsDashboardPage />} />
+            <Route path="/admissions/applications" element={<ApplicationListPage />} />
+            <Route path="/admissions/applications/:id" element={<ApplicationDetailsPage />} />
+            <Route path="/admissions/create" element={<CreateApplicationPage />} />
+            <Route path="/admissions/documents" element={<DocumentVerificationPage />} />
+            <Route path="/admissions/seat-matrix" element={<SeatMatrixPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

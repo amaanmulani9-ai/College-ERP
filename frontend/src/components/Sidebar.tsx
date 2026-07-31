@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, LogIn, UserPlus, User, GraduationCap, Server, ShieldCheck, Key, Table, Users, Settings, History, Edit3, Landmark, Building2, BookOpen, Calendar, Layers, FileText, CheckSquare, UserCheck, BarChart3, FileSpreadsheet, Award, Briefcase, HeartHandshake } from "lucide-react";
+import { LayoutDashboard, LogIn, UserPlus, User, GraduationCap, Server, ShieldCheck, Key, Table, Users, Settings, History, Edit3, Landmark, Building2, BookOpen, Calendar, Layers, FileText, CheckSquare, UserCheck, BarChart3, FileSpreadsheet, Award, Briefcase, HeartHandshake, FileCheck, FilePlus } from "lucide-react";
 
 export const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -45,6 +45,14 @@ export const Sidebar: React.FC = () => {
 
   const parentItems = [
     { label: "Parents & Guardians", path: "/parents", icon: HeartHandshake },
+  ];
+
+  const admissionItems = [
+    { label: "Admissions Hub", path: "/admissions", icon: LayoutDashboard },
+    { label: "Applications Roster", path: "/admissions/applications", icon: FileText },
+    { label: "New Application", path: "/admissions/create", icon: FilePlus },
+    { label: "Doc Verification", path: "/admissions/documents", icon: FileCheck },
+    { label: "Seat Matrix", path: "/admissions/seat-matrix", icon: Layers },
   ];
 
   return (
@@ -182,6 +190,30 @@ export const Sidebar: React.FC = () => {
               );
             })}
           </div>
+          <div className="space-y-1">
+            <div className="px-3 py-1 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
+              Admissions Engine
+            </div>
+            {admissionItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    isActive
+                      ? "bg-indigo-600/15 text-indigo-400 border border-indigo-500/20"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+
           <div className="space-y-1">
             <div className="px-3 py-1 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
               Parent Portal

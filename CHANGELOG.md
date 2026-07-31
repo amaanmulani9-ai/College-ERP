@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.10.0] - 2026-07-31
+
+### Added
+
+#### **TASK-010: Enterprise Admissions Management System**
+- Created `AdmissionApplication` model with auto-generated tenant-isolated `ADM-{YEAR}-{SEQ:06d}` application numbers, PII fields, academic intent mapping, previous qualification/CGPA tracking, guardian details, and 10-state workflow status (`draft`, `submitted`, `under_review`, `document_verification`, `interview`, `approved`, `rejected`, `waitlisted`, `enrolled`, `cancelled`).
+- Implemented `ApplicationStatusHistory` model capturing every state transition, actor, remarks, and timestamp.
+- Built `AdmissionDocument` model supporting 10 document types (`aadhaar`, `birth_certificate`, `marksheet`, `transfer_certificate`, `leaving_certificate`, `photo`, `signature`, `income_certificate`, `caste_certificate`, `other`) with approval/rejection review workflow.
+- Created `SeatMatrix` model enforcing seat quota allocations per `(program, academic_session, category)` tuple to prevent over-enrollment.
+- Implemented `AdmissionAuditLog` model providing a fine-grained audit trail of 13 admissions lifecycle event types.
+- Developed service layer (`services.py`):
+  - `generate_application_number()`
+  - 10-state workflow transition engine with strict transition validation
+  - Document review workflow (`review_document`)
+  - Seat allocation with row-level locking (`allocate_seat`)
+  - Full automated **Enrollment Pipeline** (`enroll_application`): Creates `User` account → `UserProfile` → `Student` (auto Student ID, semester mapping) → `Parent` (auto Parent code) → `StudentParentLink`.
+- Created REST APIs: `AdmissionApplicationViewSet` (CRUD, submit, approve, reject, transition, enroll, bulk approve, bulk reject, assign reviewer, audit log), `AdmissionDocumentViewSet`, `SeatMatrixViewSet`, `AdmissionDashboardView`.
+- Registered `apps.admissions` in `SHARED_APPS` and `TENANT_APPS` ensuring complete multi-tenant schema isolation.
+- Created initial Django migration `0001_initial.py`.
+- Configured Django Admin with inline state histories, document reviews, audit logs, and bulk approval/rejection admin actions.
+- Built comprehensive unit tests (`tests/test_admissions.py`) verifying application CRUD, application number generation, state machine transition constraints, document review, seat matrix locking, and automated Student+Parent enrollment pipeline.
+- Created detailed system documentation in `docs/admissions.md`.
+
+#### **Frontend — Admissions & Enrollment Console**
+- Built `admissionService.ts` typed API client covering all admissions endpoints.
+- Created `AdmissionsDashboardPage.tsx` with KPI metrics, status breakdown, and program demand fill rates.
+- Built `ApplicationListPage.tsx` with search, status filters, selection checkboxes, and bulk approve/reject actions.
+- Created `ApplicationDetailsPage.tsx` with state machine controls, document upload & review, workflow timeline, audit log, and one-click Enrollment execution.
+- Created `CreateApplicationPage.tsx` with comprehensive form inputs for PII, program intent, previous qualifications, and guardian info.
+- Built `DocumentVerificationPage.tsx` for Admissions Officers to review applicant document uploads.
+- Created `SeatMatrixPage.tsx` to configure program capacity limits and view real-time seat availability.
+- Wired all admissions routes (`/admissions`, `/admissions/applications`, `/admissions/applications/:id`, `/admissions/create`, `/admissions/documents`, `/admissions/seat-matrix`) in `App.tsx` and updated `Sidebar.tsx` navigation.
+
+---
+
 ## [0.9.0] - 2026-07-31
 
 ### Added
