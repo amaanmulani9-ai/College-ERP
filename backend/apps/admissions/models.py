@@ -31,6 +31,7 @@ class AdmissionApplication(models.Model):
         ("submitted", "Submitted"),
         ("under_review", "Under Review"),
         ("document_verification", "Document Verification"),
+        ("entrance_test", "Entrance Test"),
         ("interview", "Interview"),
         ("approved", "Approved"),
         ("rejected", "Rejected"),
@@ -90,6 +91,9 @@ class AdmissionApplication(models.Model):
     # Previous qualification
     previous_qualification = models.CharField(max_length=255, blank=True, default="")
     percentage_cgpa = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    entrance_score = models.CharField(max_length=50, blank=True, default="")
+    previous_student_id = models.CharField(max_length=50, blank=True, default="")
+    address = models.TextField(blank=True, default="")
 
     # Meta
     application_source = models.CharField(max_length=30, choices=SOURCE_CHOICES, default="online_portal")
@@ -170,14 +174,20 @@ class AdmissionDocument(models.Model):
 
     DOCUMENT_TYPE_CHOICES = [
         ("aadhaar", "Aadhaar Card"),
+        ("passport", "Passport"),
         ("birth_certificate", "Birth Certificate"),
-        ("marksheet", "Marksheet"),
+        ("marksheet", "Marksheet / Overall"),
+        ("ssc_marksheet", "SSC Marksheet / 10th"),
+        ("hsc_marksheet", "HSC Marksheet / 12th"),
+        ("graduation_marksheet", "Graduation Marksheet"),
         ("transfer_certificate", "Transfer Certificate"),
         ("leaving_certificate", "Leaving Certificate"),
         ("photo", "Passport Photo"),
+        ("photograph", "Photograph"),
         ("signature", "Signature"),
         ("income_certificate", "Income Certificate"),
         ("caste_certificate", "Caste Certificate"),
+        ("disability_certificate", "Disability Certificate"),
         ("other", "Other Document"),
     ]
 
@@ -194,6 +204,8 @@ class AdmissionDocument(models.Model):
     document_type = models.CharField(max_length=30, choices=DOCUMENT_TYPE_CHOICES)
     file = models.FileField(upload_to="admission_documents/")
     original_filename = models.CharField(max_length=255, blank=True, default="")
+    version = models.PositiveIntegerField(default=1)
+    checksum = models.CharField(max_length=64, blank=True, default="")
     review_status = models.CharField(max_length=20, choices=REVIEW_STATUS_CHOICES, default="pending")
     reviewed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
@@ -234,6 +246,8 @@ class SeatMatrix(models.Model):
     )
     total_seats = models.PositiveIntegerField(default=0)
     occupied_seats = models.PositiveIntegerField(default=0)
+    reserved_seats = models.PositiveIntegerField(default=0)
+    waitlist_count = models.PositiveIntegerField(default=0)
 
     class Meta:
         unique_together = ("program", "academic_session", "category")

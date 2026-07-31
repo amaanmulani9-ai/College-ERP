@@ -32,8 +32,9 @@ from .models import (
 VALID_TRANSITIONS: dict[str, set[str]] = {
     "draft":                  {"submitted", "cancelled"},
     "submitted":              {"under_review", "cancelled"},
-    "under_review":           {"document_verification", "rejected", "cancelled"},
-    "document_verification":  {"interview", "approved", "rejected", "cancelled"},
+    "under_review":           {"document_verification", "entrance_test", "rejected", "cancelled"},
+    "document_verification":  {"entrance_test", "interview", "approved", "rejected", "cancelled"},
+    "entrance_test":          {"interview", "approved", "rejected", "waitlisted", "cancelled"},
     "interview":              {"approved", "rejected", "waitlisted", "cancelled"},
     "approved":               {"enrolled", "cancelled"},
     "rejected":               set(),
@@ -72,7 +73,24 @@ def generate_application_number() -> str:
 # ──────────────────────────────────────────────────────────────────────────────
 
 def create_application(data: dict, actor=None, request=None) -> AdmissionApplication:
-    """Create a new admission application with auto-generated number."""
+    """Create a new admission application with auto-generated number and duplicate prevention."""
+    email = data.get("email")
+    program = data.get("program")
+    academic_session = data.get("academic_session")
+
+    if email and program and academic_session:
+        existing = AdmissionApplication.objects.filter(
+            email=email,
+            program=program,
+            academic_session=academic_session,
+            is_deleted=False,
+        ).exclude(status__in=["enrolled", "cancelled", "rejected"]).exists()
+
+        if existing:
+            raise ValueError(
+                "An active admission application already exists for this applicant, program, and academic session."
+            )
+
     app_number = generate_application_number()
     application = AdmissionApplication.objects.create(
         application_number=app_number,
@@ -172,6 +190,40 @@ def waitlist_application(app, actor=None, remarks="", request=None):
 
 def cancel_application(app, actor=None, remarks="", request=None):
     return transition_application(app, "cancelled", actor=actor, remarks=remarks or "Application cancelled", request=request)
+
+
+def rollback_application(
+    application: AdmissionApplication,
+    target_status: str,
+    actor=None,
+    remarks: str = "",
+    request=None,
+) -> AdmissionApplication:
+    """
+    Rolls back an application to a previous state for authorized administrative users.
+    Bypasses standard forward state machine validation but records history and audit logs.
+    """
+    if application.status == "enrolled":
+        raise ValueError("Cannot roll back an enrolled application.")
+
+    prev = application.status
+    application.status = target_status
+    application.save(update_fields=["status", "updated_at"])
+
+    ApplicationStatusHistory.objects.create(
+        application=application,
+        previous_status=prev,
+        new_status=target_status,
+        changed_by=actor,
+        remarks=f"[ROLLBACK] {remarks or 'Rolled back by administrator'}",
+    )
+
+    _audit(application, actor, "status_changed",
+           f"ROLLBACK {application.application_number}: {prev} → {target_status}",
+           metadata={"prev": prev, "new": target_status, "rollback": True, "remarks": remarks},
+           request=request)
+
+    return application
 
 
 # ──────────────────────────────────────────────────────────────────────────────

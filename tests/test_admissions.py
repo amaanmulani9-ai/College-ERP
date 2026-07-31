@@ -150,3 +150,36 @@ class TestAdmissionsModule:
         dash_res = self.client.get(dash_url)
         assert dash_res.status_code == status.HTTP_200_OK
         assert dash_res.data["total_applications"] >= 1
+
+    def test_duplicate_application_prevention(self):
+        data = {
+            "first_name": "Dave",
+            "last_name": "Miller",
+            "email": "dave.miller@example.com",
+            "academic_session": self.session,
+            "program": self.program,
+            "department": self.department,
+        }
+        create_application(data, actor=self.user)
+
+        with pytest.raises(ValueError, match="already exists"):
+            create_application(data, actor=self.user)
+
+    def test_application_rollback(self):
+        from apps.admissions.services import rollback_application
+        data = {
+            "first_name": "Sam",
+            "last_name": "Wilson",
+            "email": "sam.wilson@example.com",
+            "academic_session": self.session,
+            "program": self.program,
+            "department": self.department,
+        }
+        app = create_application(data, actor=self.user)
+        submit_application(app, actor=self.user)
+        transition_application(app, "under_review", actor=self.user)
+        assert app.status == "under_review"
+
+        rolled_back = rollback_application(app, "draft", actor=self.user, remarks="Need edit")
+        assert rolled_back.status == "draft"
+

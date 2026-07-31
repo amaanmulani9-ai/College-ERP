@@ -53,8 +53,11 @@ class AdmissionApplicationViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = CreateAdmissionApplicationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        application = create_application(serializer.validated_data, actor=request.user, request=request)
-        return Response(AdmissionApplicationSerializer(application).data, status=status.HTTP_201_CREATED)
+        try:
+            application = create_application(serializer.validated_data, actor=request.user, request=request)
+            return Response(AdmissionApplicationSerializer(application).data, status=status.HTTP_201_CREATED)
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_destroy(self, instance):
         soft_delete_application(instance, actor=self.request.user, request=self.request)
@@ -117,6 +120,20 @@ class AdmissionApplicationViewSet(viewsets.ModelViewSet):
                 },
                 status=status.HTTP_200_OK,
             )
+        except ValueError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=["post"])
+    def rollback(self, request, pk=None):
+        app = self.get_object()
+        target_status = request.data.get("target_status")
+        remarks = request.data.get("remarks", "")
+        if not target_status:
+            return Response({"detail": "target_status is required for rollback."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            from .services import rollback_application
+            updated = rollback_application(app, target_status, actor=request.user, remarks=remarks, request=request)
+            return Response(AdmissionApplicationSerializer(updated).data, status=status.HTTP_200_OK)
         except ValueError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
