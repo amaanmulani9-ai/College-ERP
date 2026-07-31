@@ -53,6 +53,7 @@ SHARED_APPS = (
     "apps.certificates",
     "apps.fees",
     "apps.payments",
+    "apps.scholarships",
 )
 
 
@@ -82,6 +83,7 @@ TENANT_APPS = (
     "apps.certificates",
     "apps.fees",
     "apps.payments",
+    "apps.scholarships",
 )
 
 

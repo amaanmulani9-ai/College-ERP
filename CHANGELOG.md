@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v0.18.0] - 2026-08-01
+
+### Added
+- **Enterprise Scholarship Management System (`apps/scholarships/`)**:
+  - Models: `ScholarshipType`, `Scholarship`, `ScholarshipApplication`, `ScholarshipRenewal`, `ScholarshipAuditLog`.
+  - Scholarship Types: Government, Private, Merit, Sports, Minority, Need Based, Fee Waiver.
+  - ScholarshipService: `apply()`, `approve()`, `reject()`, `renew()`, `apply_scholarship_to_fees()`, `apply_fee_waiver()`, `calculate_discount()`, `student_scholarships()`.
+  - Fee Management Integration: Auto-updates `StudentFee.scholarship_amount`, recalculates `due_amount`, and sets `waived`/`paid` status upon application approval or renewal.
+  - Eligibility Rules: CGPA minimums & family annual income cap enforcement.
+  - Business Rules: One active scholarship per type per student per academic session.
+  - REST APIs: `/api/scholarships/apply/`, `/api/scholarships/approve/`, `/api/scholarships/reject/`, `/api/scholarships/renew/`, `/api/scholarships/student/{id}/`.
+  - Permissions: `IsScholarshipOfficerOrAdmin`, `IsStudentOrScholarshipOfficer`.
+  - Django Admin: Bulk application approval action & read-only audit log.
+  - Frontend Pages: `ScholarshipDashboardPage`, `ScholarshipTypesPage`, `StudentScholarshipsPage`, `ScholarshipApplicationsPage`, `ScholarshipRenewalsPage`, `EligibilityCheckerPage`.
+  - Sidebar Navigation: Scholarship Management group added.
+  - TypeScript Service: `scholarshipService.ts`.
+  - Test Suite (`tests/test_scholarships.py`) — 11 unit & integration tests passing (100%).
+  - Documentation (`docs/scholarships.md`).
+
 ## [v0.17.0] - 2026-08-01
 
 ### Added

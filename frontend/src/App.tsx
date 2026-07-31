@@ -84,6 +84,13 @@ import PaymentHistoryPage from "./pages/PaymentHistoryPage";
 import TransactionDetailsPage from "./pages/TransactionDetailsPage";
 import RefundHistoryPage from "./pages/RefundHistoryPage";
 
+import ScholarshipDashboardPage from "./pages/ScholarshipDashboardPage";
+import ScholarshipTypesPage from "./pages/ScholarshipTypesPage";
+import StudentScholarshipsPage from "./pages/StudentScholarshipsPage";
+import ScholarshipApplicationsPage from "./pages/ScholarshipApplicationsPage";
+import ScholarshipRenewalsPage from "./pages/ScholarshipRenewalsPage";
+import EligibilityCheckerPage from "./pages/EligibilityCheckerPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -193,6 +200,14 @@ export const App: React.FC = () => {
             <Route path="/payments/history" element={<PaymentHistoryPage />} />
             <Route path="/payments/details" element={<TransactionDetailsPage />} />
             <Route path="/payments/refunds" element={<RefundHistoryPage />} />
+
+            {/* Scholarship Management Routes */}
+            <Route path="/scholarships" element={<ScholarshipDashboardPage />} />
+            <Route path="/scholarships/types" element={<ScholarshipTypesPage />} />
+            <Route path="/scholarships/student" element={<StudentScholarshipsPage />} />
+            <Route path="/scholarships/applications" element={<ScholarshipApplicationsPage />} />
+            <Route path="/scholarships/renewals" element={<ScholarshipRenewalsPage />} />
+            <Route path="/scholarships/eligibility" element={<EligibilityCheckerPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
