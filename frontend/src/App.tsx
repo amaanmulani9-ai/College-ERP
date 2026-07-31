@@ -59,6 +59,10 @@ import { AttendanceDashboardPage } from "./pages/AttendanceDashboardPage";
 import { TakeAttendancePage } from "./pages/TakeAttendancePage";
 import { AttendanceReportsPage } from "./pages/AttendanceReportsPage";
 
+import { ExamDashboardPage } from "./pages/ExamDashboardPage";
+import { ExamSchedulePage } from "./pages/ExamSchedulePage";
+import { HallTicketPage } from "./pages/HallTicketPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -138,6 +142,11 @@ export const App: React.FC = () => {
             <Route path="/attendance" element={<AttendanceDashboardPage />} />
             <Route path="/attendance/take" element={<TakeAttendancePage />} />
             <Route path="/attendance/reports" element={<AttendanceReportsPage />} />
+
+            {/* Examination Management Routes */}
+            <Route path="/examinations" element={<ExamDashboardPage />} />
+            <Route path="/examinations/schedules" element={<ExamSchedulePage />} />
+            <Route path="/examinations/hall-tickets" element={<HallTicketPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

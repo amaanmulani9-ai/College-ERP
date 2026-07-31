@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v0.13.0] - 2026-08-01
+
+### Added
+- **Enterprise Examination Management System (`apps/examinations/`)**:
+  - Models for `ExamType`, `Exam`, `ExamSchedule`, `HallTicket`, `ExamAttendance`, `InvigilatorAssignment`, and `ExamAuditLog`.
+  - Conflict engine for classroom and invigilator exam double-booking prevention.
+  - Hall Ticket generation engine requiring valid admit passes before exam attendance marking.
+  - Student exam schedule & faculty invigilator duty assignment APIs.
+  - Frontend React pages: `ExamDashboardPage`, `ExamSchedulePage`, `HallTicketPage`.
+  - Comprehensive unit test suite (`tests/test_examinations.py`).
+  - System documentation (`docs/examinations.md`).
+
 ## [v0.12.0] - 2026-08-01
 
 ### Added

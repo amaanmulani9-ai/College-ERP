@@ -63,8 +63,9 @@ gantt
 - [x] TASK-010 Enterprise Admissions Management System (`v0.10.0`)
 - [x] TASK-011 Enterprise Timetable Management System (`v0.11.0`)
 - [x] TASK-012 Enterprise Attendance Management System (`v0.12.0`)
+- [x] TASK-013 Enterprise Examination Management System (`v0.13.0`)
 
-Current Status: **Phase 12 (v0.12.0) Released** — Full Attendance Sessions, Student & Faculty Marking, Session Locking, Reports & QR/Biometric readiness implemented.
+Current Status: **Phase 13 (v0.13.0) Released** — Full Examination Types, Schedules, Hall Ticket Generation, Exam Attendance & Invigilator Duty Assignments implemented.
 
 ---
 
