@@ -73,6 +73,11 @@ import { GenerateCertificatePage } from "./pages/GenerateCertificatePage";
 import { StudentCertificatesPage } from "./pages/StudentCertificatesPage";
 import { VerificationPage } from "./pages/VerificationPage";
 
+import FeeDashboardPage from "./pages/FeeDashboardPage";
+import FeeStructurePage from "./pages/FeeStructurePage";
+import CollectFeePage from "./pages/CollectFeePage";
+import OutstandingReportPage from "./pages/OutstandingReportPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -169,6 +174,12 @@ export const App: React.FC = () => {
             <Route path="/certificates/generate" element={<GenerateCertificatePage />} />
             <Route path="/certificates/student-certs" element={<StudentCertificatesPage />} />
             <Route path="/certificates/verify" element={<VerificationPage />} />
+
+            {/* Fee Management Routes */}
+            <Route path="/fees" element={<FeeDashboardPage />} />
+            <Route path="/fees/structure" element={<FeeStructurePage />} />
+            <Route path="/fees/collect" element={<CollectFeePage />} />
+            <Route path="/fees/outstanding" element={<OutstandingReportPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

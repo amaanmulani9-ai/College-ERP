@@ -51,7 +51,9 @@ SHARED_APPS = (
     "apps.examinations",
     "apps.results",
     "apps.certificates",
+    "apps.fees",
 )
+
 
 TENANT_APPS = (
     "django.contrib.admin",
@@ -77,7 +79,9 @@ TENANT_APPS = (
     "apps.examinations",
     "apps.results",
     "apps.certificates",
+    "apps.fees",
 )
+
 
 INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]
 

@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v0.16.0] - 2026-08-01
+
+### Added
+- **Enterprise Fee Management System (`apps/fees/`)**:
+  - Models: `FeeCategory`, `FeeStructure`, `StudentFee`, `FeeInstallment`, `FeeReceipt`, `FeeAuditLog`.
+  - Fee Structure engine: program + semester + category + academic session combination with unique constraint.
+  - Fee Assignment service: assigns fee to student with optional waiver, scholarship deduction, and installment splitting (30-day intervals).
+  - Overpayment guard: blocks payments exceeding `due_amount`.
+  - Duplicate assignment prevention via `validate_no_duplicate_assignment`.
+  - Fine Calculation engine: `amount × (fine_rate% / 100) × days_overdue` (zero for non-overdue).
+  - Receipt generation: unique format `RCPT-{YEAR}-{8-char-hex}`, immutable, audit-logged.
+  - Post-save signals: `paid_amount`, `due_amount`, and `status` auto-sync on every receipt.
+  - Outstanding Report API with per-student breakdowns.
+  - Django Admin: inlines for Installments, Receipts, and Audit Logs on each StudentFee.
+  - IsFeeOfficerOrAdmin permission class.
+  - Frontend React pages: `FeeDashboardPage`, `FeeStructurePage`, `CollectFeePage`, `OutstandingReportPage`.
+  - CSV export in OutstandingReportPage.
+  - Sidebar navigation: Fee Management section with 4 links.
+  - TypeScript service: `feeService.ts` with typed interfaces.
+  - 30 unit/integration tests (`tests/test_fees.py`) — all passing.
+  - System documentation (`docs/fees.md`).
+
 ## [v0.15.0] - 2026-08-01
 
 ### Added
