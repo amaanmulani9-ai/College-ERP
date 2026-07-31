@@ -44,6 +44,7 @@ SHARED_APPS = (
     "apps.academics",
     "apps.students",
     "apps.staff",
+    "apps.parents",
 )
 
 TENANT_APPS = (
@@ -63,6 +64,7 @@ TENANT_APPS = (
     "apps.academics",
     "apps.students",
     "apps.staff",
+    "apps.parents",
 )
 
 INSTALLED_APPS = list(SHARED_APPS) + [app for app in TENANT_APPS if app not in SHARED_APPS]

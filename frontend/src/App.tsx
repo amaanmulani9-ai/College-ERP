@@ -41,6 +41,9 @@ import { CreateEmployeePage } from "./pages/CreateEmployeePage";
 import { DesignationManagementPage } from "./pages/DesignationManagementPage";
 import { EmployeeStatisticsPage } from "./pages/EmployeeStatisticsPage";
 
+import { ParentListPage } from "./pages/ParentListPage";
+import { ParentDetailsPage } from "./pages/ParentDetailsPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -99,6 +102,9 @@ export const App: React.FC = () => {
             <Route path="/rbac/permissions" element={<PermissionsPage />} />
             <Route path="/rbac/matrix" element={<PermissionMatrixPage />} />
             <Route path="/rbac/assign-roles" element={<AssignRolesPage />} />
+            {/* Parent & Guardian Management Routes */}
+            <Route path="/parents" element={<ParentListPage />} />
+            <Route path="/parents/:id" element={<ParentDetailsPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
