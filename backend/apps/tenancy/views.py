@@ -16,12 +16,12 @@ class ClientViewSet(viewsets.ModelViewSet):
     def deactivate(self, request, pk=None):
         tenant = self.get_object()
         tenant.is_active = False
-        tenant.save()
+        Client.objects.filter(pk=tenant.pk).update(is_active=False)
         return Response({"status": "deactivated", "name": tenant.name})
 
     @action(detail=True, methods=["post"])
     def activate(self, request, pk=None):
         tenant = self.get_object()
         tenant.is_active = True
-        tenant.save()
+        Client.objects.filter(pk=tenant.pk).update(is_active=True)
         return Response({"status": "activated", "name": tenant.name})

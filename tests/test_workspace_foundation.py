@@ -15,6 +15,6 @@ def test_workspace_settings_configuration():
     """Verifies essential framework configurations."""
     from django.conf import settings
     assert "rest_framework" in settings.INSTALLED_APPS
-    assert "django_tenants" in settings.INSTALLED_APPS
+    assert "django_tenants" in settings.SHARED_APPS
     assert "corsheaders" in settings.INSTALLED_APPS
     assert "whitenoise.middleware.WhiteNoiseMiddleware" in settings.MIDDLEWARE
