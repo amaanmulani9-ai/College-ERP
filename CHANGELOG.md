@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v0.11.0] - 2026-08-01
+
+### Added
+- **Enterprise Timetable Management System (`apps/timetable/`)**:
+  - Models for `Building`, `Classroom`, `TimeSlot`, `Timetable`, and `TimetableAuditLog`.
+  - Conflict Engine (`validators.py`, `services.py`) preventing Faculty double booking, Classroom double booking, and Batch double booking.
+  - Multi-view APIs for Faculty schedule, Student schedule, Room occupancy, and Master Weekly schedule matrix.
+  - Frontend React pages: `TimetableDashboardPage`, `WeeklyTimetablePage`, `ConflictViewerPage`.
+  - Full unit test suite (`tests/test_timetable.py`).
+  - System documentation (`docs/timetable.md`).
+
 ## [0.10.0] - 2026-07-31
 
 ### Added

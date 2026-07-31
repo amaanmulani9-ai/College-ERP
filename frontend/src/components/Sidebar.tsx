@@ -55,6 +55,12 @@ export const Sidebar: React.FC = () => {
     { label: "Seat Matrix", path: "/admissions/seat-matrix", icon: Layers },
   ];
 
+  const timetableItems = [
+    { label: "Timetable Hub", path: "/timetable", icon: LayoutDashboard },
+    { label: "Weekly Schedule", path: "/timetable/weekly", icon: Calendar },
+    { label: "Conflict Checker", path: "/timetable/conflict-checker", icon: AlertTriangle },
+  ];
+
   return (
     <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between overflow-y-auto">
       <div>
@@ -195,6 +201,30 @@ export const Sidebar: React.FC = () => {
               Admissions Engine
             </div>
             {admissionItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    isActive
+                      ? "bg-indigo-600/15 text-indigo-400 border border-indigo-500/20"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="space-y-1">
+            <div className="px-3 py-1 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
+              Timetable Engine
+            </div>
+            {timetableItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
               return (

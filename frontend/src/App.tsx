@@ -51,6 +51,10 @@ import { CreateApplicationPage } from "./pages/CreateApplicationPage";
 import { DocumentVerificationPage } from "./pages/DocumentVerificationPage";
 import { SeatMatrixPage } from "./pages/SeatMatrixPage";
 
+import { TimetableDashboardPage } from "./pages/TimetableDashboardPage";
+import { WeeklyTimetablePage } from "./pages/WeeklyTimetablePage";
+import { ConflictViewerPage } from "./pages/ConflictViewerPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -120,6 +124,11 @@ export const App: React.FC = () => {
             <Route path="/admissions/create" element={<CreateApplicationPage />} />
             <Route path="/admissions/documents" element={<DocumentVerificationPage />} />
             <Route path="/admissions/seat-matrix" element={<SeatMatrixPage />} />
+
+            {/* Timetable Management Routes */}
+            <Route path="/timetable" element={<TimetableDashboardPage />} />
+            <Route path="/timetable/weekly" element={<WeeklyTimetablePage />} />
+            <Route path="/timetable/conflict-checker" element={<ConflictViewerPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
