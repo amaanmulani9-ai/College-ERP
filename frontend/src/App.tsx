@@ -68,6 +68,11 @@ import { MarksEntryPage } from "./pages/MarksEntryPage";
 import { PublishResultPage } from "./pages/PublishResultPage";
 import { StudentResultPage } from "./pages/StudentResultPage";
 
+import { CertificateDashboardPage } from "./pages/CertificateDashboardPage";
+import { GenerateCertificatePage } from "./pages/GenerateCertificatePage";
+import { StudentCertificatesPage } from "./pages/StudentCertificatesPage";
+import { VerificationPage } from "./pages/VerificationPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -158,6 +163,12 @@ export const App: React.FC = () => {
             <Route path="/results/entry" element={<MarksEntryPage />} />
             <Route path="/results/publish" element={<PublishResultPage />} />
             <Route path="/results/student" element={<StudentResultPage />} />
+
+            {/* Certificate & Transcript Routes */}
+            <Route path="/certificates" element={<CertificateDashboardPage />} />
+            <Route path="/certificates/generate" element={<GenerateCertificatePage />} />
+            <Route path="/certificates/student-certs" element={<StudentCertificatesPage />} />
+            <Route path="/certificates/verify" element={<VerificationPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

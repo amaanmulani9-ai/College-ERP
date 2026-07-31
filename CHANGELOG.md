@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v0.15.0] - 2026-08-01
+
+### Added
+- **Enterprise Certificate & Transcript Management (`apps/certificates/`)**:
+  - Models for `CertificateType`, `Certificate`, `Transcript`, and `CertificateAuditLog`.
+  - Certificate generation engine for Bonafide, Leaving, Character, Degree, Marksheet, and Migration certificates.
+  - Published results enforcement rule for academic certificates & marksheets.
+  - Official transcript computation engine (CGPA, SGPA, credits earned & total credits).
+  - Public certificate verification API endpoint (`/api/certificates/verify/{number}/`).
+  - PDF download payload generation endpoint (`/api/certificates/download/{id}/`).
+  - Frontend React pages: `CertificateDashboardPage`, `GenerateCertificatePage`, `StudentCertificatesPage`, `VerificationPage`.
+  - Comprehensive unit test suite (`tests/test_certificates.py`).
+  - System documentation (`docs/certificates.md`).
+
 ## [v0.14.0] - 2026-08-01
 
 ### Added

@@ -80,6 +80,13 @@ export const Sidebar: React.FC = () => {
     { label: "Transcript Preview", path: "/results/student", icon: Trophy },
   ];
 
+  const certItems = [
+    { label: "Certificate Hub", path: "/certificates", icon: LayoutDashboard },
+    { label: "Issue Certificate", path: "/certificates/generate", icon: FileCheck },
+    { label: "Student Repository", path: "/certificates/student-certs", icon: Ticket },
+    { label: "Verification Portal", path: "/certificates/verify", icon: ShieldCheck },
+  ];
+
   return (
     <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between overflow-y-auto">
       <div>
@@ -316,6 +323,30 @@ export const Sidebar: React.FC = () => {
               Result Engine
             </div>
             {resultItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    isActive
+                      ? "bg-indigo-600/15 text-indigo-400 border border-indigo-500/20"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="space-y-1">
+            <div className="px-3 py-1 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
+              Certificates Engine
+            </div>
+            {certItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
               return (

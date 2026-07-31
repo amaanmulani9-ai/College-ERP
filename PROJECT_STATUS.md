@@ -65,8 +65,9 @@ gantt
 - [x] TASK-012 Enterprise Attendance Management System (`v0.12.0`)
 - [x] TASK-013 Enterprise Examination Management System (`v0.13.0`)
 - [x] TASK-014 Enterprise Result Management System (`v0.14.0`)
+- [x] TASK-015 Enterprise Certificate & Transcript Management (`v0.15.0`)
 
-Current Status: **Phase 14 (v0.14.0) Released** — Full Result Schemes, Marks Entry, Automatic Grade Calculation, SGPA/CGPA Engine, Merit Ranks & Result Publishing implemented.
+Current Status: **Phase 15 (v0.15.0) Released** — Certificate Types, Certificate Issuance, Published Result Rules, Official Transcript Engine, Verification Portal & Audit Logs implemented.
 
 ---
 
