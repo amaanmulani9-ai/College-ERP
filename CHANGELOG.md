@@ -1,0 +1,65 @@
+# Changelog
+
+All notable changes to the Enterprise College ERP system will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [0.8.0] - 2026-07-31
+
+### Added
+
+#### **TASK-001: Enterprise Workspace Initialization**
+- Built clean multi-app Django 5 backend + React 19 + TypeScript + Vite + Tailwind CSS frontend architecture.
+- Added core system health check endpoints (`/api/health/`).
+- Configured Vite with proxy rules for backend API routing.
+
+#### **TASK-002: Multi-Tenant SaaS Architecture**
+- Integrated PostgreSQL schema-based isolation using `django-tenants`.
+- Implemented tenant management commands (`create_tenant`, `delete_tenant`, `list_tenants`, `migrate_tenants`).
+- Created tenant resolution logging middleware (`TenantLoggingMiddleware`).
+- Configured tenant health endpoints (`/api/health/database/`, `/api/health/redis/`, `/api/health/storage/`).
+
+#### **TASK-003: Enterprise Authentication & Identity Management**
+- Implemented custom User model using email as primary identifier with SimpleJWT authentication.
+- Added access & refresh token rotation and blacklisting support.
+- Built rate limiting & 5-attempt account lockout mechanism (15 minutes window).
+- Added `AuditLog` and `TokenRecord` models for secure email verification and password resets.
+- Added React auth components: `LoginPage`, `RegisterPage`, `ForgotPasswordPage`, `ResetPasswordPage`, `VerifyEmailPage`, `ProfilePage`.
+
+#### **TASK-004: Enterprise Role-Based Access Control (RBAC)**
+- Created `Permission`, `Role`, and `UserRole` models.
+- Built idempotent RBAC seeder (`seed_rbac_defaults`) populating 14 institutional roles for every tenant.
+- Implemented `PermissionResolver` with Redis/Django caching (`rbac:<schema>:user:<user_id>:permissions`).
+- Created DRF permission classes (`RequirePermission`, `RequireAnyPermission`, `RequireAllPermissions`, `RequireRole`, `TenantOwnershipValidation`).
+- Added Permission Matrix APIs and React management pages (`RolesPage`, `PermissionsPage`, `PermissionMatrixPage`, `RoleDetailsPage`, `AssignRolesPage`).
+
+#### **TASK-005: Enterprise User Profile & Identity Management**
+- Implemented `UserProfile`, `UserContact`, `UserAddress`, `UserPreferences`, and `ProfileActivity` models auto-created via `post_save` signals.
+- Built profile avatar upload & deletion API with 5MB size limit and MIME type validation (`FormParser`, `MultiPartParser`).
+- Implemented dynamic profile completion percentage calculator.
+- Added React pages: `MyProfilePage`, `EditProfilePage`, `UserPreferencesPage`, `ActivityTimelinePage`, `ProfileCompletionWidget`.
+
+#### **TASK-006: Academic Structure Engine**
+- Built complete academic hierarchy: `Faculty` -> `Department` -> `Program` -> `AcademicSession` -> `Semester` -> `Subject` -> `SubjectOffering`.
+- Implemented soft deletion safeguards preventing orphan entity deletions.
+- Enforced single active current session rule per tenant.
+- Built REST CRUD ViewSets with soft delete & restore capabilities.
+- Added React pages: `FacultyManagementPage`, `DepartmentManagementPage`, `ProgramManagementPage`, `AcademicSessionsPage`, `SemesterManagementPage`, `SubjectManagementPage`, `SubjectOfferingsPage`.
+
+#### **TASK-007: Enterprise Student Management System**
+- Created `Student` entity linked one-to-one with `UserProfile` and referencing academic entities (`Program`, `Department`, `Semester`, `AcademicSession`).
+- Implemented auto-generated tenant-isolated Student ID formula (`ERP-YEAR-PROGRAM-SEQUENCE`).
+- Added `StudentStatusHistory` state transition auditing (`applicant`, `active`, `suspended`, `graduated`, `withdrawn`, `alumni`).
+- Created REST APIs & Dashboard Summary endpoints (`/api/students/dashboard-summary/`, bulk CSV placeholders).
+- Added React pages: `StudentListPage`, `StudentDetailsPage`, `CreateStudentPage`, `StudentStatisticsPage`, `BulkImportExportPage`.
+
+#### **TASK-008: Enterprise Staff & Employee Management System**
+- Created `Designation` entity defining institutional ranks and categories (`teaching`, `non_teaching`, `administration`, `finance`, `library`, `it_support`, `hostel`, `transport`, `security`).
+- Created `Employee` entity linked one-to-one with `UserProfile` and referencing `Department` and `Designation`.
+- Implemented auto-generated tenant-isolated Employee ID formula (`EMP-YEAR-SEQUENCE`).
+- Added `EmployeeStatusHistory` state transition auditing (`active`, `on_leave`, `suspended`, `resigned`, `retired`, `terminated`).
+- Created REST APIs & HR Dashboard Summary endpoints (`/api/staff/dashboard-summary/`).
+- Added React pages: `EmployeeListPage`, `EmployeeDetailsPage`, `CreateEmployeePage`, `DesignationManagementPage`, `EmployeeStatisticsPage`.

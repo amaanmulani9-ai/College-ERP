@@ -1,44 +1,35 @@
-FROM python:3.10-slim
+FROM python:3.13-slim AS runtime
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-ENV DJANGO_SETTINGS_MODULE=college_management_system.settings
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    DJANGO_SETTINGS_MODULE=config.settings.production
 
-# Set work directory
 WORKDIR /app
 
-# Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        gcc \
+        build-essential \
         libpq-dev \
         netcat-traditional \
     && rm -rf /var/lib/apt/lists/*
 
-# Install python dependencies
-COPY requirements.txt /app/
-# Add missing dependencies for SaaS setup
+COPY requirements.txt /tmp/requirements.txt
 RUN pip install --upgrade pip \
-    && pip install gunicorn django-tenants \
-    && pip install -r requirements.txt
+    && pip install -r /tmp/requirements.txt
 
-# Copy project
 COPY backend/ /app/
-COPY frontend/ /app/frontend/
+COPY scripts/entrypoint.sh /entrypoint.sh
 
-# Ensure staticfiles directory exists and is writable
-RUN mkdir -p /app/staticfiles && chmod 777 /app/staticfiles
+RUN mkdir -p /app/staticfiles /app/media /app/logs \
+    && chmod +x /entrypoint.sh \
+    && addgroup --system app \
+    && adduser --system --ingroup app app \
+    && chown -R app:app /app
 
-# Collect static files (needs mock DB url so settings load)
-RUN DATABASE_URL=postgres://mock:mock@localhost:5432/mock python manage.py collectstatic --noinput || true
+USER app
 
-# Copy entrypoint script
-COPY scripts/entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
+EXPOSE 8000
 
-# Run entrypoint
-ENTRYPOINT ["/app/entrypoint.sh"]
-
-# Start gunicorn
-CMD ["gunicorn", "college_management_system.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3"]
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--access-logfile", "-", "--error-logfile", "-"]

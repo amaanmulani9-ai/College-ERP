@@ -1,13 +1,13 @@
 import os
 import json
 import requests
-from django.conf import settings
 
 OLLAMA_URL = os.environ.get('OLLAMA_URL', 'http://localhost:11434')
-DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'gemma') # Default local model
+DEFAULT_MODEL = os.environ.get('OLLAMA_MODEL', 'qwen3')
+OLLAMA_TIMEOUT_SECONDS = int(os.environ.get('OLLAMA_TIMEOUT_SECONDS', '30'))
 
 HAS_AI_LIBS = False
-print("[AI HELPER] AI ML libs disabled for Free Tier. Using pure Python fallbacks.")
+print("[AI HELPER] Local-only AI mode enabled. Ollama is the only inference backend.")
 
 # ----------------- Pure Python Fallback Helpers -----------------
 class FallbackVectorDB:
@@ -43,68 +43,19 @@ class FallbackVectorDB:
 # Global fallback vector DB instance
 _fallback_db = FallbackVectorDB()
 
-try:
-    import google.generativeai as genai
-except (ImportError, ModuleNotFoundError):
-    genai = None
+def _get_ollama_host():
+    """Return the configured Ollama host, preferring Docker-friendly OLLAMA_HOST."""
+    return (os.environ.get('OLLAMA_HOST') or OLLAMA_URL).rstrip('/')
 
-# Setup Gemini using API Key from Render environment variables
-GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
-if GEMINI_API_KEY and genai:
-    try:
-        genai.configure(api_key=GEMINI_API_KEY)
-    except Exception as e:
-        print(f"[GEMINI] Config error: {e}")
 
 def generate_ollama_response(prompt, system_prompt=None, response_format=None):
     """
-    Unified AI generation dispatcher supporting Gemini API, OpenAI API, and local Ollama.
+    Generate text with local Ollama only.
+
+    The College ERP AI stack is intentionally free and local-first. External hosted
+    AI providers are not consulted even if API keys are present in the environment.
     """
-    openai_key = os.environ.get('OPENAI_API_KEY')
-    gemini_key = os.environ.get('GEMINI_API_KEY')
-    ollama_host = os.environ.get('OLLAMA_HOST', OLLAMA_URL)
-
-    # 1. Try Gemini API if key configured
-    if gemini_key and genai:
-        try:
-            model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_prompt)
-            generation_config = genai.types.GenerationConfig()
-            if response_format == "json":
-                generation_config.response_mime_type = "application/json"
-            response = model.generate_content(prompt, generation_config=generation_config)
-            if response and response.text:
-                return response.text.strip()
-        except Exception as e:
-            print(f"[AI HELPER] Gemini API notice: {e}")
-
-    # 2. Try OpenAI API if key configured
-    if openai_key:
-        try:
-            headers = {
-                "Authorization": f"Bearer {openai_key}",
-                "Content-Type": "application/json"
-            }
-            messages_payload = []
-            if system_prompt:
-                messages_payload.append({"role": "system", "content": system_prompt})
-            messages_payload.append({"role": "user", "content": prompt})
-            
-            payload = {
-                "model": os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo"),
-                "messages": messages_payload,
-                "temperature": 0.7
-            }
-            if response_format == "json":
-                payload["response_format"] = {"type": "json_object"}
-
-            res = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload, timeout=10)
-            if res.status_code == 200:
-                res_data = res.json()
-                return res_data['choices'][0]['message']['content'].strip()
-        except Exception as e:
-            print(f"[AI HELPER] OpenAI API notice: {e}")
-
-    # 3. Try Local Ollama endpoint
+    ollama_host = _get_ollama_host()
     if ollama_host:
         try:
             payload = {
@@ -114,10 +65,14 @@ def generate_ollama_response(prompt, system_prompt=None, response_format=None):
             }
             if response_format == "json":
                 payload["format"] = "json"
-            res = requests.post(f"{ollama_host}/api/generate", json=payload, timeout=5)
+            res = requests.post(
+                f"{ollama_host}/api/generate",
+                json=payload,
+                timeout=OLLAMA_TIMEOUT_SECONDS
+            )
             if res.status_code == 200:
                 return res.json().get('response', '').strip()
-        except Exception:
+        except (requests.RequestException, ValueError, TypeError, KeyError):
             pass
 
     return ""
@@ -394,4 +349,3 @@ def ai_helpdesk_answer(user, user_message):
         
     else:
         return f"Hello {user_name}! I am CampusBot, your 24/7 Campus AI Assistant. I can help you check your attendance logs, outstanding fee receipts, exam timetables, or certificate request statuses. What would you like to view?"
-

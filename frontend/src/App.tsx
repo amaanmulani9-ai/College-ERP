@@ -1,0 +1,109 @@
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MainLayout } from "./layouts/MainLayout";
+import { DashboardPage } from "./pages/DashboardPage";
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
+import { VerifyEmailPage } from "./pages/VerifyEmailPage";
+import { ProfilePage } from "./pages/ProfilePage";
+
+import { RolesPage } from "./pages/RolesPage";
+import { RoleDetailsPage } from "./pages/RoleDetailsPage";
+import { PermissionsPage } from "./pages/PermissionsPage";
+import { PermissionMatrixPage } from "./pages/PermissionMatrixPage";
+import { AssignRolesPage } from "./pages/AssignRolesPage";
+
+import { MyProfilePage } from "./pages/MyProfilePage";
+import { EditProfilePage } from "./pages/EditProfilePage";
+import { UserPreferencesPage } from "./pages/UserPreferencesPage";
+import { ActivityTimelinePage } from "./pages/ActivityTimelinePage";
+
+import { FacultyManagementPage } from "./pages/FacultyManagementPage";
+import { DepartmentManagementPage } from "./pages/DepartmentManagementPage";
+import { ProgramManagementPage } from "./pages/ProgramManagementPage";
+import { AcademicSessionsPage } from "./pages/AcademicSessionsPage";
+import { SemesterManagementPage } from "./pages/SemesterManagementPage";
+import { SubjectManagementPage } from "./pages/SubjectManagementPage";
+import { SubjectOfferingsPage } from "./pages/SubjectOfferingsPage";
+
+import { StudentListPage } from "./pages/StudentListPage";
+import { StudentDetailsPage } from "./pages/StudentDetailsPage";
+import { CreateStudentPage } from "./pages/CreateStudentPage";
+import { StudentStatisticsPage } from "./pages/StudentStatisticsPage";
+import { BulkImportExportPage } from "./pages/BulkImportExportPage";
+
+import { EmployeeListPage } from "./pages/EmployeeListPage";
+import { EmployeeDetailsPage } from "./pages/EmployeeDetailsPage";
+import { CreateEmployeePage } from "./pages/CreateEmployeePage";
+import { DesignationManagementPage } from "./pages/DesignationManagementPage";
+import { EmployeeStatisticsPage } from "./pages/EmployeeStatisticsPage";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+export const App: React.FC = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+
+            {/* Profile Management Routes */}
+            <Route path="/profile/me" element={<MyProfilePage />} />
+            <Route path="/profile/edit" element={<EditProfilePage />} />
+            <Route path="/profile/preferences" element={<UserPreferencesPage />} />
+            <Route path="/profile/timeline" element={<ActivityTimelinePage />} />
+
+            {/* Student Management Routes */}
+            <Route path="/students" element={<StudentListPage />} />
+            <Route path="/students/create" element={<CreateStudentPage />} />
+            <Route path="/students/:id" element={<StudentDetailsPage />} />
+            <Route path="/students/statistics" element={<StudentStatisticsPage />} />
+            <Route path="/students/import-export" element={<BulkImportExportPage />} />
+
+            {/* Staff & Employee Management Routes */}
+            <Route path="/staff" element={<EmployeeListPage />} />
+            <Route path="/staff/create" element={<CreateEmployeePage />} />
+            <Route path="/staff/:id" element={<EmployeeDetailsPage />} />
+            <Route path="/staff/designations" element={<DesignationManagementPage />} />
+            <Route path="/staff/statistics" element={<EmployeeStatisticsPage />} />
+
+            {/* Academic Structure Routes */}
+            <Route path="/academics/faculties" element={<FacultyManagementPage />} />
+            <Route path="/academics/departments" element={<DepartmentManagementPage />} />
+            <Route path="/academics/programs" element={<ProgramManagementPage />} />
+            <Route path="/academics/sessions" element={<AcademicSessionsPage />} />
+            <Route path="/academics/semesters" element={<SemesterManagementPage />} />
+            <Route path="/academics/subjects" element={<SubjectManagementPage />} />
+            <Route path="/academics/offerings" element={<SubjectOfferingsPage />} />
+
+            {/* RBAC Routes */}
+            <Route path="/rbac/roles" element={<RolesPage />} />
+            <Route path="/rbac/roles/:id" element={<RoleDetailsPage />} />
+            <Route path="/rbac/permissions" element={<PermissionsPage />} />
+            <Route path="/rbac/matrix" element={<PermissionMatrixPage />} />
+            <Route path="/rbac/assign-roles" element={<AssignRolesPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
+
+export default App;
