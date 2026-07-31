@@ -1,4 +1,4 @@
-import axios from './api';
+import axios from 'axios';
 
 export interface FeeCategory {
   id: string;
@@ -76,39 +76,41 @@ export interface CollectFeePayload {
   remarks?: string;
 }
 
-const feeService = {
+const API_URL = '/api/fees';
+
+export const feeService = {
   // Categories
-  getCategories: () => axios.get<{ results: FeeCategory[] }>('/fees/categories/').then(r => r.data),
-  createCategory: (data: Partial<FeeCategory>) => axios.post<FeeCategory>('/fees/categories/', data).then(r => r.data),
+  getCategories: () => axios.get<{ results: FeeCategory[] }>(`${API_URL}/categories/`).then((r: any) => r.data.results || r.data),
+  createCategory: (data: Partial<FeeCategory>) => axios.post<FeeCategory>(`${API_URL}/categories/`, data).then((r: any) => r.data),
 
   // Structures
   getStructures: (params?: Record<string, string>) =>
-    axios.get<{ results: FeeStructure[] }>('/fees/structures/', { params }).then(r => r.data),
-  createStructure: (data: Partial<FeeStructure>) => axios.post<FeeStructure>('/fees/structures/', data).then(r => r.data),
+    axios.get<{ results: FeeStructure[] }>(`${API_URL}/structures/`, { params }).then((r: any) => r.data.results || r.data),
+  createStructure: (data: Partial<FeeStructure>) => axios.post<FeeStructure>(`${API_URL}/structures/`, data).then((r: any) => r.data),
 
   // Student Fees
   getStudentFees: (params?: Record<string, string>) =>
-    axios.get<{ results: StudentFee[] }>('/fees/student-fees/', { params }).then(r => r.data),
+    axios.get<{ results: StudentFee[] }>(`${API_URL}/student-fees/`, { params }).then((r: any) => r.data.results || r.data),
   assignFee: (payload: AssignFeePayload) =>
-    axios.post<StudentFee>('/fees/assign/', payload).then(r => r.data),
+    axios.post<StudentFee>(`${API_URL}/assign/`, payload).then((r: any) => r.data),
   getStudentSummary: (studentId: string) =>
-    axios.get<any>(`/fees/student/${studentId}/`).then(r => r.data),
+    axios.get<any>(`${API_URL}/student/${studentId}/`).then((r: any) => r.data),
   getOutstandingReport: () =>
-    axios.get<StudentFee[]>('/fees/outstanding/').then(r => r.data),
+    axios.get<StudentFee[]>(`${API_URL}/outstanding/`).then((r: any) => r.data.results || r.data),
 
   // Installments
   getInstallments: (studentFeeId?: string) =>
-    axios.get<{ results: FeeInstallment[] }>('/fees/installments/', {
+    axios.get<{ results: FeeInstallment[] }>(`${API_URL}/installments/`, {
       params: studentFeeId ? { student_fee: studentFeeId } : {}
-    }).then(r => r.data),
+    }).then((r: any) => r.data.results || r.data),
 
   // Receipts
   getReceipts: (params?: Record<string, string>) =>
-    axios.get<{ results: FeeReceipt[] }>('/fees/receipts/', { params }).then(r => r.data),
+    axios.get<{ results: FeeReceipt[] }>(`${API_URL}/receipts/`, { params }).then((r: any) => r.data.results || r.data),
   collectFee: (payload: CollectFeePayload) =>
-    axios.post<FeeReceipt>('/fees/pay/', payload).then(r => r.data),
+    axios.post<FeeReceipt>(`${API_URL}/pay/`, payload).then((r: any) => r.data),
   getReceipt: (receiptId: string) =>
-    axios.get<FeeReceipt>(`/fees/receipt/${receiptId}/`).then(r => r.data),
+    axios.get<FeeReceipt>(`${API_URL}/receipt/${receiptId}/`).then((r: any) => r.data),
 };
 
 export default feeService;
