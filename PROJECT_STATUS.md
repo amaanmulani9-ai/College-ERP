@@ -62,8 +62,9 @@ gantt
 - [x] **TASK-009: Parent & Guardian Management** — Multi-student linking, document verification workflow, communication preferences engine, full audit trail, dashboard APIs, React portal pages.
 - [x] TASK-010 Enterprise Admissions Management System (`v0.10.0`)
 - [x] TASK-011 Enterprise Timetable Management System (`v0.11.0`)
+- [x] TASK-012 Enterprise Attendance Management System (`v0.12.0`)
 
-Current Status: **Phase 11 (v0.11.0) Released** — Full Timetable Infrastructure, Conflict Engine, Multi-View Schedules & Audit Logs implemented.
+Current Status: **Phase 12 (v0.12.0) Released** — Full Attendance Sessions, Student & Faculty Marking, Session Locking, Reports & QR/Biometric readiness implemented.
 
 ---
 

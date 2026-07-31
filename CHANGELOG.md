@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v0.12.0] - 2026-08-01
+
+### Added
+- **Enterprise Attendance Management System (`apps/attendance/`)**:
+  - Models for `AttendanceSession`, `StudentAttendance`, `FacultyAttendance`, and `AttendanceAuditLog`.
+  - Session locking engine preventing post-lock attendance modification.
+  - Bulk & individual attendance marking endpoints.
+  - Attendance percentage calculations & daily/monthly reporting service.
+  - QR Attendance Token generation and Biometric Integration interface readiness.
+  - Frontend React pages: `AttendanceDashboardPage`, `TakeAttendancePage`, `AttendanceReportsPage`.
+  - Comprehensive unit test suite (`tests/test_attendance.py`).
+  - System documentation (`docs/attendance.md`).
+
 ## [v0.11.0] - 2026-08-01
 
 ### Added

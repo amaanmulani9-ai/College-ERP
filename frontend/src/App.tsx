@@ -55,6 +55,10 @@ import { TimetableDashboardPage } from "./pages/TimetableDashboardPage";
 import { WeeklyTimetablePage } from "./pages/WeeklyTimetablePage";
 import { ConflictViewerPage } from "./pages/ConflictViewerPage";
 
+import { AttendanceDashboardPage } from "./pages/AttendanceDashboardPage";
+import { TakeAttendancePage } from "./pages/TakeAttendancePage";
+import { AttendanceReportsPage } from "./pages/AttendanceReportsPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -129,6 +133,11 @@ export const App: React.FC = () => {
             <Route path="/timetable" element={<TimetableDashboardPage />} />
             <Route path="/timetable/weekly" element={<WeeklyTimetablePage />} />
             <Route path="/timetable/conflict-checker" element={<ConflictViewerPage />} />
+
+            {/* Attendance Management Routes */}
+            <Route path="/attendance" element={<AttendanceDashboardPage />} />
+            <Route path="/attendance/take" element={<TakeAttendancePage />} />
+            <Route path="/attendance/reports" element={<AttendanceReportsPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
