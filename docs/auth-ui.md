@@ -1,14 +1,14 @@
 # Enterprise College ERP — Authentication UI Specification
 
-**Version:** v0.20.2-ui-auth-part3  
+**Version:** v0.20.2-ui-final  
 **Updated:** August 1, 2026  
-**Status:** Backend Integrated & Verified  
+**Status:** TASK-UI-002 (Parts 1–4) COMPLETE  
 
 ---
 
 ## 1. Overview
 
-The Enterprise Authentication suite provides a multi-step registration wizard, password strength checking, a 6-digit OTP password recovery flow, and full integration with SimpleJWT backend APIs. It maintains complete frontend independence without altering backend endpoints, JWT handling, or database schemas.
+The Enterprise Authentication suite provides a multi-step registration wizard, password strength checking, a 6-digit OTP password recovery flow, security settings, active session controls, session timeout warnings, and full integration with SimpleJWT backend APIs.
 
 ---
 
@@ -26,7 +26,7 @@ frontend/src/
 │       ├── AuthInput.tsx             # Standard input field
 │       ├── PasswordInput.tsx         # Password field with visibility toggle
 │       ├── SocialButton.tsx          # Google/Microsoft SSO buttons
-│       ├── AuthDivider.tsx font      # Visual form separator
+│       ├── AuthDivider.tsx           # Visual form separator
 │       ├── RememberMeCheckbox.tsx    # Remember me toggle
 │       ├── RegistrationStepper.tsx   # 4-step wizard progress header
 │       ├── PasswordStrengthMeter.tsx # Visual strength indicator
@@ -37,7 +37,10 @@ frontend/src/
 │       ├── AuthAlert.tsx             # Error/Success alert banners
 │       ├── ProtectedRoute.tsx        # Authenticated route guard
 │       ├── PublicRoute.tsx           # Guest-only route guard
-│       └── RoleRoute.tsx             # RBAC role guard
+│       ├── RoleRoute.tsx             # RBAC role guard
+│       ├── SessionTimeoutModal.tsx   # Inactivity warning modal
+│       ├── SecurityIndicatorBar.tsx  # Security badges bar
+│       └── UserMenuDropdown.tsx      # Header user dropdown menu
 ├── layouts/
 │   └── AuthLayout.tsx                # Split-screen branding layout
 └── pages/
@@ -45,6 +48,9 @@ frontend/src/
         ├── LoginPage.tsx             # Primary login page
         ├── RegisterPage.tsx          # 4-Step Registration Wizard
         ├── ForgotPasswordPage.tsx    # Multi-Stage Recovery Flow
+        ├── SecuritySettingsPage.tsx  # Security center (/profile/security)
+        ├── ChangePasswordPage.tsx    # Password update page (/change-password)
+        ├── ActiveSessionsPage.tsx    # Active session monitor (/sessions)
         ├── VerifyEmailPage.tsx       # Email verification page
         ├── AccessDeniedPage.tsx      # HTTP 403 Access Denied page
         └── SessionExpiredPage.tsx    # Session Timeout page
@@ -56,5 +62,5 @@ frontend/src/
 
 - **TypeScript:** 0 type errors (`npx tsc --noEmit`)
 - **Production Build:** Compiled cleanly via `npm run build`
-- **Session Restoring:** Verified on browser refresh
-- **Role Routing:** Configured for all 14 RBAC user personas
+- **Session Timeout:** Verified with 60-second countdown modal
+- **Status:** **TASK-UI-002 COMPLETE**

@@ -1,8 +1,8 @@
 # Enterprise College ERP — Authentication Architecture & API Flow Specification
 
-**Version:** v0.20.2-ui-auth-part3  
+**Version:** v0.20.2-ui-final  
 **Updated:** August 1, 2026  
-**Status:** Backend Authentication Lifecycle Integrated  
+**Status:** Complete & Production Ready  
 
 ---
 
@@ -27,18 +27,10 @@ The College ERP authentication layer implements OAuth2/JWT token-based authentic
 
 ---
 
-## 3. React Context & Route Protection
+## 3. Session Timeout & Inactivity Protocol
 
-### 3.1 `AuthContext.tsx` State Surface
-- `user`: Authenticated user profile object (`id`, `email`, `first_name`, `last_name`, `role`, `roles`, `permissions`, `tenant`).
-- `tenant`: Active tenant domain header value.
-- `isAuthenticated`: Boolean state verifying active access token and loaded user profile.
-- `isLoading`: Initial session restoration state indicator.
-
-### 3.2 Route Guard Matrix
-- **`<PublicRoute />`**: Restricts access for logged-in users and automatically redirects to their role-based dashboard.
-- **`<ProtectedRoute />`**: Guarantees valid JWT session before rendering child routes; redirects unauthenticated visitors to `/login`.
-- **`<RoleRoute allowedRoles={['...']} />`**: Validates RBAC permissions and redirects unauthorized users to `/access-denied`.
+- **Inactivity Warning:** Listens to user interactions and displays a 60-second modal before token revocation.
+- **Cross-Tab Sync:** Monitors storage events to broadcast logout actions across all open browser tabs.
 
 ---
 

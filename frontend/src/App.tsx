@@ -120,6 +120,11 @@ import { VerifyEmailPage } from "./pages/auth/VerifyEmailPage";
 import { AccessDeniedPage } from "./pages/auth/AccessDeniedPage";
 import { SessionExpiredPage } from "./pages/auth/SessionExpiredPage";
 
+import { SessionTimeoutModal } from "./components/auth/SessionTimeoutModal";
+import { SecuritySettingsPage } from "./pages/auth/SecuritySettingsPage";
+import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
+import { ActiveSessionsPage } from "./pages/auth/ActiveSessionsPage";
+
 // Lazy Loaded Public Pages for Optimized Performance
 const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
 const AboutPage = lazy(() => import("./pages/public/AboutPage").then(m => ({ default: m.AboutPage })));
@@ -154,6 +159,7 @@ export const App: React.FC = () => {
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+          <SessionTimeoutModal />
           <BrowserRouter>
             <Suspense fallback={<PageLoader />}>
             <Routes>
@@ -193,9 +199,12 @@ export const App: React.FC = () => {
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/profile" element={<ProfilePage />} />
 
-            {/* Profile Management Routes */}
+            {/* Profile & Security Management Routes */}
             <Route path="/profile/me" element={<MyProfilePage />} />
             <Route path="/profile/edit" element={<EditProfilePage />} />
+            <Route path="/profile/security" element={<SecuritySettingsPage />} />
+            <Route path="/change-password" element={<ChangePasswordPage />} />
+            <Route path="/sessions" element={<ActiveSessionsPage />} />
             <Route path="/profile/preferences" element={<UserPreferencesPage />} />
             <Route path="/profile/timeline" element={<ActivityTimelinePage />} />
 
