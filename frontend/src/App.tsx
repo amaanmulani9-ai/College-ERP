@@ -112,8 +112,13 @@ import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "./context/ThemeContext";
-import { PublicLayout } from "./layouts/PublicLayout";
-import { PageLoader } from "./components/public/PageLoader";
+import { AuthLayout } from "./layouts/AuthLayout";
+import { LoginPage } from "./pages/auth/LoginPage";
+import { RegisterPage } from "./pages/auth/RegisterPage";
+import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage";
+import { VerifyEmailPage } from "./pages/auth/VerifyEmailPage";
+import { AccessDeniedPage } from "./pages/auth/AccessDeniedPage";
+import { SessionExpiredPage } from "./pages/auth/SessionExpiredPage";
 
 // Lazy Loaded Public Pages for Optimized Performance
 const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
@@ -169,14 +174,20 @@ export const App: React.FC = () => {
                 <Route path="*" element={<NotFoundPage />} />
               </Route>
 
+              {/* Authentication Routes with AuthLayout */}
+              <Route element={<AuthLayout />}>
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/verify-email" element={<VerifyEmailPage />} />
+                <Route path="/access-denied" element={<AccessDeniedPage />} />
+                <Route path="/session-expired" element={<SessionExpiredPage />} />
+              </Route>
+
           {/* Institutional Dashboard & ERP App Routes */}
           <Route element={<MainLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/profile" element={<ProfilePage />} />
 
             {/* Profile Management Routes */}
