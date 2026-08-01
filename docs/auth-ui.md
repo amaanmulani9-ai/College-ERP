@@ -1,14 +1,14 @@
 # Enterprise College ERP — Authentication UI Specification
 
-**Version:** v0.20.2-ui-auth-part1  
+**Version:** v0.20.2-ui-auth-part2  
 **Updated:** August 1, 2026  
-**Status:** Foundation Delivered & Verified  
+**Status:** Registration Wizard & Password Recovery Flow Complete  
 
 ---
 
 ## 1. Overview
 
-The Enterprise Authentication suite provides a split-screen desktop and responsive mobile experience for institutional portal access. Built using React 19, TypeScript, and Framer Motion, it integrates with existing SimpleJWT and django-tenants backend authentication services without altering backend endpoints.
+The Enterprise Authentication suite provides a multi-step registration wizard, password strength checking, and a 6-digit OTP password recovery flow. It maintains complete frontend independence without altering backend endpoints, JWT handling, or database schemas.
 
 ---
 
@@ -18,42 +18,50 @@ The Enterprise Authentication suite provides a split-screen desktop and responsi
 frontend/src/
 ├── components/
 │   └── auth/
-│       ├── AuthCard.tsx             # Glassmorphism container card
-│       ├── AuthInput.tsx            # Form input with icons & validation messaging
-│       ├── PasswordInput.tsx        # Password field with show/hide toggle
-│       ├── SocialButton.tsx         # Google & Microsoft SSO placeholders
-│       ├── AuthDivider.tsx          # "or continue with email" separator
-│       └── RememberMeCheckbox.tsx   # Persistent session checkbox
+│       ├── AuthCard.tsx              # Glassmorphism card container
+│       ├── AuthInput.tsx             # Standard input field
+│       ├── PasswordInput.tsx         # Password field with visibility toggle
+│       ├── SocialButton.tsx          # Google/Microsoft SSO buttons
+│       ├── AuthDivider.tsx           # Visual form separator
+│       ├── RememberMeCheckbox.tsx    # Remember me toggle
+│       ├── RegistrationStepper.tsx   # 4-step wizard progress header
+│       ├── PasswordStrengthMeter.tsx # Visual strength indicator (Weak, Fair, Strong, Excellent)
+│       ├── PasswordChecklist.tsx     # 5-point password rule checklist
+│       ├── OTPInput.tsx              # 6-digit numeric OTP input (auto-focus, paste support)
+│       ├── CountdownTimer.tsx        # Resend countdown timer
+│       ├── SuccessCard.tsx           # Check-animated completion card
+│       └── AuthAlert.tsx             # Error/Success alert banners
 ├── layouts/
-│   └── AuthLayout.tsx               # Split-screen desktop branding & layout
+│   └── AuthLayout.tsx                # Split-screen branding layout
 └── pages/
     └── auth/
-        ├── LoginPage.tsx            # Primary institutional sign-in page
-        ├── RegisterPage.tsx         # Tenant provisioning navigation
-        ├── ForgotPasswordPage.tsx    # Password reset request form
-        ├── VerifyEmailPage.tsx      # Email verification state page
-        ├── AccessDeniedPage.tsx     # 403 RBAC permission denial page
-        └── SessionExpiredPage.tsx   # JWT session timeout page
+        ├── LoginPage.tsx             # Primary login page
+        ├── RegisterPage.tsx          # 4-Step Registration Wizard (Personal, Institution, Security, Review)
+        ├── ForgotPasswordPage.tsx    # Multi-Stage Recovery Flow (Email -> OTP -> New Password -> Success)
+        ├── VerifyEmailPage.tsx       # Email verification page
+        ├── AccessDeniedPage.tsx      # HTTP 403 Access Denied page
+        └── SessionExpiredPage.tsx    # Session Timeout page
 ```
 
 ---
 
-## 3. Key Design Features
+## 3. Key Flows (Part 2 Additions)
 
-### 3.1 Split-Screen Desktop Layout (`AuthLayout.tsx`)
-- **Left Panel:** Institutional branding, platform benefits list, security compliance badges (ISO 27001, Schema Isolation), and system status uptime indicator.
-- **Right Panel:** Centered, responsive glassmorphism card supporting light/dark theme switching.
+### 3.1 Registration Wizard (`RegisterPage.tsx`)
+- **Step 1 (Personal):** First Name, Last Name, Email, Mobile Number.
+- **Step 2 (Institution):** Tenant Selection, RBAC Role Selection, Department, Terms & Privacy Acceptance.
+- **Step 3 (Security):** Create Password, Password Strength Meter, Password Checklist, Confirm Password.
+- **Step 4 (Review & Submit):** Account Summary Review & `SuccessCard` confirmation.
 
-### 3.2 Form Validation & States (`LoginPage.tsx`)
-- Client-side email format and password length validation.
-- Loading state spinner with disabled button behavior.
-- Error banner for invalid credentials.
-- Navigation links to `/forgot-password`, `/register`, and back to marketing site `/`.
+### 3.2 Password Recovery Flow (`ForgotPasswordPage.tsx`)
+- **Stage 1 (Email):** Institutional email input.
+- **Stage 2 (OTP Verification):** 6-digit auto-advancing `OTPInput` with `CountdownTimer` and resend handler.
+- **Stage 3 (New Password):** Create new password with rule checklist and validation.
+- **Stage 4 (Success):** Confirmation card with direct link back to `/login`.
 
 ---
 
-## 4. Verification
+## 4. Verification & Quality Gate
 
 - **TypeScript:** 0 type errors (`npx tsc --noEmit`)
-- **Build:** Production bundle compiled with `npm run build`
-- **Security:** Reuses existing JWT/SimpleJWT and RBAC contracts without altering backend API code.
+- **Production Build:** Compiled cleanly via `npm run build`
