@@ -1,15 +1,16 @@
 from django.db.models import Q
 from rest_framework import generics, status
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import UserProfile, UserPreferences, ProfileActivity
+from .models import ProfileActivity, UserPreferences, UserProfile
 from .serializers import (
     AvatarUploadSerializer,
     ProfileActivitySerializer,
     UpdateProfileSerializer,
-    UserProfileSerializer,
     UserPreferencesSerializer,
+    UserProfileSerializer,
 )
 from .services import (
     calculate_profile_completion,
@@ -40,7 +41,6 @@ class MyProfileView(generics.RetrieveUpdateAPIView):
         )
 
 
-from rest_framework.parsers import FormParser, MultiPartParser
 
 class AvatarUploadView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
@@ -121,11 +121,15 @@ class SearchProfilesView(generics.ListAPIView):
         if not query:
             return UserProfile.objects.none()
 
-        return UserProfile.objects.filter(
-            Q(first_name__icontains=query)
-            | Q(last_name__icontains=query)
-            | Q(display_name__icontains=query)
-            | Q(user__email__icontains=query)
-            | Q(contact__mobile_number__icontains=query)
-            | Q(code__icontains=query)
-        ).select_related("user", "contact").distinct()
+        return (
+            UserProfile.objects.filter(
+                Q(first_name__icontains=query)
+                | Q(last_name__icontains=query)
+                | Q(display_name__icontains=query)
+                | Q(user__email__icontains=query)
+                | Q(contact__mobile_number__icontains=query)
+                | Q(code__icontains=query)
+            )
+            .select_related("user", "contact")
+            .distinct()
+        )

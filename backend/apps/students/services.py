@@ -1,6 +1,7 @@
 import datetime
-from django.db import connection
+
 from apps.authentication.services import log_audit_event
+
 from .models import Student, StudentStatusHistory
 
 
@@ -64,7 +65,9 @@ def reinstate_student(student, actor=None, request=None):
 
 
 def graduate_student(student, actor=None, request=None):
-    return transition_student_status(student, "graduated", actor=actor, reason="Program completed & graduated", request=request)
+    return transition_student_status(
+        student, "graduated", actor=actor, reason="Program completed & graduated", request=request
+    )
 
 
 def withdraw_student(student, reason, actor=None, request=None):
@@ -75,7 +78,12 @@ def soft_delete_student(student, actor=None, request=None):
     student.is_deleted = True
     student.save(update_fields=["is_deleted", "updated_at"])
     if request:
-        log_audit_event(request, event_type="student_deleted", user=actor or request.user, details={"student_id": student.student_id})
+        log_audit_event(
+            request,
+            event_type="student_deleted",
+            user=actor or request.user,
+            details={"student_id": student.student_id},
+        )
     return True
 
 
@@ -83,5 +91,10 @@ def restore_student(student, actor=None, request=None):
     student.is_deleted = False
     student.save(update_fields=["is_deleted", "updated_at"])
     if request:
-        log_audit_event(request, event_type="student_restored", user=actor or request.user, details={"student_id": student.student_id})
+        log_audit_event(
+            request,
+            event_type="student_restored",
+            user=actor or request.user,
+            details={"student_id": student.student_id},
+        )
     return student

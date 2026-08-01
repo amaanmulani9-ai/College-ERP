@@ -124,7 +124,9 @@ class ExamAttendanceViewSet(viewsets.ModelViewSet):
         remarks = serializer.validated_data.get("remarks", "")
 
         try:
-            att = ExamService.mark_exam_attendance(schedule_id, student_id, status_val, remarks, actor=request.user, request=request)
+            att = ExamService.mark_exam_attendance(
+                schedule_id, student_id, status_val, remarks, actor=request.user, request=request
+            )
             return Response(ExamAttendanceSerializer(att).data, status=status.HTTP_200_OK)
         except ValueError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
@@ -147,7 +149,9 @@ class InvigilatorAssignmentViewSet(viewsets.ModelViewSet):
             return Response({"detail": "exam_schedule and faculty are required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            assignment = ExamService.assign_invigilator(schedule_id, faculty_id, duty_status_val, remarks, actor=request.user, request=request)
+            assignment = ExamService.assign_invigilator(
+                schedule_id, faculty_id, duty_status_val, remarks, actor=request.user, request=request
+            )
             return Response(InvigilatorAssignmentSerializer(assignment).data, status=status.HTTP_201_CREATED)
         except ValueError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)

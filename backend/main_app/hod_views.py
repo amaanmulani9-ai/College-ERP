@@ -1,11 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
-from .decorators import admin_required, staff_required, student_required, admin_or_backoffice_required
+from .decorators import admin_required, admin_or_backoffice_required
 import json
 import os
 import csv
 import io
-import time
 import random
 import string
 import mimetypes
@@ -15,17 +14,14 @@ import requests
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import (HttpResponse, HttpResponseRedirect,
-                              get_object_or_404, redirect, render)
+from django.shortcuts import (HttpResponse, get_object_or_404, redirect, render)
 from django.templatetags.static import static
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import UpdateView
 
 from .forms import *
-from django.db.models import Sum, Count, Q, F, Avg
+from django.db.models import Sum, Count, Q, F
 from django.db.models.functions import TruncMonth
-import calendar
 from datetime import date, timedelta
 
 
@@ -284,7 +280,6 @@ def naac_report_view(request):
 @login_required(login_url='/')
 @admin_required
 def export_naac_report_csv(request):
-    import csv
     from .naac_nirf_reports import generate_naac_nirf_data
     
     naac = generate_naac_nirf_data()
@@ -316,7 +311,6 @@ def export_naac_report_csv(request):
 @login_required(login_url='/')
 @admin_required
 def export_staff_analytics(request):
-    import csv
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="staff_performance_analytics.csv"'
 
@@ -1103,7 +1097,7 @@ def check_email_availability(request):
         if user:
             return HttpResponse(True)
         return HttpResponse(False)
-    except Exception as e:
+    except Exception:
         return HttpResponse(False)
 
 
@@ -1126,7 +1120,7 @@ def student_feedback_message(request):
             feedback.reply = reply
             feedback.save()
             return HttpResponse(True)
-        except Exception as e:
+        except Exception:
             return HttpResponse(False)
 
 
@@ -1149,7 +1143,7 @@ def staff_feedback_message(request):
             feedback.reply = reply
             feedback.save()
             return HttpResponse(True)
-        except Exception as e:
+        except Exception:
             return HttpResponse(False)
 
 
@@ -1188,7 +1182,7 @@ def view_staff_leave(request):
                 print("Email error:", e)
                 
             return HttpResponse(True)
-        except Exception as e:
+        except Exception:
             return HttpResponse("False")
 
 
@@ -1227,7 +1221,7 @@ def view_student_leave(request):
                 print("Email error:", e)
                 
             return HttpResponse(True)
-        except Exception as e:
+        except Exception:
             return HttpResponse("False")
 
 
@@ -1267,7 +1261,7 @@ def get_admin_attendance(request):
             }
             json_data.append(data)
         return JsonResponse(json.dumps(json_data), safe=False)
-    except Exception as e:
+    except Exception:
         return JsonResponse(json.dumps([]), safe=False)
 
 
@@ -1357,7 +1351,7 @@ def send_student_notification(request):
         notification = NotificationStudent(student=student, message=message)
         notification.save()
         return HttpResponse("True")
-    except Exception as e:
+    except Exception:
         return HttpResponse("False")
 
 
@@ -1388,7 +1382,7 @@ def send_staff_notification(request):
         notification = NotificationStaff(staff=staff, message=message)
         notification.save()
         return HttpResponse("True")
-    except Exception as e:
+    except Exception:
         return HttpResponse("False")
 
 
@@ -1835,7 +1829,7 @@ def admin_events(request):
 def admin_delete_event(request, event_id):
     event = get_object_or_404(CollegeEvent, id=event_id)
     event.delete()
-    messages.success(request, f"Event deleted.")
+    messages.success(request, "Event deleted.")
     return redirect(reverse('admin_events'))
 
 @login_required(login_url='/')
@@ -2357,7 +2351,7 @@ def admin_settings_theme(request):
     return render(request, 'hod_template/settings_theme.html', {'page_title': 'Theme & Language', 'theme': theme})
 
 def admin_settings_account(request):
-    from .models import AccountSettings, CustomUser
+    from .models import AccountSettings
     account, created = AccountSettings.objects.get_or_create(admin=request.user)
     
     if request.method == 'POST':
@@ -2383,13 +2377,12 @@ def admin_settings_account(request):
         
     return render(request, 'hod_template/settings_account.html', {'page_title': 'Account Settings', 'account': account})
 
-from django.http import HttpResponse, Http404, JsonResponse
+from django.http import HttpResponse, Http404
 
 @login_required(login_url='/')
 @admin_required
 def import_students_csv(request):
-    from .models import CustomUser, Student, Course, Session
-    import csv, io, random, string
+    from .models import CustomUser, Course, Session
     
     if request.method == "POST" and request.FILES.get('file'):
         csv_file = request.FILES['file']
@@ -2469,7 +2462,7 @@ def import_students_csv(request):
                             pass
                     student.save()
                     success_count += 1
-                except Exception as e:
+                except Exception:
                     error_count += 1
                     
             messages.success(request, f"Successfully imported {success_count} students. {error_count} failed.")
@@ -2513,7 +2506,6 @@ def view_online_registrations(request):
 
 @login_required(login_url='/')
 def read_registration_csv(request, filename):
-    import csv
     if request.user.user_type not in ['1', '2']:
         messages.error(request, "You do not have permission to view this page.")
         return redirect('login_page')
@@ -2570,7 +2562,6 @@ def download_registration_csv(request, filename):
 @admin_required
 def admin_job_letter(request):
     """Listing page showing all staff with a 'Print Job Letter' button."""
-    from .models import RulesRegulation
     all_staff = Staff.objects.select_related('admin', 'course').all()
     context = {
         'page_title': 'Staff Job Letters',

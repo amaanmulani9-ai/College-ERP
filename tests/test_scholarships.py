@@ -11,26 +11,23 @@ Tests:
 7. Student Scholarships Query
 8. REST API Permissions & Tenant Isolation
 """
+
 import decimal
 from datetime import date
-from unittest.mock import patch
 
 import pytest
-from django.contrib.auth import get_user_model
-from rest_framework.test import APIClient
-
 from apps.academics.models import AcademicSession, Department, Faculty, Program, Semester
 from apps.fees.models import FeeCategory, FeeStructure, StudentFee
 from apps.profiles.models import UserProfile
 from apps.scholarships.models import (
     Scholarship,
-    ScholarshipApplication,
     ScholarshipAuditLog,
-    ScholarshipRenewal,
     ScholarshipType,
 )
 from apps.scholarships.services import ScholarshipService
 from apps.students.models import Student
+from django.contrib.auth import get_user_model
+from rest_framework.test import APIClient
 
 User = get_user_model()
 
@@ -114,6 +111,7 @@ def setup_sch_data(db):
 # 1. ScholarshipType Unit Tests
 # ===========================================================================
 
+
 def test_scholarship_type_creation(setup_sch_data):
     st = setup_sch_data["sch_type"]
     assert str(st) == "Merit Excellence Scholarship (Merit Based)"
@@ -124,6 +122,7 @@ def test_scholarship_type_creation(setup_sch_data):
 # ===========================================================================
 # 2. Service Unit Tests: Apply & Eligibility Validation
 # ===========================================================================
+
 
 def test_apply_scholarship_success(setup_sch_data):
     app = ScholarshipService.apply(
@@ -188,6 +187,7 @@ def test_apply_scholarship_duplicate_prevention(setup_sch_data):
 # 3. Service Unit Tests: Approval & Auto Fee Deduction
 # ===========================================================================
 
+
 def test_approve_application_and_fee_integration(setup_sch_data):
     app = ScholarshipService.apply(
         student_id=str(setup_sch_data["student"].id),
@@ -238,6 +238,7 @@ def test_reject_application(setup_sch_data):
 # 4. Service Unit Tests: Renewal & Waiver
 # ===========================================================================
 
+
 def test_renew_scholarship(setup_sch_data):
     app = ScholarshipService.apply(
         student_id=str(setup_sch_data["student"].id),
@@ -278,6 +279,7 @@ def test_apply_direct_fee_waiver(setup_sch_data):
 # ===========================================================================
 # 5. REST API ViewSet Tests
 # ===========================================================================
+
 
 def test_apply_scholarship_api(setup_sch_data):
     client = APIClient()

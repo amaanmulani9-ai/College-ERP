@@ -1,17 +1,18 @@
 import pytest
-from django.urls import reverse
-from django.core.files.uploadedfile import SimpleUploadedFile
-from rest_framework.test import APIClient
 from apps.authentication.models import User
-from apps.profiles.models import UserProfile, UserContact, UserPreferences, ProfileActivity
 from apps.profiles.services import calculate_profile_completion
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.urls import reverse
+from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
 def test_automatic_profile_creation_on_user_registration():
     """Verifies that creating a User automatically initializes UserProfile, UserContact, and UserPreferences via post-save signals."""
-    user = User.objects.create_user(email="newuser@college.edu", password="UserPassword123!", first_name="Alice", last_name="Smith")
-    
+    user = User.objects.create_user(
+        email="newuser@college.edu", password="UserPassword123!", first_name="Alice", last_name="Smith"
+    )
+
     assert hasattr(user, "profile") is True
     profile = user.profile
     assert profile.first_name == "Alice"
@@ -38,18 +39,20 @@ def test_profile_update_and_completion_calculation():
     assert "First Name" in comp_initial["missing_fields"]
 
     # 2. Update profile details via API
-    res_update = client.patch(reverse("profiles:my_profile"), {
-        "first_name": "Bob",
-        "last_name": "Marley",
-        "gender": "male",
-        "date_of_birth": "2000-01-15",
-        "blood_group": "O+",
-        "nationality": "American",
-        "biography": "Computer Science student.",
-        "contact": {
-            "mobile_number": "+1 555 987 6543"
-        }
-    }, format="json")
+    res_update = client.patch(
+        reverse("profiles:my_profile"),
+        {
+            "first_name": "Bob",
+            "last_name": "Marley",
+            "gender": "male",
+            "date_of_birth": "2000-01-15",
+            "blood_group": "O+",
+            "nationality": "American",
+            "biography": "Computer Science student.",
+            "contact": {"mobile_number": "+1 555 987 6543"},
+        },
+        format="json",
+    )
     assert res_update.status_code == 200
 
     profile.refresh_from_db()
@@ -85,7 +88,9 @@ def test_user_preferences_and_activity_timeline():
     client.force_authenticate(user=user)
 
     # Update preferences
-    res_pref = client.patch(reverse("profiles:my_preferences"), {"time_format": "24h", "theme": "glassmorphic"}, format="json")
+    res_pref = client.patch(
+        reverse("profiles:my_preferences"), {"time_format": "24h", "theme": "glassmorphic"}, format="json"
+    )
     assert res_pref.status_code == 200
 
     prefs = user.profile.preferences
@@ -102,7 +107,9 @@ def test_user_preferences_and_activity_timeline():
 def test_profile_search_api():
     """Verifies searching profiles by name or email."""
     client = APIClient()
-    user = User.objects.create_user(email="search_user@college.edu", password="SearchPassword123!", first_name="Charlie", last_name="Brown")
+    user = User.objects.create_user(
+        email="search_user@college.edu", password="SearchPassword123!", first_name="Charlie", last_name="Brown"
+    )
     client.force_authenticate(user=user)
 
     res_search = client.get(reverse("profiles:search_profiles") + "?q=Charlie")

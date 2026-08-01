@@ -13,21 +13,20 @@ Methods:
     vacant_rooms()        – Query rooms with available capacity
     occupied_rooms()      – Query rooms with occupied beds
 """
+
 import decimal
 import logging
 from datetime import date, datetime
 from typing import Any, Dict, List, Optional
 
-from django.db import models, transaction
-from django.utils import timezone
-
 from apps.academics.models import AcademicSession
 from apps.staff.models import Employee
 from apps.students.models import Student
+from django.db import models, transaction
+from django.utils import timezone
 
 from .models import (
     Bed,
-    Hostel,
     HostelAllocation,
     HostelAuditLog,
     MaintenanceRequest,
@@ -96,7 +95,10 @@ class HostelService:
         if fee_amount and fee_amount > 0:
             try:
                 from apps.fees.models import FeeCategory, FeeStructure, StudentFee
-                category, _ = FeeCategory.objects.get_or_create(code="HOSTEL_FEE", defaults={"name": "Hostel Fee", "is_active": True})
+
+                category, _ = FeeCategory.objects.get_or_create(
+                    code="HOSTEL_FEE", defaults={"name": "Hostel Fee", "is_active": True}
+                )
                 structure, _ = FeeStructure.objects.get_or_create(
                     academic_session=session,
                     program=student.program,
@@ -135,7 +137,11 @@ class HostelService:
     def transfer_room(allocation_id: str, new_bed_id: str, actor=None) -> HostelAllocation:
         """Transfer student from current bed to a new vacant bed."""
         try:
-            alloc = HostelAllocation.objects.select_for_update().select_related("bed__room", "student").get(pk=allocation_id)
+            alloc = (
+                HostelAllocation.objects.select_for_update()
+                .select_related("bed__room", "student")
+                .get(pk=allocation_id)
+            )
         except HostelAllocation.DoesNotExist:
             raise ValueError(f"HostelAllocation {allocation_id!r} not found.")
 
@@ -223,7 +229,11 @@ class HostelService:
     def check_out(allocation_id: str, check_out_date: Optional[date] = None, actor=None) -> HostelAllocation:
         """Process check-out and vacate bed."""
         try:
-            alloc = HostelAllocation.objects.select_for_update().select_related("bed__room", "student").get(pk=allocation_id)
+            alloc = (
+                HostelAllocation.objects.select_for_update()
+                .select_related("bed__room", "student")
+                .get(pk=allocation_id)
+            )
         except HostelAllocation.DoesNotExist:
             raise ValueError(f"HostelAllocation {allocation_id!r} not found.")
 
@@ -330,20 +340,38 @@ class HostelService:
     @staticmethod
     def vacant_rooms() -> List[Dict[str, Any]]:
         """Return list of rooms with available bed capacity."""
-        rooms = Room.objects.filter(occupied_beds__lt=models.F("capacity"), status__in=["available"]).select_related("floor__block__hostel")
-        return list(rooms.values(
-            "id", "room_number", "room_type", "capacity", "occupied_beds",
-            "floor__floor_number", "floor__block__name", "floor__block__hostel__name",
-        ))
+        rooms = Room.objects.filter(occupied_beds__lt=models.F("capacity"), status__in=["available"]).select_related(
+            "floor__block__hostel"
+        )
+        return list(
+            rooms.values(
+                "id",
+                "room_number",
+                "room_type",
+                "capacity",
+                "occupied_beds",
+                "floor__floor_number",
+                "floor__block__name",
+                "floor__block__hostel__name",
+            )
+        )
 
     @staticmethod
     def occupied_rooms() -> List[Dict[str, Any]]:
         """Return list of rooms with occupied beds."""
         rooms = Room.objects.filter(occupied_beds__gt=0).select_related("floor__block__hostel")
-        return list(rooms.values(
-            "id", "room_number", "room_type", "capacity", "occupied_beds",
-            "floor__floor_number", "floor__block__name", "floor__block__hostel__name",
-        ))
+        return list(
+            rooms.values(
+                "id",
+                "room_number",
+                "room_type",
+                "capacity",
+                "occupied_beds",
+                "floor__floor_number",
+                "floor__block__name",
+                "floor__block__hostel__name",
+            )
+        )
 
 
 def _log_audit(hostel=None, allocation=None, actor=None, event_type="", description=""):

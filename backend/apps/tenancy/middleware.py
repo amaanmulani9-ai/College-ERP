@@ -1,6 +1,6 @@
 import logging
 import time
-from django.http import JsonResponse
+
 from django.db import connection
 
 logger = logging.getLogger("apps.tenancy")

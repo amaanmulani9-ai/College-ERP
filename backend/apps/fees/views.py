@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import FeeAuditLog, FeeCategory, FeeInstallment, FeeReceipt, FeeStructure, StudentFee
+from .models import FeeCategory, FeeInstallment, FeeReceipt, FeeStructure, StudentFee
 from .serializers import (
     AssignFeeRequestSerializer,
     CollectFeeRequestSerializer,
@@ -34,7 +34,11 @@ class FeeStructureViewSet(viewsets.ModelViewSet):
 
 
 class StudentFeeViewSet(viewsets.ModelViewSet):
-    queryset = StudentFee.objects.all().select_related("student__profile", "fee_structure__category").prefetch_related("installments")
+    queryset = (
+        StudentFee.objects.all()
+        .select_related("student__profile", "fee_structure__category")
+        .prefetch_related("installments")
+    )
     serializer_class = StudentFeeSerializer
     permission_classes = [IsAuthenticated]
     search_fields = ["student__student_id", "student__profile__first_name", "fee_structure__category__name"]
@@ -103,7 +107,11 @@ class FeeReceiptViewSet(viewsets.ModelViewSet):
                 student_fee_id=str(serializer.validated_data["student_fee_id"]),
                 amount=serializer.validated_data["amount"],
                 payment_mode=serializer.validated_data.get("payment_mode", "cash"),
-                installment_id=str(serializer.validated_data["installment_id"]) if serializer.validated_data.get("installment_id") else None,
+                installment_id=(
+                    str(serializer.validated_data["installment_id"])
+                    if serializer.validated_data.get("installment_id")
+                    else None
+                ),
                 remarks=serializer.validated_data.get("remarks", ""),
                 actor=request.user,
                 request=request,

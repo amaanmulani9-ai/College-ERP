@@ -4,10 +4,13 @@ Enforces:
  - No duplicate fee assignment for student and fee structure
  - Fine calculation rules for overdue installments
 """
+
 import datetime
 
 
-def calculate_installment_fine(due_date: datetime.date, payment_date: datetime.date = None, fine_per_day: float = 5.0) -> float:
+def calculate_installment_fine(
+    due_date: datetime.date, payment_date: datetime.date = None, fine_per_day: float = 5.0
+) -> float:
     """
     Calculates overdue fine amount based on days late past due date.
     """
@@ -22,6 +25,7 @@ def calculate_installment_fine(due_date: datetime.date, payment_date: datetime.d
 
 def validate_no_duplicate_assignment(student_id: str, fee_structure_id: str):
     from .models import StudentFee
+
     if StudentFee.objects.filter(student_id=student_id, fee_structure_id=fee_structure_id, is_deleted=False).exists():
         raise ValueError("Fee structure is already assigned to this student.")
 

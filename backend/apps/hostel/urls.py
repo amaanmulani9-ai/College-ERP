@@ -34,7 +34,6 @@ urlpatterns = [
     path("check-out/", HostelAllocationViewSet.as_view({"post": "check_out"}), name="hostel-check-out"),
     path("vacant/", RoomViewSet.as_view({"get": "vacant_rooms"}), name="hostel-vacant-rooms"),
     path("occupied/", RoomViewSet.as_view({"get": "occupied_rooms"}), name="hostel-occupied-rooms"),
-
     # Router URLs
     path("", include(router.urls)),
 ]

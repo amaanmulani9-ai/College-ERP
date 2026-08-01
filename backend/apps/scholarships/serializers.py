@@ -17,9 +17,17 @@ class ScholarshipTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScholarshipType
         fields = [
-            "id", "name", "code", "provider", "provider_display",
-            "description", "min_cgpa_requirement", "max_family_income",
-            "is_active", "created_at", "updated_at",
+            "id",
+            "name",
+            "code",
+            "provider",
+            "provider_display",
+            "description",
+            "min_cgpa_requirement",
+            "max_family_income",
+            "is_active",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
@@ -32,10 +40,20 @@ class ScholarshipSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scholarship
         fields = [
-            "id", "student", "scholarship_type", "scholarship_type_name",
-            "academic_session", "academic_session_name", "amount", "percentage",
-            "start_date", "end_date", "status", "status_display",
-            "created_at", "updated_at",
+            "id",
+            "student",
+            "scholarship_type",
+            "scholarship_type_name",
+            "academic_session",
+            "academic_session_name",
+            "amount",
+            "percentage",
+            "start_date",
+            "end_date",
+            "status",
+            "status_display",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
@@ -50,16 +68,34 @@ class ScholarshipApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScholarshipApplication
         fields = [
-            "id", "student", "scholarship_type", "scholarship_type_name",
-            "scholarship_type_code", "academic_session", "academic_session_name",
-            "requested_amount", "family_annual_income", "current_cgpa",
-            "documents", "statement_of_purpose", "status", "status_display",
-            "rejection_reason", "approved_by_email", "approved_at",
-            "created_at", "updated_at",
+            "id",
+            "student",
+            "scholarship_type",
+            "scholarship_type_name",
+            "scholarship_type_code",
+            "academic_session",
+            "academic_session_name",
+            "requested_amount",
+            "family_annual_income",
+            "current_cgpa",
+            "documents",
+            "statement_of_purpose",
+            "status",
+            "status_display",
+            "rejection_reason",
+            "approved_by_email",
+            "approved_at",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = [
-            "id", "status", "rejection_reason", "approved_by_email",
-            "approved_at", "created_at", "updated_at",
+            "id",
+            "status",
+            "rejection_reason",
+            "approved_by_email",
+            "approved_at",
+            "created_at",
+            "updated_at",
         ]
 
 
@@ -71,9 +107,17 @@ class ScholarshipRenewalSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScholarshipRenewal
         fields = [
-            "id", "scholarship", "scholarship_name", "academic_session",
-            "academic_session_name", "status", "status_display", "remarks",
-            "processed_at", "created_at", "updated_at",
+            "id",
+            "scholarship",
+            "scholarship_name",
+            "academic_session",
+            "academic_session_name",
+            "status",
+            "status_display",
+            "remarks",
+            "processed_at",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["id", "processed_at", "created_at", "updated_at"]
 
@@ -84,8 +128,15 @@ class ScholarshipAuditLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScholarshipAuditLog
         fields = [
-            "id", "student", "scholarship", "application", "actor",
-            "actor_email", "event_type", "description", "timestamp",
+            "id",
+            "student",
+            "scholarship",
+            "application",
+            "actor",
+            "actor_email",
+            "event_type",
+            "description",
+            "timestamp",
         ]
         read_only_fields = fields
 
@@ -93,6 +144,7 @@ class ScholarshipAuditLogSerializer(serializers.ModelSerializer):
 # ---------------------------------------------------------------------------
 # Request / Action Serializers
 # ---------------------------------------------------------------------------
+
 
 class ApplyScholarshipRequestSerializer(serializers.Serializer):
     student_id = serializers.UUIDField()

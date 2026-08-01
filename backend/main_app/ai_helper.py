@@ -284,7 +284,7 @@ def predict_student_risk(student):
             'status_color': status_color,
             'recommendation': recommendation
         }
-    except Exception as e:
+    except Exception:
         return {
             'student_id': student.id if student else 0,
             'student_name': student.admin.get_full_name() if student else 'Student',
@@ -342,10 +342,10 @@ def ai_helpdesk_answer(user, user_message):
             return f"Hello {user_name}! Your tuition and semester fee records are completely paid up and verified with zero pending balance."
             
     elif "exam" in msg_lower or "schedule" in msg_lower or "date" in msg_lower or "timetable" in msg_lower:
-        return f"Semester examinations and internal practical tests are published on your Academic Calendar dashboard. Next upcoming evaluation starts on the 1st of next month."
+        return "Semester examinations and internal practical tests are published on your Academic Calendar dashboard. Next upcoming evaluation starts on the 1st of next month."
         
     elif "admission" in msg_lower or "certificate" in msg_lower or "bonafide" in msg_lower:
-        return f"You can request digital Bonafide, Character, or Transfer certificates directly from your Student Portal under 'Certificate Requests'."
+        return "You can request digital Bonafide, Character, or Transfer certificates directly from your Student Portal under 'Certificate Requests'."
         
     else:
         return f"Hello {user_name}! I am CampusBot, your 24/7 Campus AI Assistant. I can help you check your attendance logs, outstanding fee receipts, exam timetables, or certificate request statuses. What would you like to view?"

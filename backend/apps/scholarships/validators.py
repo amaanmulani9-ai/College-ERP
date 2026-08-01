@@ -5,6 +5,7 @@ Scholarship Validators
 - Income eligibility check
 - CGPA eligibility check
 """
+
 import decimal
 from typing import Optional
 
@@ -12,6 +13,7 @@ from typing import Optional
 def validate_no_duplicate_application(student_id: str, scholarship_type_id: str, academic_session_id: str) -> None:
     """Ensure student hasn't already applied for the same scholarship type in this session."""
     from .models import ScholarshipApplication
+
     exists = ScholarshipApplication.objects.filter(
         student_id=student_id,
         scholarship_type_id=scholarship_type_id,
@@ -25,6 +27,7 @@ def validate_no_duplicate_application(student_id: str, scholarship_type_id: str,
 def validate_no_duplicate_scholarship(student_id: str, scholarship_type_id: str, academic_session_id: str) -> None:
     """Ensure student doesn't have an active scholarship of this type in this session."""
     from .models import Scholarship
+
     exists = Scholarship.objects.filter(
         student_id=student_id,
         scholarship_type_id=scholarship_type_id,

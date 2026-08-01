@@ -1,5 +1,4 @@
 import pytest
-from django.utils import timezone
 from main_app.models import CustomUser
 
 # Monkey patch Django's BaseContext copy to support Python 3.14+

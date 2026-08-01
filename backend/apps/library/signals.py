@@ -3,6 +3,7 @@ Library Signals
 ===============
 Signal listeners for library domain events.
 """
+
 import logging
 
 from django.db.models.signals import post_save

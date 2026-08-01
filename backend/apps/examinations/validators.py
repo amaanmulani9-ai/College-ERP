@@ -8,7 +8,9 @@ Enforces:
  - Hall Ticket verification before marking attendance
  - Schedule lock checks
 """
-from typing import List, Dict, Any
+
+from typing import Any, Dict, List
+
 from .models import ExamSchedule, HallTicket
 
 
@@ -38,11 +40,13 @@ def check_exam_schedule_conflicts(
 
     if room_clash.exists():
         clash = room_clash.first()
-        conflicts.append({
-            "type": "classroom_conflict",
-            "message": f"Classroom {clash.classroom} is already booked for exam '{clash.exam.subject.name}' on {date} from {clash.start_time} to {clash.end_time}.",
-            "conflicting_schedule_id": str(clash.id),
-        })
+        conflicts.append(
+            {
+                "type": "classroom_conflict",
+                "message": f"Classroom {clash.classroom} is already booked for exam '{clash.exam.subject.name}' on {date} from {clash.start_time} to {clash.end_time}.",
+                "conflicting_schedule_id": str(clash.id),
+            }
+        )
 
     # 2. Invigilator Conflict Check
     if invigilator_id:
@@ -58,11 +62,13 @@ def check_exam_schedule_conflicts(
 
         if invig_clash.exists():
             clash = invig_clash.first()
-            conflicts.append({
-                "type": "invigilator_conflict",
-                "message": f"Faculty invigilator {clash.invigilator.profile.get_full_name()} is already assigned to an exam room on {date} during this time.",
-                "conflicting_schedule_id": str(clash.id),
-            })
+            conflicts.append(
+                {
+                    "type": "invigilator_conflict",
+                    "message": f"Faculty invigilator {clash.invigilator.profile.get_full_name()} is already assigned to an exam room on {date} during this time.",
+                    "conflicting_schedule_id": str(clash.id),
+                }
+            )
 
     return conflicts
 
@@ -74,7 +80,7 @@ def validate_hall_ticket_required(student_id: str, exam_id: str) -> HallTicket:
     """
     ticket = HallTicket.objects.filter(student_id=student_id, exam_id=exam_id, is_deleted=False).first()
     if not ticket or ticket.status in ["revoked", "blocked"]:
-        raise ValueError(f"Student does not possess a valid issued Hall Ticket for this examination.")
+        raise ValueError("Student does not possess a valid issued Hall Ticket for this examination.")
     return ticket
 
 

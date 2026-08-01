@@ -1,10 +1,11 @@
 from django.contrib import admin
+
 from .models import (
     Parent,
-    StudentParentLink,
-    ParentDocument,
-    ParentCommunicationPreference,
     ParentActivityLog,
+    ParentCommunicationPreference,
+    ParentDocument,
+    StudentParentLink,
 )
 
 
@@ -45,6 +46,7 @@ class ParentAdmin(admin.ModelAdmin):
 
     def get_full_name(self, obj):
         return obj.profile.get_full_name()
+
     get_full_name.short_description = "Full Name"
 
 

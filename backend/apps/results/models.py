@@ -1,11 +1,10 @@
 import uuid
 
-from django.conf import settings
-from django.db import models
-
 from apps.academics.models import Program, Semester, Subject
 from apps.examinations.models import Exam
 from apps.students.models import Student
+from django.conf import settings
+from django.db import models
 
 
 class SoftDeleteManager(models.Manager):
@@ -16,6 +15,7 @@ class SoftDeleteManager(models.Manager):
 # ---------------------------------------------------------------------------
 # Result Scheme
 # ---------------------------------------------------------------------------
+
 
 class ResultScheme(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -47,6 +47,7 @@ class ResultScheme(models.Model):
 # ---------------------------------------------------------------------------
 # Student Result
 # ---------------------------------------------------------------------------
+
 
 class StudentResult(models.Model):
     STATUS_CHOICES = [
@@ -95,6 +96,7 @@ class StudentResult(models.Model):
 # Semester Result
 # ---------------------------------------------------------------------------
 
+
 class SemesterResult(models.Model):
     STATUS_CHOICES = [
         ("pass", "Pass"),
@@ -139,6 +141,7 @@ class SemesterResult(models.Model):
 # Result Audit Log
 # ---------------------------------------------------------------------------
 
+
 class ResultAuditLog(models.Model):
     EVENT_CHOICES = [
         ("marks_entered", "Marks Entered"),
@@ -149,8 +152,12 @@ class ResultAuditLog(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    student_result = models.ForeignKey(StudentResult, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs")
-    semester_result = models.ForeignKey(SemesterResult, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs")
+    student_result = models.ForeignKey(
+        StudentResult, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs"
+    )
+    semester_result = models.ForeignKey(
+        SemesterResult, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs"
+    )
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     event_type = models.CharField(max_length=30, choices=EVENT_CHOICES)
     description = models.CharField(max_length=500)

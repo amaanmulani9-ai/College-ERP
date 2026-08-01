@@ -1,6 +1,5 @@
 import factory
 from main_app.models import CustomUser, Course, Session, Student, Staff, Subject
-from django.utils import timezone
 from datetime import datetime, date
 from django.db.models.signals import post_save
 

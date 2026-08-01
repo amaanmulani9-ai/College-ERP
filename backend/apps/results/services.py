@@ -3,10 +3,11 @@ Result Business Services (ResultService).
 Handles marks entry, automatic grade point & credit point computation, SGPA & CGPA calculation,
 batch rank generation, result publishing, and audit logging.
 """
-from typing import List, Dict, Any
-from django.db import transaction
-from django.db.models import Sum
+
+from typing import List
+
 from apps.authentication.services import log_audit_event
+from django.db import transaction
 
 from .models import ResultAuditLog, ResultScheme, SemesterResult, StudentResult
 from .validators import calculate_grade_and_points, validate_marks_within_limits
@@ -55,12 +56,14 @@ class ResultService:
         subject_credits = subject.credits if subject and hasattr(subject, "credits") else 4
         credit_point = round(grade_point * subject_credits, 2)
 
-        data.update({
-            "total_marks": total_marks,
-            "grade": grade,
-            "grade_point": grade_point,
-            "credit_point": credit_point,
-        })
+        data.update(
+            {
+                "total_marks": total_marks,
+                "grade": grade,
+                "grade_point": grade_point,
+                "credit_point": credit_point,
+            }
+        )
 
         exam_val = data.get("exam", None)
         result, created = StudentResult.objects.update_or_create(
@@ -131,7 +134,9 @@ class ResultService:
     @transaction.atomic
     def generate_rank(semester_id: str) -> List[SemesterResult]:
         sem_results = list(
-            SemesterResult.objects.filter(semester_id=semester_id, is_deleted=False).order_by("-sgpa", "-credits_earned")
+            SemesterResult.objects.filter(semester_id=semester_id, is_deleted=False).order_by(
+                "-sgpa", "-credits_earned"
+            )
         )
 
         for rank_idx, sem_res in enumerate(sem_results, start=1):
@@ -150,7 +155,11 @@ class ResultService:
 
         if request:
             try:
-                log_audit_event(request, event_type="results_published", details=f"Published {updated} semester results for semester {semester_id}")
+                log_audit_event(
+                    request,
+                    event_type="results_published",
+                    details=f"Published {updated} semester results for semester {semester_id}",
+                )
             except Exception:
                 pass
 

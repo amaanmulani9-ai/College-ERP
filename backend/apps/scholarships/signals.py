@@ -3,6 +3,7 @@ Scholarship Signals
 ===================
 Signal handler to keep fee discounts aligned when a Scholarship status changes.
 """
+
 import logging
 
 from django.db.models.signals import post_save

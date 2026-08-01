@@ -6,7 +6,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from .models import (
-    PaymentAuditLog,
     PaymentGateway,
     PaymentOrder,
     PaymentTransaction,
@@ -137,6 +136,7 @@ class RefundViewSet(viewsets.ReadOnlyModelViewSet):
 
 class WebhookViewSet(viewsets.GenericViewSet):
     """Handles inbound payment gateway webhooks."""
+
     permission_classes = [AllowAny]
     serializer_class = WebhookLogSerializer
 

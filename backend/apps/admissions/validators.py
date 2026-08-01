@@ -2,7 +2,9 @@
 Admissions Validators.
 Custom validation logic for duplicate application detection and document checksums.
 """
+
 import hashlib
+
 from django.core.exceptions import ValidationError
 
 
@@ -19,12 +21,16 @@ def validate_duplicate_application(email: str, mobile: str, program_id: str, ses
     """
     Prevents duplicate active applications for the same applicant per program and session.
     """
-    existing = model_cls.objects.filter(
-        email=email,
-        program_id=program_id,
-        academic_session_id=session_id,
-        is_deleted=False,
-    ).exclude(status__in=["enrolled", "cancelled", "rejected"]).exists()
+    existing = (
+        model_cls.objects.filter(
+            email=email,
+            program_id=program_id,
+            academic_session_id=session_id,
+            is_deleted=False,
+        )
+        .exclude(status__in=["enrolled", "cancelled", "rejected"])
+        .exists()
+    )
 
     if existing:
         raise ValidationError(

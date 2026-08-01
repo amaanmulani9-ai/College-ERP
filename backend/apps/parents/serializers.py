@@ -1,6 +1,6 @@
-from rest_framework import serializers
 from apps.profiles.serializers import UserProfileSerializer
-from apps.students.serializers import StudentSerializer
+from rest_framework import serializers
+
 from .models import (
     Parent,
     ParentActivityLog,
@@ -31,13 +31,9 @@ class ParentCommunicationPreferenceSerializer(serializers.ModelSerializer):
 
 
 class ParentDocumentSerializer(serializers.ModelSerializer):
-    document_type_display = serializers.CharField(
-        source="get_document_type_display", read_only=True
-    )
+    document_type_display = serializers.CharField(source="get_document_type_display", read_only=True)
     status_display = serializers.CharField(source="get_status_display", read_only=True)
-    reviewed_by_name = serializers.CharField(
-        source="reviewed_by.get_full_name", read_only=True, default=""
-    )
+    reviewed_by_name = serializers.CharField(source="reviewed_by.get_full_name", read_only=True, default="")
 
     class Meta:
         model = ParentDocument
@@ -80,9 +76,7 @@ class ParentActivityLogSerializer(serializers.ModelSerializer):
 
 class StudentParentLinkSerializer(serializers.ModelSerializer):
     student_id_code = serializers.CharField(source="student.student_id", read_only=True)
-    student_name = serializers.CharField(
-        source="student.profile.get_full_name", read_only=True
-    )
+    student_name = serializers.CharField(source="student.profile.get_full_name", read_only=True)
     parent_code = serializers.CharField(source="parent.parent_code", read_only=True)
 
     class Meta:
@@ -105,15 +99,9 @@ class StudentParentLinkSerializer(serializers.ModelSerializer):
 
 class ParentSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(read_only=True)
-    relationship_type_display = serializers.CharField(
-        source="get_relationship_type_display", read_only=True
-    )
-    education_level_display = serializers.CharField(
-        source="get_education_level_display", read_only=True
-    )
-    verified_by_name = serializers.CharField(
-        source="verified_by.get_full_name", read_only=True, default=""
-    )
+    relationship_type_display = serializers.CharField(source="get_relationship_type_display", read_only=True)
+    education_level_display = serializers.CharField(source="get_education_level_display", read_only=True)
+    verified_by_name = serializers.CharField(source="verified_by.get_full_name", read_only=True, default="")
     communication_preferences = ParentCommunicationPreferenceSerializer(read_only=True)
     documents = ParentDocumentSerializer(many=True, read_only=True)
     student_links = StudentParentLinkSerializer(many=True, read_only=True)
@@ -161,20 +149,12 @@ class CreateParentSerializer(serializers.Serializer):
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
-    password = serializers.CharField(
-        required=False, default="ParentPassword123!", write_only=True
-    )
-    relationship_type = serializers.ChoiceField(
-        choices=Parent.RELATIONSHIP_CHOICES, default="guardian"
-    )
+    password = serializers.CharField(required=False, default="ParentPassword123!", write_only=True)
+    relationship_type = serializers.ChoiceField(choices=Parent.RELATIONSHIP_CHOICES, default="guardian")
     occupation = serializers.CharField(required=False, allow_blank=True, default="")
     employer_name = serializers.CharField(required=False, allow_blank=True, default="")
-    annual_income = serializers.DecimalField(
-        max_digits=14, decimal_places=2, required=False, allow_null=True
-    )
-    education_level = serializers.ChoiceField(
-        choices=Parent.EDUCATION_CHOICES, default="bachelor"
-    )
+    annual_income = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, allow_null=True)
+    education_level = serializers.ChoiceField(choices=Parent.EDUCATION_CHOICES, default="bachelor")
     portal_access_enabled = serializers.BooleanField(default=True)
     notification_enabled = serializers.BooleanField(default=True)
 

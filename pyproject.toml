@@ -39,6 +39,7 @@ exclude = ['migrations/', 'venv/']
 [tool.pytest.ini_options]
 minversion = "8.0"
 addopts = "-ra -q --ds=config.settings.test"
+testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 pythonpath = ["backend"]
 

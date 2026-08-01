@@ -4,7 +4,8 @@ Enforces:
  - Marks do not exceed maximum values in scheme
  - Results cannot be published prior to verification
 """
-from typing import Dict, Tuple
+
+from typing import Tuple
 
 
 def calculate_grade_and_points(percentage: float) -> Tuple[str, float]:

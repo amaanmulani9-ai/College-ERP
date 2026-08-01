@@ -1,12 +1,11 @@
 import uuid
 
-from django.conf import settings
-from django.db import models
-
 from apps.academics.models import AcademicSession, Program, Semester, Subject
 from apps.staff.models import Employee
 from apps.students.models import Student
 from apps.timetable.models import Classroom
+from django.conf import settings
+from django.db import models
 
 
 class SoftDeleteManager(models.Manager):
@@ -17,6 +16,7 @@ class SoftDeleteManager(models.Manager):
 # ---------------------------------------------------------------------------
 # Exam Type
 # ---------------------------------------------------------------------------
+
 
 class ExamType(models.Model):
     CATEGORY_CHOICES = [
@@ -51,6 +51,7 @@ class ExamType(models.Model):
 # ---------------------------------------------------------------------------
 # Exam
 # ---------------------------------------------------------------------------
+
 
 class Exam(models.Model):
     STATUS_CHOICES = [
@@ -92,6 +93,7 @@ class Exam(models.Model):
 # Exam Schedule
 # ---------------------------------------------------------------------------
 
+
 class ExamSchedule(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name="schedules")
@@ -99,7 +101,9 @@ class ExamSchedule(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE, related_name="exam_schedules")
-    invigilator = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name="invigilated_schedules")
+    invigilator = models.ForeignKey(
+        Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name="invigilated_schedules"
+    )
     capacity = models.PositiveIntegerField(default=60)
     is_locked = models.BooleanField(default=False, db_index=True)
 
@@ -122,6 +126,7 @@ class ExamSchedule(models.Model):
 # ---------------------------------------------------------------------------
 # Hall Ticket
 # ---------------------------------------------------------------------------
+
 
 class HallTicket(models.Model):
     STATUS_CHOICES = [
@@ -157,6 +162,7 @@ class HallTicket(models.Model):
 # Exam Attendance
 # ---------------------------------------------------------------------------
 
+
 class ExamAttendance(models.Model):
     STATUS_CHOICES = [
         ("present", "Present"),
@@ -189,6 +195,7 @@ class ExamAttendance(models.Model):
 # Invigilator Assignment
 # ---------------------------------------------------------------------------
 
+
 class InvigilatorAssignment(models.Model):
     DUTY_STATUS_CHOICES = [
         ("assigned", "Assigned"),
@@ -220,6 +227,7 @@ class InvigilatorAssignment(models.Model):
 # ---------------------------------------------------------------------------
 # Exam Audit Log
 # ---------------------------------------------------------------------------
+
 
 class ExamAuditLog(models.Model):
     EVENT_CHOICES = [

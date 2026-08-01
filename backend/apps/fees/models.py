@@ -1,10 +1,9 @@
 import uuid
 
-from django.conf import settings
-from django.db import models
-
 from apps.academics.models import AcademicSession, Program, Semester
 from apps.students.models import Student
+from django.conf import settings
+from django.db import models
 
 
 class SoftDeleteManager(models.Manager):
@@ -15,6 +14,7 @@ class SoftDeleteManager(models.Manager):
 # ---------------------------------------------------------------------------
 # Fee Category
 # ---------------------------------------------------------------------------
+
 
 class FeeCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -37,6 +37,7 @@ class FeeCategory(models.Model):
 # ---------------------------------------------------------------------------
 # Fee Structure
 # ---------------------------------------------------------------------------
+
 
 class FeeStructure(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -64,6 +65,7 @@ class FeeStructure(models.Model):
 # ---------------------------------------------------------------------------
 # Student Fee
 # ---------------------------------------------------------------------------
+
 
 class StudentFee(models.Model):
     STATUS_CHOICES = [
@@ -106,6 +108,7 @@ class StudentFee(models.Model):
 # Fee Installment
 # ---------------------------------------------------------------------------
 
+
 class FeeInstallment(models.Model):
     STATUS_CHOICES = [
         ("pending", "Pending"),
@@ -142,6 +145,7 @@ class FeeInstallment(models.Model):
 # Fee Receipt
 # ---------------------------------------------------------------------------
 
+
 class FeeReceipt(models.Model):
     MODE_CHOICES = [
         ("cash", "Cash"),
@@ -161,8 +165,12 @@ class FeeReceipt(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     receipt_number = models.CharField(max_length=100, unique=True, db_index=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="fee_receipts")
-    student_fee = models.ForeignKey(StudentFee, on_delete=models.SET_NULL, null=True, blank=True, related_name="receipts")
-    installment = models.ForeignKey(FeeInstallment, on_delete=models.SET_NULL, null=True, blank=True, related_name="receipts")
+    student_fee = models.ForeignKey(
+        StudentFee, on_delete=models.SET_NULL, null=True, blank=True, related_name="receipts"
+    )
+    installment = models.ForeignKey(
+        FeeInstallment, on_delete=models.SET_NULL, null=True, blank=True, related_name="receipts"
+    )
 
     payment_date = models.DateField(auto_now_add=True)
     amount = models.FloatField(default=0.0)
@@ -186,6 +194,7 @@ class FeeReceipt(models.Model):
 # Fee Audit Log
 # ---------------------------------------------------------------------------
 
+
 class FeeAuditLog(models.Model):
     EVENT_CHOICES = [
         ("fee_assigned", "Fee Assigned"),
@@ -196,7 +205,9 @@ class FeeAuditLog(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    student_fee = models.ForeignKey(StudentFee, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs")
+    student_fee = models.ForeignKey(
+        StudentFee, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs"
+    )
     receipt = models.ForeignKey(FeeReceipt, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs")
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     event_type = models.CharField(max_length=30, choices=EVENT_CHOICES)

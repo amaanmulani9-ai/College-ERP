@@ -2,9 +2,11 @@
 Attendance Signals.
 Listens for post-save events on attendance sessions and records.
 """
+
+import logging
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-import logging
 
 from .models import AttendanceSession
 

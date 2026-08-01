@@ -8,18 +8,18 @@ WebhookLog       – raw webhook payload for audit & idempotency
 Refund           – refund request and status
 PaymentAuditLog  – append-only event log
 """
-import uuid
 
-from django.conf import settings
-from django.db import models
+import uuid
 
 from apps.fees.models import FeeReceipt, StudentFee
 from apps.students.models import Student
-
+from django.conf import settings
+from django.db import models
 
 # ---------------------------------------------------------------------------
 # Payment Gateway Configuration
 # ---------------------------------------------------------------------------
+
 
 class PaymentGateway(models.Model):
     PROVIDER_CHOICES = [
@@ -36,7 +36,9 @@ class PaymentGateway(models.Model):
     is_active = models.BooleanField(default=True)
 
     # Credentials stored as config dict (encrypted at deployment level)
-    config = models.JSONField(default=dict, blank=True, help_text="Gateway API keys and settings (store secrets via env).")
+    config = models.JSONField(
+        default=dict, blank=True, help_text="Gateway API keys and settings (store secrets via env)."
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -53,6 +55,7 @@ class PaymentGateway(models.Model):
 # ---------------------------------------------------------------------------
 # Payment Order  (created before payment, maps to gateway order_id)
 # ---------------------------------------------------------------------------
+
 
 class PaymentOrder(models.Model):
     STATUS_CHOICES = [
@@ -94,6 +97,7 @@ class PaymentOrder(models.Model):
 # Payment Transaction  (immutable record of completed/failed payment)
 # ---------------------------------------------------------------------------
 
+
 class PaymentTransaction(models.Model):
     STATUS_CHOICES = [
         ("initiated", "Initiated"),
@@ -105,8 +109,12 @@ class PaymentTransaction(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="payment_transactions")
-    order = models.OneToOneField(PaymentOrder, on_delete=models.CASCADE, related_name="transaction", null=True, blank=True)
-    fee_receipt = models.ForeignKey(FeeReceipt, on_delete=models.SET_NULL, null=True, blank=True, related_name="payment_transactions")
+    order = models.OneToOneField(
+        PaymentOrder, on_delete=models.CASCADE, related_name="transaction", null=True, blank=True
+    )
+    fee_receipt = models.ForeignKey(
+        FeeReceipt, on_delete=models.SET_NULL, null=True, blank=True, related_name="payment_transactions"
+    )
     gateway = models.ForeignKey(PaymentGateway, on_delete=models.PROTECT, related_name="transactions")
 
     # Gateway identifiers
@@ -140,9 +148,12 @@ class PaymentTransaction(models.Model):
 # Webhook Log  (raw webhook payloads — used for idempotency + replay)
 # ---------------------------------------------------------------------------
 
+
 class WebhookLog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    gateway = models.ForeignKey(PaymentGateway, on_delete=models.SET_NULL, null=True, blank=True, related_name="webhook_logs")
+    gateway = models.ForeignKey(
+        PaymentGateway, on_delete=models.SET_NULL, null=True, blank=True, related_name="webhook_logs"
+    )
     event_id = models.CharField(max_length=255, db_index=True, blank=True, default="")
     event_type = models.CharField(max_length=100)
     payload = models.JSONField(default=dict)
@@ -167,6 +178,7 @@ class WebhookLog(models.Model):
 # Refund
 # ---------------------------------------------------------------------------
 
+
 class Refund(models.Model):
     STATUS_CHOICES = [
         ("requested", "Requested"),
@@ -177,7 +189,9 @@ class Refund(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     transaction = models.ForeignKey(PaymentTransaction, on_delete=models.CASCADE, related_name="refunds")
-    refund_id = models.CharField(max_length=255, blank=True, default="", db_index=True, help_text="Gateway-assigned refund ID")
+    refund_id = models.CharField(
+        max_length=255, blank=True, default="", db_index=True, help_text="Gateway-assigned refund ID"
+    )
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     reason = models.CharField(max_length=500)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="requested")
@@ -200,6 +214,7 @@ class Refund(models.Model):
 # Payment Audit Log
 # ---------------------------------------------------------------------------
 
+
 class PaymentAuditLog(models.Model):
     EVENT_CHOICES = [
         ("order_created", "Order Created"),
@@ -216,7 +231,9 @@ class PaymentAuditLog(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    transaction = models.ForeignKey(PaymentTransaction, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs")
+    transaction = models.ForeignKey(
+        PaymentTransaction, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs"
+    )
     order = models.ForeignKey(PaymentOrder, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs")
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     event_type = models.CharField(max_length=30, choices=EVENT_CHOICES)

@@ -71,7 +71,16 @@ class TimetableViewSet(viewsets.ModelViewSet):
         "classroom__room_number",
         "program__name",
     ]
-    filterset_fields = ["academic_session", "program", "semester", "faculty", "classroom", "time_slot", "batch", "status"]
+    filterset_fields = [
+        "academic_session",
+        "program",
+        "semester",
+        "faculty",
+        "classroom",
+        "time_slot",
+        "batch",
+        "status",
+    ]
 
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:

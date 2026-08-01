@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand
 from apps.tenancy.models import Client, Domain
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -11,7 +11,9 @@ class Command(BaseCommand):
         parser.add_argument("--schema", type=str, required=True, help="PostgreSQL Schema Name")
         parser.add_argument("--domain", type=str, required=True, help="College Domain (e.g., collegea.localhost)")
         parser.add_argument("--email", type=str, default="", help="Contact Email")
-        parser.add_argument("--plan", type=str, default="standard", help="Subscription Plan (free, standard, enterprise)")
+        parser.add_argument(
+            "--plan", type=str, default="standard", help="Subscription Plan (free, standard, enterprise)"
+        )
 
     def handle(self, *args, **options):
         name = options["name"]
@@ -41,5 +43,7 @@ class Command(BaseCommand):
         )
 
         self.stdout.write(
-            self.style.SUCCESS(f"Successfully created tenant '{name}' [Schema: {schema_name}] mapped to domain '{domain.domain}'.")
+            self.style.SUCCESS(
+                f"Successfully created tenant '{name}' [Schema: {schema_name}] mapped to domain '{domain.domain}'."
+            )
         )

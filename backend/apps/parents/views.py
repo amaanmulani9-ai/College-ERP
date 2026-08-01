@@ -1,14 +1,13 @@
-from django.db.models import Count, Q
+from apps.authentication.models import User
+from apps.profiles.models import UserProfile
+from apps.students.models import Student
+from django.db.models import Count
 from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.authentication.models import User
-from apps.profiles.models import UserProfile
-from apps.students.models import Student
-
-from .models import Parent, ParentDocument, StudentParentLink
+from .models import Parent, ParentDocument
 from .serializers import (
     CreateParentSerializer,
     DocumentReviewSerializer,
@@ -132,9 +131,7 @@ class ParentViewSet(viewsets.ModelViewSet):
         try:
             student = Student.objects.get(id=data["student_id"])
         except Student.DoesNotExist:
-            return Response(
-                {"detail": "Student not found."}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"detail": "Student not found."}, status=status.HTTP_404_NOT_FOUND)
 
         link = link_student_to_parent(
             parent=parent,
@@ -153,15 +150,11 @@ class ParentViewSet(viewsets.ModelViewSet):
         parent = self.get_object()
         student_id = request.data.get("student_id")
         if not student_id:
-            return Response(
-                {"detail": "student_id is required."}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"detail": "student_id is required."}, status=status.HTTP_400_BAD_REQUEST)
         try:
             student = Student.objects.get(id=student_id)
         except Student.DoesNotExist:
-            return Response(
-                {"detail": "Student not found."}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"detail": "Student not found."}, status=status.HTTP_404_NOT_FOUND)
         unlink_student_from_parent(parent, student, actor=request.user, request=request)
         return Response({"detail": "Student unlinked successfully."}, status=status.HTTP_200_OK)
 
@@ -182,6 +175,7 @@ class ParentViewSet(viewsets.ModelViewSet):
 # ---------------------------------------------------------------------------
 # Document management
 # ---------------------------------------------------------------------------
+
 
 class ParentDocumentViewSet(viewsets.ModelViewSet):
     """
@@ -217,6 +211,7 @@ class ParentDocumentViewSet(viewsets.ModelViewSet):
 # Dashboard summary
 # ---------------------------------------------------------------------------
 
+
 class ParentDashboardSummaryView(generics.GenericAPIView):
     """
     GET /api/parents/dashboard/
@@ -231,11 +226,7 @@ class ParentDashboardSummaryView(generics.GenericAPIView):
         unverified = Parent.objects.filter(is_verified=False).count()
         portal_enabled = Parent.objects.filter(portal_access_enabled=True).count()
 
-        by_relationship = (
-            Parent.objects.values("relationship_type")
-            .annotate(count=Count("id"))
-            .order_by("-count")
-        )
+        by_relationship = Parent.objects.values("relationship_type").annotate(count=Count("id")).order_by("-count")
 
         pending_docs = ParentDocument.objects.filter(status="pending").count()
 

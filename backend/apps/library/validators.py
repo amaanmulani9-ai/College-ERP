@@ -6,12 +6,14 @@ Library Validators
 - Book availability check
 - Borrower issue limit check
 """
+
 from typing import Optional
 
 
 def validate_isbn_unique(isbn: str, exclude_id: Optional[str] = None) -> None:
     """Raise ValueError if ISBN already exists."""
     from .models import Book
+
     qs = Book.objects.filter(isbn=isbn)
     if exclude_id:
         qs = qs.exclude(id=exclude_id)
@@ -22,6 +24,7 @@ def validate_isbn_unique(isbn: str, exclude_id: Optional[str] = None) -> None:
 def validate_barcode_unique(barcode: str, exclude_id: Optional[str] = None) -> None:
     """Raise ValueError if Barcode already exists."""
     from .models import Book
+
     qs = Book.objects.filter(barcode=barcode)
     if exclude_id:
         qs = qs.exclude(id=exclude_id)
@@ -37,9 +40,12 @@ def validate_book_available(book) -> None:
         raise ValueError(f"Book '{book.title}' is currently marked as {book.status!r} and cannot be issued.")
 
 
-def validate_borrower_limit(student_id: Optional[str] = None, staff_id: Optional[str] = None, max_limit: int = 3) -> None:
+def validate_borrower_limit(
+    student_id: Optional[str] = None, staff_id: Optional[str] = None, max_limit: int = 3
+) -> None:
     """Ensure student or staff hasn't exceeded active issued books limit."""
     from .models import BookIssue
+
     if student_id:
         active_count = BookIssue.objects.filter(student_id=student_id, status="issued").count()
         if active_count >= max_limit:

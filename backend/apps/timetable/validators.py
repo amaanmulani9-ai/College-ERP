@@ -5,7 +5,9 @@ Prevents:
  - Classroom double-booking
  - Batch double-booking
 """
-from typing import List, Dict, Any
+
+from typing import Any, Dict, List
+
 from .models import Timetable
 
 
@@ -36,11 +38,13 @@ def check_timetable_conflicts(
 
     if faculty_clash.exists():
         clash = faculty_clash.first()
-        conflicts.append({
-            "type": "faculty_double_booking",
-            "message": f"Faculty is already assigned to {clash.subject.name} in room {clash.classroom} during this time slot.",
-            "conflicting_entry_id": str(clash.id),
-        })
+        conflicts.append(
+            {
+                "type": "faculty_double_booking",
+                "message": f"Faculty is already assigned to {clash.subject.name} in room {clash.classroom} during this time slot.",
+                "conflicting_entry_id": str(clash.id),
+            }
+        )
 
     # 2. Classroom Double Booking Check
     room_clash = Timetable.objects.filter(
@@ -54,11 +58,13 @@ def check_timetable_conflicts(
 
     if room_clash.exists():
         clash = room_clash.first()
-        conflicts.append({
-            "type": "classroom_double_booking",
-            "message": f"Classroom is already occupied by {clash.faculty.profile.get_full_name()} for {clash.subject.name}.",
-            "conflicting_entry_id": str(clash.id),
-        })
+        conflicts.append(
+            {
+                "type": "classroom_double_booking",
+                "message": f"Classroom is already occupied by {clash.faculty.profile.get_full_name()} for {clash.subject.name}.",
+                "conflicting_entry_id": str(clash.id),
+            }
+        )
 
     # 3. Batch Double Booking Check
     batch_query = Timetable.objects.filter(
@@ -76,10 +82,12 @@ def check_timetable_conflicts(
 
     if batch_query.exists():
         clash = batch_query.first()
-        conflicts.append({
-            "type": "batch_double_booking",
-            "message": f"Batch '{batch}' for this program & semester is already scheduled for {clash.subject.name} in room {clash.classroom}.",
-            "conflicting_entry_id": str(clash.id),
-        })
+        conflicts.append(
+            {
+                "type": "batch_double_booking",
+                "message": f"Batch '{batch}' for this program & semester is already scheduled for {clash.subject.name} in room {clash.classroom}.",
+                "conflicting_entry_id": str(clash.id),
+            }
+        )
 
     return conflicts

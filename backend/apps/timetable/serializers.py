@@ -1,7 +1,11 @@
-from rest_framework import serializers
-
-from apps.academics.serializers import AcademicSessionSerializer, ProgramSerializer, SemesterSerializer, SubjectSerializer
+from apps.academics.serializers import (
+    AcademicSessionSerializer,
+    ProgramSerializer,
+    SemesterSerializer,
+    SubjectSerializer,
+)
 from apps.staff.serializers import EmployeeSerializer
+from rest_framework import serializers
 
 from .models import Building, Classroom, TimeSlot, Timetable, TimetableAuditLog
 

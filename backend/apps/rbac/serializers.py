@@ -1,13 +1,24 @@
-from rest_framework import serializers
-from apps.authentication.models import User
 from apps.authentication.serializers import UserSerializer
+from rest_framework import serializers
+
 from .models import Permission, Role, UserRole
 
 
 class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permission
-        fields = ["id", "code", "name", "description", "module", "action", "is_active", "is_system", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "code",
+            "name",
+            "description",
+            "module",
+            "action",
+            "is_active",
+            "is_system",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
 

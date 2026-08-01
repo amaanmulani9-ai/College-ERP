@@ -13,16 +13,15 @@ Methods:
     damaged_book()     – Mark issue/book as damaged and charge damage fine
     book_history()     – Circulation history for a book or borrower
 """
+
 import decimal
 import logging
 from datetime import date, timedelta
 from typing import Any, Dict, List, Optional
 
-from django.db import transaction
-from django.utils import timezone
-
 from apps.staff.models import Employee
 from apps.students.models import Student
+from django.db import transaction
 
 from .models import (
     Author,
@@ -268,7 +267,9 @@ class LibraryService:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def calculate_fine(due_date: date, return_date: Optional[date] = None, fine_rate: decimal.Decimal = FINE_PER_DAY) -> decimal.Decimal:
+    def calculate_fine(
+        due_date: date, return_date: Optional[date] = None, fine_rate: decimal.Decimal = FINE_PER_DAY
+    ) -> decimal.Decimal:
         """Compute fine for overdue returns."""
         actual_date = return_date or date.today()
         if actual_date <= due_date:
@@ -351,11 +352,20 @@ class LibraryService:
         if student_id:
             qs = qs.filter(student_id=student_id)
 
-        return list(qs.order_by("-issue_date").values(
-            "id", "book__title", "book__isbn", "student__student_id",
-            "staff__employee_id", "issue_date", "due_date", "return_date",
-            "fine_amount", "status",
-        ))
+        return list(
+            qs.order_by("-issue_date").values(
+                "id",
+                "book__title",
+                "book__isbn",
+                "student__student_id",
+                "staff__employee_id",
+                "issue_date",
+                "due_date",
+                "return_date",
+                "fine_amount",
+                "status",
+            )
+        )
 
 
 def _log_audit(book=None, issue=None, actor=None, event_type="", description=""):

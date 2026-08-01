@@ -1,9 +1,13 @@
-from rest_framework import serializers
-
-from apps.academics.serializers import AcademicSessionSerializer, ProgramSerializer, SemesterSerializer, SubjectSerializer
+from apps.academics.serializers import (
+    AcademicSessionSerializer,
+    ProgramSerializer,
+    SemesterSerializer,
+    SubjectSerializer,
+)
 from apps.staff.serializers import EmployeeSerializer
 from apps.students.serializers import StudentSerializer
 from apps.timetable.serializers import ClassroomSerializer
+from rest_framework import serializers
 
 from .models import Exam, ExamAttendance, ExamAuditLog, ExamSchedule, ExamType, HallTicket, InvigilatorAssignment
 
@@ -13,7 +17,17 @@ class ExamTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ExamType
-        fields = ["id", "name", "code", "category", "category_display", "is_internal", "is_active", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "name",
+            "code",
+            "category",
+            "category_display",
+            "is_internal",
+            "is_active",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
 

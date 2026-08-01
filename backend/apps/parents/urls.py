@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import ParentDocumentViewSet, ParentDashboardSummaryView, ParentViewSet
+from .views import ParentDashboardSummaryView, ParentDocumentViewSet, ParentViewSet
 
 router = DefaultRouter()
 router.register(r"parents", ParentViewSet, basename="parent")

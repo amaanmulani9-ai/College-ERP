@@ -93,6 +93,7 @@ class HostelAuditLogAdmin(admin.ModelAdmin):
 
     def description_short(self, obj):
         return obj.description[:60]
+
     description_short.short_description = "Description"
 
     def has_add_permission(self, request):

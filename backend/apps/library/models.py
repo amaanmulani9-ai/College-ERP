@@ -9,18 +9,18 @@ BookIssue    – Active/Past book circulation & issue tracking
 Reservation  – Book reservation queue for unavailable copies
 LibraryAuditLog – Audit log for library actions
 """
-import uuid
 
-from django.conf import settings
-from django.db import models
+import uuid
 
 from apps.staff.models import Employee
 from apps.students.models import Student
-
+from django.conf import settings
+from django.db import models
 
 # ---------------------------------------------------------------------------
 # Book Category
 # ---------------------------------------------------------------------------
+
 
 class BookCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -45,6 +45,7 @@ class BookCategory(models.Model):
 # Author
 # ---------------------------------------------------------------------------
 
+
 class Author(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=200)
@@ -66,6 +67,7 @@ class Author(models.Model):
 # Publisher
 # ---------------------------------------------------------------------------
 
+
 class Publisher(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=200)
@@ -86,6 +88,7 @@ class Publisher(models.Model):
 # ---------------------------------------------------------------------------
 # Book
 # ---------------------------------------------------------------------------
+
 
 class Book(models.Model):
     STATUS_CHOICES = [
@@ -129,6 +132,7 @@ class Book(models.Model):
 # Book Issue (Circulation)
 # ---------------------------------------------------------------------------
 
+
 class BookIssue(models.Model):
     STATUS_CHOICES = [
         ("issued", "Issued"),
@@ -150,7 +154,9 @@ class BookIssue(models.Model):
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="issued", db_index=True)
     remarks = models.CharField(max_length=255, blank=True, default="")
-    issued_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="issued_books")
+    issued_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="issued_books"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -169,6 +175,7 @@ class BookIssue(models.Model):
 # Reservation
 # ---------------------------------------------------------------------------
 
+
 class Reservation(models.Model):
     STATUS_CHOICES = [
         ("pending", "Pending"),
@@ -179,8 +186,12 @@ class Reservation(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="reservations")
-    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True, related_name="book_reservations")
-    staff = models.ForeignKey(Employee, on_delete=models.CASCADE, null=True, blank=True, related_name="book_reservations")
+    student = models.ForeignKey(
+        Student, on_delete=models.CASCADE, null=True, blank=True, related_name="book_reservations"
+    )
+    staff = models.ForeignKey(
+        Employee, on_delete=models.CASCADE, null=True, blank=True, related_name="book_reservations"
+    )
 
     reserved_date = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending", db_index=True)
@@ -201,6 +212,7 @@ class Reservation(models.Model):
 # ---------------------------------------------------------------------------
 # Library Audit Log
 # ---------------------------------------------------------------------------
+
 
 class LibraryAuditLog(models.Model):
     EVENT_CHOICES = [

@@ -1,7 +1,6 @@
-from rest_framework import serializers
-
 from apps.academics.serializers import AcademicSessionSerializer, ProgramSerializer
 from apps.students.serializers import StudentSerializer
+from rest_framework import serializers
 
 from .models import Certificate, CertificateAuditLog, CertificateType, Transcript
 
@@ -39,7 +38,15 @@ class CertificateSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "certificate_number", "generated_at", "generated_by", "is_deleted", "created_at", "updated_at"]
+        read_only_fields = [
+            "id",
+            "certificate_number",
+            "generated_at",
+            "generated_by",
+            "is_deleted",
+            "created_at",
+            "updated_at",
+        ]
 
 
 class GenerateCertificateRequestSerializer(serializers.Serializer):

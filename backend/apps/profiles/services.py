@@ -1,5 +1,6 @@
-from rest_framework.exceptions import ValidationError
 from apps.authentication.services import get_client_ip
+from rest_framework.exceptions import ValidationError
+
 from .models import ProfileActivity
 
 

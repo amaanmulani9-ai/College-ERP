@@ -1,24 +1,51 @@
 from rest_framework import serializers
-from .models import UserProfile, UserContact, UserAddress, UserPreferences, ProfileActivity
+
+from .models import ProfileActivity, UserAddress, UserContact, UserPreferences, UserProfile
 from .services import calculate_profile_completion
 
 
 class UserContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserContact
-        fields = ["primary_email", "secondary_email", "mobile_number", "alternate_mobile", "emergency_contact_name", "emergency_contact_number"]
+        fields = [
+            "primary_email",
+            "secondary_email",
+            "mobile_number",
+            "alternate_mobile",
+            "emergency_contact_name",
+            "emergency_contact_number",
+        ]
 
 
 class UserAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserAddress
-        fields = ["id", "address_type", "address_line1", "address_line2", "city", "state", "country", "postal_code", "latitude", "longitude"]
+        fields = [
+            "id",
+            "address_type",
+            "address_line1",
+            "address_line2",
+            "city",
+            "state",
+            "country",
+            "postal_code",
+            "latitude",
+            "longitude",
+        ]
 
 
 class UserPreferencesSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserPreferences
-        fields = ["theme", "dark_mode", "notification_preferences", "time_format", "date_format", "language", "dashboard_layout"]
+        fields = [
+            "theme",
+            "dark_mode",
+            "notification_preferences",
+            "time_format",
+            "date_format",
+            "language",
+            "dashboard_layout",
+        ]
 
 
 class ProfileActivitySerializer(serializers.ModelSerializer):

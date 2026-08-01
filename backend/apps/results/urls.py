@@ -12,8 +12,20 @@ router.register(r"semester-results", SemesterResultViewSet, basename="semester-r
 urlpatterns = [
     path("calculate/", StudentResultViewSet.as_view({"post": "calculate"}), name="results-calculate"),
     path("publish/", SemesterResultViewSet.as_view({"post": "publish"}), name="results-publish"),
-    path("student/<str:student_id>/", StudentResultViewSet.as_view({"get": "student_history"}), name="results-student-history"),
-    path("semester/<str:semester_id>/", SemesterResultViewSet.as_view({"get": "semester_summary"}), name="results-semester-summary"),
-    path("transcript-preview/", StudentResultViewSet.as_view({"get": "transcript_preview"}), name="results-transcript-preview"),
+    path(
+        "student/<str:student_id>/",
+        StudentResultViewSet.as_view({"get": "student_history"}),
+        name="results-student-history",
+    ),
+    path(
+        "semester/<str:semester_id>/",
+        SemesterResultViewSet.as_view({"get": "semester_summary"}),
+        name="results-semester-summary",
+    ),
+    path(
+        "transcript-preview/",
+        StudentResultViewSet.as_view({"get": "transcript_preview"}),
+        name="results-transcript-preview",
+    ),
     path("", include(router.urls)),
 ]

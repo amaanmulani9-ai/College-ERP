@@ -1,18 +1,27 @@
 import pytest
-from django.urls import reverse
-from rest_framework.test import APIClient
+from apps.academics.models import Department, Faculty
 from apps.authentication.models import User
 from apps.profiles.models import UserProfile
-from apps.academics.models import Faculty, Department
 from apps.staff.models import Designation, Employee, EmployeeStatusHistory
-from apps.staff.services import generate_employee_code, suspend_employee, reinstate_employee, retire_employee, soft_delete_employee, restore_employee
+from apps.staff.services import (
+    generate_employee_code,
+    reinstate_employee,
+    restore_employee,
+    retire_employee,
+    soft_delete_employee,
+    suspend_employee,
+)
+from django.urls import reverse
+from rest_framework.test import APIClient
 
 
 @pytest.fixture
 def setup_staff_foundation(db):
     faculty = Faculty.objects.create(name="School of Engineering", code="SOE")
     dept = Department.objects.create(faculty=faculty, name="Mechanical Engineering", code="ME")
-    desig = Designation.objects.create(name="Assistant Professor", code="ASST_PROF", department=dept, category="teaching")
+    desig = Designation.objects.create(
+        name="Assistant Professor", code="ASST_PROF", department=dept, category="teaching"
+    )
     return {"dept": dept, "desig": desig}
 
 

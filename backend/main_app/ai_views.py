@@ -1,13 +1,12 @@
-import os
 import json
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
-from .models import CustomUser, Student, Staff, Course, Subject, Session, Assignment, AssignmentSubmission
+from .models import Student, Course, Subject, AssignmentSubmission
 # AI helper functions will be imported locally in views to save memory during startup
 
 def check_ai_limit(request, limit=2):
@@ -169,9 +168,6 @@ def staff_ai_grade_assignment(request):
             
     return JsonResponse({'status': 'error', 'message': 'Invalid action'})
 
-import jwt
-from datetime import datetime, timedelta
-from django.conf import settings
 
 
 

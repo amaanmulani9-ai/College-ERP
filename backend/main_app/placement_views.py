@@ -1,9 +1,9 @@
 import json
 import uuid
 from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from main_app.models import Company, JobPosting, Resume, Interview, OfferLetter, Student, CustomUser
+from main_app.models import Company, JobPosting, Resume, Interview, OfferLetter, Student
 from django.contrib import messages
 
 def student_placement_dashboard(request):

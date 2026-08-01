@@ -1,15 +1,14 @@
+from apps.authentication.models import User
+from apps.profiles.models import UserProfile
 from django.db.models import Count
-from rest_framework import generics, viewsets, status
+from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.authentication.models import User
-from apps.profiles.models import UserProfile
-from .models import Student, StudentStatusHistory
+from .models import Student
 from .serializers import (
     CreateStudentSerializer,
-    StatusTransitionSerializer,
     StudentSerializer,
     StudentStatusHistorySerializer,
 )
@@ -26,9 +25,18 @@ from .services import (
 
 
 class StudentViewSet(viewsets.ModelViewSet):
-    queryset = Student.objects.all().select_related("profile", "program", "department", "current_semester", "academic_session")
+    queryset = Student.objects.all().select_related(
+        "profile", "program", "department", "current_semester", "academic_session"
+    )
     permission_classes = [IsAuthenticated]
-    search_fields = ["student_id", "enrollment_number", "roll_number", "profile__first_name", "profile__last_name", "profile__user__email"]
+    search_fields = [
+        "student_id",
+        "enrollment_number",
+        "roll_number",
+        "profile__first_name",
+        "profile__last_name",
+        "profile__user__email",
+    ]
     filterset_fields = ["program", "department", "current_semester", "academic_session", "status", "category"]
 
     def get_serializer_class(self):
@@ -48,7 +56,9 @@ class StudentViewSet(viewsets.ModelViewSet):
 
         # Create auth user & profile
         user = User.objects.create_user(email=email, password=password, first_name=first_name, last_name=last_name)
-        profile, _ = UserProfile.objects.get_or_create(user=user, defaults={"first_name": first_name, "last_name": last_name})
+        profile, _ = UserProfile.objects.get_or_create(
+            user=user, defaults={"first_name": first_name, "last_name": last_name}
+        )
 
         # Generate unique Student ID
         program = data["program"]
@@ -136,7 +146,9 @@ class BulkImportView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        return Response({"detail": "Bulk import CSV parser placeholder triggered successfully."}, status=status.HTTP_200_OK)
+        return Response(
+            {"detail": "Bulk import CSV parser placeholder triggered successfully."}, status=status.HTTP_200_OK
+        )
 
 
 class BulkExportView(generics.GenericAPIView):
@@ -163,4 +175,6 @@ class BulkStatusUpdateView(generics.GenericAPIView):
             except Student.DoesNotExist:
                 continue
 
-        return Response({"detail": f"Successfully updated status for {updated_count} students."}, status=status.HTTP_200_OK)
+        return Response(
+            {"detail": f"Successfully updated status for {updated_count} students."}, status=status.HTTP_200_OK
+        )

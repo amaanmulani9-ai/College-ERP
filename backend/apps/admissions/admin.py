@@ -47,6 +47,7 @@ class AdmissionApplicationAdmin(admin.ModelAdmin):
     @admin.action(description="Approve selected applications")
     def bulk_approve(self, request, queryset):
         from .services import approve_application
+
         count = 0
         for app in queryset:
             try:
@@ -59,6 +60,7 @@ class AdmissionApplicationAdmin(admin.ModelAdmin):
     @admin.action(description="Reject selected applications")
     def bulk_reject(self, request, queryset):
         from .services import reject_application
+
         count = 0
         for app in queryset:
             try:

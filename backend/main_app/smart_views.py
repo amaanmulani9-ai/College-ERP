@@ -8,9 +8,8 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from datetime import date
-from django.utils import timezone
 
-from .models import CustomUser, Student, Staff, Course, Subject, Session, Attendance, AttendanceReport, Book, IssuedBook, VisitorPass
+from .models import CustomUser, Student, Staff, Subject, Session, Attendance, AttendanceReport, Book, IssuedBook, VisitorPass
 
 @login_required
 def student_id_card(request):

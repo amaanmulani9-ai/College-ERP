@@ -22,8 +22,11 @@ urlpatterns = [
     path("approve/", ScholarshipApplicationViewSet.as_view({"post": "approve"}), name="scholarship-approve"),
     path("reject/", ScholarshipApplicationViewSet.as_view({"post": "reject"}), name="scholarship-reject"),
     path("renew/", ScholarshipRenewalViewSet.as_view({"post": "renew"}), name="scholarship-renew"),
-    path("student/<uuid:student_id>/", ScholarshipViewSet.as_view({"get": "student_scholarships"}), name="student-scholarships"),
-
+    path(
+        "student/<uuid:student_id>/",
+        ScholarshipViewSet.as_view({"get": "student_scholarships"}),
+        name="student-scholarships",
+    ),
     # Router URLs
     path("", include(router.urls)),
 ]

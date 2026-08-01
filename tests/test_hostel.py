@@ -12,30 +12,26 @@ Tests:
 8. Vacant & Occupied Room Query Endpoints
 9. REST API Permissions & Access Control (Warden vs Student)
 """
+
 import decimal
-from datetime import date, datetime
+from datetime import date
 
 import pytest
-from django.contrib.auth import get_user_model
-from rest_framework.test import APIClient
-
 from apps.academics.models import AcademicSession, Department, Faculty, Program, Semester
 from apps.hostel.models import (
     Bed,
     Block,
     Floor,
     Hostel,
-    HostelAllocation,
-    HostelAuditLog,
-    MaintenanceRequest,
     Room,
-    Visitor,
     Warden,
 )
 from apps.hostel.services import HostelService
 from apps.profiles.models import UserProfile
 from apps.staff.models import Designation, Employee
 from apps.students.models import Student
+from django.contrib.auth import get_user_model
+from rest_framework.test import APIClient
 
 User = get_user_model()
 
@@ -121,6 +117,7 @@ def setup_hostel_data(db):
 # 1. Bed Allocation & Fee Integration Tests
 # ===========================================================================
 
+
 def test_allocate_bed_success_and_fee_integration(setup_hostel_data):
     student = setup_hostel_data["student"]
     bed1 = setup_hostel_data["bed1"]
@@ -142,6 +139,7 @@ def test_allocate_bed_success_and_fee_integration(setup_hostel_data):
 
     # Check fee integration
     from apps.fees.models import StudentFee
+
     fee = StudentFee.objects.filter(student=student, fee_structure__academic_session=session).first()
     assert fee is not None
     assert fee.total_amount == 25000.00
@@ -170,6 +168,7 @@ def test_allocate_bed_duplicate_allocation_fails(setup_hostel_data):
 # ===========================================================================
 # 2. Room Transfer, Check-In & Check-Out
 # ===========================================================================
+
 
 def test_transfer_room(setup_hostel_data):
     student = setup_hostel_data["student"]
@@ -224,6 +223,7 @@ def test_check_in_and_check_out(setup_hostel_data):
 # 3. Visitor Entry & Maintenance
 # ===========================================================================
 
+
 def test_visitor_entry(setup_hostel_data):
     visitor = HostelService.visitor_entry(
         student_id=str(setup_hostel_data["student"].id),
@@ -252,6 +252,7 @@ def test_maintenance_request(setup_hostel_data):
 # ===========================================================================
 # 4. REST API ViewSets
 # ===========================================================================
+
 
 def test_allocate_bed_api(setup_hostel_data):
     client = APIClient()

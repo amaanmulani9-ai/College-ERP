@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand
 from apps.tenancy.models import Client
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -15,6 +15,8 @@ class Command(BaseCommand):
             tenant = Client.objects.get(schema_name=schema_name)
             tenant_name = tenant.name
             tenant.delete(force_drop=True)
-            self.stdout.write(self.style.SUCCESS(f"Successfully deleted tenant '{tenant_name}' [Schema: {schema_name}]."))
+            self.stdout.write(
+                self.style.SUCCESS(f"Successfully deleted tenant '{tenant_name}' [Schema: {schema_name}].")
+            )
         except Client.DoesNotExist:
             self.stderr.write(self.style.ERROR(f"Tenant schema '{schema_name}' does not exist."))

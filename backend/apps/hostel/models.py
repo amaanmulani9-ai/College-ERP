@@ -12,14 +12,14 @@ Visitor            – Visitor register
 MaintenanceRequest – Room maintenance tickets
 HostelAuditLog     – Audit log for hostel events
 """
-import uuid
 
-from django.conf import settings
-from django.db import models
+import uuid
 
 from apps.academics.models import AcademicSession
 from apps.staff.models import Employee
 from apps.students.models import Student
+from django.conf import settings
+from django.db import models
 
 
 class SoftDeleteManager(models.Manager):
@@ -30,6 +30,7 @@ class SoftDeleteManager(models.Manager):
 # ---------------------------------------------------------------------------
 # Hostel
 # ---------------------------------------------------------------------------
+
 
 class Hostel(models.Model):
     GENDER_CHOICES = [
@@ -65,6 +66,7 @@ class Hostel(models.Model):
 # Block
 # ---------------------------------------------------------------------------
 
+
 class Block(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     hostel = models.ForeignKey(Hostel, on_delete=models.CASCADE, related_name="blocks")
@@ -88,6 +90,7 @@ class Block(models.Model):
 # Floor
 # ---------------------------------------------------------------------------
 
+
 class Floor(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     block = models.ForeignKey(Block, on_delete=models.CASCADE, related_name="floors")
@@ -109,6 +112,7 @@ class Floor(models.Model):
 # ---------------------------------------------------------------------------
 # Room
 # ---------------------------------------------------------------------------
+
 
 class Room(models.Model):
     ROOM_TYPE_CHOICES = [
@@ -150,6 +154,7 @@ class Room(models.Model):
 # Bed
 # ---------------------------------------------------------------------------
 
+
 class Bed(models.Model):
     STATUS_CHOICES = [
         ("vacant", "Vacant"),
@@ -179,6 +184,7 @@ class Bed(models.Model):
 # Warden
 # ---------------------------------------------------------------------------
 
+
 class Warden(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="warden_assignments")
@@ -200,6 +206,7 @@ class Warden(models.Model):
 # ---------------------------------------------------------------------------
 # Hostel Allocation
 # ---------------------------------------------------------------------------
+
 
 class HostelAllocation(models.Model):
     STATUS_CHOICES = [
@@ -235,6 +242,7 @@ class HostelAllocation(models.Model):
 # Visitor Register
 # ---------------------------------------------------------------------------
 
+
 class Visitor(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="hostel_visitors")
@@ -261,6 +269,7 @@ class Visitor(models.Model):
 # Maintenance Request
 # ---------------------------------------------------------------------------
 
+
 class MaintenanceRequest(models.Model):
     STATUS_CHOICES = [
         ("pending", "Pending"),
@@ -275,7 +284,9 @@ class MaintenanceRequest(models.Model):
     description = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending", db_index=True)
 
-    assigned_to = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name="maintenance_assignments")
+    assigned_to = models.ForeignKey(
+        Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name="maintenance_assignments"
+    )
     completed_date = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -293,6 +304,7 @@ class MaintenanceRequest(models.Model):
 # ---------------------------------------------------------------------------
 # Audit Log
 # ---------------------------------------------------------------------------
+
 
 class HostelAuditLog(models.Model):
     EVENT_CHOICES = [

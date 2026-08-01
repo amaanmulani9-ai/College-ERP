@@ -1,6 +1,6 @@
-from rest_framework import serializers
 from apps.profiles.serializers import UserProfileSerializer
-from apps.academics.serializers import DepartmentSerializer
+from rest_framework import serializers
+
 from .models import Designation, Employee, EmployeeStatusHistory
 
 
@@ -9,7 +9,17 @@ class DesignationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Designation
-        fields = ["id", "name", "code", "department", "department_name", "category", "is_active", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "name",
+            "code",
+            "department",
+            "department_name",
+            "category",
+            "is_active",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
 

@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from rest_framework import serializers
 
 from .models import (
@@ -43,11 +41,25 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = [
-            "id", "isbn", "barcode", "title", "author", "author_name",
-            "publisher", "publisher_name", "category", "category_name",
-            "edition", "language", "copies", "available_copies",
-            "shelf_number", "status", "status_display",
-            "created_at", "updated_at",
+            "id",
+            "isbn",
+            "barcode",
+            "title",
+            "author",
+            "author_name",
+            "publisher",
+            "publisher_name",
+            "category",
+            "category_name",
+            "edition",
+            "language",
+            "copies",
+            "available_copies",
+            "shelf_number",
+            "status",
+            "status_display",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["id", "available_copies", "created_at", "updated_at"]
 
@@ -62,9 +74,23 @@ class BookIssueSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookIssue
         fields = [
-            "id", "book", "book_title", "book_isbn", "student", "student_id_str",
-            "staff", "staff_employee_id", "issue_date", "due_date", "return_date",
-            "fine_amount", "status", "status_display", "remarks", "created_at", "updated_at",
+            "id",
+            "book",
+            "book_title",
+            "book_isbn",
+            "student",
+            "student_id_str",
+            "staff",
+            "staff_employee_id",
+            "issue_date",
+            "due_date",
+            "return_date",
+            "fine_amount",
+            "status",
+            "status_display",
+            "remarks",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["id", "issue_date", "return_date", "fine_amount", "status", "created_at", "updated_at"]
 
@@ -76,9 +102,16 @@ class ReservationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reservation
         fields = [
-            "id", "book", "book_title", "student", "staff",
-            "reserved_date", "status", "status_display",
-            "created_at", "updated_at",
+            "id",
+            "book",
+            "book_title",
+            "student",
+            "staff",
+            "reserved_date",
+            "status",
+            "status_display",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["id", "reserved_date", "status", "created_at", "updated_at"]
 
@@ -95,6 +128,7 @@ class LibraryAuditLogSerializer(serializers.ModelSerializer):
 # ---------------------------------------------------------------------------
 # Action Request Serializers
 # ---------------------------------------------------------------------------
+
 
 class IssueBookRequestSerializer(serializers.Serializer):
     book_id = serializers.UUIDField()

@@ -7,9 +7,9 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'college_management_system.setti
 django.setup()
 
 from main_app.models import (
-    Student, Course, Subject, FeeRecord, FeePayment, 
+    Student, Subject, FeeRecord, FeePayment, 
     Timetable, PlacementDrive, PlacementRegistration, 
-    CertificateRequest, StudentResult, CustomUser, StudentRegistration
+    CertificateRequest, StudentResult, StudentRegistration
 )
 
 def seed_erp():

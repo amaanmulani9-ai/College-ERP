@@ -3,13 +3,15 @@ Certificate & Transcript Business Services (CertificateService).
 Handles certificate generation with unique numbering, transcript computation,
 certificate verification, PDF download payload generation, and audit logging.
 """
+
 import uuid
-from typing import Dict, Any, List
+from typing import Any, Dict, List
+
+from apps.authentication.services import log_audit_event
+from apps.results.models import SemesterResult
+from apps.students.models import Student
 from django.db import transaction
 from django.utils import timezone
-from apps.authentication.services import log_audit_event
-from apps.results.models import SemesterResult, StudentResult
-from apps.students.models import Student
 
 from .models import Certificate, CertificateAuditLog, CertificateType, Transcript
 from .validators import validate_results_published_for_certificate
@@ -57,7 +59,6 @@ class CertificateService:
         validate_results_published_for_certificate(student_id, "TRANSCRIPT")
 
         sem_results = SemesterResult.objects.filter(student_id=student_id, is_published=True, is_deleted=False)
-        student_results = StudentResult.objects.filter(student_id=student_id, status="published", is_deleted=False)
 
         total_credits = sum(r.total_credits for r in sem_results)
         earned_credits = sum(r.credits_earned for r in sem_results)
@@ -142,7 +143,15 @@ class CertificateService:
         )
 
 
-def _log_audit(certificate=None, transcript=None, actor=None, event_type: str = "", description: str = "", metadata: dict = None, request=None):
+def _log_audit(
+    certificate=None,
+    transcript=None,
+    actor=None,
+    event_type: str = "",
+    description: str = "",
+    metadata: dict = None,
+    request=None,
+):
     if request:
         try:
             log_audit_event(request, event_type=f"cert_{event_type}", details=description)

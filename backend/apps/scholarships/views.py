@@ -44,7 +44,12 @@ class ScholarshipViewSet(viewsets.ModelViewSet):
     filterset_fields = ["status", "scholarship_type", "academic_session", "student"]
     search_fields = ["student__student_id", "scholarship_type__code"]
 
-    @action(detail=False, methods=["get"], url_path="student/(?P<student_id>[^/.]+)", permission_classes=[IsStudentOrScholarshipOfficer])
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="student/(?P<student_id>[^/.]+)",
+        permission_classes=[IsStudentOrScholarshipOfficer],
+    )
     def student_scholarships(self, request, student_id=None):
         """Get active & past scholarships for a given student."""
         data = ScholarshipService.student_scholarships(student_id)
@@ -52,7 +57,9 @@ class ScholarshipViewSet(viewsets.ModelViewSet):
 
 
 class ScholarshipApplicationViewSet(viewsets.ModelViewSet):
-    queryset = ScholarshipApplication.objects.all().select_related("student", "scholarship_type", "academic_session", "approved_by")
+    queryset = ScholarshipApplication.objects.all().select_related(
+        "student", "scholarship_type", "academic_session", "approved_by"
+    )
     serializer_class = ScholarshipApplicationSerializer
     permission_classes = [IsAuthenticated]
     filterset_fields = ["status", "scholarship_type", "academic_session", "student"]
@@ -120,7 +127,9 @@ class ScholarshipApplicationViewSet(viewsets.ModelViewSet):
 
 
 class ScholarshipRenewalViewSet(viewsets.ModelViewSet):
-    queryset = ScholarshipRenewal.objects.all().select_related("scholarship__scholarship_type", "academic_session", "processed_by")
+    queryset = ScholarshipRenewal.objects.all().select_related(
+        "scholarship__scholarship_type", "academic_session", "processed_by"
+    )
     serializer_class = ScholarshipRenewalSerializer
     permission_classes = [IsScholarshipOfficerOrAdmin]
     filterset_fields = ["status", "academic_session", "scholarship"]

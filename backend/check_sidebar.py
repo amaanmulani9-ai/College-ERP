@@ -1,8 +1,7 @@
 import os
-import sys
 import re
 import django
-from django.urls import reverse, resolve
+from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'college_management_system.settings')

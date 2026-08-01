@@ -1,7 +1,9 @@
 import random
 import string
-from django.utils import timezone
+
 from apps.authentication.services import log_audit_event
+from django.utils import timezone
+
 from .models import (
     Parent,
     ParentActivityLog,
@@ -9,10 +11,10 @@ from .models import (
     StudentParentLink,
 )
 
-
 # ---------------------------------------------------------------------------
 # Code generation
 # ---------------------------------------------------------------------------
+
 
 def generate_parent_code() -> str:
     """Generate a unique PAR-XXXXXXXX code for a parent."""
@@ -26,6 +28,7 @@ def generate_parent_code() -> str:
 # ---------------------------------------------------------------------------
 # Parent lifecycle
 # ---------------------------------------------------------------------------
+
 
 def create_parent(profile, relationship_type="guardian", **kwargs) -> Parent:
     """Create a Parent record with auto-generated code and default comm prefs."""
@@ -73,6 +76,7 @@ def restore_parent(parent: Parent, actor=None, request=None) -> Parent:
 # Student ↔ Parent links
 # ---------------------------------------------------------------------------
 
+
 def link_student_to_parent(
     parent: Parent,
     student,
@@ -113,9 +117,7 @@ def link_student_to_parent(
     return link
 
 
-def unlink_student_from_parent(
-    parent: Parent, student, actor=None, request=None
-) -> None:
+def unlink_student_from_parent(parent: Parent, student, actor=None, request=None) -> None:
     """Remove a student–parent link."""
     StudentParentLink.objects.filter(parent=parent, student=student).delete()
     _log(
@@ -131,6 +133,7 @@ def unlink_student_from_parent(
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
+
 
 def _log(
     parent: Parent,

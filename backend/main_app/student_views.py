@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from .decorators import admin_required, staff_required, student_required
+from .decorators import student_required
 import json
 import math
 from datetime import datetime, timedelta
@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import (HttpResponseRedirect, get_object_or_404,
+from django.shortcuts import (get_object_or_404,
                               redirect, render)
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -167,7 +167,7 @@ def student_view_attendance(request):
                 }
                 json_data.append(data)
             return JsonResponse(json.dumps(json_data), safe=False)
-        except Exception as e:
+        except Exception:
             return JsonResponse(json.dumps([]), safe=False)
 
 
@@ -276,7 +276,7 @@ def student_fcmtoken(request):
         student_user.fcm_token = token
         student_user.save()
         return HttpResponse("True")
-    except Exception as e:
+    except Exception:
         return HttpResponse("False")
 
 
@@ -417,7 +417,6 @@ def student_report_card(request):
 @login_required(login_url='/')
 @student_required
 def student_report_card_pdf(request):
-    import io
     from xhtml2pdf import pisa
     from django.template.loader import get_template
     from django.http import HttpResponse
@@ -448,7 +447,7 @@ def student_report_card_pdf(request):
 
 
 #library
-from datetime import date, timedelta
+from datetime import date
 
 @login_required(login_url='/')
 @student_required
@@ -660,7 +659,6 @@ def student_print_fee(request, fee_id):
 @login_required(login_url='/')
 @student_required
 def student_fee_receipt(request, payment_id):
-    import io
     from xhtml2pdf import pisa
     from django.template.loader import get_template
     from django.http import HttpResponse
@@ -821,7 +819,7 @@ def student_ai_chat(request):
                 total_pres = sum(s.present_count for s in subjects)
                 overall = int((total_pres / total_att) * 100) if total_att > 0 else 0
                 
-                reply = f"🎓 **Attendance Overview:**\n"
+                reply = "🎓 **Attendance Overview:**\n"
                 reply += f"Your overall attendance is **{overall}%** ({total_pres} present out of {total_att} total lectures).\n\n"
                 reply += "Here is your subject-wise breakdown:\n"
 
@@ -853,7 +851,7 @@ def student_ai_chat(request):
                 if pending_fees == 0:
                     reply = "💸 **Financial Status:**\nFantastic news! You have **no pending fees**. All your dues are fully paid. Thank you!"
                 else:
-                    reply = f"💸 **Financial Status:**\n"
+                    reply = "💸 **Financial Status:**\n"
                     reply += f"You have an outstanding fee balance of **INR {pending_fees:,.2f}**.\n\n"
                     reply += "Outstanding Items:\n"
                     reply += "\n".join(unpaid_details)

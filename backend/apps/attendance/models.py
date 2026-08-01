@@ -1,12 +1,11 @@
 import uuid
 
-from django.conf import settings
-from django.db import models
-
 from apps.academics.models import Subject
 from apps.staff.models import Employee
 from apps.students.models import Student
 from apps.timetable.models import Classroom, Timetable
+from django.conf import settings
+from django.db import models
 
 
 class SoftDeleteManager(models.Manager):
@@ -18,6 +17,7 @@ class SoftDeleteManager(models.Manager):
 # Attendance Session
 # ---------------------------------------------------------------------------
 
+
 class AttendanceSession(models.Model):
     STATUS_CHOICES = [
         ("scheduled", "Scheduled"),
@@ -28,19 +28,23 @@ class AttendanceSession(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    timetable = models.ForeignKey(Timetable, on_delete=models.SET_NULL, null=True, blank=True, related_name="attendance_sessions")
+    timetable = models.ForeignKey(
+        Timetable, on_delete=models.SET_NULL, null=True, blank=True, related_name="attendance_sessions"
+    )
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name="attendance_sessions")
     faculty = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name="conducted_sessions")
-    classroom = models.ForeignKey(Classroom, on_delete=models.SET_NULL, null=True, blank=True, related_name="attendance_sessions")
+    classroom = models.ForeignKey(
+        Classroom, on_delete=models.SET_NULL, null=True, blank=True, related_name="attendance_sessions"
+    )
 
     date = models.DateField(db_index=True)
     start_time = models.TimeField()
     end_time = models.TimeField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="completed", db_index=True)
-    
+
     qr_token = models.CharField(max_length=128, blank=True, default="")
     is_locked = models.BooleanField(default=False, db_index=True)
-    
+
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -61,6 +65,7 @@ class AttendanceSession(models.Model):
 # Student Attendance
 # ---------------------------------------------------------------------------
 
+
 class StudentAttendance(models.Model):
     STATUS_CHOICES = [
         ("present", "Present"),
@@ -74,7 +79,7 @@ class StudentAttendance(models.Model):
     session = models.ForeignKey(AttendanceSession, on_delete=models.CASCADE, related_name="student_attendances")
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="attendances")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="present", db_index=True)
-    
+
     check_in_time = models.DateTimeField(null=True, blank=True)
     check_out_time = models.DateTimeField(null=True, blank=True)
     remarks = models.CharField(max_length=255, blank=True, default="")
@@ -99,6 +104,7 @@ class StudentAttendance(models.Model):
 # ---------------------------------------------------------------------------
 # Faculty Attendance
 # ---------------------------------------------------------------------------
+
 
 class FacultyAttendance(models.Model):
     STATUS_CHOICES = [
@@ -138,6 +144,7 @@ class FacultyAttendance(models.Model):
 # Attendance Audit Log
 # ---------------------------------------------------------------------------
 
+
 class AttendanceAuditLog(models.Model):
     EVENT_CHOICES = [
         ("created", "Session Created"),
@@ -149,7 +156,9 @@ class AttendanceAuditLog(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    session = models.ForeignKey(AttendanceSession, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs")
+    session = models.ForeignKey(
+        AttendanceSession, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs"
+    )
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     event_type = models.CharField(max_length=30, choices=EVENT_CHOICES)
     description = models.CharField(max_length=500)

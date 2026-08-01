@@ -19,7 +19,17 @@ class HostelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Hostel
-        fields = ["id", "name", "code", "gender_type", "gender_type_display", "address", "is_active", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "name",
+            "code",
+            "gender_type",
+            "gender_type_display",
+            "address",
+            "is_active",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
 
@@ -51,9 +61,20 @@ class RoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Room
         fields = [
-            "id", "floor", "floor_number", "block_name", "hostel_name",
-            "room_number", "room_type", "room_type_display", "capacity",
-            "occupied_beds", "status", "status_display", "created_at", "updated_at",
+            "id",
+            "floor",
+            "floor_number",
+            "block_name",
+            "hostel_name",
+            "room_number",
+            "room_type",
+            "room_type_display",
+            "capacity",
+            "occupied_beds",
+            "status",
+            "status_display",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["id", "occupied_beds", "created_at", "updated_at"]
 
@@ -74,7 +95,16 @@ class WardenSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Warden
-        fields = ["id", "employee", "employee_name", "hostel", "hostel_name", "contact_number", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "employee",
+            "employee_name",
+            "hostel",
+            "hostel_name",
+            "contact_number",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
 
@@ -88,9 +118,20 @@ class HostelAllocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = HostelAllocation
         fields = [
-            "id", "student", "student_id_str", "student_name", "bed", "bed_number",
-            "room_number", "academic_session", "check_in_date", "check_out_date",
-            "status", "status_display", "created_at", "updated_at",
+            "id",
+            "student",
+            "student_id_str",
+            "student_name",
+            "bed",
+            "bed_number",
+            "room_number",
+            "academic_session",
+            "check_in_date",
+            "check_out_date",
+            "status",
+            "status_display",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
@@ -101,9 +142,17 @@ class VisitorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Visitor
         fields = [
-            "id", "student", "student_id_str", "visitor_name", "relation",
-            "mobile", "visit_date", "check_in_time", "check_out_time",
-            "created_at", "updated_at",
+            "id",
+            "student",
+            "student_id_str",
+            "visitor_name",
+            "relation",
+            "mobile",
+            "visit_date",
+            "check_in_time",
+            "check_out_time",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
@@ -115,8 +164,17 @@ class MaintenanceRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = MaintenanceRequest
         fields = [
-            "id", "room", "room_number", "title", "description", "status",
-            "status_display", "assigned_to", "completed_date", "created_at", "updated_at",
+            "id",
+            "room",
+            "room_number",
+            "title",
+            "description",
+            "status",
+            "status_display",
+            "assigned_to",
+            "completed_date",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
@@ -133,6 +191,7 @@ class HostelAuditLogSerializer(serializers.ModelSerializer):
 # ---------------------------------------------------------------------------
 # Action Request Serializers
 # ---------------------------------------------------------------------------
+
 
 class AllocateBedRequestSerializer(serializers.Serializer):
     student_id = serializers.UUIDField()

@@ -3,6 +3,7 @@ Admissions Background Tasks & Notification Event Hooks.
 Defines placeholder event publishers for admission lifecycle milestones.
 Do not send real emails/SMS yet; only publish event payloads to logs/event bus.
 """
+
 import logging
 
 logger = logging.getLogger("apps.admissions")

@@ -3,13 +3,15 @@ Exam Business Services (ExamService).
 Handles exam creation, schedule creation with conflict checks, hall ticket generation,
 exam attendance marking, invigilator assignments, and schedules.
 """
+
 import uuid
-from typing import List, Dict, Any
+from typing import List
+
+from apps.authentication.services import log_audit_event
 from django.db import transaction
 from django.utils import timezone
-from apps.authentication.services import log_audit_event
 
-from .models import Exam, ExamAttendance, ExamAuditLog, ExamSchedule, ExamType, HallTicket, InvigilatorAssignment
+from .models import Exam, ExamAttendance, ExamAuditLog, ExamSchedule, HallTicket, InvigilatorAssignment
 from .validators import check_exam_schedule_conflicts, validate_hall_ticket_required, validate_schedule_unlocked
 
 
@@ -35,7 +37,11 @@ class ExamService:
             start_time=data["start_time"],
             end_time=data["end_time"],
             classroom_id=str(data["classroom"].id) if hasattr(data["classroom"], "id") else str(data["classroom"]),
-            invigilator_id=str(data["invigilator"].id) if data.get("invigilator") and hasattr(data["invigilator"], "id") else (str(data["invigilator"]) if data.get("invigilator") else None),
+            invigilator_id=(
+                str(data["invigilator"].id)
+                if data.get("invigilator") and hasattr(data["invigilator"], "id")
+                else (str(data["invigilator"]) if data.get("invigilator") else None)
+            ),
         )
         if conflicts:
             raise ValueError(f"Exam scheduling conflict: {conflicts[0]['message']}")
@@ -82,7 +88,9 @@ class ExamService:
 
     @staticmethod
     @transaction.atomic
-    def mark_exam_attendance(schedule_id: str, student_id: str, status: str = "present", remarks: str = "", actor=None, request=None) -> ExamAttendance:
+    def mark_exam_attendance(
+        schedule_id: str, student_id: str, status: str = "present", remarks: str = "", actor=None, request=None
+    ) -> ExamAttendance:
         schedule = ExamSchedule.objects.get(pk=schedule_id)
         validate_schedule_unlocked(schedule)
 
@@ -106,7 +114,9 @@ class ExamService:
 
     @staticmethod
     @transaction.atomic
-    def assign_invigilator(schedule_id: str, faculty_id: str, duty_status: str = "assigned", remarks: str = "", actor=None, request=None) -> InvigilatorAssignment:
+    def assign_invigilator(
+        schedule_id: str, faculty_id: str, duty_status: str = "assigned", remarks: str = "", actor=None, request=None
+    ) -> InvigilatorAssignment:
         schedule = ExamSchedule.objects.get(pk=schedule_id)
         validate_schedule_unlocked(schedule)
 
@@ -144,6 +154,7 @@ class ExamService:
     @staticmethod
     def student_schedule(student_id: str) -> List[ExamSchedule]:
         from apps.students.models import Student
+
         student = Student.objects.get(pk=student_id)
         return (
             ExamSchedule.objects.filter(

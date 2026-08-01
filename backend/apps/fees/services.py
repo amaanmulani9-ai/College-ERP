@@ -3,15 +3,17 @@ Fee Business Services (FeeService).
 Handles student fee assignment, waivers & scholarships, installment splitting, fee collection,
 automatic fine calculation, receipt generation, outstanding reports, and audit logging.
 """
+
 import datetime
 import uuid
-from typing import Dict, Any, List
-from django.db import transaction
-from django.utils import timezone
+from typing import Any, Dict
+
 from apps.authentication.services import log_audit_event
 from apps.students.models import Student
+from django.db import transaction
+from django.utils import timezone
 
-from .models import FeeAuditLog, FeeCategory, FeeInstallment, FeeReceipt, FeeStructure, StudentFee
+from .models import FeeAuditLog, FeeInstallment, FeeReceipt, FeeStructure, StudentFee
 from .validators import calculate_installment_fine, validate_no_duplicate_assignment
 
 
@@ -114,7 +116,13 @@ class FeeService:
 
         # Update Student Fee balance
         student_fee.paid_amount += amount
-        student_fee.due_amount = max(0.0, student_fee.total_amount - student_fee.waiver_amount - student_fee.scholarship_amount - student_fee.paid_amount)
+        student_fee.due_amount = max(
+            0.0,
+            student_fee.total_amount
+            - student_fee.waiver_amount
+            - student_fee.scholarship_amount
+            - student_fee.paid_amount,
+        )
 
         if student_fee.due_amount <= 0:
             student_fee.status = "paid"
@@ -179,7 +187,15 @@ class FeeService:
         return f"RCPT-{timezone.now().year}-{uuid.uuid4().hex[:8].upper()}"
 
 
-def _log_audit(student_fee=None, receipt=None, actor=None, event_type: str = "", description: str = "", metadata: dict = None, request=None):
+def _log_audit(
+    student_fee=None,
+    receipt=None,
+    actor=None,
+    event_type: str = "",
+    description: str = "",
+    metadata: dict = None,
+    request=None,
+):
     if request:
         try:
             log_audit_event(request, event_type=f"fee_{event_type}", details=description)

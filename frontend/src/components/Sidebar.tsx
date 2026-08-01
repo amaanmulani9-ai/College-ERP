@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, LogIn, UserPlus, User, GraduationCap, Server, ShieldCheck, Key, Table, Users, Settings, History, Edit3, Landmark, Building2, BookOpen, Calendar, Layers, FileText, CheckSquare, UserCheck, BarChart3, FileSpreadsheet, Award, Briefcase, HeartHandshake, FileCheck, FilePlus, RefreshCw } from "lucide-react";
+import { LayoutDashboard, LogIn, UserPlus, User, GraduationCap, Server, ShieldCheck, Key, Table, Users, Settings, History, Edit3, Landmark, Building2, BookOpen, Calendar, Layers, FileText, CheckSquare, UserCheck, BarChart3, FileSpreadsheet, Award, Briefcase, HeartHandshake, FileCheck, FilePlus, RefreshCw, AlertTriangle, PieChart, Ticket, Trophy } from "lucide-react";
 
 export const Sidebar: React.FC = () => {
   const location = useLocation();

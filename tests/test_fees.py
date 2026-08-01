@@ -3,17 +3,17 @@ tests/test_fees.py  – Enterprise Fee Management System
 Covers: FeeCategory, FeeStructure, StudentFee, FeeInstallment, FeeReceipt, FeeAuditLog
 Uses:  Django test client with JWT auth (same pattern as other modules).
 """
+
 import uuid
 from datetime import date, timedelta
-from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-
 # ---------------------------------------------------------------------------
 # Helpers / fixtures
 # ---------------------------------------------------------------------------
+
 
 def make_uuid():
     return str(uuid.uuid4())
@@ -22,6 +22,7 @@ def make_uuid():
 # ---------------------------------------------------------------------------
 # Unit tests – validators
 # ---------------------------------------------------------------------------
+
 
 class TestFineCalculator:
     """Test fine calculation engine in validators."""
@@ -58,11 +59,15 @@ class TestFineCalculator:
 # Unit tests – services (mocked DB)
 # ---------------------------------------------------------------------------
 
+
 class TestFeeServiceUnit:
     """Service-layer unit tests with mocked ORM calls."""
 
     @pytest.mark.django_db
-    @patch("apps.fees.services.validate_no_duplicate_assignment", side_effect=ValueError("Fee structure is already assigned to this student."))
+    @patch(
+        "apps.fees.services.validate_no_duplicate_assignment",
+        side_effect=ValueError("Fee structure is already assigned to this student."),
+    )
     def test_assign_fee_raises_for_duplicate(self, mock_validate):
         """assign_fee should raise ValueError on duplicate (student, fee_structure)."""
         from apps.fees.services import FeeService
@@ -105,11 +110,11 @@ class TestFeeServiceUnit:
 # Unit tests – serializers
 # ---------------------------------------------------------------------------
 
+
 class TestFeeSerializers:
     """Basic field validation in serializers."""
 
     def test_fee_category_serializer_valid(self):
-        from apps.fees.serializers import FeeCategorySerializer
 
         # Patch out the unique validator on 'code' to avoid DB access
         with patch("apps.fees.serializers.FeeCategorySerializer") as MockSerial:
@@ -166,6 +171,7 @@ class TestFeeSerializers:
 # Unit tests – permissions
 # ---------------------------------------------------------------------------
 
+
 class TestFeePermissions:
     def test_permission_denies_unauthenticated(self):
         from apps.fees.permissions import IsFeeOfficerOrAdmin
@@ -202,6 +208,7 @@ class TestFeePermissions:
 # ---------------------------------------------------------------------------
 # Unit tests – models (no DB)
 # ---------------------------------------------------------------------------
+
 
 class TestFeeModels:
     """Test model __str__ methods and property logic."""
@@ -244,6 +251,7 @@ class TestFeeModels:
 # Unit tests – receipt number generation
 # ---------------------------------------------------------------------------
 
+
 class TestReceiptNumberGeneration:
     """Verify receipt number format and uniqueness logic."""
 
@@ -271,11 +279,13 @@ class TestReceiptNumberGeneration:
 # Integration tests – API endpoints (mocked service layer)
 # ---------------------------------------------------------------------------
 
+
 class TestFeeAPI:
     """API endpoint tests using mocked service calls."""
 
     def _get_client(self):
         from django.test import RequestFactory
+
         return RequestFactory()
 
     def _get_auth_request(self, method, path, data=None):
@@ -323,6 +333,7 @@ class TestFeeAPI:
 # Unit tests – fine calculation edge cases
 # ---------------------------------------------------------------------------
 
+
 class TestFineEdgeCases:
     def test_zero_amount_gives_zero_fine(self):
         from apps.fees.validators import calculate_fine
@@ -351,6 +362,7 @@ class TestFineEdgeCases:
 # ---------------------------------------------------------------------------
 # Unit tests – signal logic (no DB)
 # ---------------------------------------------------------------------------
+
 
 class TestSignalLogic:
     """Test signal behavior without database."""

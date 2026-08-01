@@ -25,7 +25,6 @@ urlpatterns = [
     path("history/", PaymentTransactionViewSet.as_view({"get": "history"}), name="payment-history"),
     path("refund/", RefundViewSet.as_view({"post": "create_refund"}), name="payment-refund-create"),
     path("webhook/razorpay/", WebhookViewSet.as_view({"post": "razorpay_webhook"}), name="payment-webhook-razorpay"),
-
     # Router URLs
     path("", include(router.urls)),
 ]

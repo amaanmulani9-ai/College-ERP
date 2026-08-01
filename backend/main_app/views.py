@@ -146,7 +146,9 @@ def institution_signup(request):
             return render(request, 'main_app/institution_signup.html')
 
         try:
-            import re, uuid, datetime
+            import re
+            import uuid
+            import datetime
 
             # Clean slug for tenant schema & domain
             raw_slug = re.sub(r'[^a-zA-Z0-9]', '', institution_name.lower())
@@ -366,7 +368,9 @@ def verify_otp_and_register(request):
             cache.delete(f"signup_email_otp_{email}")
             cache.delete(f"signup_mobile_otp_{mobile}")
 
-            import re, uuid, datetime
+            import re
+            import uuid
+            import datetime
 
             # Clean slug for tenant schema
             raw_slug = re.sub(r'[^a-zA-Z0-9]', '', institution_name.lower())
@@ -457,13 +461,10 @@ def health_check(request):
     status_code = 200 if all(checks.values()) else 503
     return JsonResponse({'status': 'ok' if status_code == 200 else 'degraded', 'checks': checks}, status=status_code)
 
-import csv
 import os
 import uuid
 import datetime
-from django.conf import settings
-from django.contrib import messages
-from .models import Course, Session, CustomUser, Student, StudentRegistration
+from .models import Course, Student, StudentRegistration
 
 def online_registration(request):
     courses = Course.objects.all()
@@ -660,7 +661,7 @@ def get_attendance(request):
                     }
             attendance_list.append(data)
         return JsonResponse(json.dumps(attendance_list), safe=False)
-    except Exception as e:
+    except Exception:
         return JsonResponse(json.dumps([]), safe=False)
 
 
@@ -703,8 +704,7 @@ messaging.setBackgroundMessageHandler(function (payload) {{
     return HttpResponse(data, content_type='application/javascript')
 
 
-from django.contrib.auth.decorators import login_required
-from .models import Subject, DiscussionMessage
+from .models import DiscussionMessage
 
 @login_required
 def discussion_board(request):

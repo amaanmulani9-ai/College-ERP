@@ -1,9 +1,5 @@
-import os
-import json
 import logging
 import jwt
-import requests
-from django.conf import settings
 from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
@@ -24,7 +20,6 @@ class FirebaseAuthService:
 
         # 1. Try Firebase Admin SDK if installed & initialized
         try:
-            import firebase_admin
             from firebase_admin import auth as firebase_auth
 
             decoded_token = firebase_auth.verify_id_token(id_token)

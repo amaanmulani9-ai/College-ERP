@@ -1,4 +1,3 @@
-import os
 
 def locale_settings(request):
     """Exposes country, language, and currency parameters to all templates."""

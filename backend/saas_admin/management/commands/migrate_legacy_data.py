@@ -1,6 +1,6 @@
 import datetime
 from django.core.management.base import BaseCommand
-from django.db import connections, transaction
+from django.db import transaction
 from django_tenants.utils import schema_context
 from saas_admin.models import Client, Domain
 

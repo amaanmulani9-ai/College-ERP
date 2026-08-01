@@ -1,22 +1,21 @@
 import datetime
-import pytest
-from django.urls import reverse
-from rest_framework import status
-from rest_framework.test import APIClient
 
+import pytest
 from apps.academics.models import AcademicSession, Department, Faculty, Program, Semester
-from apps.admissions.models import AdmissionApplication, AdmissionDocument, SeatMatrix
+from apps.admissions.models import SeatMatrix
 from apps.admissions.services import (
     approve_application,
     create_application,
     enroll_application,
     generate_application_number,
-    reject_application,
     submit_application,
     transition_application,
 )
 from apps.authentication.models import User
 from apps.students.models import Student
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
@@ -34,9 +33,7 @@ class TestAdmissionsModule:
         self.program = Program.objects.create(
             name="B.Tech Computer Science", code="BSCS", department=self.department, degree_level="bachelor"
         )
-        self.semester1 = Semester.objects.create(
-            program=self.program, semester_number=1, name="Semester 1"
-        )
+        self.semester1 = Semester.objects.create(program=self.program, semester_number=1, name="Semester 1")
         self.session = AcademicSession.objects.create(
             name="2026-2027", start_date=datetime.date(2026, 8, 1), end_date=datetime.date(2027, 5, 31), is_current=True
         )
@@ -119,9 +116,7 @@ class TestAdmissionsModule:
         assert seat_matrix.available_seats == 0
 
         # Try to enroll second student when 0 seats available
-        app2 = create_application(
-            {**data, "email": "other@example.com", "first_name": "Bob"}, actor=self.user
-        )
+        app2 = create_application({**data, "email": "other@example.com", "first_name": "Bob"}, actor=self.user)
         submit_application(app2, actor=self.user)
         transition_application(app2, "under_review", actor=self.user)
         transition_application(app2, "document_verification", actor=self.user)
@@ -143,7 +138,7 @@ class TestAdmissionsModule:
         }
         res = self.client.post(url, payload, format="json")
         assert res.status_code == status.HTTP_201_CREATED
-        app_id = res.data["id"]
+        _ = res.data["id"]  # Validate the field exists
 
         # Dashboard check
         dash_url = reverse("admissions-dashboard")
@@ -167,6 +162,7 @@ class TestAdmissionsModule:
 
     def test_application_rollback(self):
         from apps.admissions.services import rollback_application
+
         data = {
             "first_name": "Sam",
             "last_name": "Wilson",
@@ -182,4 +178,3 @@ class TestAdmissionsModule:
 
         rolled_back = rollback_application(app, "draft", actor=self.user, remarks="Need edit")
         assert rolled_back.status == "draft"
-

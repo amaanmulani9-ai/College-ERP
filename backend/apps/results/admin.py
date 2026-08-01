@@ -40,4 +40,12 @@ class SemesterResultAdmin(admin.ModelAdmin):
 class ResultAuditLogAdmin(admin.ModelAdmin):
     list_display = ["event_type", "actor", "description", "timestamp"]
     list_filter = ["event_type"]
-    readonly_fields = ["student_result", "semester_result", "actor", "event_type", "description", "metadata", "timestamp"]
+    readonly_fields = [
+        "student_result",
+        "semester_result",
+        "actor",
+        "event_type",
+        "description",
+        "metadata",
+        "timestamp",
+    ]

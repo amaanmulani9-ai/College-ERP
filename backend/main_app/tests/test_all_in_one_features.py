@@ -1,5 +1,5 @@
 from django.test import TestCase
-from main_app.models import CustomUser, Student, Staff, Course, Subject, Session, Attendance, AttendanceReport, PlacementDrive, PlacementRegistration
+from main_app.models import CustomUser, Student, Staff, Course, Subject, Session, Attendance, AttendanceReport, PlacementDrive
 from main_app.naac_nirf_reports import generate_naac_nirf_data
 from main_app.analytics_engine import calculate_student_risk, generate_system_risk_analytics
 from main_app.mobile_api_views import api_biometric_punch

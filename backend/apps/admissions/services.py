@@ -4,17 +4,17 @@ document review, seat allocation, and enrollment orchestration.
 
 All business logic lives here.  Views are thin wrappers.
 """
-import datetime
 
-from django.db import transaction
-from django.utils import timezone
+import datetime
 
 from apps.authentication.models import User
 from apps.authentication.services import log_audit_event
+from apps.parents.services import create_parent, link_student_to_parent
 from apps.profiles.models import UserProfile
 from apps.students.models import Student
 from apps.students.services import generate_student_code
-from apps.parents.services import create_parent, link_student_to_parent
+from django.db import transaction
+from django.utils import timezone
 
 from .models import (
     AdmissionApplication,
@@ -24,23 +24,22 @@ from .models import (
     SeatMatrix,
 )
 
-
 # ──────────────────────────────────────────────────────────────────────────────
 # Valid workflow transitions  (from → {to, …})
 # ──────────────────────────────────────────────────────────────────────────────
 
 VALID_TRANSITIONS: dict[str, set[str]] = {
-    "draft":                  {"submitted", "cancelled"},
-    "submitted":              {"under_review", "cancelled"},
-    "under_review":           {"document_verification", "entrance_test", "rejected", "cancelled"},
-    "document_verification":  {"entrance_test", "interview", "approved", "rejected", "cancelled"},
-    "entrance_test":          {"interview", "approved", "rejected", "waitlisted", "cancelled"},
-    "interview":              {"approved", "rejected", "waitlisted", "cancelled"},
-    "approved":               {"enrolled", "cancelled"},
-    "rejected":               set(),
-    "waitlisted":             {"approved", "rejected", "cancelled"},
-    "enrolled":               set(),
-    "cancelled":              set(),
+    "draft": {"submitted", "cancelled"},
+    "submitted": {"under_review", "cancelled"},
+    "under_review": {"document_verification", "entrance_test", "rejected", "cancelled"},
+    "document_verification": {"entrance_test", "interview", "approved", "rejected", "cancelled"},
+    "entrance_test": {"interview", "approved", "rejected", "waitlisted", "cancelled"},
+    "interview": {"approved", "rejected", "waitlisted", "cancelled"},
+    "approved": {"enrolled", "cancelled"},
+    "rejected": set(),
+    "waitlisted": {"approved", "rejected", "cancelled"},
+    "enrolled": set(),
+    "cancelled": set(),
 }
 
 
@@ -48,13 +47,13 @@ VALID_TRANSITIONS: dict[str, set[str]] = {
 # Application number generation
 # ──────────────────────────────────────────────────────────────────────────────
 
+
 def generate_application_number() -> str:
     """Generate ADM-{YEAR}-{SEQUENCE:06d}."""
     year = datetime.date.today().year
     prefix = f"ADM-{year}-"
     last = (
-        AdmissionApplication.all_objects
-        .filter(application_number__startswith=prefix)
+        AdmissionApplication.all_objects.filter(application_number__startswith=prefix)
         .order_by("-application_number")
         .first()
     )
@@ -72,6 +71,7 @@ def generate_application_number() -> str:
 # CRUD helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
+
 def create_application(data: dict, actor=None, request=None) -> AdmissionApplication:
     """Create a new admission application with auto-generated number and duplicate prevention."""
     email = data.get("email")
@@ -79,12 +79,16 @@ def create_application(data: dict, actor=None, request=None) -> AdmissionApplica
     academic_session = data.get("academic_session")
 
     if email and program and academic_session:
-        existing = AdmissionApplication.objects.filter(
-            email=email,
-            program=program,
-            academic_session=academic_session,
-            is_deleted=False,
-        ).exclude(status__in=["enrolled", "cancelled", "rejected"]).exists()
+        existing = (
+            AdmissionApplication.objects.filter(
+                email=email,
+                program=program,
+                academic_session=academic_session,
+                is_deleted=False,
+            )
+            .exclude(status__in=["enrolled", "cancelled", "rejected"])
+            .exists()
+        )
 
         if existing:
             raise ValueError(
@@ -96,29 +100,39 @@ def create_application(data: dict, actor=None, request=None) -> AdmissionApplica
         application_number=app_number,
         **data,
     )
-    _audit(application, actor, "application_created",
-           f"Application {app_number} created", request=request)
+    _audit(application, actor, "application_created", f"Application {app_number} created", request=request)
     return application
 
 
 def soft_delete_application(application, actor=None, request=None):
     application.is_deleted = True
     application.save(update_fields=["is_deleted", "updated_at"])
-    _audit(application, actor, "application_deleted",
-           f"Application {application.application_number} soft-deleted", request=request)
+    _audit(
+        application,
+        actor,
+        "application_deleted",
+        f"Application {application.application_number} soft-deleted",
+        request=request,
+    )
 
 
 def restore_application(application, actor=None, request=None):
     application.is_deleted = False
     application.save(update_fields=["is_deleted", "updated_at"])
-    _audit(application, actor, "application_restored",
-           f"Application {application.application_number} restored", request=request)
+    _audit(
+        application,
+        actor,
+        "application_restored",
+        f"Application {application.application_number} restored",
+        request=request,
+    )
     return application
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Workflow transitions
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 def transition_application(
     application: AdmissionApplication,
@@ -157,39 +171,61 @@ def transition_application(
     elif new_status == "rejected":
         event = "application_rejected"
 
-    _audit(application, actor, event,
-           f"{application.application_number}: {prev} → {new_status}",
-           metadata={"prev": prev, "new": new_status, "remarks": remarks},
-           request=request)
+    _audit(
+        application,
+        actor,
+        event,
+        f"{application.application_number}: {prev} → {new_status}",
+        metadata={"prev": prev, "new": new_status, "remarks": remarks},
+        request=request,
+    )
 
     return application
 
 
 # Convenience wrappers
 
+
 def submit_application(app, actor=None, request=None):
     return transition_application(app, "submitted", actor=actor, remarks="Application submitted", request=request)
+
 
 def start_review(app, actor=None, request=None):
     return transition_application(app, "under_review", actor=actor, remarks="Review started", request=request)
 
+
 def start_document_verification(app, actor=None, request=None):
-    return transition_application(app, "document_verification", actor=actor, remarks="Document verification started", request=request)
+    return transition_application(
+        app, "document_verification", actor=actor, remarks="Document verification started", request=request
+    )
+
 
 def schedule_interview(app, actor=None, request=None):
     return transition_application(app, "interview", actor=actor, remarks="Interview scheduled", request=request)
 
+
 def approve_application(app, actor=None, remarks="", request=None):
-    return transition_application(app, "approved", actor=actor, remarks=remarks or "Application approved", request=request)
+    return transition_application(
+        app, "approved", actor=actor, remarks=remarks or "Application approved", request=request
+    )
+
 
 def reject_application(app, actor=None, remarks="", request=None):
-    return transition_application(app, "rejected", actor=actor, remarks=remarks or "Application rejected", request=request)
+    return transition_application(
+        app, "rejected", actor=actor, remarks=remarks or "Application rejected", request=request
+    )
+
 
 def waitlist_application(app, actor=None, remarks="", request=None):
-    return transition_application(app, "waitlisted", actor=actor, remarks=remarks or "Placed on waitlist", request=request)
+    return transition_application(
+        app, "waitlisted", actor=actor, remarks=remarks or "Placed on waitlist", request=request
+    )
+
 
 def cancel_application(app, actor=None, remarks="", request=None):
-    return transition_application(app, "cancelled", actor=actor, remarks=remarks or "Application cancelled", request=request)
+    return transition_application(
+        app, "cancelled", actor=actor, remarks=remarks or "Application cancelled", request=request
+    )
 
 
 def rollback_application(
@@ -218,10 +254,14 @@ def rollback_application(
         remarks=f"[ROLLBACK] {remarks or 'Rolled back by administrator'}",
     )
 
-    _audit(application, actor, "status_changed",
-           f"ROLLBACK {application.application_number}: {prev} → {target_status}",
-           metadata={"prev": prev, "new": target_status, "rollback": True, "remarks": remarks},
-           request=request)
+    _audit(
+        application,
+        actor,
+        "status_changed",
+        f"ROLLBACK {application.application_number}: {prev} → {target_status}",
+        metadata={"prev": prev, "new": target_status, "rollback": True, "remarks": remarks},
+        request=request,
+    )
 
     return application
 
@@ -229,6 +269,7 @@ def rollback_application(
 # ──────────────────────────────────────────────────────────────────────────────
 # Document review
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 def review_document(
     document: AdmissionDocument,
@@ -241,15 +282,24 @@ def review_document(
     document.reviewed_by = actor
     document.review_remarks = remarks
     document.reviewed_at = timezone.now()
-    document.save(update_fields=[
-        "review_status", "reviewed_by", "review_remarks", "reviewed_at",
-    ])
+    document.save(
+        update_fields=[
+            "review_status",
+            "reviewed_by",
+            "review_remarks",
+            "reviewed_at",
+        ]
+    )
 
     event = "document_approved" if new_status == "approved" else "document_rejected"
-    _audit(document.application, actor, event,
-           f"{document.get_document_type_display()} {new_status}",
-           metadata={"document_id": str(document.id), "remarks": remarks},
-           request=request)
+    _audit(
+        document.application,
+        actor,
+        event,
+        f"{document.get_document_type_display()} {new_status}",
+        metadata={"document_id": str(document.id), "remarks": remarks},
+        request=request,
+    )
 
     return document
 
@@ -258,11 +308,14 @@ def review_document(
 # Seat allocation
 # ──────────────────────────────────────────────────────────────────────────────
 
+
 def check_seat_availability(program, academic_session, category: str) -> int:
     """Return available seats for the given combination, or -1 if no matrix."""
     try:
         matrix = SeatMatrix.objects.get(
-            program=program, academic_session=academic_session, category=category,
+            program=program,
+            academic_session=academic_session,
+            category=category,
         )
         return matrix.available_seats
     except SeatMatrix.DoesNotExist:
@@ -287,10 +340,14 @@ def allocate_seat(application: AdmissionApplication, actor=None, request=None) -
     matrix.occupied_seats += 1
     matrix.save(update_fields=["occupied_seats"])
 
-    _audit(application, actor, "seat_allocated",
-           f"Seat allocated in {matrix}",
-           metadata={"matrix_id": str(matrix.id), "occupied": matrix.occupied_seats},
-           request=request)
+    _audit(
+        application,
+        actor,
+        "seat_allocated",
+        f"Seat allocated in {matrix}",
+        metadata={"matrix_id": str(matrix.id), "occupied": matrix.occupied_seats},
+        request=request,
+    )
 
     return True
 
@@ -298,6 +355,7 @@ def allocate_seat(application: AdmissionApplication, actor=None, request=None) -
 # ──────────────────────────────────────────────────────────────────────────────
 # Enrollment workflow  (the big one)
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 @transaction.atomic
 def enroll_application(
@@ -373,10 +431,14 @@ def enroll_application(
         guardian_phone=application.guardian_phone,
     )
 
-    _audit(application, actor, "student_created",
-           f"Student {student.student_id} created from {application.application_number}",
-           metadata={"student_pk": str(student.id)},
-           request=request)
+    _audit(
+        application,
+        actor,
+        "student_created",
+        f"Student {student.student_id} created from {application.application_number}",
+        metadata={"student_pk": str(student.id)},
+        request=request,
+    )
 
     # ── 4. Create Parent & link (if guardian data provided) ──
     if application.guardian_email:
@@ -385,7 +447,11 @@ def enroll_application(
                 email=application.guardian_email,
                 password="ParentPassword123!",
                 first_name=application.guardian_name.split()[0] if application.guardian_name else "Guardian",
-                last_name=application.guardian_name.split()[-1] if application.guardian_name and " " in application.guardian_name else "",
+                last_name=(
+                    application.guardian_name.split()[-1]
+                    if application.guardian_name and " " in application.guardian_name
+                    else ""
+                ),
             )
             parent_profile, _ = UserProfile.objects.get_or_create(
                 user=parent_user,
@@ -406,23 +472,30 @@ def enroll_application(
                 actor=actor,
                 request=request,
             )
-            _audit(application, actor, "parent_linked",
-                   f"Parent {parent.parent_code} linked to {student.student_id}",
-                   metadata={"parent_pk": str(parent.id)},
-                   request=request)
+            _audit(
+                application,
+                actor,
+                "parent_linked",
+                f"Parent {parent.parent_code} linked to {student.student_id}",
+                metadata={"parent_pk": str(parent.id)},
+                request=request,
+            )
         except Exception:
             pass  # Guardian creation is best-effort — don't block enrollment
 
     # ── 5. Mark enrolled ──
     application.enrolled_student = student
     application.save(update_fields=["enrolled_student", "updated_at"])
-    transition_application(application, "enrolled", actor=actor,
-                           remarks="Enrollment completed", request=request)
+    transition_application(application, "enrolled", actor=actor, remarks="Enrollment completed", request=request)
 
-    _audit(application, actor, "enrollment_completed",
-           f"Enrollment completed: {application.application_number} → {student.student_id}",
-           metadata={"student_id": student.student_id},
-           request=request)
+    _audit(
+        application,
+        actor,
+        "enrollment_completed",
+        f"Enrollment completed: {application.application_number} → {student.student_id}",
+        metadata={"student_id": student.student_id},
+        request=request,
+    )
 
     return student
 
@@ -430,6 +503,7 @@ def enroll_application(
 # ──────────────────────────────────────────────────────────────────────────────
 # Internal helpers
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 def _audit(
     application: AdmissionApplication,

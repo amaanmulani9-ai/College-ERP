@@ -1,10 +1,9 @@
 import uuid
 
-from django.conf import settings
-from django.db import models
-
 from apps.academics.models import AcademicSession, Program
 from apps.students.models import Student
+from django.conf import settings
+from django.db import models
 
 
 class SoftDeleteManager(models.Manager):
@@ -15,6 +14,7 @@ class SoftDeleteManager(models.Manager):
 # ---------------------------------------------------------------------------
 # Certificate Type
 # ---------------------------------------------------------------------------
+
 
 class CertificateType(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -39,6 +39,7 @@ class CertificateType(models.Model):
 # Certificate
 # ---------------------------------------------------------------------------
 
+
 class Certificate(models.Model):
     STATUS_CHOICES = [
         ("draft", "Draft"),
@@ -50,7 +51,9 @@ class Certificate(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="certificates")
     certificate_type = models.ForeignKey(CertificateType, on_delete=models.PROTECT, related_name="issued_certificates")
     certificate_number = models.CharField(max_length=100, unique=True, db_index=True)
-    academic_session = models.ForeignKey(AcademicSession, on_delete=models.SET_NULL, null=True, blank=True, related_name="certificates")
+    academic_session = models.ForeignKey(
+        AcademicSession, on_delete=models.SET_NULL, null=True, blank=True, related_name="certificates"
+    )
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="issued", db_index=True)
     generated_at = models.DateTimeField(auto_now_add=True)
@@ -76,6 +79,7 @@ class Certificate(models.Model):
 # ---------------------------------------------------------------------------
 # Transcript
 # ---------------------------------------------------------------------------
+
 
 class Transcript(models.Model):
     STATUS_CHOICES = [
@@ -117,6 +121,7 @@ class Transcript(models.Model):
 # Certificate Audit Log
 # ---------------------------------------------------------------------------
 
+
 class CertificateAuditLog(models.Model):
     EVENT_CHOICES = [
         ("certificate_generated", "Certificate Generated"),
@@ -126,8 +131,12 @@ class CertificateAuditLog(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    certificate = models.ForeignKey(Certificate, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs")
-    transcript = models.ForeignKey(Transcript, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs")
+    certificate = models.ForeignKey(
+        Certificate, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs"
+    )
+    transcript = models.ForeignKey(
+        Transcript, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs"
+    )
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     event_type = models.CharField(max_length=30, choices=EVENT_CHOICES)
     description = models.CharField(max_length=500)

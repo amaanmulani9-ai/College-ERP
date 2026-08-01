@@ -1,4 +1,3 @@
-import os
 
 filepath = r'c:\Users\Amaan\OneDrive\Desktop\College-ERP-main\College-ERP-main\frontend\templates\hod_template\certificates.html'
 

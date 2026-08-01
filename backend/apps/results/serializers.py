@@ -1,8 +1,7 @@
-from rest_framework import serializers
-
 from apps.academics.serializers import ProgramSerializer, SemesterSerializer, SubjectSerializer
 from apps.examinations.serializers import ExamSerializer
 from apps.students.serializers import StudentSerializer
+from rest_framework import serializers
 
 from .models import ResultAuditLog, ResultScheme, SemesterResult, StudentResult
 

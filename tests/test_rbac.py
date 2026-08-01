@@ -1,10 +1,10 @@
 import pytest
-from django.urls import reverse
-from rest_framework.test import APIClient
 from apps.authentication.models import User
-from apps.rbac.models import Permission, Role, UserRole
+from apps.rbac.models import Permission, Role
 from apps.rbac.seeders import seed_rbac_defaults
 from apps.rbac.services import PermissionResolver, assign_role_to_user, remove_role_from_user
+from django.urls import reverse
+from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
@@ -13,7 +13,7 @@ def test_rbac_seeder_and_default_roles():
     assert seed_rbac_defaults(tenant_schema="public") is True
     assert Permission.objects.count() >= 20
     assert Role.objects.count() == 14
-    
+
     admin_role = Role.objects.get(name="College Admin")
     assert admin_role.permissions.count() >= 20
 
@@ -50,11 +50,11 @@ def test_role_crud_and_cloning():
 
     # 1. Create custom role
     create_url = reverse("rbac:role-list")
-    res_create = client.post(create_url, {
-        "name": "Custom Exam Evaluator",
-        "description": "Evaluates answer sheets.",
-        "priority": 40
-    }, format="json")
+    res_create = client.post(
+        create_url,
+        {"name": "Custom Exam Evaluator", "description": "Evaluates answer sheets.", "priority": 40},
+        format="json",
+    )
     assert res_create.status_code == 201
     role_id = res_create.data["id"]
 

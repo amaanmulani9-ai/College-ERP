@@ -28,8 +28,14 @@ class ScholarshipAdmin(admin.ModelAdmin):
 @admin.register(ScholarshipApplication)
 class ScholarshipApplicationAdmin(admin.ModelAdmin):
     list_display = (
-        "student", "scholarship_type", "academic_session", "requested_amount",
-        "current_cgpa", "status", "approved_by", "created_at",
+        "student",
+        "scholarship_type",
+        "academic_session",
+        "requested_amount",
+        "current_cgpa",
+        "status",
+        "approved_by",
+        "created_at",
     )
     list_filter = ("status", "scholarship_type", "academic_session")
     search_fields = ("student__student_id", "scholarship_type__name")
@@ -39,6 +45,7 @@ class ScholarshipApplicationAdmin(admin.ModelAdmin):
     @admin.action(description="Bulk Approve selected scholarship applications")
     def bulk_approve_applications(self, request, queryset):
         from .services import ScholarshipService
+
         count = 0
         for app in queryset.filter(status="submitted"):
             try:
@@ -66,6 +73,7 @@ class ScholarshipAuditLogAdmin(admin.ModelAdmin):
 
     def description_short(self, obj):
         return obj.description[:60]
+
     description_short.short_description = "Description"
 
     def has_add_permission(self, request):

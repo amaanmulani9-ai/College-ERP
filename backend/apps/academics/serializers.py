@@ -1,5 +1,6 @@
-from rest_framework import serializers
 from apps.authentication.serializers import UserSerializer
+from rest_framework import serializers
+
 from .models import (
     AcademicSession,
     Department,
@@ -17,7 +18,20 @@ class FacultySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Faculty
-        fields = ["id", "name", "code", "description", "dean", "dean_details", "departments_count", "is_active", "display_order", "is_deleted", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "name",
+            "code",
+            "description",
+            "dean",
+            "dean_details",
+            "departments_count",
+            "is_active",
+            "display_order",
+            "is_deleted",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
 
@@ -28,7 +42,24 @@ class DepartmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Department
-        fields = ["id", "faculty", "faculty_name", "name", "code", "description", "hod", "hod_details", "email", "phone", "programs_count", "is_active", "display_order", "is_deleted", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "faculty",
+            "faculty_name",
+            "name",
+            "code",
+            "description",
+            "hod",
+            "hod_details",
+            "email",
+            "phone",
+            "programs_count",
+            "is_active",
+            "display_order",
+            "is_deleted",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
 
@@ -38,7 +69,21 @@ class ProgramSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Program
-        fields = ["id", "department", "department_name", "name", "code", "degree_level", "duration_years", "total_credits", "semesters_count", "is_active", "is_deleted", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "department",
+            "department_name",
+            "name",
+            "code",
+            "degree_level",
+            "duration_years",
+            "total_credits",
+            "semesters_count",
+            "is_active",
+            "is_deleted",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
 
@@ -55,7 +100,19 @@ class SemesterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Semester
-        fields = ["id", "program", "program_name", "semester_number", "name", "credits", "subjects_count", "is_active", "is_deleted", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "program",
+            "program_name",
+            "semester_number",
+            "name",
+            "credits",
+            "subjects_count",
+            "is_active",
+            "is_deleted",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
 
@@ -96,5 +153,18 @@ class SubjectOfferingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SubjectOffering
-        fields = ["id", "subject", "subject_code", "subject_name", "session", "session_name", "department", "department_name", "capacity", "status", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "subject",
+            "subject_code",
+            "subject_name",
+            "session",
+            "session_name",
+            "department",
+            "department_name",
+            "capacity",
+            "status",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]

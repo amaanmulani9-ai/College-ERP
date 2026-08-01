@@ -4,7 +4,7 @@ from django.db.models import Sum
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from .models import FeeInstallment, FeeReceipt, StudentFee
+from .models import FeeInstallment, FeeReceipt
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,9 @@ def update_student_fee_on_receipt(sender, instance, created, **kwargs):
             FeeReceipt.objects.filter(
                 student_fee=student_fee,
                 status="success",
-            ).aggregate(total=Sum("amount"))["total"]
+            ).aggregate(
+                total=Sum("amount")
+            )["total"]
             or 0
         )
         student_fee.paid_amount = paid

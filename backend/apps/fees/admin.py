@@ -10,7 +10,6 @@ from .models import (
     StudentFee,
 )
 
-
 # ---------------------------------------------------------------------------
 # Inlines
 # ---------------------------------------------------------------------------
@@ -68,10 +67,12 @@ class FeeStructureAdmin(admin.ModelAdmin):
 
     def program_name(self, obj):
         return obj.program.name if obj.program else "—"
+
     program_name.short_description = "Program"
 
     def semester_name(self, obj):
         return obj.semester.name if obj.semester else "—"
+
     semester_name.short_description = "Semester"
 
 
@@ -94,9 +95,8 @@ class StudentFeeAdmin(admin.ModelAdmin):
 
     def due_amount_display(self, obj):
         color = "red" if obj.due_amount > 0 else "green"
-        return format_html(
-            '<span style="color: {};">₹ {}</span>', color, obj.due_amount
-        )
+        return format_html('<span style="color: {};">₹ {}</span>', color, obj.due_amount)
+
     due_amount_display.short_description = "Due Amount"
 
 

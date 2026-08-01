@@ -3,11 +3,13 @@ Attendance Business Services (AttendanceService).
 Handles session management, individual & bulk attendance marking, percentage calculation,
 faculty attendance, reports, locking, and audit logs.
 """
+
 import datetime
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+from apps.authentication.services import log_audit_event
 from django.db import transaction
 from django.db.models import Count, Q
-from apps.authentication.services import log_audit_event
 
 from .models import AttendanceAuditLog, AttendanceSession, FacultyAttendance, StudentAttendance
 from .validators import generate_qr_attendance_token, validate_session_unlocked
@@ -32,7 +34,14 @@ class AttendanceService:
 
     @staticmethod
     @transaction.atomic
-    def mark_attendance(session: AttendanceSession, student_id: str, status: str = "present", remarks: str = "", actor=None, request=None) -> StudentAttendance:
+    def mark_attendance(
+        session: AttendanceSession,
+        student_id: str,
+        status: str = "present",
+        remarks: str = "",
+        actor=None,
+        request=None,
+    ) -> StudentAttendance:
         validate_session_unlocked(session)
 
         attendance, created = StudentAttendance.objects.update_or_create(
@@ -52,7 +61,9 @@ class AttendanceService:
 
     @staticmethod
     @transaction.atomic
-    def bulk_mark(session: AttendanceSession, records: List[Dict[str, Any]], actor=None, request=None) -> List[StudentAttendance]:
+    def bulk_mark(
+        session: AttendanceSession, records: List[Dict[str, Any]], actor=None, request=None
+    ) -> List[StudentAttendance]:
         validate_session_unlocked(session)
 
         marked_records = []
@@ -60,7 +71,7 @@ class AttendanceService:
             student_id = rec["student_id"]
             status = rec.get("status", "present")
             remarks = rec.get("remarks", "")
-            
+
             att, _ = StudentAttendance.objects.update_or_create(
                 session=session,
                 student_id=student_id,
@@ -79,7 +90,16 @@ class AttendanceService:
 
     @staticmethod
     @transaction.atomic
-    def faculty_attendance(faculty_id: str, date: datetime.date, status: str = "present", check_in=None, check_out=None, remarks: str = "", actor=None, request=None) -> FacultyAttendance:
+    def faculty_attendance(
+        faculty_id: str,
+        date: datetime.date,
+        status: str = "present",
+        check_in=None,
+        check_out=None,
+        remarks: str = "",
+        actor=None,
+        request=None,
+    ) -> FacultyAttendance:
         rec, _ = FacultyAttendance.objects.update_or_create(
             faculty_id=faculty_id,
             date=date,
@@ -88,7 +108,11 @@ class AttendanceService:
 
         if request:
             try:
-                log_audit_event(request, event_type="faculty_attendance_marked", details=f"Faculty {faculty_id} attendance set to {status}")
+                log_audit_event(
+                    request,
+                    event_type="faculty_attendance_marked",
+                    details=f"Faculty {faculty_id} attendance set to {status}",
+                )
             except Exception:
                 pass
 

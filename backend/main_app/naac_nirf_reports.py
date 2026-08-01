@@ -5,10 +5,10 @@ Aggregates key metrics required for NAAC Criteria 1-7 and NIRF Ranking data subm
 
 from main_app.models import (
     Course, Student, Staff, Subject, Session, Book, IssuedBook,
-    PlacementDrive, PlacementRegistration, StudentResult, OnlineExamResult,
+    PlacementDrive, PlacementRegistration, OnlineExamResult,
     CertificateRequest, StudentRegistration, CollegeEvent, FeeRecord
 )
-from django.db.models import Count, Q, Avg, Sum
+from django.db.models import Sum
 
 
 def generate_naac_nirf_data():

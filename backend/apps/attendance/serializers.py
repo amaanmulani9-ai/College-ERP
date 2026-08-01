@@ -1,9 +1,8 @@
-from rest_framework import serializers
-
 from apps.academics.serializers import SubjectSerializer
 from apps.staff.serializers import EmployeeSerializer
 from apps.students.serializers import StudentSerializer
 from apps.timetable.serializers import ClassroomSerializer, TimetableSerializer
+from rest_framework import serializers
 
 from .models import AttendanceAuditLog, AttendanceSession, FacultyAttendance, StudentAttendance
 

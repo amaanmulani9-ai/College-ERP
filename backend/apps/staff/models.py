@@ -1,8 +1,9 @@
 import uuid
-from django.db import models
-from django.conf import settings
-from apps.profiles.models import UserProfile
+
 from apps.academics.models import Department
+from apps.profiles.models import UserProfile
+from django.conf import settings
+from django.db import models
 
 
 class EmployeeSoftDeleteManager(models.Manager):
@@ -26,7 +27,9 @@ class Designation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=150)
     code = models.CharField(max_length=50, unique=True)
-    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True, related_name="designations")
+    department = models.ForeignKey(
+        Department, on_delete=models.SET_NULL, null=True, blank=True, related_name="designations"
+    )
     category = models.CharField(max_length=30, choices=CATEGORY_CHOICES, default="teaching")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -68,17 +71,19 @@ class Employee(models.Model):
     profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE, related_name="employee_profile")
     department = models.ForeignKey(Department, on_delete=models.PROTECT, related_name="employees")
     designation = models.ForeignKey(Designation, on_delete=models.PROTECT, related_name="employees")
-    
+
     employment_type = models.CharField(max_length=30, choices=EMPLOYMENT_TYPE_CHOICES, default="full_time")
     joining_date = models.DateField()
     probation_end_date = models.DateField(blank=True, null=True)
     employment_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active", db_index=True)
-    
-    reporting_manager = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, related_name="subordinates")
+
+    reporting_manager = models.ForeignKey(
+        "self", on_delete=models.SET_NULL, null=True, blank=True, related_name="subordinates"
+    )
     qualification = models.CharField(max_length=200, blank=True, default="")
     experience_years = models.DecimalField(max_digits=4, decimal_places=1, default=0.0)
     salary_grade = models.CharField(max_length=50, blank=True, default="")
-    
+
     office_location = models.CharField(max_length=150, blank=True, default="")
     work_email = models.EmailField(blank=True, default="")
     extension_number = models.CharField(max_length=30, blank=True, default="")

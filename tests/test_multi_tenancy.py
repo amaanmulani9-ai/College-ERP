@@ -1,6 +1,6 @@
 import pytest
-from django.urls import reverse
 from apps.tenancy.models import Client, Domain
+from django.urls import reverse
 
 
 @pytest.mark.django_db

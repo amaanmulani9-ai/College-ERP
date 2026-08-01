@@ -5,7 +5,6 @@ to calculate individual Risk Profiles (High Risk, Moderate Risk, Safe) for proac
 """
 
 from main_app.models import Student, AttendanceReport, StudentResult, OnlineExamResult, FeeRecord
-from django.db.models import Avg, Sum, Count
 
 
 def calculate_student_risk(student):

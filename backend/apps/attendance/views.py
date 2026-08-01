@@ -1,4 +1,5 @@
 import datetime
+
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -43,12 +44,14 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
         student_id = request.data.get("student_id")
         status_val = request.data.get("status", "present")
         remarks = request.data.get("remarks", "")
-        
+
         if not student_id:
             return Response({"detail": "student_id is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            att = AttendanceService.mark_attendance(session, student_id, status_val, remarks, actor=request.user, request=request)
+            att = AttendanceService.mark_attendance(
+                session, student_id, status_val, remarks, actor=request.user, request=request
+            )
             return Response(StudentAttendanceSerializer(att).data, status=status.HTTP_200_OK)
         except ValueError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
@@ -128,7 +131,9 @@ class FacultyAttendanceViewSet(viewsets.ModelViewSet):
             return Response({"detail": "faculty_id is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         date_obj = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
-        rec = AttendanceService.faculty_attendance(faculty_id, date_obj, status_val, check_in, check_out, remarks, actor=request.user, request=request)
+        rec = AttendanceService.faculty_attendance(
+            faculty_id, date_obj, status_val, check_in, check_out, remarks, actor=request.user, request=request
+        )
         return Response(FacultyAttendanceSerializer(rec).data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"], url_path="faculty/(?P<faculty_id>[^/.]+)")

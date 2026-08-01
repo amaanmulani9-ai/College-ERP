@@ -1,7 +1,8 @@
 import uuid
-from django.db import models
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import models
 
 
 class SoftDeleteManager(models.Manager):
@@ -14,8 +15,10 @@ class Faculty(models.Model):
     name = models.CharField(max_length=200)
     code = models.CharField(max_length=50, db_index=True)
     description = models.TextField(blank=True, default="")
-    dean = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="managed_faculties")
-    
+    dean = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="managed_faculties"
+    )
+
     is_active = models.BooleanField(default=True)
     display_order = models.IntegerField(default=0)
     is_deleted = models.BooleanField(default=False)
@@ -47,7 +50,9 @@ class Department(models.Model):
     name = models.CharField(max_length=200)
     code = models.CharField(max_length=50, db_index=True)
     description = models.TextField(blank=True, default="")
-    hod = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="headed_departments")
+    hod = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="headed_departments"
+    )
     email = models.EmailField(blank=True, default="")
     phone = models.CharField(max_length=30, blank=True, default="")
 
@@ -147,7 +152,7 @@ class Semester(models.Model):
     semester_number = models.IntegerField()
     name = models.CharField(max_length=100)  # e.g., "Semester 1"
     credits = models.IntegerField(default=20)
-    
+
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
 

@@ -13,6 +13,7 @@ Usage:
     ok      = gateway.verify_signature(order_id, payment_id, signature)
     refund  = gateway.refund(payment_id, amount)
 """
+
 import hashlib
 import hmac
 import logging
@@ -25,6 +26,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Abstract Base Gateway
 # ---------------------------------------------------------------------------
+
 
 class BaseGateway(ABC):
     """
@@ -82,6 +84,7 @@ class BaseGateway(ABC):
 # Razorpay Gateway (full implementation)
 # ---------------------------------------------------------------------------
 
+
 class RazorpayGateway(BaseGateway):
     """
     Full Razorpay implementation.
@@ -101,9 +104,8 @@ class RazorpayGateway(BaseGateway):
         if self._client is None:
             try:
                 import razorpay  # type: ignore
-                self._client = razorpay.Client(
-                    auth=(self.config["key_id"], self.config["key_secret"])
-                )
+
+                self._client = razorpay.Client(auth=(self.config["key_id"], self.config["key_secret"]))
             except ImportError:
                 raise RuntimeError("razorpay package not installed. Run: pip install razorpay")
         return self._client
@@ -204,6 +206,7 @@ class RazorpayGateway(BaseGateway):
 # Stripe Gateway (stub — future implementation)
 # ---------------------------------------------------------------------------
 
+
 class StripeGateway(BaseGateway):
     """Stripe integration stub. Implement in TASK-018."""
 
@@ -227,6 +230,7 @@ class StripeGateway(BaseGateway):
 # PhonePe Gateway (stub — future implementation)
 # ---------------------------------------------------------------------------
 
+
 class PhonePeGateway(BaseGateway):
     """PhonePe integration stub. Implement in TASK-018."""
 
@@ -249,6 +253,7 @@ class PhonePeGateway(BaseGateway):
 # ---------------------------------------------------------------------------
 # UPI Gateway (stub — future implementation)
 # ---------------------------------------------------------------------------
+
 
 class UPIGateway(BaseGateway):
     """Generic UPI integration stub. Implement in TASK-018."""

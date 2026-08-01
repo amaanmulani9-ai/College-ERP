@@ -1,10 +1,9 @@
 import hashlib
 import io
 import qrcode
-from PIL import Image
 from django.core.files.base import ContentFile
 from django.conf import settings
-from typing import Tuple, Dict, Any, Optional
+from typing import Dict, Any
 
 class DigitalVerificationService:
     """

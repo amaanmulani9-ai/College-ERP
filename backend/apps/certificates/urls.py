@@ -17,7 +17,11 @@ router.register(r"transcripts", TranscriptViewSet, basename="transcript")
 urlpatterns = [
     path("generate/", CertificateViewSet.as_view({"post": "generate"}), name="certificate-generate"),
     path("transcript/generate/", TranscriptViewSet.as_view({"post": "generate"}), name="transcript-generate"),
-    path("student/<str:student_id>/", CertificateViewSet.as_view({"get": "student_certificates"}), name="certificate-student-list"),
+    path(
+        "student/<str:student_id>/",
+        CertificateViewSet.as_view({"get": "student_certificates"}),
+        name="certificate-student-list",
+    ),
     path("verify/<str:number>/", CertificateViewSet.as_view({"get": "verify"}), name="certificate-verify"),
     path("download/<str:cert_id>/", CertificateViewSet.as_view({"get": "download"}), name="certificate-download"),
     path("", include(router.urls)),

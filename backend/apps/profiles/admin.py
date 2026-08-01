@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import UserProfile, UserContact, UserAddress, UserPreferences, ProfileActivity
+
+from .models import ProfileActivity, UserAddress, UserContact, UserPreferences, UserProfile
 
 
 class UserContactInline(admin.StackedInline):
@@ -26,6 +27,7 @@ class UserProfileAdmin(admin.ModelAdmin):
 
     def user_email(self, obj):
         return obj.user.email
+
     user_email.short_description = "User Email"
 
 
@@ -34,4 +36,13 @@ class ProfileActivityAdmin(admin.ModelAdmin):
     list_display = ("timestamp", "activity_type", "profile", "ip_address")
     list_filter = ("activity_type", "timestamp")
     search_fields = ("profile__user__email", "description", "ip_address")
-    readonly_fields = ("id", "profile", "activity_type", "description", "details", "ip_address", "user_agent", "timestamp")
+    readonly_fields = (
+        "id",
+        "profile",
+        "activity_type",
+        "description",
+        "details",
+        "ip_address",
+        "user_agent",
+        "timestamp",
+    )

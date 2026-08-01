@@ -1,8 +1,10 @@
 from datetime import timedelta
-from django.utils import timezone
+
 from django.contrib.auth import authenticate
+from django.utils import timezone
 from rest_framework import serializers
-from .models import User, TokenRecord
+
+from .models import User
 from .validators import EnterprisePasswordValidator
 
 
@@ -31,7 +33,15 @@ class UserSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "is_email_verified", "is_active", "is_staff", "is_superuser", "created_at", "updated_at"]
+        read_only_fields = [
+            "id",
+            "is_email_verified",
+            "is_active",
+            "is_staff",
+            "is_superuser",
+            "created_at",
+            "updated_at",
+        ]
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -83,7 +93,9 @@ class LoginSerializer(serializers.Serializer):
             )
 
         if not user.is_active:
-            raise serializers.ValidationError({"detail": "Account is deactivated. Please contact college administration."})
+            raise serializers.ValidationError(
+                {"detail": "Account is deactivated. Please contact college administration."}
+            )
 
         authenticated_user = authenticate(username=email, password=password)
         if not authenticated_user:

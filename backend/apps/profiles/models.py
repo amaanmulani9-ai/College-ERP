@@ -1,6 +1,7 @@
 import uuid
-from django.db import models
+
 from django.conf import settings
+from django.db import models
 
 
 class UserProfile(models.Model):
@@ -29,7 +30,7 @@ class UserProfile(models.Model):
     middle_name = models.CharField(max_length=150, blank=True, default="")
     last_name = models.CharField(max_length=150, blank=True, default="")
     display_name = models.CharField(max_length=200, blank=True, default="")
-    
+
     profile_photo = models.FileField(upload_to="avatars/", blank=True, null=True)
     cover_photo = models.FileField(upload_to="covers/", blank=True, null=True)
     signature_image = models.FileField(upload_to="signatures/", blank=True, null=True)

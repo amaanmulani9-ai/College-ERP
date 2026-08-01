@@ -1,10 +1,9 @@
 import uuid
 
-from django.conf import settings
-from django.db import models
-
 from apps.academics.models import AcademicSession, Program, Semester, Subject
 from apps.staff.models import Employee
+from django.conf import settings
+from django.db import models
 
 
 class SoftDeleteManager(models.Manager):
@@ -15,6 +14,7 @@ class SoftDeleteManager(models.Manager):
 # ---------------------------------------------------------------------------
 # Building
 # ---------------------------------------------------------------------------
+
 
 class Building(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -41,6 +41,7 @@ class Building(models.Model):
 # ---------------------------------------------------------------------------
 # Classroom
 # ---------------------------------------------------------------------------
+
 
 class Classroom(models.Model):
     ROOM_TYPE_CHOICES = [
@@ -78,6 +79,7 @@ class Classroom(models.Model):
 # TimeSlot
 # ---------------------------------------------------------------------------
 
+
 class TimeSlot(models.Model):
     DAY_CHOICES = [
         ("Monday", "Monday"),
@@ -111,6 +113,7 @@ class TimeSlot(models.Model):
 # ---------------------------------------------------------------------------
 # Timetable
 # ---------------------------------------------------------------------------
+
 
 class Timetable(models.Model):
     STATUS_CHOICES = [
@@ -157,6 +160,7 @@ class Timetable(models.Model):
 # Timetable Audit Log
 # ---------------------------------------------------------------------------
 
+
 class TimetableAuditLog(models.Model):
     EVENT_CHOICES = [
         ("created", "Created"),
@@ -168,7 +172,9 @@ class TimetableAuditLog(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    timetable = models.ForeignKey(Timetable, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs")
+    timetable = models.ForeignKey(
+        Timetable, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs"
+    )
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     event_type = models.CharField(max_length=30, choices=EVENT_CHOICES)
     description = models.CharField(max_length=500)

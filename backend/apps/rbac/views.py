@@ -1,13 +1,12 @@
+from apps.authentication.models import User
+from apps.authentication.services import log_audit_event
 from django.db import connection
-from rest_framework import generics, viewsets, status
+from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.authentication.models import User
-from apps.authentication.services import log_audit_event
 from .models import Permission, Role, UserRole
-from .permissions import RequirePermission
 from .serializers import (
     AssignPermissionToRoleSerializer,
     AssignRoleToUserSerializer,
@@ -15,7 +14,6 @@ from .serializers import (
     PermissionSerializer,
     RoleDetailSerializer,
     RoleSerializer,
-    UserRoleSerializer,
 )
 from .services import PermissionResolver, assign_role_to_user, remove_role_from_user
 
@@ -102,7 +100,9 @@ class RoleViewSet(viewsets.ModelViewSet):
             details={"role": role.name, "permission_code": perm.code},
         )
 
-        return Response({"detail": f"Permission '{perm.code}' assigned to role '{role.name}'."}, status=status.HTTP_200_OK)
+        return Response(
+            {"detail": f"Permission '{perm.code}' assigned to role '{role.name}'."}, status=status.HTTP_200_OK
+        )
 
     @action(detail=True, methods=["post"], url_path="remove-permission")
     def remove_permission(self, request, pk=None):
@@ -123,7 +123,9 @@ class RoleViewSet(viewsets.ModelViewSet):
             details={"role": role.name, "permission_code": perm.code},
         )
 
-        return Response({"detail": f"Permission '{perm.code}' removed from role '{role.name}'."}, status=status.HTTP_200_OK)
+        return Response(
+            {"detail": f"Permission '{perm.code}' removed from role '{role.name}'."}, status=status.HTTP_200_OK
+        )
 
     @action(detail=True, methods=["post"])
     def disable(self, request, pk=None):
@@ -185,16 +187,18 @@ class PermissionMatrixView(generics.GenericAPIView):
         matrix = []
         for role in roles:
             assigned_codes = set(role.permissions.values_list("code", flat=True))
-            matrix.append({
-                "role_id": str(role.id),
-                "role_name": role.name,
-                "permissions": {perm.code: (perm.code in assigned_codes) for perm in permissions}
-            })
+            matrix.append(
+                {
+                    "role_id": str(role.id),
+                    "role_name": role.name,
+                    "permissions": {perm.code: (perm.code in assigned_codes) for perm in permissions},
+                }
+            )
 
-        return Response({
-            "permissions": PermissionSerializer(permissions, many=True).data,
-            "matrix": matrix
-        }, status=status.HTTP_200_OK)
+        return Response(
+            {"permissions": PermissionSerializer(permissions, many=True).data, "matrix": matrix},
+            status=status.HTTP_200_OK,
+        )
 
 
 class RoleMatrixView(generics.GenericAPIView):
@@ -207,14 +211,13 @@ class RoleMatrixView(generics.GenericAPIView):
         matrix = []
         for user in users:
             user_assigned_roles = set(user.user_roles.values_list("role_id", flat=True))
-            matrix.append({
-                "user_id": str(user.id),
-                "email": user.email,
-                "full_name": user.get_full_name(),
-                "roles": {str(role.id): (role.id in user_assigned_roles) for role in roles}
-            })
+            matrix.append(
+                {
+                    "user_id": str(user.id),
+                    "email": user.email,
+                    "full_name": user.get_full_name(),
+                    "roles": {str(role.id): (role.id in user_assigned_roles) for role in roles},
+                }
+            )
 
-        return Response({
-            "roles": RoleSerializer(roles, many=True).data,
-            "matrix": matrix
-        }, status=status.HTTP_200_OK)
+        return Response({"roles": RoleSerializer(roles, many=True).data, "matrix": matrix}, status=status.HTTP_200_OK)

@@ -38,7 +38,9 @@ class CertificateViewSet(viewsets.ModelViewSet):
         cert_type_id = str(serializer.validated_data["certificate_type_id"])
 
         try:
-            cert = CertificateService.generate_certificate(student_id, cert_type_id, actor=request.user, request=request)
+            cert = CertificateService.generate_certificate(
+                student_id, cert_type_id, actor=request.user, request=request
+            )
             return Response(CertificateSerializer(cert).data, status=status.HTTP_201_CREATED)
         except Exception as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)

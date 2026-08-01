@@ -1,13 +1,13 @@
 import csv
 import json
 from django.db.models import Count, Sum, Avg, Q
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from main_app.models import (
     Student, Staff, Course, Subject, Attendance, AttendanceReport,
     FeeRecord, FeePayment, PlacementDrive, PlacementRegistration,
-    CustomUser, Session, StudentResult, IssuedBook, LeaveReportStaff, LeaveReportStudent
+    CustomUser, StudentResult, IssuedBook, LeaveReportStaff, LeaveReportStudent
 )
 
 @login_required

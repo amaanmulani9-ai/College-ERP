@@ -1,7 +1,8 @@
-from rest_framework.permissions import BasePermission
 from django.db import connection
-from .services import PermissionResolver
+from rest_framework.permissions import BasePermission
+
 from .models import UserRole
+from .services import PermissionResolver
 
 
 class RequirePermission(BasePermission):

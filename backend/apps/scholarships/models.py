@@ -7,18 +7,18 @@ ScholarshipApplication – Student application & approval workflow
 ScholarshipRenewal     – Annual renewal for multi-year scholarships
 ScholarshipAuditLog    – Immutable audit trail of scholarship events
 """
-import uuid
 
-from django.conf import settings
-from django.db import models
+import uuid
 
 from apps.academics.models import AcademicSession
 from apps.students.models import Student
-
+from django.conf import settings
+from django.db import models
 
 # ---------------------------------------------------------------------------
 # Scholarship Type (Catalog)
 # ---------------------------------------------------------------------------
+
 
 class ScholarshipType(models.Model):
     PROVIDER_CHOICES = [
@@ -37,7 +37,9 @@ class ScholarshipType(models.Model):
     provider = models.CharField(max_length=30, choices=PROVIDER_CHOICES, default="merit")
     description = models.TextField(blank=True, default="")
     min_cgpa_requirement = models.FloatField(default=0.0, help_text="Minimum CGPA required for eligibility")
-    max_family_income = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, help_text="Income cap for need-based scholarships")
+    max_family_income = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True, help_text="Income cap for need-based scholarships"
+    )
     is_active = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -56,6 +58,7 @@ class ScholarshipType(models.Model):
 # Scholarship (Active / Granted Award)
 # ---------------------------------------------------------------------------
 
+
 class Scholarship(models.Model):
     STATUS_CHOICES = [
         ("active", "Active"),
@@ -69,7 +72,9 @@ class Scholarship(models.Model):
     scholarship_type = models.ForeignKey(ScholarshipType, on_delete=models.PROTECT, related_name="scholarships")
     academic_session = models.ForeignKey(AcademicSession, on_delete=models.PROTECT, related_name="scholarships")
 
-    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, help_text="Flat scholarship amount in INR")
+    amount = models.DecimalField(
+        max_digits=12, decimal_places=2, default=0.00, help_text="Flat scholarship amount in INR"
+    )
     percentage = models.FloatField(default=0.0, help_text="Percentage discount (0-100%) if percentage-based")
 
     start_date = models.DateField()
@@ -93,6 +98,7 @@ class Scholarship(models.Model):
 # Scholarship Application
 # ---------------------------------------------------------------------------
 
+
 class ScholarshipApplication(models.Model):
     STATUS_CHOICES = [
         ("draft", "Draft"),
@@ -105,7 +111,9 @@ class ScholarshipApplication(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="scholarship_applications")
     scholarship_type = models.ForeignKey(ScholarshipType, on_delete=models.PROTECT, related_name="applications")
-    academic_session = models.ForeignKey(AcademicSession, on_delete=models.PROTECT, related_name="scholarship_applications")
+    academic_session = models.ForeignKey(
+        AcademicSession, on_delete=models.PROTECT, related_name="scholarship_applications"
+    )
 
     requested_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     family_annual_income = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
@@ -116,7 +124,13 @@ class ScholarshipApplication(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="submitted", db_index=True)
     rejection_reason = models.CharField(max_length=500, blank=True, default="")
 
-    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="approved_scholarship_apps")
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approved_scholarship_apps",
+    )
     approved_at = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -135,6 +149,7 @@ class ScholarshipApplication(models.Model):
 # ---------------------------------------------------------------------------
 # Scholarship Renewal
 # ---------------------------------------------------------------------------
+
 
 class ScholarshipRenewal(models.Model):
     STATUS_CHOICES = [
@@ -166,6 +181,7 @@ class ScholarshipRenewal(models.Model):
 # ---------------------------------------------------------------------------
 # Scholarship Audit Log
 # ---------------------------------------------------------------------------
+
 
 class ScholarshipAuditLog(models.Model):
     EVENT_CHOICES = [

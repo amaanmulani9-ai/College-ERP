@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
 from main_app.tests.factories import CustomUserFactory, StaffFactory
-from main_app.models import Admin, RulesRegulation
+from main_app.models import Admin
 
 pytestmark = pytest.mark.django_db
 

@@ -9,10 +9,10 @@ from .models import (
     WebhookLog,
 )
 
-
 # ---------------------------------------------------------------------------
 # Inlines
 # ---------------------------------------------------------------------------
+
 
 class PaymentTransactionInline(admin.TabularInline):
     model = PaymentTransaction
@@ -52,6 +52,7 @@ class PaymentAuditLogInline(admin.TabularInline):
 # Model Admins
 # ---------------------------------------------------------------------------
 
+
 @admin.register(PaymentGateway)
 class PaymentGatewayAdmin(admin.ModelAdmin):
     list_display = ("name", "provider", "is_active", "created_at")
@@ -78,14 +79,26 @@ class PaymentOrderAdmin(admin.ModelAdmin):
 @admin.register(PaymentTransaction)
 class PaymentTransactionAdmin(admin.ModelAdmin):
     list_display = (
-        "transaction_id", "student", "amount", "currency", "status",
-        "gateway", "paid_at", "created_at",
+        "transaction_id",
+        "student",
+        "amount",
+        "currency",
+        "status",
+        "gateway",
+        "paid_at",
+        "created_at",
     )
     list_filter = ("status", "gateway", "currency")
     search_fields = ("transaction_id", "order_id", "gateway_payment_id", "student__student_id")
     readonly_fields = (
-        "id", "transaction_id", "gateway_payment_id", "gateway_signature",
-        "gateway_response", "paid_at", "created_at", "updated_at",
+        "id",
+        "transaction_id",
+        "gateway_payment_id",
+        "gateway_signature",
+        "gateway_response",
+        "paid_at",
+        "created_at",
+        "updated_at",
     )
     ordering = ("-created_at",)
     inlines = [RefundInline, PaymentAuditLogInline]
@@ -102,7 +115,17 @@ class WebhookLogAdmin(admin.ModelAdmin):
     list_display = ("event_type", "event_id", "gateway", "is_processed", "processing_error", "received_at")
     list_filter = ("is_processed", "event_type", "gateway")
     search_fields = ("event_id", "event_type")
-    readonly_fields = ("id", "gateway", "event_id", "event_type", "payload", "headers", "is_processed", "processing_error", "received_at")
+    readonly_fields = (
+        "id",
+        "gateway",
+        "event_id",
+        "event_type",
+        "payload",
+        "headers",
+        "is_processed",
+        "processing_error",
+        "received_at",
+    )
     ordering = ("-received_at",)
 
     def has_add_permission(self, request):
@@ -131,6 +154,7 @@ class PaymentAuditLogAdmin(admin.ModelAdmin):
 
     def description_short(self, obj):
         return obj.description[:60]
+
     description_short.short_description = "Description"
 
     def has_add_permission(self, request):

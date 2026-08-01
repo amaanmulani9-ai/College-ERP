@@ -1,8 +1,9 @@
 import uuid
-from django.db import models
-from django.conf import settings
+
+from apps.academics.models import AcademicSession, Department, Program, Semester
 from apps.profiles.models import UserProfile
-from apps.academics.models import Program, Department, Semester, AcademicSession
+from django.conf import settings
+from django.db import models
 
 
 class StudentSoftDeleteManager(models.Manager):
@@ -32,7 +33,7 @@ class Student(models.Model):
     student_id = models.CharField(max_length=50, unique=True, db_index=True)
     enrollment_number = models.CharField(max_length=50, unique=True, db_index=True)
     roll_number = models.CharField(max_length=50, blank=True, default="")
-    
+
     profile = models.OneToOneField(UserProfile, on_delete=models.CASCADE, related_name="student_profile")
     program = models.ForeignKey(Program, on_delete=models.PROTECT, related_name="students")
     department = models.ForeignKey(Department, on_delete=models.PROTECT, related_name="students")
@@ -43,7 +44,7 @@ class Student(models.Model):
     expected_graduation_date = models.DateField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active", db_index=True)
     category = models.CharField(max_length=30, choices=CATEGORY_CHOICES, default="General")
-    
+
     blood_group = models.CharField(max_length=5, blank=True, default="")
     nationality = models.CharField(max_length=100, blank=True, default="American")
 

@@ -1,11 +1,9 @@
 import datetime
-import pytest
-from django.urls import reverse
-from rest_framework import status
-from rest_framework.test import APIClient
 
-from apps.academics.models import AcademicSession, Department, Faculty as FacultyDept, Program, Semester, Subject
-from apps.attendance.models import AttendanceSession, FacultyAttendance, StudentAttendance
+import pytest
+from apps.academics.models import AcademicSession, Department
+from apps.academics.models import Faculty as FacultyDept
+from apps.academics.models import Program, Semester, Subject
 from apps.attendance.services import AttendanceService
 from apps.attendance.validators import generate_qr_attendance_token, process_biometric_event_payload
 from apps.authentication.models import User
@@ -13,6 +11,7 @@ from apps.profiles.models import UserProfile
 from apps.staff.models import Designation, Employee
 from apps.students.models import Student
 from apps.timetable.models import Building, Classroom, TimeSlot, Timetable
+from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
@@ -35,9 +34,7 @@ class TestAttendanceModule:
         self.session_academic = AcademicSession.objects.create(
             name="2026-2027", start_date=datetime.date(2026, 8, 1), end_date=datetime.date(2027, 5, 31), is_current=True
         )
-        self.subject = Subject.objects.create(
-            name="Data Structures", code="CS101", semester=self.semester1, credits=4
-        )
+        self.subject = Subject.objects.create(name="Data Structures", code="CS101", semester=self.semester1, credits=4)
 
         # Faculty Employee
         self.fac_user = User.objects.create_user(

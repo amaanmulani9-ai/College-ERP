@@ -1,5 +1,4 @@
 import pytest
-from main_app.models import CustomUser, Student, Staff
 from main_app.tests.factories import CustomUserFactory, StudentFactory, StaffFactory
 
 pytestmark = pytest.mark.django_db

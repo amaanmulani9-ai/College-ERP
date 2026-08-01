@@ -1,12 +1,12 @@
+from apps.authentication.models import User
+from apps.profiles.models import UserProfile
 from django.db.models import Count
-from rest_framework import generics, viewsets, status
+from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from apps.authentication.models import User
-from apps.profiles.models import UserProfile
-from .models import Designation, Employee, EmployeeStatusHistory
+from .models import Designation, Employee
 from .serializers import (
     CreateEmployeeSerializer,
     DesignationSerializer,
@@ -55,7 +55,9 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         password = data.pop("password", "StaffPassword123!")
 
         user = User.objects.create_user(email=email, password=password, first_name=first_name, last_name=last_name)
-        profile, _ = UserProfile.objects.get_or_create(user=user, defaults={"first_name": first_name, "last_name": last_name})
+        profile, _ = UserProfile.objects.get_or_create(
+            user=user, defaults={"first_name": first_name, "last_name": last_name}
+        )
 
         code = generate_employee_code()
 
@@ -123,7 +125,9 @@ class StaffDashboardSummaryView(generics.GenericAPIView):
         total_employees = Employee.objects.count()
         active_count = Employee.objects.filter(employment_status="active").count()
         teaching_count = Employee.objects.filter(designation__category="teaching", employment_status="active").count()
-        non_teaching_count = Employee.objects.filter(employment_status="active").exclude(designation__category="teaching").count()
+        non_teaching_count = (
+            Employee.objects.filter(employment_status="active").exclude(designation__category="teaching").count()
+        )
 
         department_breakdown = (
             Employee.objects.filter(employment_status="active")

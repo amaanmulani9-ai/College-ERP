@@ -2,9 +2,11 @@
 Examination Signals.
 Defines post-save signal listeners for exam entities.
 """
+
+import logging
+
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-import logging
 
 from .models import Exam
 

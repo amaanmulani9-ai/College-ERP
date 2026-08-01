@@ -12,17 +12,17 @@ Methods:
     apply_fee_waiver()    – Manually adjust fee waiver or scholarship on StudentFee
     student_scholarships()– Query list of student's active & past scholarships
 """
+
 import decimal
 import logging
 from datetime import date, timedelta
 from typing import Any, Dict, List, Optional
 
-from django.db import transaction
-from django.utils import timezone
-
 from apps.academics.models import AcademicSession
 from apps.fees.models import StudentFee
 from apps.students.models import Student
+from django.db import transaction
+from django.utils import timezone
 
 from .models import (
     Scholarship,
@@ -359,11 +359,20 @@ class ScholarshipService:
             .select_related("scholarship_type", "academic_session")
             .order_by("-created_at")
         )
-        return list(schs.values(
-            "id", "scholarship_type__name", "scholarship_type__code",
-            "scholarship_type__provider", "academic_session__name",
-            "amount", "percentage", "start_date", "end_date", "status",
-        ))
+        return list(
+            schs.values(
+                "id",
+                "scholarship_type__name",
+                "scholarship_type__code",
+                "scholarship_type__provider",
+                "academic_session__name",
+                "amount",
+                "percentage",
+                "start_date",
+                "end_date",
+                "status",
+            )
+        )
 
 
 def _log_audit(student, scholarship=None, application=None, actor=None, event_type="", description=""):

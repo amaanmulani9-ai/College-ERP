@@ -1,7 +1,8 @@
+from apps.authentication.services import log_audit_event
 from django.core.cache import cache
 from django.db import connection
-from apps.authentication.services import log_audit_event
-from .models import Role, Permission, UserRole
+
+from .models import Permission, UserRole
 
 
 class PermissionResolver:

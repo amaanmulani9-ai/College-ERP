@@ -11,27 +11,25 @@ Tests:
 7. REST API Endpoints & Fine Reports
 8. Permissions & Access Control (Librarian vs Student)
 """
+
 import decimal
 from datetime import date, timedelta
 
 import pytest
-from django.contrib.auth import get_user_model
-from rest_framework.test import APIClient
-
 from apps.academics.models import AcademicSession, Department, Faculty, Program, Semester
 from apps.library.models import (
     Author,
     Book,
     BookCategory,
-    BookIssue,
     LibraryAuditLog,
     Publisher,
-    Reservation,
 )
 from apps.library.services import LibraryService
 from apps.profiles.models import UserProfile
 from apps.staff.models import Designation, Employee
 from apps.students.models import Student
+from django.contrib.auth import get_user_model
+from rest_framework.test import APIClient
 
 User = get_user_model()
 
@@ -116,6 +114,7 @@ def setup_lib_data(db):
 # 1. Catalog Unit Tests
 # ===========================================================================
 
+
 def test_add_book_success(setup_lib_data):
     book = LibraryService.add_book(
         isbn="978-0201616224",
@@ -157,6 +156,7 @@ def test_add_book_unique_validation(setup_lib_data):
 # ===========================================================================
 # 2. Circulation Unit Tests: Issue & Return
 # ===========================================================================
+
 
 def test_issue_and_return_book(setup_lib_data):
     book = setup_lib_data["book"]
@@ -210,6 +210,7 @@ def test_return_book_overdue_fine_calculation(setup_lib_data):
 # 3. Service Unit Tests: Reservations, Lost, Damaged
 # ===========================================================================
 
+
 def test_reserve_book(setup_lib_data):
     res = LibraryService.reserve_book(
         book_id=str(setup_lib_data["book"].id),
@@ -247,6 +248,7 @@ def test_lost_and_damaged_book_reporting(setup_lib_data):
 # ===========================================================================
 # 4. REST API ViewSet Tests
 # ===========================================================================
+
 
 def test_issue_book_api(setup_lib_data):
     client = APIClient()

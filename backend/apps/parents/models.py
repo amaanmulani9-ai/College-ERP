@@ -1,10 +1,9 @@
 import uuid
 
-from django.conf import settings
-from django.db import models
-
 from apps.profiles.models import UserProfile
 from apps.students.models import Student
+from django.conf import settings
+from django.db import models
 
 
 class ParentSoftDeleteManager(models.Manager):
@@ -57,9 +56,7 @@ class Parent(models.Model):
     )
     occupation = models.CharField(max_length=200, blank=True, default="")
     employer_name = models.CharField(max_length=200, blank=True, default="")
-    annual_income = models.DecimalField(
-        max_digits=14, decimal_places=2, null=True, blank=True
-    )
+    annual_income = models.DecimalField(max_digits=14, decimal_places=2, null=True, blank=True)
     education_level = models.CharField(
         max_length=30,
         choices=EDUCATION_CHOICES,

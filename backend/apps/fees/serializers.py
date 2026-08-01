@@ -1,7 +1,6 @@
-from rest_framework import serializers
-
 from apps.academics.serializers import AcademicSessionSerializer, ProgramSerializer, SemesterSerializer
 from apps.students.serializers import StudentSerializer
+from rest_framework import serializers
 
 from .models import FeeAuditLog, FeeCategory, FeeInstallment, FeeReceipt, FeeStructure, StudentFee
 

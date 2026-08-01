@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import Designation, Employee, EmployeeStatusHistory
 
 
@@ -17,13 +18,23 @@ class DesignationAdmin(admin.ModelAdmin):
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ("employee_id", "get_employee_name", "employee_number", "department", "designation", "employment_type", "employment_status", "is_deleted")
+    list_display = (
+        "employee_id",
+        "get_employee_name",
+        "employee_number",
+        "department",
+        "designation",
+        "employment_type",
+        "employment_status",
+        "is_deleted",
+    )
     list_filter = ("employment_status", "employment_type", "department", "designation__category", "is_deleted")
     search_fields = ("employee_id", "employee_number", "profile__first_name", "profile__last_name", "work_email")
     inlines = [EmployeeStatusHistoryInline]
 
     def get_employee_name(self, obj):
         return obj.profile.get_full_name()
+
     get_employee_name.short_description = "Employee Name"
 
 

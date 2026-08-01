@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand
 from apps.tenancy.models import Client
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):

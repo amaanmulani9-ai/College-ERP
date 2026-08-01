@@ -1,13 +1,13 @@
 import os
 import django
-from datetime import datetime, date
+from datetime import date
 
 # Set up Django environment
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'college_management_system.settings')
 django.setup()
 
 from django.contrib.auth.hashers import make_password
-from main_app.models import CustomUser, Session, Course, Subject, Book, Staff, Student
+from main_app.models import CustomUser, Session, Course, Subject, Book
 
 def seed_data():
     print("Starting database seeding with fresh, clean data...")

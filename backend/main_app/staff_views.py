@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from .decorators import admin_required, staff_required, student_required
+from .decorators import staff_required
 import json
 
 from django.contrib import messages
@@ -7,7 +7,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.mail import send_mail
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import (HttpResponseRedirect, get_object_or_404,redirect, render)
+from django.shortcuts import (get_object_or_404,redirect, render)
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -100,7 +100,7 @@ def get_students(request):
                     }
             student_data.append(data)
         return JsonResponse(json.dumps(student_data), content_type='application/json', safe=False)
-    except Exception as e:
+    except Exception:
         return JsonResponse(json.dumps([]), safe=False)
 
 
@@ -128,7 +128,7 @@ def save_attendance(request):
             # NOTE: Moved to a background task / cron job to avoid slowing down attendance saving
             # and spamming students on every single save.
             pass
-    except Exception as e:
+    except Exception:
         return HttpResponse("False")
 
     return HttpResponse("OK")
@@ -164,7 +164,7 @@ def get_student_attendance(request):
                     "status": attendance.status}
             student_data.append(data)
         return JsonResponse(json.dumps(student_data), content_type='application/json', safe=False)
-    except Exception as e:
+    except Exception:
         return JsonResponse(json.dumps([]), safe=False)
 
 
@@ -190,7 +190,7 @@ def update_attendance(request):
             report.status = status_map.get(report.student.admin_id)
             
         AttendanceReport.objects.bulk_update(reports, ['status'])
-    except Exception as e:
+    except Exception:
         return HttpResponse("False")
 
     return HttpResponse("OK")
@@ -299,7 +299,7 @@ def staff_fcmtoken(request):
         staff_user.fcm_token = token
         staff_user.save()
         return HttpResponse("True")
-    except Exception as e:
+    except Exception:
         return HttpResponse("False")
 
 
@@ -347,7 +347,7 @@ def staff_add_result(request):
                 print("Email error:", e)
                 
             messages.success(request, "Scores Saved" if created else "Scores Updated")
-        except Exception as e:
+        except Exception:
             messages.warning(request, "Error Occured While Processing Form")
     return render(request, "staff_template/staff_add_result.html", context)
 
@@ -367,7 +367,7 @@ def fetch_student_result(request):
             'test': result.test
         }
         return HttpResponse(json.dumps(result_data))
-    except Exception as e:
+    except Exception:
         return HttpResponse('False')
 
 #library

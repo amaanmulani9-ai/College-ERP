@@ -1,15 +1,17 @@
 import datetime
-import pytest
-from django.urls import reverse
-from rest_framework import status
-from rest_framework.test import APIClient
 
-from apps.academics.models import AcademicSession, Department, Faculty as FacultyDept, Program, Semester, Subject
+import pytest
+from apps.academics.models import AcademicSession, Department
+from apps.academics.models import Faculty as FacultyDept
+from apps.academics.models import Program, Semester, Subject
 from apps.authentication.models import User
 from apps.profiles.models import UserProfile
 from apps.staff.models import Designation, Employee
-from apps.timetable.models import Building, Classroom, TimeSlot, Timetable
+from apps.timetable.models import Building, Classroom, TimeSlot
 from apps.timetable.services import TimetableService
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIClient
 
 
 @pytest.mark.django_db
@@ -32,9 +34,7 @@ class TestTimetableModule:
         self.session = AcademicSession.objects.create(
             name="2026-2027", start_date=datetime.date(2026, 8, 1), end_date=datetime.date(2027, 5, 31), is_current=True
         )
-        self.subject = Subject.objects.create(
-            name="Data Structures", code="CS101", semester=self.semester1, credits=4
-        )
+        self.subject = Subject.objects.create(name="Data Structures", code="CS101", semester=self.semester1, credits=4)
 
         # Faculty Employee
         self.fac_user = User.objects.create_user(

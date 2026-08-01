@@ -14,17 +14,17 @@ PaymentService methods:
 All methods are atomic where appropriate.
 Receipt auto-generated via FeeService after successful payment.
 """
+
 import decimal
 import logging
 import uuid
 from typing import Any, Dict, List, Optional
 
+from apps.fees.services import FeeService
+from apps.students.models import Student
 from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
-
-from apps.fees.services import FeeService
-from apps.students.models import Student
 
 from .gateways import GatewayFactory
 from .models import (
@@ -285,9 +285,9 @@ class PaymentService:
             refund_obj.save()
 
             # Update transaction status
-            total_refunded = Refund.objects.filter(
-                transaction=txn, status="success"
-            ).aggregate(total=Sum("amount"))["total"] or 0
+            total_refunded = (
+                Refund.objects.filter(transaction=txn, status="success").aggregate(total=Sum("amount"))["total"] or 0
+            )
             if total_refunded >= txn.amount:
                 txn.status = "refunded"
             else:
@@ -326,11 +326,21 @@ class PaymentService:
             .select_related("gateway", "order", "fee_receipt")
             .order_by("-created_at")
         )
-        return list(txns.values(
-            "id", "transaction_id", "gateway_order_id", "gateway__name",
-            "amount", "currency", "status", "paid_at", "created_at",
-            "failure_reason", "fee_receipt__receipt_number",
-        ))
+        return list(
+            txns.values(
+                "id",
+                "transaction_id",
+                "gateway_order_id",
+                "gateway__name",
+                "amount",
+                "currency",
+                "status",
+                "paid_at",
+                "created_at",
+                "failure_reason",
+                "fee_receipt__receipt_number",
+            )
+        )
 
     # ------------------------------------------------------------------
     # 6. Webhook Handler
@@ -405,6 +415,7 @@ class PaymentService:
 # ---------------------------------------------------------------------------
 # Private helpers
 # ---------------------------------------------------------------------------
+
 
 def _process_webhook_event(event_type: str, payload: Dict, gateway_obj: PaymentGateway) -> None:
     """Dispatch webhook event to appropriate handler."""

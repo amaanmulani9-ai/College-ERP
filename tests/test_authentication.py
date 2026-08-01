@@ -1,15 +1,14 @@
 import pytest
+from apps.authentication.models import TokenRecord, User
 from django.urls import reverse
 from rest_framework_simplejwt.tokens import RefreshToken
-from apps.authentication.models import User, TokenRecord, AuditLog
-from apps.tenancy.models import Client, Domain
 
 
 @pytest.mark.django_db
 def test_user_registration_and_password_policy(client):
     """Verifies user registration with strong password policy validation."""
     url = reverse("authentication:register")
-    
+
     # 1. Weak password failure
     payload_weak = {
         "email": "student@college.edu",
@@ -42,14 +41,18 @@ def test_login_and_account_lockout(client):
 
     # 1. Failed attempts tracking
     for _ in range(5):
-        res_fail = client.post(login_url, {"email": "faculty@college.edu", "password": "WrongPassword!"}, content_type="application/json")
+        res_fail = client.post(
+            login_url, {"email": "faculty@college.edu", "password": "WrongPassword!"}, content_type="application/json"
+        )
         assert res_fail.status_code == 400
 
     user.refresh_from_db()
     assert user.is_locked_out() is True
 
     # 2. Locked out attempt
-    res_lockout = client.post(login_url, {"email": "faculty@college.edu", "password": "FacultyPassword123!"}, content_type="application/json")
+    res_lockout = client.post(
+        login_url, {"email": "faculty@college.edu", "password": "FacultyPassword123!"}, content_type="application/json"
+    )
     assert res_lockout.status_code == 400
     assert "locked" in str(res_lockout.json()).lower()
 
@@ -58,7 +61,7 @@ def test_login_and_account_lockout(client):
 def test_password_reset_and_email_verification_flow(client):
     """Verifies password reset token generation and email verification tokens."""
     user = User.objects.create_user(email="reset@college.edu", password="OldPassword123!")
-    
+
     # 1. Forgot password
     forgot_url = reverse("authentication:forgot_password")
     res_forgot = client.post(forgot_url, {"email": "reset@college.edu"}, content_type="application/json")
@@ -69,7 +72,9 @@ def test_password_reset_and_email_verification_flow(client):
 
     # 2. Reset password
     reset_url = reverse("authentication:reset_password")
-    res_reset = client.post(reset_url, {"token": token_rec.token, "new_password": "NewSecurePassword123!"}, content_type="application/json")
+    res_reset = client.post(
+        reset_url, {"token": token_rec.token, "new_password": "NewSecurePassword123!"}, content_type="application/json"
+    )
     assert res_reset.status_code == 200
 
     user.refresh_from_db()

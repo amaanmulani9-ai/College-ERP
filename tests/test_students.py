@@ -1,11 +1,18 @@
 import pytest
-from django.urls import reverse
-from rest_framework.test import APIClient
+from apps.academics.models import AcademicSession, Department, Faculty, Program, Semester
 from apps.authentication.models import User
 from apps.profiles.models import UserProfile
-from apps.academics.models import Faculty, Department, Program, Semester, AcademicSession
 from apps.students.models import Student, StudentStatusHistory
-from apps.students.services import generate_student_code, transition_student_status, suspend_student, reinstate_student, graduate_student, soft_delete_student, restore_student
+from apps.students.services import (
+    generate_student_code,
+    graduate_student,
+    reinstate_student,
+    restore_student,
+    soft_delete_student,
+    suspend_student,
+)
+from django.urls import reverse
+from rest_framework.test import APIClient
 
 
 @pytest.fixture
@@ -14,7 +21,9 @@ def setup_academic_data(db):
     dept = Department.objects.create(faculty=faculty, name="Information Technology", code="IT")
     prog = Program.objects.create(department=dept, name="BSc IT", code="BSCIT", degree_level="UG")
     sem = Semester.objects.create(program=prog, semester_number=1, name="Semester 1")
-    session = AcademicSession.objects.create(name="2025–2026", start_date="2025-08-01", end_date="2026-05-31", is_current=True)
+    session = AcademicSession.objects.create(
+        name="2025–2026", start_date="2025-08-01", end_date="2026-05-31", is_current=True
+    )
     return {"dept": dept, "prog": prog, "sem": sem, "session": session}
 
 
@@ -22,7 +31,7 @@ def setup_academic_data(db):
 def test_student_code_generator(setup_academic_data):
     """Verifies that Student IDs follow ERP-YEAR-PROGRAM-SEQUENCE pattern and increment correctly."""
     prog = setup_academic_data["prog"]
-    
+
     code1 = generate_student_code(prog.code)
     assert code1.startswith("ERP-")
     assert "BSCIT" in code1
@@ -34,7 +43,7 @@ def test_student_creation_and_status_transitions(setup_academic_data):
     """Verifies student creation, status transitions, and history tracking."""
     user = User.objects.create_user(email="john.doe@college.edu", password="Password123!")
     profile = UserProfile.objects.get(user=user)
-    
+
     student = Student.objects.create(
         student_id="ERP-2026-BSCIT-00001",
         enrollment_number="ENR001",
@@ -73,7 +82,7 @@ def test_student_soft_delete_and_restore(setup_academic_data):
     """Verifies soft delete and restore functionality."""
     user = User.objects.create_user(email="jane.smith@college.edu", password="Password123!")
     profile = UserProfile.objects.get(user=user)
-    
+
     student = Student.objects.create(
         student_id="ERP-2026-BSCIT-00002",
         enrollment_number="ENR002",
@@ -118,7 +127,9 @@ def test_student_rest_api_crud(setup_academic_data):
     assert res_create.data["student_id"].startswith("ERP-")
 
     # 2. Suspend via API
-    res_suspend = client.post(reverse("students:student-suspend", kwargs={"pk": student_id}), {"reason": "Fees overdue"}, format="json")
+    res_suspend = client.post(
+        reverse("students:student-suspend", kwargs={"pk": student_id}), {"reason": "Fees overdue"}, format="json"
+    )
     assert res_suspend.status_code == 200
     assert res_suspend.data["status"] == "suspended"
 

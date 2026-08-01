@@ -1,6 +1,6 @@
-from rest_framework import serializers
 from apps.profiles.serializers import UserProfileSerializer
-from apps.academics.serializers import ProgramSerializer, DepartmentSerializer, SemesterSerializer, AcademicSessionSerializer
+from rest_framework import serializers
+
 from .models import Student, StudentStatusHistory
 
 

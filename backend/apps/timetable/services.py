@@ -2,10 +2,11 @@
 Timetable Business Services (TimetableService).
 Handles timetable CRUD, conflict engine invocation, schedule queries, and audit logs.
 """
-from django.db import transaction
-from apps.authentication.services import log_audit_event
 
-from .models import Building, Classroom, TimeSlot, Timetable, TimetableAuditLog
+from apps.authentication.services import log_audit_event
+from django.db import transaction
+
+from .models import Timetable, TimetableAuditLog
 from .validators import check_timetable_conflicts
 
 
@@ -147,9 +148,9 @@ class TimetableService:
         qs = Timetable.objects.filter(status="active", is_deleted=False)
         if session_id:
             qs = qs.filter(academic_session_id=session_id)
-        return qs.select_related("time_slot", "classroom", "subject", "faculty__profile", "program", "semester").order_by(
-            "time_slot__day", "time_slot__period_number"
-        )
+        return qs.select_related(
+            "time_slot", "classroom", "subject", "faculty__profile", "program", "semester"
+        ).order_by("time_slot__day", "time_slot__period_number")
 
 
 def _log_audit(timetable, actor, event_type: str, description: str, metadata: dict = None, request=None):

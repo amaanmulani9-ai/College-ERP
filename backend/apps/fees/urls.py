@@ -25,7 +25,9 @@ router.register(r"receipts", FeeReceiptViewSet, basename="fee-receipt")
 urlpatterns = [
     path("assign/", StudentFeeViewSet.as_view({"post": "assign"}), name="fees-assign"),
     path("pay/", FeeReceiptViewSet.as_view({"post": "pay"}), name="fees-pay"),
-    path("student/<str:student_id>/", StudentFeeViewSet.as_view({"get": "student_summary"}), name="fees-student-summary"),
+    path(
+        "student/<str:student_id>/", StudentFeeViewSet.as_view({"get": "student_summary"}), name="fees-student-summary"
+    ),
     path("outstanding/", StudentFeeViewSet.as_view({"get": "outstanding_report"}), name="fees-outstanding"),
     path("receipt/<str:receipt_id>/", FeeReceiptViewSet.as_view({"get": "get_receipt"}), name="fees-receipt-detail"),
     path("", include(router.urls)),

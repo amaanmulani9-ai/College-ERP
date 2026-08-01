@@ -1,17 +1,12 @@
 import json
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Q, Sum
 from .models import (
-    Parent, Student, StudentResult, AttendanceReport,
+    Parent, StudentResult, AttendanceReport,
     OnlineExamResult, FeeRecord, FeePayment, Timetable,
-    LeaveReportStudent, FeedbackParent, Subject, Session, Course,
-    IssuedBook, Assignment, AssignmentSubmission, NotificationStudent, StudentBehaviourRecord, Event, Exam
+    FeedbackParent, Subject, IssuedBook, Assignment, AssignmentSubmission, NotificationStudent, StudentBehaviourRecord, Exam
 )
 
 

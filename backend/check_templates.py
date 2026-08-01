@@ -31,7 +31,7 @@ for vf in view_files:
 
 missing_templates = sorted(list(set(missing_templates)))
 
-print(f"Checked templates in view files.")
+print("Checked templates in view files.")
 if missing_templates:
     print("\n--- MISSING TEMPLATES ---")
     for vf, t in missing_templates:

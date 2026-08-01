@@ -1,19 +1,15 @@
 import json
 from datetime import date, timedelta
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from django.utils import timezone
-from django.db.models import Count, Sum, Q, F
+from django.db.models import Count, Sum, Q
 from .models import (
-    CustomUser, Student, Staff, Course, Subject, Session,
+    CustomUser, Student, Staff, Course, Session,
     FeeRecord, FeePayment, CertificateRequest,
     LeaveReportStudent, LeaveReportStaff,
-    Attendance, AttendanceReport, Backoffice,
-    StudentRegistration, PlacementDrive, Parent, AdmissionQuery, Complaint
+    Backoffice,
+    StudentRegistration, Parent, AdmissionQuery, Complaint
 )
 
 

@@ -45,7 +45,9 @@ class StudentResultViewSet(viewsets.ModelViewSet):
         semester_id = request.data.get("semester")
 
         if not student_id or not semester_id:
-            return Response({"detail": "student and semester parameters are required."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "student and semester parameters are required."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         sem_res = ResultService.calculate_sgpa(student_id, semester_id)
         return Response(SemesterResultSerializer(sem_res).data, status=status.HTTP_200_OK)
@@ -96,7 +98,10 @@ class SemesterResultViewSet(viewsets.ModelViewSet):
         semester_id = str(serializer.validated_data["semester_id"])
 
         count = ResultService.publish_result(semester_id, actor=request.user, request=request)
-        return Response({"published_count": count, "message": f"Successfully published results for {count} students."}, status=status.HTTP_200_OK)
+        return Response(
+            {"published_count": count, "message": f"Successfully published results for {count} students."},
+            status=status.HTTP_200_OK,
+        )
 
     @action(detail=False, methods=["post"], url_path="rank")
     def rank_generation(self, request):
@@ -109,5 +114,7 @@ class SemesterResultViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="semester/(?P<semester_id>[^/.]+)")
     def semester_summary(self, request, semester_id=None):
-        results = SemesterResult.objects.filter(semester_id=semester_id, is_deleted=False).select_related("student__profile")
+        results = SemesterResult.objects.filter(semester_id=semester_id, is_deleted=False).select_related(
+            "student__profile"
+        )
         return Response(SemesterResultSerializer(results, many=True).data, status=status.HTTP_200_OK)

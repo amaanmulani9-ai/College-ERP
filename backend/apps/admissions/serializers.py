@@ -1,7 +1,6 @@
-from rest_framework import serializers
-
 from apps.academics.serializers import AcademicSessionSerializer, DepartmentSerializer, ProgramSerializer
 from apps.students.serializers import StudentSerializer
+from rest_framework import serializers
 
 from .models import (
     AdmissionApplication,

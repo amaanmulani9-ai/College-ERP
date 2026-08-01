@@ -1,9 +1,41 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import include, path
 
+def api_root(request):
+    return JsonResponse({
+        "name": "College ERP REST API",
+        "version": "v0.20.0",
+        "status": "healthy",
+        "frontend_url": "http://localhost:5173/",
+        "admin_url": "http://localhost:8000/admin/",
+        "endpoints": [
+            "/admin/",
+            "/api/auth/",
+            "/api/tenancy/",
+            "/api/rbac/",
+            "/api/profiles/",
+            "/api/academics/",
+            "/api/students/",
+            "/api/staff/",
+            "/api/admissions/",
+            "/api/timetable/",
+            "/api/attendance/",
+            "/api/examinations/",
+            "/api/results/",
+            "/api/certificates/",
+            "/api/fees/",
+            "/api/payments/",
+            "/api/scholarships/",
+            "/api/library/",
+            "/api/hostel/"
+        ]
+    })
+
 urlpatterns = [
+    path("", api_root),
     path("admin/", admin.site.urls),
     path("api/", include("apps.core.urls")),
     path("api/tenancy/", include("apps.tenancy.urls")),

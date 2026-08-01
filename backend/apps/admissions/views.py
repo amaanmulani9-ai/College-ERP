@@ -1,10 +1,9 @@
-from django.db.models import Count, Q
+from apps.authentication.models import User
+from django.db.models import Count
 from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
-from apps.authentication.models import User
 
 from .models import AdmissionApplication, AdmissionDocument, SeatMatrix
 from .serializers import (
@@ -95,9 +94,7 @@ class AdmissionApplicationViewSet(viewsets.ModelViewSet):
         remarks = serializer.validated_data.get("remarks", "")
 
         try:
-            updated = transition_application(
-                app, new_status, actor=request.user, remarks=remarks, request=request
-            )
+            updated = transition_application(app, new_status, actor=request.user, remarks=remarks, request=request)
             return Response(AdmissionApplicationSerializer(updated).data, status=status.HTTP_200_OK)
         except ValueError as exc:
             return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
@@ -132,6 +129,7 @@ class AdmissionApplicationViewSet(viewsets.ModelViewSet):
             return Response({"detail": "target_status is required for rollback."}, status=status.HTTP_400_BAD_REQUEST)
         try:
             from .services import rollback_application
+
             updated = rollback_application(app, target_status, actor=request.user, remarks=remarks, request=request)
             return Response(AdmissionApplicationSerializer(updated).data, status=status.HTTP_200_OK)
         except ValueError as exc:
@@ -231,9 +229,7 @@ class AdmissionDocumentViewSet(viewsets.ModelViewSet):
         status_val = serializer.validated_data["status"]
         remarks = serializer.validated_data.get("remarks", "")
 
-        updated = review_document(
-            document, status_val, actor=request.user, remarks=remarks, request=request
-        )
+        updated = review_document(document, status_val, actor=request.user, remarks=remarks, request=request)
         return Response(AdmissionDocumentSerializer(updated).data, status=status.HTTP_200_OK)
 
 
@@ -258,16 +254,10 @@ class AdmissionDashboardView(generics.GenericAPIView):
 
     def get(self, request):
         total_apps = AdmissionApplication.objects.count()
-        status_counts = (
-            AdmissionApplication.objects.values("status")
-            .annotate(count=Count("id"))
-            .order_by("-count")
-        )
+        status_counts = AdmissionApplication.objects.values("status").annotate(count=Count("id")).order_by("-count")
 
         program_breakdown = (
-            AdmissionApplication.objects.values("program__name")
-            .annotate(count=Count("id"))
-            .order_by("-count")
+            AdmissionApplication.objects.values("program__name").annotate(count=Count("id")).order_by("-count")
         )
 
         pending_documents = AdmissionDocument.objects.filter(review_status="pending").count()

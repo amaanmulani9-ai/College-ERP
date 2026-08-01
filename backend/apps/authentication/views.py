@@ -3,9 +3,8 @@ from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenRefreshView
 
-from .models import User, TokenRecord
+from .models import TokenRecord, User
 from .serializers import (
     ChangePasswordSerializer,
     ForgotPasswordSerializer,
@@ -164,7 +163,9 @@ class ResetPasswordView(generics.GenericAPIView):
         try:
             record = TokenRecord.objects.get(token=token_str, token_type="password_reset")
             if not record.is_valid():
-                return Response({"token": ["Token has expired or already been used."]}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"token": ["Token has expired or already been used."]}, status=status.HTTP_400_BAD_REQUEST
+                )
 
             user = record.user
             user.set_password(new_password)
@@ -191,7 +192,9 @@ class VerifyEmailView(generics.GenericAPIView):
         try:
             record = TokenRecord.objects.get(token=token_str, token_type="email_verification")
             if not record.is_valid():
-                return Response({"token": ["Token has expired or already been used."]}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"token": ["Token has expired or already been used."]}, status=status.HTTP_400_BAD_REQUEST
+                )
 
             user = record.user
             user.is_email_verified = True

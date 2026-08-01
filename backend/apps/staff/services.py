@@ -1,5 +1,7 @@
 import datetime
+
 from apps.authentication.services import log_audit_event
+
 from .models import Employee, EmployeeStatusHistory
 
 
@@ -66,7 +68,9 @@ def resign_employee(employee, reason, actor=None, request=None):
 
 
 def retire_employee(employee, actor=None, request=None):
-    return transition_employee_status(employee, "retired", actor=actor, reason="Superannuation retirement", request=request)
+    return transition_employee_status(
+        employee, "retired", actor=actor, reason="Superannuation retirement", request=request
+    )
 
 
 def terminate_employee(employee, reason, actor=None, request=None):
@@ -77,7 +81,12 @@ def soft_delete_employee(employee, actor=None, request=None):
     employee.is_deleted = True
     employee.save(update_fields=["is_deleted", "updated_at"])
     if request:
-        log_audit_event(request, event_type="employee_deleted", user=actor or request.user, details={"employee_id": employee.employee_id})
+        log_audit_event(
+            request,
+            event_type="employee_deleted",
+            user=actor or request.user,
+            details={"employee_id": employee.employee_id},
+        )
     return True
 
 
@@ -85,5 +94,10 @@ def restore_employee(employee, actor=None, request=None):
     employee.is_deleted = False
     employee.save(update_fields=["is_deleted", "updated_at"])
     if request:
-        log_audit_event(request, event_type="employee_restored", user=actor or request.user, details={"employee_id": employee.employee_id})
+        log_audit_event(
+            request,
+            event_type="employee_restored",
+            user=actor or request.user,
+            details={"employee_id": employee.employee_id},
+        )
     return employee

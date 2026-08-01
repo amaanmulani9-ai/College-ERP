@@ -1,4 +1,5 @@
 import os
+
 from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
@@ -26,7 +27,9 @@ def health_database(request):
         status["error"] = str(e)
         status_code = 503
 
-    return JsonResponse({"status": "healthy" if status_code == 200 else "unhealthy", "database": status}, status=status_code)
+    return JsonResponse(
+        {"status": "healthy" if status_code == 200 else "unhealthy", "database": status}, status=status_code
+    )
 
 
 @require_GET
@@ -41,7 +44,9 @@ def health_redis(request):
         status["error"] = str(e)
         status_code = 503
 
-    return JsonResponse({"status": "healthy" if status_code == 200 else "unhealthy", "redis": status}, status=status_code)
+    return JsonResponse(
+        {"status": "healthy" if status_code == 200 else "unhealthy", "redis": status}, status=status_code
+    )
 
 
 @require_GET
@@ -61,7 +66,9 @@ def health_storage(request):
         status["error"] = str(e)
         status_code = 503
 
-    return JsonResponse({"status": "healthy" if status_code == 200 else "unhealthy", "storage": status}, status=status_code)
+    return JsonResponse(
+        {"status": "healthy" if status_code == 200 else "unhealthy", "storage": status}, status=status_code
+    )
 
 
 @require_GET

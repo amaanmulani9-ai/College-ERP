@@ -3,6 +3,7 @@ Hostel Signals
 ==============
 Signal listeners for hostel domain events.
 """
+
 import logging
 
 from django.db.models.signals import post_save

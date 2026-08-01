@@ -1,5 +1,4 @@
 import os
-import sys
 import django
 from django.template.loader import render_to_string
 from django.test import RequestFactory

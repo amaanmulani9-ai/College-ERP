@@ -1,14 +1,13 @@
 import json
-from datetime import date
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.utils import timezone
-from .models import CustomUser, Student, Staff, Parent, Course, Session, Timetable, LiveClass, FeeRecord, ChatMessage, NotificationStudent, NotificationStaff
+from .models import CustomUser, Student, Staff, Parent, Course, Session, LiveClass, FeeRecord, ChatMessage, NotificationStudent, NotificationStaff
 from .communication_helper import send_email_brevo, send_sms_twilio, send_fcm_push, build_whatsapp_link, normalize_whatsapp_number
 
 @login_required

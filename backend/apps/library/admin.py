@@ -35,7 +35,17 @@ class PublisherAdmin(admin.ModelAdmin):
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    list_display = ("title", "isbn", "barcode", "author", "category", "copies", "available_copies", "shelf_number", "status")
+    list_display = (
+        "title",
+        "isbn",
+        "barcode",
+        "author",
+        "category",
+        "copies",
+        "available_copies",
+        "shelf_number",
+        "status",
+    )
     list_filter = ("status", "category", "language")
     search_fields = ("title", "isbn", "barcode", "author__name")
     readonly_fields = ("id", "available_copies", "created_at", "updated_at")
@@ -66,6 +76,7 @@ class LibraryAuditLogAdmin(admin.ModelAdmin):
 
     def description_short(self, obj):
         return obj.description[:60]
+
     description_short.short_description = "Description"
 
     def has_add_permission(self, request):

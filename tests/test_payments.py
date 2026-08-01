@@ -12,14 +12,11 @@ Tests:
 8. Student Payment History API
 9. Permissions & Access Control (IsPaymentOfficerOrAdmin, IsStudentOrPaymentOfficer)
 """
+
 import decimal
-import uuid
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
-from django.contrib.auth import get_user_model
-from rest_framework.test import APIClient
-
 from apps.academics.models import AcademicSession, Department, Faculty, Program, Semester
 from apps.fees.models import FeeCategory, FeeStructure, StudentFee
 from apps.payments.gateways import GatewayFactory, RazorpayGateway
@@ -28,11 +25,11 @@ from apps.payments.models import (
     PaymentGateway,
     PaymentOrder,
     PaymentTransaction,
-    Refund,
-    WebhookLog,
 )
 from apps.payments.services import PaymentService
 from apps.students.models import Student
+from django.contrib.auth import get_user_model
+from rest_framework.test import APIClient
 
 User = get_user_model()
 
@@ -59,13 +56,12 @@ def setup_data(db):
     faculty = Faculty.objects.create(name="Engineering", code="ENG-PAY")
     department = Department.objects.create(name="CS", code="CS-PAY", faculty=faculty)
     program = Program.objects.create(name="B.Tech CS", code="BTCS-PAY", department=department)
-    academic_session = AcademicSession.objects.create(
-        name="2026-2027", start_date="2026-08-01", end_date="2027-05-31"
-    )
+    academic_session = AcademicSession.objects.create(name="2026-2027", start_date="2026-08-01", end_date="2027-05-31")
     semester = Semester.objects.create(program=program, semester_number=1, name="Sem 1 PAY")
 
-    from apps.profiles.models import UserProfile
     from datetime import date
+
+    from apps.profiles.models import UserProfile
 
     user_profile, _ = UserProfile.objects.get_or_create(user=user)
     student = Student.objects.create(
@@ -121,6 +117,7 @@ def setup_data(db):
 # 1. Gateway Unit Tests
 # ===========================================================================
 
+
 def test_gateway_factory():
     config = {"key_id": "k", "key_secret": "s"}
     gw = GatewayFactory.get("razorpay", config)
@@ -138,6 +135,7 @@ def test_razorpay_signature_verification(setup_data):
     # Compute expected signature
     import hashlib
     import hmac
+
     msg = f"{order_id}|{payment_id}".encode("utf-8")
     secret = setup_data["gateway"].config["key_secret"].encode("utf-8")
     valid_sig = hmac.new(secret, msg, hashlib.sha256).hexdigest()
@@ -149,6 +147,7 @@ def test_razorpay_signature_verification(setup_data):
 # ===========================================================================
 # 2. Service Unit Tests
 # ===========================================================================
+
 
 @patch("apps.payments.gateways.RazorpayGateway.create_order")
 def test_create_order_service_success(mock_create_order, setup_data):
@@ -289,7 +288,7 @@ def test_refund_validation_over_amount(setup_data):
         amount=decimal.Decimal("1000.00"),
         status="paid",
     )
-    txn = PaymentTransaction.objects.create(
+    _ = PaymentTransaction.objects.create(
         student=setup_data["student"],
         order=order,
         gateway=setup_data["gateway"],
@@ -357,6 +356,7 @@ def test_webhook_handler_and_idempotency(setup_data):
 # 3. REST API ViewSet Tests
 # ===========================================================================
 
+
 @patch("apps.payments.gateways.RazorpayGateway.create_order")
 def test_create_order_api(mock_create_order, setup_data):
     mock_create_order.return_value = {
@@ -386,7 +386,7 @@ def test_create_order_api(mock_create_order, setup_data):
 
 @patch("apps.payments.gateways.RazorpayGateway.verify_signature", return_value=True)
 def test_verify_payment_api(mock_verify_sig, setup_data):
-    order = PaymentOrder.objects.create(
+    _ = PaymentOrder.objects.create(
         student=setup_data["student"],
         student_fee=setup_data["student_fee"],
         gateway=setup_data["gateway"],

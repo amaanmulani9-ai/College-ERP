@@ -29,7 +29,6 @@ urlpatterns = [
     path("fines/", BookIssueViewSet.as_view({"get": "fines_report"}), name="library-fines-report"),
     path("lost/", BookIssueViewSet.as_view({"post": "lost"}), name="library-lost"),
     path("damaged/", BookIssueViewSet.as_view({"post": "damaged"}), name="library-damaged"),
-
     # Router URLs
     path("", include(router.urls)),
 ]
