@@ -132,6 +132,9 @@ import { HODDashboardPage } from "./pages/dashboard/HODDashboardPage";
 import { TeacherDashboardPage } from "./pages/dashboard/TeacherDashboardPage";
 import { StudentDashboardPage } from "./pages/dashboard/StudentDashboardPage";
 import { ParentDashboardPage } from "./pages/dashboard/ParentDashboardPage";
+import { AccountantDashboardPage } from "./pages/dashboard/AccountantDashboardPage";
+import { LibrarianDashboardPage } from "./pages/dashboard/LibrarianDashboardPage";
+import { HostelWardenDashboardPage } from "./pages/dashboard/HostelWardenDashboardPage";
 
 // Lazy Loaded Public Pages for Optimized Performance
 const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
@@ -210,6 +213,9 @@ export const App: React.FC = () => {
             <Route path="/dashboard/teacher" element={<TeacherDashboardPage />} />
             <Route path="/dashboard/student" element={<StudentDashboardPage />} />
             <Route path="/dashboard/parent" element={<ParentDashboardPage />} />
+            <Route path="/dashboard/accountant" element={<AccountantDashboardPage />} />
+            <Route path="/dashboard/library" element={<LibrarianDashboardPage />} />
+            <Route path="/dashboard/hostel" element={<HostelWardenDashboardPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/profile" element={<ProfilePage />} />
 
