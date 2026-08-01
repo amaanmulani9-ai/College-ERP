@@ -185,6 +185,21 @@ import { LoanPage } from "./pages/payroll/LoanPage";
 import { TaxSlabPage } from "./pages/payroll/TaxSlabPage";
 import { ReportsPage as PayrollReportsPage } from "./pages/payroll/ReportsPage";
 
+// ─── HR Management ─────────────────────────────────────────────────────────
+import { HRDashboardPage } from "./pages/hr/HRDashboardPage";
+import { DepartmentPage as HRDepartmentPage } from "./pages/hr/DepartmentPage";
+import { DesignationPage as HRDesignationPage } from "./pages/hr/DesignationPage";
+import { LeaveRequestPage } from "./pages/hr/LeaveRequestPage";
+import { RecruitmentPage } from "./pages/hr/RecruitmentPage";
+import { OnboardingPage } from "./pages/hr/OnboardingPage";
+import { PerformancePage } from "./pages/hr/PerformancePage";
+import { TrainingPage } from "./pages/hr/TrainingPage";
+import { PromotionTransferPage } from "./pages/hr/PromotionTransferPage";
+import { ResignationExitPage } from "./pages/hr/ResignationExitPage";
+import { DisciplinaryPage } from "./pages/hr/DisciplinaryPage";
+import { AnnouncementsPage } from "./pages/hr/AnnouncementsPage";
+import { ReportsPage as HRReportsPage } from "./pages/hr/ReportsPage";
+
 // ─── Lazy Loaded Public Pages ─────────────────────────────────────────────
 const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
 const AboutPage = lazy(() => import("./pages/public/AboutPage").then(m => ({ default: m.AboutPage })));
@@ -419,6 +434,22 @@ export const App: React.FC = () => {
                   <Route path="/payroll/loans" element={<LoanPage />} />
                   <Route path="/payroll/tax-slabs" element={<TaxSlabPage />} />
                   <Route path="/payroll/reports" element={<PayrollReportsPage />} />
+
+                  {/* HR Management */}
+                  <Route path="/hr" element={<HRDashboardPage />} />
+                  <Route path="/hr/dashboard" element={<HRDashboardPage />} />
+                  <Route path="/hr/departments" element={<HRDepartmentPage />} />
+                  <Route path="/hr/designations" element={<HRDesignationPage />} />
+                  <Route path="/hr/leaves" element={<LeaveRequestPage />} />
+                  <Route path="/hr/recruitment" element={<RecruitmentPage />} />
+                  <Route path="/hr/onboarding" element={<OnboardingPage />} />
+                  <Route path="/hr/performance" element={<PerformancePage />} />
+                  <Route path="/hr/training" element={<TrainingPage />} />
+                  <Route path="/hr/promotions-transfers" element={<PromotionTransferPage />} />
+                  <Route path="/hr/resignations-exits" element={<ResignationExitPage />} />
+                  <Route path="/hr/disciplinary" element={<DisciplinaryPage />} />
+                  <Route path="/hr/announcements" element={<AnnouncementsPage />} />
+                  <Route path="/hr/reports" element={<HRReportsPage />} />
 
                   {/* Reports */}
                   <Route path="/reports/naac-nirf" element={<SuperAdminDashboardPage />} />

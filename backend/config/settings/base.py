@@ -58,6 +58,7 @@ SHARED_APPS = (
     "apps.hostel",
     "apps.transport",
     "apps.payroll",
+    "apps.hr",
 )
 
 
@@ -92,6 +93,7 @@ TENANT_APPS = (
     "apps.hostel",
     "apps.transport",
     "apps.payroll",
+    "apps.hr",
 )
 
 

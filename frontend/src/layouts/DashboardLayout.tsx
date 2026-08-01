@@ -111,6 +111,7 @@ export const DashboardLayout: React.FC = () => {
         { label: "Admissions Portal", route: "/admissions", icon: <Users className="w-4 h-4" /> },
         { label: "Faculty & Staff", route: "/staff", icon: <UserCheck className="w-4 h-4" /> },
         { label: "Parent Portal", route: "/parents", icon: <Users className="w-4 h-4" /> },
+        { label: "HR & Personnel", route: "/hr", icon: <Users className="w-4 h-4" /> },
       ],
     },
     {
