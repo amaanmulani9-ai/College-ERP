@@ -1,62 +1,78 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Briefcase, MapPin, ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { Briefcase, Heart, Rocket, Shield, Users, ArrowRight, CheckCircle2 } from "lucide-react";
 
 export const CareersPage: React.FC = () => {
-  const jobs = [
-    { title: "Senior Python / Django Architect", team: "Core Backend & Multi-Tenancy", location: "Remote / Silicon Valley / Mumbai", type: "Full-Time" },
-    { title: "Staff Frontend Engineer (React 19 / Vite)", team: "Design System & UI Architecture", location: "Remote / Hybrid", type: "Full-Time" },
-    { title: "AI / ML Solutions Engineer", team: "Predictive Analytics & Ollama Advising", location: "Remote / Hybrid", type: "Full-Time" },
-    { title: "Enterprise Technical Account Manager", team: "Institutional Growth", location: "Mumbai / New Delhi / Bangalore", type: "Full-Time" },
+  useEffect(() => {
+    document.title = "Careers & Open Positions | College ERP";
+  }, []);
+
+  const cultureBenefits = [
+    { icon: <Rocket className="w-5 h-5 text-indigo-400" />, title: "High-Impact Engineering", desc: "Build systems that serve thousands of institutions and millions of students daily." },
+    { icon: <Heart className="w-5 h-5 text-pink-400" />, title: "Remote-First & Flexible", desc: "Work from anywhere with flexible hours and generous personal leave." },
+    { icon: <Shield className="w-5 h-5 text-emerald-400" />, title: "Competitive Package", desc: "Top-of-market salary, equity options, health insurance, and learning stipends." },
+    { icon: <Users className="w-5 h-5 text-amber-400" />, title: "Inclusive Environment", desc: "Collaborative, transparent culture focused on continuous learning." },
+  ];
+
+  const positions = [
+    { title: "Senior Python / Django Architect", dept: "Backend Engineering", loc: "Remote", type: "Full-Time" },
+    { title: "Senior React 19 Frontend Developer", dept: "UI Engineering", loc: "Remote", type: "Full-Time" },
+    { title: "SaaS Multi-Tenant DevOps Specialist", dept: "Infrastructure", loc: "Remote", type: "Full-Time" },
+    { title: "Enterprise Account Executive", dept: "Institutional Sales", loc: "New Delhi / Remote", type: "Full-Time" },
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+    <div className="pt-10 pb-20 space-y-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center max-w-3xl mx-auto space-y-4">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-950/80 border border-indigo-800/60 text-indigo-300 text-xs font-semibold">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-950/80 border border-indigo-500/30 text-indigo-300 text-xs font-semibold backdrop-blur-md">
           <Briefcase className="w-3.5 h-3.5 text-indigo-400" />
-          We Are Hiring
+          Join Our Mission
         </div>
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-white">
-          Build the Future of{" "}
-          <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-            Educational SaaS
-          </span>
+        <h1 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight leading-tight">
+          Shape the Future of Higher Education Software
         </h1>
-        <p className="text-slate-300 text-base">
-          Join our mission to empower thousands of colleges and universities with next-generation automated ERP systems.
+        <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+          We are an ambitious team of engineers, designers, and domain experts building next-generation SaaS tools.
         </p>
       </div>
 
-      {/* Jobs Grid */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold text-white mb-6">Open Engineering & Product Positions</h2>
-        {jobs.map((j, idx) => (
-          <div
-            key={idx}
-            className="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-indigo-500/40 transition-colors"
-          >
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white">{j.title}</h3>
-                <span className="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded font-mono font-semibold">
-                  {j.type}
-                </span>
-              </div>
-              <p className="text-xs text-slate-400">{j.team}</p>
-              <div className="flex items-center gap-1 text-[11px] text-slate-500 pt-1">
-                <MapPin className="w-3 h-3 text-indigo-400" /> {j.location}
-              </div>
+      {/* Benefits */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {cultureBenefits.map((b, idx) => (
+          <div key={idx} className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 backdrop-blur-xl space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center">
+              {b.icon}
             </div>
-
-            <Link
-              to="/contact"
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl transition-all self-start md:self-center inline-flex items-center gap-1.5"
-            >
-              Apply Now <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+            <h3 className="text-base font-bold text-white">{b.title}</h3>
+            <p className="text-xs text-slate-400 leading-relaxed">{b.desc}</p>
           </div>
         ))}
+      </div>
+
+      {/* Open Positions */}
+      <div className="space-y-6">
+        <div className="text-center max-w-xl mx-auto">
+          <h2 className="text-2xl font-bold text-white">Current Open Positions</h2>
+          <p className="text-xs text-slate-400 mt-1">Explore open roles across engineering, sales, and product design.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {positions.map((p, idx) => (
+            <div key={idx} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 backdrop-blur-xl flex items-center justify-between hover:border-indigo-500/40 transition-colors">
+              <div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">
+                  {p.dept}
+                </span>
+                <h3 className="text-base font-bold text-white mt-1.5">{p.title}</h3>
+                <p className="text-xs text-slate-400 mt-0.5">{p.loc} • {p.type}</p>
+              </div>
+              <Link to="/contact" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white rounded-xl transition-colors flex items-center gap-1">
+                Apply <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

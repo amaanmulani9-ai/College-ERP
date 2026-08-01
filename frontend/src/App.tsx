@@ -123,6 +123,7 @@ import { HelpPage } from "./pages/public/HelpPage";
 import { CareersPage } from "./pages/public/CareersPage";
 import { BlogPage } from "./pages/public/BlogPage";
 import { DemoPage } from "./pages/public/DemoPage";
+import { StatusPage } from "./pages/public/StatusPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -153,6 +154,7 @@ export const App: React.FC = () => {
             <Route path="/careers" element={<CareersPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/demo" element={<DemoPage />} />
+            <Route path="/status" element={<StatusPage />} />
           </Route>
 
           {/* Institutional Dashboard & ERP App Routes */}
