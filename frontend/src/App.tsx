@@ -215,6 +215,19 @@ import { StockAdjustmentPage } from "./pages/inventory/StockAdjustmentPage";
 import { ReorderAlertsPage } from "./pages/inventory/ReorderAlertsPage";
 import { ReportsPage as InventoryReportsPage } from "./pages/inventory/ReportsPage";
 
+// ─── Procurement & Purchase Management ────────────────────────────────────
+import { ProcurementDashboardPage } from "./pages/procurement/ProcurementDashboardPage";
+import { PurchaseRequisitionPage } from "./pages/procurement/PurchaseRequisitionPage";
+import { ApprovalPage as ProcurementApprovalPage } from "./pages/procurement/ApprovalPage";
+import { RFQPage } from "./pages/procurement/RFQPage";
+import { QuotationPage } from "./pages/procurement/QuotationPage";
+import { QuotationComparisonPage } from "./pages/procurement/QuotationComparisonPage";
+import { PurchaseOrderPage } from "./pages/procurement/PurchaseOrderPage";
+import { InvoicePage as PurchaseInvoicePage } from "./pages/procurement/InvoicePage";
+import { PaymentsPage as PurchasePaymentsPage } from "./pages/procurement/PaymentsPage";
+import { VendorContractsPage } from "./pages/procurement/VendorContractsPage";
+import { ReportsPage as ProcurementReportsPage } from "./pages/procurement/ReportsPage";
+
 // ─── Lazy Loaded Public Pages ─────────────────────────────────────────────
 const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
 const AboutPage = lazy(() => import("./pages/public/AboutPage").then(m => ({ default: m.AboutPage })));
@@ -481,6 +494,20 @@ export const App: React.FC = () => {
                   <Route path="/inventory/adjustments" element={<StockAdjustmentPage />} />
                   <Route path="/inventory/reorder-alerts" element={<ReorderAlertsPage />} />
                   <Route path="/inventory/reports" element={<InventoryReportsPage />} />
+
+                  {/* Procurement & Purchase Management */}
+                  <Route path="/procurement" element={<ProcurementDashboardPage />} />
+                  <Route path="/procurement/dashboard" element={<ProcurementDashboardPage />} />
+                  <Route path="/procurement/requisitions" element={<PurchaseRequisitionPage />} />
+                  <Route path="/procurement/approvals" element={<ProcurementApprovalPage />} />
+                  <Route path="/procurement/rfqs" element={<RFQPage />} />
+                  <Route path="/procurement/quotations" element={<QuotationPage />} />
+                  <Route path="/procurement/comparisons" element={<QuotationComparisonPage />} />
+                  <Route path="/procurement/orders" element={<PurchaseOrderPage />} />
+                  <Route path="/procurement/invoices" element={<PurchaseInvoicePage />} />
+                  <Route path="/procurement/payments" element={<PurchasePaymentsPage />} />
+                  <Route path="/procurement/contracts" element={<VendorContractsPage />} />
+                  <Route path="/procurement/reports" element={<ProcurementReportsPage />} />
 
                   {/* Reports */}
                   <Route path="/reports/naac-nirf" element={<SuperAdminDashboardPage />} />
