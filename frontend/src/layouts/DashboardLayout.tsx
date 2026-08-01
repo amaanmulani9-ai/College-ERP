@@ -119,6 +119,7 @@ export const DashboardLayout: React.FC = () => {
         { label: "Fee Structures", route: "/fees", icon: <CreditCard className="w-4 h-4" /> },
         { label: "Payment Collections", route: "/payments", icon: <CreditCard className="w-4 h-4" /> },
         { label: "Scholarships", route: "/scholarships", icon: <CreditCard className="w-4 h-4" /> },
+        { label: "Payroll & Salaries", route: "/payroll", icon: <DollarSign className="w-4 h-4" /> },
       ],
     },
     {

@@ -31,7 +31,8 @@ def api_root(request):
             "/api/scholarships/",
             "/api/library/",
             "/api/hostel/",
-            "/api/transport/"
+            "/api/transport/",
+            "/api/payroll/"
         ]
     })
 
@@ -59,6 +60,7 @@ urlpatterns = [
     path("api/library/", include("apps.library.urls")),
     path("api/hostel/", include("apps.hostel.urls")),
     path("api/transport/", include("apps.transport.urls")),
+    path("api/payroll/", include("apps.payroll.urls")),
 ]
 
 if settings.DEBUG:

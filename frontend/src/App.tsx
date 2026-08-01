@@ -169,6 +169,22 @@ import { FuelLogsPage } from "./pages/transport/FuelLogsPage";
 import { TransportAttendancePage } from "./pages/transport/TransportAttendancePage";
 import { IncidentReportsPage } from "./pages/transport/IncidentReportsPage";
 
+// ─── Payroll Management ────────────────────────────────────────────────────
+import { PayrollDashboardPage } from "./pages/payroll/PayrollDashboardPage";
+import { SalaryStructurePage } from "./pages/payroll/SalaryStructurePage";
+import { SalaryComponentPage } from "./pages/payroll/SalaryComponentPage";
+import { EmployeeSalaryPage } from "./pages/payroll/EmployeeSalaryPage";
+import { PayrollCyclePage } from "./pages/payroll/PayrollCyclePage";
+import { PayrollRunPage } from "./pages/payroll/PayrollRunPage";
+import { PayslipPage } from "./pages/payroll/PayslipPage";
+import { AllowancePage } from "./pages/payroll/AllowancePage";
+import { DeductionPage } from "./pages/payroll/DeductionPage";
+import { BonusPage } from "./pages/payroll/BonusPage";
+import { OvertimePage } from "./pages/payroll/OvertimePage";
+import { LoanPage } from "./pages/payroll/LoanPage";
+import { TaxSlabPage } from "./pages/payroll/TaxSlabPage";
+import { ReportsPage as PayrollReportsPage } from "./pages/payroll/ReportsPage";
+
 // ─── Lazy Loaded Public Pages ─────────────────────────────────────────────
 const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
 const AboutPage = lazy(() => import("./pages/public/AboutPage").then(m => ({ default: m.AboutPage })));
@@ -386,6 +402,23 @@ export const App: React.FC = () => {
                   <Route path="/transport/fuel" element={<FuelLogsPage />} />
                   <Route path="/transport/attendance" element={<TransportAttendancePage />} />
                   <Route path="/transport/incidents" element={<IncidentReportsPage />} />
+
+                  {/* Payroll Management */}
+                  <Route path="/payroll" element={<PayrollDashboardPage />} />
+                  <Route path="/payroll/dashboard" element={<PayrollDashboardPage />} />
+                  <Route path="/payroll/structures" element={<SalaryStructurePage />} />
+                  <Route path="/payroll/components" element={<SalaryComponentPage />} />
+                  <Route path="/payroll/employee-salary" element={<EmployeeSalaryPage />} />
+                  <Route path="/payroll/cycles" element={<PayrollCyclePage />} />
+                  <Route path="/payroll/runs" element={<PayrollRunPage />} />
+                  <Route path="/payroll/payslips" element={<PayslipPage />} />
+                  <Route path="/payroll/allowances" element={<AllowancePage />} />
+                  <Route path="/payroll/deductions" element={<DeductionPage />} />
+                  <Route path="/payroll/bonuses" element={<BonusPage />} />
+                  <Route path="/payroll/overtime" element={<OvertimePage />} />
+                  <Route path="/payroll/loans" element={<LoanPage />} />
+                  <Route path="/payroll/tax-slabs" element={<TaxSlabPage />} />
+                  <Route path="/payroll/reports" element={<PayrollReportsPage />} />
 
                   {/* Reports */}
                   <Route path="/reports/naac-nirf" element={<SuperAdminDashboardPage />} />
