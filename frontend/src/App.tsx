@@ -108,6 +108,22 @@ import { VisitorRegisterPage } from "./pages/VisitorRegisterPage";
 import { HostelMaintenancePage } from "./pages/HostelMaintenancePage";
 import { VacancyReportPage } from "./pages/VacancyReportPage";
 
+import { ThemeProvider } from "./context/ThemeContext";
+
+import { PublicLayout } from "./layouts/PublicLayout";
+import { HomePage } from "./pages/public/HomePage";
+import { AboutPage } from "./pages/public/AboutPage";
+import { FeaturesPage } from "./pages/public/FeaturesPage";
+import { ModulesPage } from "./pages/public/ModulesPage";
+import { PricingPage } from "./pages/public/PricingPage";
+import { ContactPage } from "./pages/public/ContactPage";
+import { PrivacyPage } from "./pages/public/PrivacyPage";
+import { TermsPage } from "./pages/public/TermsPage";
+import { HelpPage } from "./pages/public/HelpPage";
+import { CareersPage } from "./pages/public/CareersPage";
+import { BlogPage } from "./pages/public/BlogPage";
+import { DemoPage } from "./pages/public/DemoPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -119,11 +135,29 @@ const queryClient = new QueryClient({
 
 export const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Routes>
+          {/* Public Marketing Suite Routes */}
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/features" element={<FeaturesPage />} />
+            <Route path="/modules" element={<ModulesPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/help" element={<HelpPage />} />
+            <Route path="/careers" element={<CareersPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/demo" element={<DemoPage />} />
+          </Route>
+
+          {/* Institutional Dashboard & ERP App Routes */}
           <Route element={<MainLayout />}>
-            <Route path="/" element={<DashboardPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -248,6 +282,7 @@ export const App: React.FC = () => {
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
+  </ThemeProvider>
   );
 };
 
