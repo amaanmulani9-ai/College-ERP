@@ -125,7 +125,11 @@ import { SecuritySettingsPage } from "./pages/auth/SecuritySettingsPage";
 import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
 import { DashboardLayout } from "./layouts/DashboardLayout";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { RoleRoute } from "./components/auth/RoleRoute";
 import { SuperAdminDashboardPage } from "./pages/dashboard/SuperAdminDashboardPage";
+import { PrincipalDashboardPage } from "./pages/dashboard/PrincipalDashboardPage";
+import { HODDashboardPage } from "./pages/dashboard/HODDashboardPage";
+import { TeacherDashboardPage } from "./pages/dashboard/TeacherDashboardPage";
 
 // Lazy Loaded Public Pages for Optimized Performance
 const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
@@ -199,6 +203,9 @@ export const App: React.FC = () => {
           <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<SuperAdminDashboardPage />} />
             <Route path="/dashboard/super-admin" element={<SuperAdminDashboardPage />} />
+            <Route path="/dashboard/principal" element={<PrincipalDashboardPage />} />
+            <Route path="/dashboard/hod" element={<HODDashboardPage />} />
+            <Route path="/dashboard/teacher" element={<TeacherDashboardPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/profile" element={<ProfilePage />} />
 

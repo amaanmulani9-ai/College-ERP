@@ -1,8 +1,8 @@
 # Enterprise College ERP — Dashboard Framework & Design System
 
-**Version:** v0.20.3-ui-dashboard-part2  
+**Version:** v0.20.3-ui-dashboard-part3  
 **Updated:** August 1, 2026  
-**Status:** Super Admin Dashboard Integrated  
+**Status:** Academic Leadership Dashboards Complete  
 
 ---
 
@@ -31,7 +31,10 @@ frontend/src/
 │   └── DashboardLayout.tsx             # Master desktop & mobile dashboard layout wrapper
 └── pages/
     └── dashboard/
-        └── SuperAdminDashboardPage.tsx # Platform Super Admin Executive Dashboard (/dashboard/super-admin)
+        ├── SuperAdminDashboardPage.tsx # Platform Super Admin Dashboard (/dashboard/super-admin)
+        ├── PrincipalDashboardPage.tsx  # Principal Executive Dashboard (/dashboard/principal)
+        ├── HODDashboardPage.tsx        # Head of Department Dashboard (/dashboard/hod)
+        └── TeacherDashboardPage.tsx    # Faculty & Teacher Workbench (/dashboard/teacher)
 ```
 
 ---
@@ -39,6 +42,9 @@ frontend/src/
 ## 3. Implemented Role Dashboards
 
 - **Super Admin (`/dashboard/super-admin`):** Full multi-tenant SaaS platform management, 9 global KPI metrics, active tenant schema matrix, and 6 infrastructure health monitors.
+- **Principal (`/dashboard/principal`):** Executive academic overview, graduation rates, fee collection %, and department performance.
+- **HOD (`/dashboard/hod`):** Departmental student performance, faculty workload matrix, and course completion progress.
+- **Teacher (`/dashboard/teacher`):** Today's timetable schedule, pending attendance markers, low attendance student alerts (&lt;75%), and grade upload triggers.
 
 ---
 
