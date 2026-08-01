@@ -3,3 +3,4 @@ export * from "./Button";
 export * from "./Typography";
 export * from "./forms";
 export * from "./data";
+export * from "./feedback";
