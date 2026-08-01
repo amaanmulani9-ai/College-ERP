@@ -1,14 +1,14 @@
 # Enterprise College ERP — Dashboard Framework & Design System
 
-**Version:** v0.20.3-ui-dashboard-part3  
+**Version:** v0.20.3-ui-dashboard-part4  
 **Updated:** August 1, 2026  
-**Status:** Academic Leadership Dashboards Complete  
+**Status:** Student & Parent Dashboards Integrated  
 
 ---
 
 ## 1. Executive Summary
 
-The Enterprise Dashboard Framework provides a unified, highly responsive layout (`DashboardLayout.tsx`) for all 14 RBAC user roles across College ERP. It includes a collapsible multi-group sidebar, a top navigation bar with tenant and academic session indicators, an auto-generating breadcrumbs bar, a floating command palette trigger (`⌘K`), and a reusable widget component library.
+The Enterprise Dashboard Framework provides a unified, highly responsive layout (`DashboardLayout.tsx`) for all 14 RBAC user roles across College ERP. It includes a collapsible multi-group sidebar, top navigation with tenant/session indicators, auto-generating breadcrumbs, a floating command palette trigger (`⌘K`), and a reusable widget component library.
 
 ---
 
@@ -31,20 +31,26 @@ frontend/src/
 │   └── DashboardLayout.tsx             # Master desktop & mobile dashboard layout wrapper
 └── pages/
     └── dashboard/
-        ├── SuperAdminDashboardPage.tsx # Platform Super Admin Dashboard (/dashboard/super-admin)
-        ├── PrincipalDashboardPage.tsx  # Principal Executive Dashboard (/dashboard/principal)
+        ├── SuperAdminDashboardPage.tsx # SaaS Platform Super Admin Dashboard (/dashboard/super-admin)
+        ├── PrincipalDashboardPage.tsx  # Institution Principal Executive Dashboard (/dashboard/principal)
         ├── HODDashboardPage.tsx        # Head of Department Dashboard (/dashboard/hod)
-        └── TeacherDashboardPage.tsx    # Faculty & Teacher Workbench (/dashboard/teacher)
+        ├── TeacherDashboardPage.tsx    # Faculty & Teacher Workbench (/dashboard/teacher)
+        ├── StudentDashboardPage.tsx    # Student Academic Portal (/dashboard/student)
+        └── ParentDashboardPage.tsx     # Parent Guardian Oversight Portal (/dashboard/parent)
 ```
 
 ---
 
 ## 3. Implemented Role Dashboards
 
-- **Super Admin (`/dashboard/super-admin`):** Full multi-tenant SaaS platform management, 9 global KPI metrics, active tenant schema matrix, and 6 infrastructure health monitors.
-- **Principal (`/dashboard/principal`):** Executive academic overview, graduation rates, fee collection %, and department performance.
-- **HOD (`/dashboard/hod`):** Departmental student performance, faculty workload matrix, and course completion progress.
-- **Teacher (`/dashboard/teacher`):** Today's timetable schedule, pending attendance markers, low attendance student alerts (&lt;75%), and grade upload triggers.
+| Route | Dashboard | RBAC Role |
+|-------|-----------|-----------|
+| `/dashboard/super-admin` | SaaS Platform Operations Panel | super_admin |
+| `/dashboard/principal` | Executive Academic Operations | principal |
+| `/dashboard/hod` | Departmental Oversight | hod |
+| `/dashboard/teacher` | Faculty Workbench | teacher |
+| `/dashboard/student` | Student Academic Portal | student |
+| `/dashboard/parent` | Parent Guardian Dashboard | parent |
 
 ---
 

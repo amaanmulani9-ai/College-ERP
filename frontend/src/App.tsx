@@ -130,6 +130,8 @@ import { SuperAdminDashboardPage } from "./pages/dashboard/SuperAdminDashboardPa
 import { PrincipalDashboardPage } from "./pages/dashboard/PrincipalDashboardPage";
 import { HODDashboardPage } from "./pages/dashboard/HODDashboardPage";
 import { TeacherDashboardPage } from "./pages/dashboard/TeacherDashboardPage";
+import { StudentDashboardPage } from "./pages/dashboard/StudentDashboardPage";
+import { ParentDashboardPage } from "./pages/dashboard/ParentDashboardPage";
 
 // Lazy Loaded Public Pages for Optimized Performance
 const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
@@ -206,6 +208,8 @@ export const App: React.FC = () => {
             <Route path="/dashboard/principal" element={<PrincipalDashboardPage />} />
             <Route path="/dashboard/hod" element={<HODDashboardPage />} />
             <Route path="/dashboard/teacher" element={<TeacherDashboardPage />} />
+            <Route path="/dashboard/student" element={<StudentDashboardPage />} />
+            <Route path="/dashboard/parent" element={<ParentDashboardPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/profile" element={<ProfilePage />} />
 
