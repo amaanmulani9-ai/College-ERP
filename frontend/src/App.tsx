@@ -125,6 +125,7 @@ import { SecuritySettingsPage } from "./pages/auth/SecuritySettingsPage";
 import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
 import { DashboardLayout } from "./layouts/DashboardLayout";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+import { SuperAdminDashboardPage } from "./pages/dashboard/SuperAdminDashboardPage";
 
 // Lazy Loaded Public Pages for Optimized Performance
 const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
@@ -196,7 +197,8 @@ export const App: React.FC = () => {
 
           {/* Institutional Dashboard & ERP App Routes */}
           <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/dashboard" element={<SuperAdminDashboardPage />} />
+            <Route path="/dashboard/super-admin" element={<SuperAdminDashboardPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/profile" element={<ProfilePage />} />
 
