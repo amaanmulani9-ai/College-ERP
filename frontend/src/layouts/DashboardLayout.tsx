@@ -129,6 +129,7 @@ export const DashboardLayout: React.FC = () => {
         { label: "Digital Library", route: "/library", icon: <Building className="w-4 h-4" /> },
         { label: "Hostels & Beds", route: "/hostel", icon: <Building className="w-4 h-4" /> },
         { label: "Transport & Fleet", route: "/transport", icon: <Bus className="w-4 h-4" /> },
+        { label: "Inventory & Stores", route: "/inventory", icon: <Package className="w-4 h-4" /> },
       ],
     },
     {

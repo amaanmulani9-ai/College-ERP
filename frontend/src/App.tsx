@@ -200,6 +200,21 @@ import { DisciplinaryPage } from "./pages/hr/DisciplinaryPage";
 import { AnnouncementsPage } from "./pages/hr/AnnouncementsPage";
 import { ReportsPage as HRReportsPage } from "./pages/hr/ReportsPage";
 
+// ─── Inventory & Store Management ──────────────────────────────────────────
+import { InventoryDashboardPage } from "./pages/inventory/InventoryDashboardPage";
+import { CategoryPage as InventoryCategoryPage } from "./pages/inventory/CategoryPage";
+import { WarehousePage } from "./pages/inventory/WarehousePage";
+import { SupplierPage } from "./pages/inventory/SupplierPage";
+import { InventoryItemsPage } from "./pages/inventory/InventoryItemsPage";
+import { StockPage } from "./pages/inventory/StockPage";
+import { PurchaseRequestPage } from "./pages/inventory/PurchaseRequestPage";
+import { GoodsReceiptPage } from "./pages/inventory/GoodsReceiptPage";
+import { IssueVoucherPage } from "./pages/inventory/IssueVoucherPage";
+import { ReturnVoucherPage } from "./pages/inventory/ReturnVoucherPage";
+import { StockAdjustmentPage } from "./pages/inventory/StockAdjustmentPage";
+import { ReorderAlertsPage } from "./pages/inventory/ReorderAlertsPage";
+import { ReportsPage as InventoryReportsPage } from "./pages/inventory/ReportsPage";
+
 // ─── Lazy Loaded Public Pages ─────────────────────────────────────────────
 const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
 const AboutPage = lazy(() => import("./pages/public/AboutPage").then(m => ({ default: m.AboutPage })));
@@ -450,6 +465,22 @@ export const App: React.FC = () => {
                   <Route path="/hr/disciplinary" element={<DisciplinaryPage />} />
                   <Route path="/hr/announcements" element={<AnnouncementsPage />} />
                   <Route path="/hr/reports" element={<HRReportsPage />} />
+
+                  {/* Inventory & Store Management */}
+                  <Route path="/inventory" element={<InventoryDashboardPage />} />
+                  <Route path="/inventory/dashboard" element={<InventoryDashboardPage />} />
+                  <Route path="/inventory/categories" element={<InventoryCategoryPage />} />
+                  <Route path="/inventory/warehouses" element={<WarehousePage />} />
+                  <Route path="/inventory/suppliers" element={<SupplierPage />} />
+                  <Route path="/inventory/items" element={<InventoryItemsPage />} />
+                  <Route path="/inventory/stock" element={<StockPage />} />
+                  <Route path="/inventory/purchase-requests" element={<PurchaseRequestPage />} />
+                  <Route path="/inventory/goods-receipts" element={<GoodsReceiptPage />} />
+                  <Route path="/inventory/issue-vouchers" element={<IssueVoucherPage />} />
+                  <Route path="/inventory/return-vouchers" element={<ReturnVoucherPage />} />
+                  <Route path="/inventory/adjustments" element={<StockAdjustmentPage />} />
+                  <Route path="/inventory/reorder-alerts" element={<ReorderAlertsPage />} />
+                  <Route path="/inventory/reports" element={<InventoryReportsPage />} />
 
                   {/* Reports */}
                   <Route path="/reports/naac-nirf" element={<SuperAdminDashboardPage />} />
