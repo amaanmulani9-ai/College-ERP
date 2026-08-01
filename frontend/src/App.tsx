@@ -108,22 +108,30 @@ import { VisitorRegisterPage } from "./pages/VisitorRegisterPage";
 import { HostelMaintenancePage } from "./pages/HostelMaintenancePage";
 import { VacancyReportPage } from "./pages/VacancyReportPage";
 
+import React, { Suspense, lazy } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "./context/ThemeContext";
-
 import { PublicLayout } from "./layouts/PublicLayout";
-import { HomePage } from "./pages/public/HomePage";
-import { AboutPage } from "./pages/public/AboutPage";
-import { FeaturesPage } from "./pages/public/FeaturesPage";
-import { ModulesPage } from "./pages/public/ModulesPage";
-import { PricingPage } from "./pages/public/PricingPage";
-import { ContactPage } from "./pages/public/ContactPage";
-import { PrivacyPage } from "./pages/public/PrivacyPage";
-import { TermsPage } from "./pages/public/TermsPage";
-import { HelpPage } from "./pages/public/HelpPage";
-import { CareersPage } from "./pages/public/CareersPage";
-import { BlogPage } from "./pages/public/BlogPage";
-import { DemoPage } from "./pages/public/DemoPage";
-import { StatusPage } from "./pages/public/StatusPage";
+import { PageLoader } from "./components/public/PageLoader";
+
+// Lazy Loaded Public Pages for Optimized Performance
+const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
+const AboutPage = lazy(() => import("./pages/public/AboutPage").then(m => ({ default: m.AboutPage })));
+const FeaturesPage = lazy(() => import("./pages/public/FeaturesPage").then(m => ({ default: m.FeaturesPage })));
+const ModulesPage = lazy(() => import("./pages/public/ModulesPage").then(m => ({ default: m.ModulesPage })));
+const PricingPage = lazy(() => import("./pages/public/PricingPage").then(m => ({ default: m.PricingPage })));
+const ContactPage = lazy(() => import("./pages/public/ContactPage").then(m => ({ default: m.ContactPage })));
+const PrivacyPage = lazy(() => import("./pages/public/PrivacyPage").then(m => ({ default: m.PrivacyPage })));
+const TermsPage = lazy(() => import("./pages/public/TermsPage").then(m => ({ default: m.TermsPage })));
+const HelpPage = lazy(() => import("./pages/public/HelpPage").then(m => ({ default: m.HelpPage })));
+const CareersPage = lazy(() => import("./pages/public/CareersPage").then(m => ({ default: m.CareersPage })));
+const BlogPage = lazy(() => import("./pages/public/BlogPage").then(m => ({ default: m.BlogPage })));
+const DemoPage = lazy(() => import("./pages/public/DemoPage").then(m => ({ default: m.DemoPage })));
+const StatusPage = lazy(() => import("./pages/public/StatusPage").then(m => ({ default: m.StatusPage })));
+const NotFoundPage = lazy(() => import("./pages/public/NotFoundPage").then(m => ({ default: m.NotFoundPage })));
+const ServerErrorPage = lazy(() => import("./pages/public/ServerErrorPage").then(m => ({ default: m.ServerErrorPage })));
+const OfflinePage = lazy(() => import("./pages/public/OfflinePage").then(m => ({ default: m.OfflinePage })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -139,23 +147,27 @@ export const App: React.FC = () => {
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <Routes>
-          {/* Public Marketing Suite Routes */}
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/features" element={<FeaturesPage />} />
-            <Route path="/modules" element={<ModulesPage />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/help" element={<HelpPage />} />
-            <Route path="/careers" element={<CareersPage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/demo" element={<DemoPage />} />
-            <Route path="/status" element={<StatusPage />} />
-          </Route>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              {/* Public Marketing Suite Routes */}
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/features" element={<FeaturesPage />} />
+                <Route path="/modules" element={<ModulesPage />} />
+                <Route path="/pricing" element={<PricingPage />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                <Route path="/help" element={<HelpPage />} />
+                <Route path="/careers" element={<CareersPage />} />
+                <Route path="/blog" element={<BlogPage />} />
+                <Route path="/demo" element={<DemoPage />} />
+                <Route path="/status" element={<StatusPage />} />
+                <Route path="/500" element={<ServerErrorPage />} />
+                <Route path="/offline" element={<OfflinePage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Route>
 
           {/* Institutional Dashboard & ERP App Routes */}
           <Route element={<MainLayout />}>
@@ -282,6 +294,7 @@ export const App: React.FC = () => {
             <Route path="/hostel/vacancy" element={<VacancyReportPage />} />
           </Route>
         </Routes>
+        </Suspense>
       </BrowserRouter>
     </QueryClientProvider>
   </ThemeProvider>
