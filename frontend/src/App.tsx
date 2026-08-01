@@ -123,7 +123,8 @@ import { SessionExpiredPage } from "./pages/auth/SessionExpiredPage";
 import { SessionTimeoutModal } from "./components/auth/SessionTimeoutModal";
 import { SecuritySettingsPage } from "./pages/auth/SecuritySettingsPage";
 import { ChangePasswordPage } from "./pages/auth/ChangePasswordPage";
-import { ActiveSessionsPage } from "./pages/auth/ActiveSessionsPage";
+import { DashboardLayout } from "./layouts/DashboardLayout";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 // Lazy Loaded Public Pages for Optimized Performance
 const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
@@ -194,7 +195,7 @@ export const App: React.FC = () => {
               </Route>
 
           {/* Institutional Dashboard & ERP App Routes */}
-          <Route element={<MainLayout />}>
+          <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/profile" element={<ProfilePage />} />
