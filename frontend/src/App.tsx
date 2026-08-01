@@ -157,6 +157,18 @@ import { VisitorRegisterPage } from "./pages/VisitorRegisterPage";
 import { HostelMaintenancePage } from "./pages/HostelMaintenancePage";
 import { VacancyReportPage } from "./pages/VacancyReportPage";
 
+// ─── Transport Management ──────────────────────────────────────────────────
+import { TransportDashboardPage } from "./pages/transport/TransportDashboardPage";
+import { VehicleListPage } from "./pages/transport/VehicleListPage";
+import { RouteListPage } from "./pages/transport/RouteListPage";
+import { DriverListPage } from "./pages/transport/DriverListPage";
+import { StudentAllocationPage as StudentTransportAllocationPage } from "./pages/transport/StudentAllocationPage";
+import { TransportPassesPage } from "./pages/transport/TransportPassesPage";
+import { MaintenanceLogPage } from "./pages/transport/MaintenanceLogPage";
+import { FuelLogsPage } from "./pages/transport/FuelLogsPage";
+import { TransportAttendancePage } from "./pages/transport/TransportAttendancePage";
+import { IncidentReportsPage } from "./pages/transport/IncidentReportsPage";
+
 // ─── Lazy Loaded Public Pages ─────────────────────────────────────────────
 const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
 const AboutPage = lazy(() => import("./pages/public/AboutPage").then(m => ({ default: m.AboutPage })));
@@ -361,6 +373,19 @@ export const App: React.FC = () => {
                   <Route path="/hostel/visitors" element={<VisitorRegisterPage />} />
                   <Route path="/hostel/maintenance" element={<HostelMaintenancePage />} />
                   <Route path="/hostel/vacancy" element={<VacancyReportPage />} />
+
+                  {/* Transport Management */}
+                  <Route path="/transport" element={<TransportDashboardPage />} />
+                  <Route path="/transport/dashboard" element={<TransportDashboardPage />} />
+                  <Route path="/transport/vehicles" element={<VehicleListPage />} />
+                  <Route path="/transport/routes" element={<RouteListPage />} />
+                  <Route path="/transport/drivers" element={<DriverListPage />} />
+                  <Route path="/transport/allocations" element={<StudentTransportAllocationPage />} />
+                  <Route path="/transport/passes" element={<TransportPassesPage />} />
+                  <Route path="/transport/maintenance" element={<MaintenanceLogPage />} />
+                  <Route path="/transport/fuel" element={<FuelLogsPage />} />
+                  <Route path="/transport/attendance" element={<TransportAttendancePage />} />
+                  <Route path="/transport/incidents" element={<IncidentReportsPage />} />
 
                   {/* Reports */}
                   <Route path="/reports/naac-nirf" element={<SuperAdminDashboardPage />} />

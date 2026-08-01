@@ -56,6 +56,7 @@ SHARED_APPS = (
     "apps.scholarships",
     "apps.library",
     "apps.hostel",
+    "apps.transport",
 )
 
 
@@ -88,6 +89,7 @@ TENANT_APPS = (
     "apps.scholarships",
     "apps.library",
     "apps.hostel",
+    "apps.transport",
 )
 
 
