@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, ArrowRight, LogIn, AlertCircle } from "lucide-react";
+import { Mail, LogIn, AlertCircle } from "lucide-react";
 import { AuthCard } from "../../components/auth/AuthCard";
 import { AuthInput } from "../../components/auth/AuthInput";
 import { PasswordInput } from "../../components/auth/PasswordInput";
@@ -8,9 +8,11 @@ import { RememberMeCheckbox } from "../../components/auth/RememberMeCheckbox";
 import { AuthDivider } from "../../components/auth/AuthDivider";
 import { SocialButton } from "../../components/auth/SocialButton";
 import { SEOHead } from "../../components/public/SEOHead";
+import { useAuth } from "../../context/AuthContext";
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const { login, getRoleRedirectPath } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(true);
@@ -42,13 +44,13 @@ export const LoginPage: React.FC = () => {
 
     setIsLoading(true);
     try {
-      // Simulate client authentication validation before dashboard handoff
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      // Store dummy token for frontend navigation preview
-      localStorage.setItem("access_token", "demo_token_v0.20.0");
-      navigate("/dashboard");
-    } catch (err) {
-      setErrorMessage("Invalid institutional credentials. Please check your email and password.");
+      const res = await login({ email, password, rememberMe });
+      const userRole = res.user?.role || "College Admin";
+      const redirectPath = getRoleRedirectPath(userRole);
+      navigate(redirectPath, { replace: true });
+    } catch (err: any) {
+      const msg = err?.response?.data?.detail || "Invalid institutional credentials. Please check your email and password.";
+      setErrorMessage(msg);
     } finally {
       setIsLoading(false);
     }
@@ -134,7 +136,7 @@ export const LoginPage: React.FC = () => {
           {isLoading ? (
             <>
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>Authenticating Tenant...</span>
+              <span>Authenticating...</span>
             </>
           ) : (
             <>
@@ -155,7 +157,7 @@ export const LoginPage: React.FC = () => {
         </p>
 
         <Link to="/" className="inline-flex items-center gap-1 text-[11px] text-slate-500 hover:text-slate-300 transition-colors">
-          <ArrowRight className="w-3 h-3 rotate-180" /> Back to Marketing Website
+          Back to Marketing Website
         </Link>
       </div>
     </AuthCard>

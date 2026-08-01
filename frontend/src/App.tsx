@@ -147,12 +147,15 @@ const queryClient = new QueryClient({
   },
 });
 
+import { AuthProvider } from "./context/AuthContext";
+
 export const App: React.FC = () => {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Suspense fallback={<PageLoader />}>
+        <AuthProvider>
+          <BrowserRouter>
+            <Suspense fallback={<PageLoader />}>
             <Routes>
               {/* Public Marketing Suite Routes */}
               <Route element={<PublicLayout />}>
@@ -307,8 +310,9 @@ export const App: React.FC = () => {
         </Routes>
         </Suspense>
       </BrowserRouter>
-    </QueryClientProvider>
-  </ThemeProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+</ThemeProvider>
   );
 };
 
