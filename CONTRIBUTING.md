@@ -1,64 +1,18 @@
 # Contributing to Enterprise College ERP
 
-Thank you for contributing to the Enterprise College ERP platform! Please read these guidelines before submitting code.
+Thank you for your interest in contributing to the Enterprise College ERP Suite!
 
----
+## Guidelines
 
-## 1. Coding Standards
+1. **Pull Requests**:
+   - Create a feature branch off `main`.
+   - Ensure all tests pass (`pytest` & `npm run build`).
+   - Keep pull requests focused and documented.
 
-### Python / Django:
-- Adhere to **PEP 8** standards.
-- Keep business logic in `services.py`, NOT inside DRF views.
-- Use explicit type annotations and docstrings for public functions.
-- Enforce soft-deletion integrity (`is_deleted=True`) where appropriate.
+2. **Coding Standards**:
+   - Python: Follow PEP 8 and use type hints.
+   - TypeScript/React: Strict TypeScript, no `any`, 0 type errors with `npx tsc --noEmit`.
 
-### TypeScript / React:
-- Use functional components with explicit TypeScript interfaces.
-- Follow component-driven architecture with atomic styles (Tailwind CSS).
-- Avoid inline `any` types. Define models in `services/`.
-
----
-
-## 2. Folder Structure
-
-```
-College-ERP/
-├── backend/
-│   ├── apps/
-│   │   ├── academics/
-│   │   ├── authentication/
-│   │   ├── core/
-│   │   ├── profiles/
-│   │   ├── rbac/
-│   │   ├── staff/
-│   │   ├── students/
-│   │   └── tenancy/
-│   └── config/
-├── frontend/
-│   └── src/
-│       ├── components/
-│       ├── layouts/
-│       ├── pages/
-│       └── services/
-├── docs/
-├── scripts/
-└── tests/
-```
-
----
-
-## 3. Branch & Commit Guidelines
-
-- **Branch Naming**: `feat/feature-name` or `fix/bug-description`.
-- **Commit Format**: Conventional commits (`feat: ...`, `fix: ...`, `docs: ...`).
-
----
-
-## 4. Testing Requirements
-
-- Maintain **80%+ test coverage** across all modules.
-- Run `pytest` and specific module verification scripts before opening PRs:
-  ```bash
-  python -m pytest tests/
-  python scripts/verify_task8.py
-  ```
+3. **Testing**:
+   - Write unit tests for new backend views and services.
+   - Maintain minimum 80%+ test coverage.

@@ -1,166 +1,138 @@
-# Enterprise College ERP System
+# Enterprise College ERP Suite
 
-[![Version](https://img.shields.io/badge/version-v0.8.0-indigo.svg)](CHANGELOG.md)
-[![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.13+-blue.svg)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/Django-5.0-success.svg)](https://www.djangoproject.com/)
-[![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+![Version](https://img.shields.io/badge/version-v1.0.0-indigo.svg?style=for-the-badge)
+![License](https://img.shields.io/badge/license-MIT-emerald.svg?style=for-the-badge)
+![Python](https://img.shields.io/badge/python-3.12-blue.svg?style=for-the-badge)
+![Django](https://img.shields.io/badge/django-5.1-092E20.svg?style=for-the-badge)
+![React](https://img.shields.io/badge/react-19.0-61DAFB.svg?style=for-the-badge)
+![TypeScript](https://img.shields.io/badge/typescript-5.7-3178C6.svg?style=for-the-badge)
+![Vite](https://img.shields.io/badge/vite-6.0-646CFF.svg?style=for-the-badge)
+![PostgreSQL](https://img.shields.io/badge/postgresql-16.0-4169E1.svg?style=for-the-badge)
 
-A production-ready, multi-tenant SaaS platform engineered to manage all academic, administrative, student, and personnel operations for educational institutions.
-
----
-
-## 🚀 Key Features & Modules
-
-- **Multi-Tenant SaaS Architecture**: PostgreSQL schema-based isolation powered by `django-tenants`. Each college gets an isolated schema while sharing application code.
-- **Enterprise Authentication**: Email-based primary login, SimpleJWT access/refresh tokens with rotation & blacklisting, brute-force protection (15-min lockout after 5 failures).
-- **Dynamic RBAC System**: 14 default institutional roles seeded automatically with Redis permission caching (`rbac:<schema>:user:<user_id>:permissions`).
-- **Identity & User Profiles**: Centralized identity profile with avatar upload/deletion safeguards and completion percentage calculator.
-- **Academic Structure Engine**: Tiered hierarchy modeling (`Faculty` -> `Department` -> `Program` -> `AcademicSession` -> `Semester` -> `Subject` -> `Offering`) with soft deletion safeguards.
-- **Student Management System**: Auto Student ID generation (`ERP-YEAR-PROGRAM-SEQUENCE`), status lifecycle auditing (`applicant`, `active`, `suspended`, `graduated`, `withdrawn`, `alumni`), and guardian contact details.
-- **Staff & HR Management System**: Auto Employee ID generation (`EMP-YEAR-SEQUENCE`), designation rank catalog (`teaching`, `non_teaching`, `administration`, etc.), and employment status auditing (`active`, `on_leave`, `suspended`, `resigned`, `retired`, `terminated`).
+The **Enterprise College ERP Suite** is a modern, high-performance, multi-tenant SaaS platform built for higher education institutions, universities, and multi-campus collegiate systems.
 
 ---
 
-## 🏛️ System Architecture
+## 🏛 Architecture Overview
 
-```mermaid
-graph TD
-    User[Browser / Client] --> Proxy[Nginx / Vite Proxy]
-    Proxy --> TenantMW[Tenant Resolution Middleware]
-    TenantMW --> DB[(PostgreSQL Schema Isolated)]
-    TenantMW --> Cache[(Redis Cache / Celery)]
-    TenantMW --> Auth[JWT Auth & RBAC Engine]
-    Auth --> Modules[Academic, Student, Staff & Profile Apps]
+```
+                      +------------------------------------------+
+                      |         Enterprise Web & PWA Client      |
+                      |   React 19 · TypeScript 5.7 · Vite 6    |
+                      +--------------------+---------------------+
+                                           | REST API / JSON
+                                           v
+                      +--------------------+---------------------+
+                      |         Django REST Framework API        |
+                      |    Python 3.12 · Multi-Tenant Middleware |
+                      +--------------------+---------------------+
+                                           |
+         +---------------------------------+---------------------------------+
+         |                                 |                                 |
+         v                                 v                                 v
++------------------+             +-------------------+             +-------------------+
+|  PostgreSQL DB   |             |   Redis Cache &   |             |  Service Worker   |
+| Multi-Tenancy    |             |  Celery Workers   |             |  Offline Action   |
+| Schema Isolation |             |  Task Queues      |             |  PWA Queue        |
++------------------+             +-------------------+             +-------------------+
 ```
 
 ---
 
-## 📁 Repository Structure
+## 🚀 Key Modules & Capabilities
 
-```
-College-ERP/
-├── backend/
-│   ├── apps/
-│   │   ├── academics/       # Academic Structure Engine
-│   │   ├── authentication/  # Identity & JWT Authentication
-│   │   ├── core/            # Core utilities & health check
-│   │   ├── profiles/        # Centralized User Profiles
-│   │   ├── rbac/            # Role-Based Access Control
-│   │   ├── staff/           # Staff & HR Management System
-│   │   ├── students/        # Student Management System
-│   │   └── tenancy/         # SaaS Multi-Tenant Manager
-│   ├── config/              # Modular settings & root URLs
-│   └── manage.py
-├── frontend/
-│   ├── src/
-│   │   ├── components/      # Reusable UI components & Sidebar
-│   │   ├── layouts/         # Main Dashboard & Glassmorphism layouts
-│   │   ├── pages/           # Module Management Pages
-│   │   └── services/        # Axios API Client Layer
-│   └── vite.config.ts
-├── docs/                    # Architectural & Workflow Docs
-├── scripts/                 # Verification & Setup Scripts
-├── tests/                   # Automated Pytest Test Suite
-├── CHANGELOG.md             # Version History
-├── PROJECT_STATUS.md        # Roadmap & Completion Breakdown
-├── RELEASE_NOTES_v0.8.0.md  # v0.8.0 Release Documentation
-├── CONTRIBUTING.md          # Contribution Guidelines
-├── SECURITY.md              # Security Policy & Reporting
-└── LICENSE                  # MIT License
-```
+### 1. Backend ERP Core (30 Domain Applications)
+- **Admissions & Enrollment**: Application tracking, document verification, entrance merit list calculation.
+- **Academic Administration**: Departments, courses, curriculum trees, semester credits, prerequisites.
+- **Examinations & Grading**: Exam scheduling, gradebook matrix, GPA/CGPA computation, transcript generation.
+- **Finance & Fee Collection**: Fee structure configuration, online payment gateway, ledger entries, receipts.
+- **Hostel & Housing**: Room allocation, warden management, mess billing, gate pass tracking.
+- **Library Management**: Accession register, ISBN catalog, book issuance/returns, overdue fine calculation.
+- **Faculty Load & HR**: Staff profiles, payroll processing, leave management, teaching workload distribution.
+- **Transport & Logistics**: Vehicle fleet tracking, route management, student bus pass allocation.
+- **IAM & Audit Trails**: Role-Based Access Control (RBAC), multi-tenancy isolation, detailed audit logs.
 
----
+### 2. Desktop & Touch Workspace
+- Touch-optimized tab workspace (`frontend/src/components/workspace/`).
+- Docking side panels, recent items history, workspace favorites.
+- Global Command Palette (<kbd>Ctrl+K</kbd> / <kbd>⌘K</kbd>) & Docked AI Assistant.
 
-## 🛠️ Technology Stack
+### 3. Reporting & Analytics
+- Visual drag-and-drop report builder.
+- Dynamic charts (Bar, Line, Pie, Area) with live filtering.
+- Automated scheduled PDF, XLSX, and CSV report export & email distribution.
 
-- **Backend**: Python 3.13+, Django 5.0, Django REST Framework, `django-tenants`, SimpleJWT
-- **Frontend**: React 19, TypeScript, Vite, Vanilla CSS + Tailwind CSS, Axios, React Query
-- **Database & Cache**: PostgreSQL 16, Redis 7
-- **DevOps & Containers**: Docker, Docker Compose, Gunicorn, WhiteNoise
+### 4. Progressive Web App (PWA) & Mobile Engine
+- Standalone installable PWA (`frontend/src/mobile/pwa/`).
+- Network RTT latency monitoring and offline banner notification.
+- Offline action queue with automatic background synchronization upon reconnection.
+
+### 5. Motion, State, & Accessibility Systems
+- **Motion System** (`frontend/src/ux/motion/`): GPU-accelerated transition wrappers and micro-animations.
+- **State System** (`frontend/src/ux/states/`): Standardized shimmer skeletons, empty states, and HTTP error recovery.
+- **Accessibility System** (`frontend/src/ux/accessibility/`): WCAG 2.1 AA keyboard focus traps, ARIA live region announcements, and shortcut help overlays (<kbd>?</kbd>).
 
 ---
 
-## ⚡ Quick Start & Development Setup
+## ⚙️ Quick Start & Installation
 
-### 1. Environment Setup
-Copy sample environment files:
-```bash
-cp .env.example .env
-cp frontend/.env.example frontend/.env
-```
+### Prerequisites
+- Python 3.12+
+- Node.js 20+ & npm 10+
+- PostgreSQL 16+ (or local SQLite for dev)
 
-### 2. Running with Docker Compose
-```bash
-docker-compose up -d --build
-```
-Access the application at `http://localhost:5173`.
-
-### 3. Local Development (Without Docker)
-
-**Backend Setup**:
+### Backend Setup
 ```bash
 cd backend
-python -m venv ../venv
-../venv/Scripts/activate   # On Windows (or source ../venv/bin/activate on Linux/Mac)
+python -m venv venv
+# On Windows:
+..\venv\Scripts\activate
+# On Linux/macOS:
+source venv/bin/activate
+
 pip install -r requirements.txt
-python manage.py migrate_schemas
-python manage.py seed_rbac_defaults
-python manage.py runserver 8000
+python manage.py migrate
+python manage.py runserver 0.0.0.0:8000
 ```
 
-**Frontend Setup**:
+### Frontend Setup
 ```bash
-cd frontend
 npm install
 npm run dev
 ```
 
 ---
 
-## 🧪 Automated Testing & Verification
+## 🐳 Docker Deployment
 
-Run unit & integration test suites:
 ```bash
-# Run pytest across all backend apps
-python -m pytest tests/
-
-# Run module verification scripts
-python scripts/verify_task6.py
-python scripts/verify_task7.py
-python scripts/verify_task8.py
+# Build and launch complete stack with Docker Compose
+docker-compose up --build -d
 ```
 
 ---
 
-## 📖 API Documentation
+## 🧪 Testing & Verification
 
-API endpoints are organized by app:
-- **Authentication**: `/api/auth/`
-- **Tenancy**: `/api/tenancy/`
-- **RBAC Matrix**: `/api/rbac/`
-- **User Profiles**: `/api/profiles/`
-- **Academics**: `/api/academics/`
-- **Students**: `/api/students/`
-- **Staff & HR**: `/api/staff/`
+```bash
+# Run Django backend checks & migrations test
+cd backend
+python manage.py check
+python manage.py makemigrations --check
 
-For detailed schemas, refer to individual doc files in [`docs/`](docs/).
+# Run Pytest suite (201 tests passing)
+pytest
 
----
-
-## 🗺️ Product Roadmap
-
-- [x] **v0.8.0**: Foundation, Auth, RBAC, Academic Hierarchy, Student & Staff Modules.
-- [ ] **v0.9.0**: Admissions Workflow & Application Processing Engine.
-- [ ] **v0.10.0**: Daily & Subject Attendance Tracking Engine.
-- [ ] **v0.11.0**: Examination, Grading & Transcript Management.
-- [ ] **v1.0.0**: Production Release with Finance, Fee Collection, and AI Advising.
+# Run Frontend TypeScript check & Production Build
+cd ..
+npx tsc --noEmit
+npm run build
+```
 
 ---
 
-## 📄 License & Version
+## 📄 License & Contributing
 
-Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information.
+Distributed under the **MIT License**. See `LICENSE` for more information.
 
-**Current Version:** `v0.8.0`
+Contributions are welcome! Please read `CONTRIBUTING.md` and follow our `CODE_OF_CONDUCT.md`.
