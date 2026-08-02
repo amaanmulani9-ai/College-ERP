@@ -1,0 +1,15 @@
+[Unit]
+Description=Celery Beat Scheduler Daemon for Enterprise College ERP
+After=network.target redis.service celery.service
+
+[Service]
+Type=simple
+User=erpuser
+Group=www-data
+WorkingDirectory=/var/www/college-erp/backend
+ExecStart=/var/www/college-erp/venv/bin/celery -A config beat --loglevel=INFO
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

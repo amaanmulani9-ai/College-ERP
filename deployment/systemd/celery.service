@@ -1,0 +1,16 @@
+[Unit]
+Description=Celery Worker Daemon for Enterprise College ERP
+After=network.target redis.service
+
+[Service]
+Type=forking
+User=erpuser
+Group=www-data
+WorkingDirectory=/var/www/college-erp/backend
+ExecStart=/var/www/college-erp/venv/bin/celery -A config worker --loglevel=INFO --detach
+ExecStop=/var/www/college-erp/venv/bin/celery multi stopwait worker
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
