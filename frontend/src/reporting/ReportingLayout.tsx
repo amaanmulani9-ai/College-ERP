@@ -10,7 +10,8 @@ import { SavedReports } from "./components/SavedReports";
 import { RecentReports } from "./components/RecentReports";
 import { FavoriteReports } from "./components/FavoriteReports";
 import { AnalyticsDashboard } from "./charts/AnalyticsDashboard";
-import { X, Play, LayoutGrid, BarChart3 } from "lucide-react";
+import { ReportBuilder } from "./builder/ReportBuilder";
+import { X, Play, LayoutGrid, BarChart3, Wrench } from "lucide-react";
 
 export const ReportingLayoutContent: React.FC = () => {
   const {
@@ -25,7 +26,7 @@ export const ReportingLayoutContent: React.FC = () => {
     setViewMode,
   } = useReporting();
 
-  const [activeTabMode, setActiveTabMode] = useState<"catalog" | "analytics">("catalog");
+  const [activeTabMode, setActiveTabMode] = useState<"catalog" | "analytics" | "builder">("catalog");
 
   // Filter reports based on activeCategory and searchQuery
   const filteredReports = reports.filter((report) => {
@@ -50,7 +51,7 @@ export const ReportingLayoutContent: React.FC = () => {
   return (
     <div className="flex h-full min-h-[calc(100vh-4rem)] bg-slate-950 text-slate-100 font-sans">
       {/* Category Sidebar */}
-      <ReportSidebar />
+      {activeTabMode !== "builder" && <ReportSidebar />}
 
       {/* Main Workspace Content Area */}
       <div className="flex-1 flex flex-col min-w-0 p-4 sm:p-6 overflow-y-auto">
@@ -67,6 +68,7 @@ export const ReportingLayoutContent: React.FC = () => {
             <LayoutGrid className="w-3.5 h-3.5" />
             <span>Report Catalog</span>
           </button>
+
           <button
             onClick={() => setActiveTabMode("analytics")}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
@@ -76,11 +78,25 @@ export const ReportingLayoutContent: React.FC = () => {
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Visual Analytics Dashboards</span>
+            <span>Visual Analytics</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTabMode("builder")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+              activeTabMode === "builder"
+                ? "bg-indigo-600 text-white shadow-md"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <Wrench className="w-3.5 h-3.5 text-amber-400" />
+            <span>No-Code Builder</span>
           </button>
         </div>
 
-        {activeTabMode === "analytics" ? (
+        {activeTabMode === "builder" ? (
+          <ReportBuilder />
+        ) : activeTabMode === "analytics" ? (
           <AnalyticsDashboard />
         ) : (
           <>
@@ -107,7 +123,7 @@ export const ReportingLayoutContent: React.FC = () => {
         )}
 
         {/* Docked Reports Panel */}
-        {dockedReports.length > 0 && (
+        {dockedReports.length > 0 && activeTabMode !== "builder" && (
           <aside
             aria-label="Docked Reports Panel"
             className="mt-6 p-4 bg-slate-900 border border-slate-800 rounded-xl shadow-xl"

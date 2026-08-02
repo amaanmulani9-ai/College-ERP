@@ -19,3 +19,6 @@ export * from "./components/RecentReports";
 export * from "./components/FavoriteReports";
 export * from "./components/ReportSearch";
 export * from "./components/ReportEmptyState";
+
+export * from "./charts";
+export * from "./builder";
