@@ -22,3 +22,4 @@ export * from "./components/ReportEmptyState";
 
 export * from "./charts";
 export * from "./builder";
+export * from "./executive";

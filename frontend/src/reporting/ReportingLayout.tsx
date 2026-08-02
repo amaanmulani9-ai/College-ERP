@@ -11,7 +11,8 @@ import { RecentReports } from "./components/RecentReports";
 import { FavoriteReports } from "./components/FavoriteReports";
 import { AnalyticsDashboard } from "./charts/AnalyticsDashboard";
 import { ReportBuilder } from "./builder/ReportBuilder";
-import { X, Play, LayoutGrid, BarChart3, Wrench } from "lucide-react";
+import { ExecutiveAnalyticsCenter } from "./executive/ExecutiveAnalyticsCenter";
+import { X, Play, LayoutGrid, BarChart3, Wrench, ShieldCheck } from "lucide-react";
 
 export const ReportingLayoutContent: React.FC = () => {
   const {
@@ -26,7 +27,9 @@ export const ReportingLayoutContent: React.FC = () => {
     setViewMode,
   } = useReporting();
 
-  const [activeTabMode, setActiveTabMode] = useState<"catalog" | "analytics" | "builder">("catalog");
+  const [activeTabMode, setActiveTabMode] = useState<
+    "catalog" | "analytics" | "builder" | "executive"
+  >("catalog");
 
   // Filter reports based on activeCategory and searchQuery
   const filteredReports = reports.filter((report) => {
@@ -51,7 +54,7 @@ export const ReportingLayoutContent: React.FC = () => {
   return (
     <div className="flex h-full min-h-[calc(100vh-4rem)] bg-slate-950 text-slate-100 font-sans">
       {/* Category Sidebar */}
-      {activeTabMode !== "builder" && <ReportSidebar />}
+      {activeTabMode === "catalog" && <ReportSidebar />}
 
       {/* Main Workspace Content Area */}
       <div className="flex-1 flex flex-col min-w-0 p-4 sm:p-6 overflow-y-auto">
@@ -92,9 +95,23 @@ export const ReportingLayoutContent: React.FC = () => {
             <Wrench className="w-3.5 h-3.5 text-amber-400" />
             <span>No-Code Builder</span>
           </button>
+
+          <button
+            onClick={() => setActiveTabMode("executive")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+              activeTabMode === "executive"
+                ? "bg-indigo-600 text-white shadow-md"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Executive Center</span>
+          </button>
         </div>
 
-        {activeTabMode === "builder" ? (
+        {activeTabMode === "executive" ? (
+          <ExecutiveAnalyticsCenter />
+        ) : activeTabMode === "builder" ? (
           <ReportBuilder />
         ) : activeTabMode === "analytics" ? (
           <AnalyticsDashboard />
@@ -123,7 +140,7 @@ export const ReportingLayoutContent: React.FC = () => {
         )}
 
         {/* Docked Reports Panel */}
-        {dockedReports.length > 0 && activeTabMode !== "builder" && (
+        {dockedReports.length > 0 && activeTabMode === "catalog" && (
           <aside
             aria-label="Docked Reports Panel"
             className="mt-6 p-4 bg-slate-900 border border-slate-800 rounded-xl shadow-xl"

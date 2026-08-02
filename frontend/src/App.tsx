@@ -682,7 +682,9 @@ export const App: React.FC = () => {
                   <Route path="/reports" element={<ReportingPage />} />
                   <Route path="/reporting" element={<ReportingPage />} />
                   <Route path="/reporting/builder" element={<ReportingPage />} />
+                  <Route path="/reporting/executive" element={<ReportingPage />} />
                   <Route path="/reports/naac-nirf" element={<SuperAdminDashboardPage />} />
+
 
 
 
