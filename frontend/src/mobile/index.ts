@@ -19,3 +19,4 @@ export * from "./MobileFoundationCenter";
 export * from "./workspace";
 export * from "./dashboard";
 export * from "./pwa";
+export * from "./final";
