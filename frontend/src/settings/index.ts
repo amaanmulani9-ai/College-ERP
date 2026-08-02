@@ -9,3 +9,4 @@ export * from "./SettingsSearch";
 export * from "./SettingsHome";
 export * from "./SettingsLayout";
 export * from "./SettingsPage";
+export * from "./institution";

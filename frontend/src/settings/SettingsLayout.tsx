@@ -5,12 +5,13 @@ import { SettingsToolbar } from "./SettingsToolbar";
 import { SettingsBreadcrumbs } from "./SettingsBreadcrumbs";
 import { SettingsHome } from "./SettingsHome";
 import { SettingsSearch } from "./SettingsSearch";
+import { InstitutionSettingsCenter } from "./institution/InstitutionSettingsCenter";
 import { SettingPageItem } from "./types";
 import { useTabs } from "../workspace/TabContext";
 import { ArrowLeft, Save, Sliders, CheckCircle2 } from "lucide-react";
 
 export const SettingsLayoutContent: React.FC = () => {
-  const { selectedPage, setSelectedPage } = useSettings();
+  const { selectedPage, setSelectedPage, activeCategory } = useSettings();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
@@ -29,6 +30,12 @@ export const SettingsLayoutContent: React.FC = () => {
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 2000);
   };
+
+  const isInstitutionOrAcademic =
+    activeCategory === "Institution" ||
+    activeCategory === "Academic" ||
+    selectedPage?.category === "Institution" ||
+    selectedPage?.category === "Academic";
 
   return (
     <div className="flex h-full min-h-[calc(100vh-4rem)] bg-slate-950 text-slate-100 font-sans">
@@ -53,8 +60,10 @@ export const SettingsLayoutContent: React.FC = () => {
           }
         />
 
-        {/* Dynamic View: Settings Home Dashboard vs Active Setting Item Configuration View */}
-        {selectedPage ? (
+        {/* Dynamic View: Institution & Academic Center vs General Config View vs Settings Home */}
+        {isInstitutionOrAcademic ? (
+          <InstitutionSettingsCenter />
+        ) : selectedPage ? (
           <div className="space-y-6">
             <div className="flex items-center justify-between p-4 bg-slate-900 border border-slate-800 rounded-xl shadow-md">
               <div className="flex items-center gap-3">
