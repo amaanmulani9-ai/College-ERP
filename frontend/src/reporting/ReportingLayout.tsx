@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useReporting } from "./ReportingContext";
 import { ReportSidebar } from "./ReportSidebar";
 import { ReportBreadcrumbs } from "./ReportBreadcrumbs";
@@ -9,7 +9,8 @@ import { ReportTable } from "./components/ReportTable";
 import { SavedReports } from "./components/SavedReports";
 import { RecentReports } from "./components/RecentReports";
 import { FavoriteReports } from "./components/FavoriteReports";
-import { X, Play } from "lucide-react";
+import { AnalyticsDashboard } from "./charts/AnalyticsDashboard";
+import { X, Play, LayoutGrid, BarChart3 } from "lucide-react";
 
 export const ReportingLayoutContent: React.FC = () => {
   const {
@@ -24,9 +25,10 @@ export const ReportingLayoutContent: React.FC = () => {
     setViewMode,
   } = useReporting();
 
+  const [activeTabMode, setActiveTabMode] = useState<"catalog" | "analytics">("catalog");
+
   // Filter reports based on activeCategory and searchQuery
   const filteredReports = reports.filter((report) => {
-    // Category match
     const matchesCategory =
       activeCategory === "All" ||
       activeCategory === "Favorites" ||
@@ -34,7 +36,6 @@ export const ReportingLayoutContent: React.FC = () => {
       activeCategory === "Saved" ||
       report.category === activeCategory;
 
-    // Search query match
     const matchesSearch =
       !searchQuery ||
       report.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -53,27 +54,59 @@ export const ReportingLayoutContent: React.FC = () => {
 
       {/* Main Workspace Content Area */}
       <div className="flex-1 flex flex-col min-w-0 p-4 sm:p-6 overflow-y-auto">
-        <ReportBreadcrumbs />
-        <ReportToolbar />
+        {/* Mode Switcher Header Tabs */}
+        <div className="flex items-center gap-2 mb-4 p-1 bg-slate-900 border border-slate-800 rounded-xl w-fit">
+          <button
+            onClick={() => setActiveTabMode("catalog")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+              activeTabMode === "catalog"
+                ? "bg-indigo-600 text-white shadow-md"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+            <span>Report Catalog</span>
+          </button>
+          <button
+            onClick={() => setActiveTabMode("analytics")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+              activeTabMode === "analytics"
+                ? "bg-indigo-600 text-white shadow-md"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <BarChart3 className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Visual Analytics Dashboards</span>
+          </button>
+        </div>
 
-        {/* Dynamic Main View */}
-        <main className="flex-1">
-          {selectedReport ? (
-            <ReportViewer />
-          ) : activeCategory === "Saved" ? (
-            <SavedReports />
-          ) : activeCategory === "Recent" ? (
-            <RecentReports />
-          ) : activeCategory === "Favorites" ? (
-            <FavoriteReports />
-          ) : viewMode === "table" ? (
-            <ReportTable reports={filteredReports} />
-          ) : (
-            <ReportGrid reports={filteredReports} />
-          )}
-        </main>
+        {activeTabMode === "analytics" ? (
+          <AnalyticsDashboard />
+        ) : (
+          <>
+            <ReportBreadcrumbs />
+            <ReportToolbar />
 
-        {/* Docked Reports Panel (if any report is docked) */}
+            {/* Dynamic Main View */}
+            <main className="flex-1">
+              {selectedReport ? (
+                <ReportViewer />
+              ) : activeCategory === "Saved" ? (
+                <SavedReports />
+              ) : activeCategory === "Recent" ? (
+                <RecentReports />
+              ) : activeCategory === "Favorites" ? (
+                <FavoriteReports />
+              ) : viewMode === "table" ? (
+                <ReportTable reports={filteredReports} />
+              ) : (
+                <ReportGrid reports={filteredReports} />
+              )}
+            </main>
+          </>
+        )}
+
+        {/* Docked Reports Panel */}
         {dockedReports.length > 0 && (
           <aside
             aria-label="Docked Reports Panel"
@@ -100,6 +133,7 @@ export const ReportingLayoutContent: React.FC = () => {
                     onClick={() => {
                       setSelectedReport(report);
                       setViewMode("viewer");
+                      setActiveTabMode("catalog");
                     }}
                     className="p-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
                     title="Open Report"
