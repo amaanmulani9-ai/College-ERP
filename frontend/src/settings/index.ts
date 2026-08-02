@@ -11,3 +11,6 @@ export * from "./SettingsLayout";
 export * from "./SettingsPage";
 export * from "./institution";
 export * from "./security";
+export * from "./platform";
+export * from "./system";
+export * from "./final";

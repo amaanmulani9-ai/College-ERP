@@ -7,6 +7,9 @@ import { SettingsHome } from "./SettingsHome";
 import { SettingsSearch } from "./SettingsSearch";
 import { InstitutionSettingsCenter } from "./institution/InstitutionSettingsCenter";
 import { SecuritySettingsCenter } from "./security/SecuritySettingsCenter";
+import { SystemSettingsCenter } from "./system/SystemSettingsCenter";
+import { PlatformSettingsCenter } from "./platform/PlatformSettingsCenter";
+import { SettingsFinalCenter } from "./final/SettingsFinalCenter";
 import { SettingPageItem } from "./types";
 import { useTabs } from "../workspace/TabContext";
 import { ArrowLeft, Save, Sliders, CheckCircle2 } from "lucide-react";
@@ -16,13 +19,10 @@ export const SettingsLayoutContent: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Workspace integration
   let openTabAction: ((tab: { title: string; route: string; iconName?: string }) => void) | null = null;
   try {
     const tabsCtx = useTabs();
-    if (tabsCtx && tabsCtx.openTab) {
-      openTabAction = tabsCtx.openTab;
-    }
+    if (tabsCtx && tabsCtx.openTab) openTabAction = tabsCtx.openTab;
   } catch (_e) {
     openTabAction = null;
   }
@@ -43,19 +43,43 @@ export const SettingsLayoutContent: React.FC = () => {
     activeCategory === "Roles & Permissions" ||
     activeCategory === "Authentication" ||
     activeCategory === "Security" ||
-    activeCategory === "Audit Logs" ||
     selectedPage?.category === "Users" ||
     selectedPage?.category === "Roles & Permissions" ||
     selectedPage?.category === "Authentication" ||
-    selectedPage?.category === "Security" ||
-    selectedPage?.category === "Audit Logs";
+    selectedPage?.category === "Security";
+
+  const isPlatform =
+    activeCategory === "Branding" ||
+    activeCategory === "Notifications" ||
+    activeCategory === "Integrations" ||
+    activeCategory === "AI" ||
+    selectedPage?.category === "Branding" ||
+    selectedPage?.category === "Notifications" ||
+    selectedPage?.category === "Integrations" ||
+    selectedPage?.category === "AI";
+
+  const isSystem =
+    activeCategory === "System" ||
+    activeCategory === "Audit Logs" ||
+    activeCategory === "Backups" ||
+    activeCategory === "General" ||
+    selectedPage?.category === "System" ||
+    selectedPage?.category === "Audit Logs" ||
+    selectedPage?.category === "Backups";
+
+  const isFinal =
+    activeCategory === "Preferences" ||
+    activeCategory === "Appearance" ||
+    activeCategory === "Accessibility" ||
+    activeCategory === "Finalization" ||
+    selectedPage?.category === "Preferences" ||
+    selectedPage?.category === "Appearance" ||
+    selectedPage?.category === "Accessibility";
 
   return (
     <div className="flex h-full min-h-[calc(100vh-4rem)] bg-slate-950 text-slate-100 font-sans">
-      {/* Category Sidebar */}
       <SettingsSidebar />
 
-      {/* Main Content Workspace */}
       <div className="flex-1 flex flex-col min-w-0 p-4 sm:p-6 overflow-y-auto">
         <SettingsBreadcrumbs />
 
@@ -73,11 +97,16 @@ export const SettingsLayoutContent: React.FC = () => {
           }
         />
 
-        {/* Dynamic View: Institution vs Security vs General Config View vs Settings Home */}
-        {isInstitutionOrAcademic ? (
+        {isFinal ? (
+          <SettingsFinalCenter />
+        ) : isSystem ? (
+          <SystemSettingsCenter />
+        ) : isInstitutionOrAcademic ? (
           <InstitutionSettingsCenter />
         ) : isSecurityOrIAM ? (
           <SecuritySettingsCenter />
+        ) : isPlatform ? (
+          <PlatformSettingsCenter />
         ) : selectedPage ? (
           <div className="space-y-6">
             <div className="flex items-center justify-between p-4 bg-slate-900 border border-slate-800 rounded-xl shadow-md">
@@ -119,34 +148,26 @@ export const SettingsLayoutContent: React.FC = () => {
               </button>
             </div>
 
-            {/* Config Form Placeholder View */}
             <div className="p-6 bg-slate-900/90 border border-slate-800 rounded-xl space-y-4 text-xs font-sans">
               <h3 className="text-xs font-bold text-slate-200 uppercase font-mono border-b border-slate-800 pb-2">
                 Active Configuration Form Parameters
               </h3>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                    Configuration Status
-                  </label>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">Configuration Status</label>
                   <select className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 text-xs font-mono">
                     <option value="enabled">Enabled (Active Production)</option>
                     <option value="disabled">Disabled (Maintenance)</option>
                   </select>
                 </div>
-
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                    Admin Approval Requirement
-                  </label>
+                  <label className="block text-[11px] font-semibold text-slate-300 mb-1">Admin Approval Requirement</label>
                   <select className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 text-xs font-mono">
                     <option value="strict">Strict Dual-Factor Approval</option>
                     <option value="standard">Standard Single Approval</option>
                   </select>
                 </div>
               </div>
-
               <div>
                 <label className="block text-[11px] font-semibold text-slate-300 mb-1">
                   Configuration Log Notes & Audit Comments
@@ -164,7 +185,6 @@ export const SettingsLayoutContent: React.FC = () => {
         )}
       </div>
 
-      {/* Global Search Modal */}
       {isSearchOpen && (
         <SettingsSearch
           onClose={() => setIsSearchOpen(false)}
