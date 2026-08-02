@@ -17,3 +17,4 @@ export * from "./ResponsiveTable";
 export * from "./PWAInstallBanner";
 export * from "./MobileFoundationCenter";
 export * from "./workspace";
+export * from "./dashboard";
