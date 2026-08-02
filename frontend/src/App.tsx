@@ -228,6 +228,90 @@ import { PaymentsPage as PurchasePaymentsPage } from "./pages/procurement/Paymen
 import { VendorContractsPage } from "./pages/procurement/VendorContractsPage";
 import { ReportsPage as ProcurementReportsPage } from "./pages/procurement/ReportsPage";
 
+// ─── Enterprise Asset Management ───────────────────────────────────────────
+import { AssetsDashboardPage } from "./pages/assets/AssetsDashboardPage";
+import { AssetCategoryPage } from "./pages/assets/AssetCategoryPage";
+import { AssetsPage } from "./pages/assets/AssetsPage";
+import { AllocationPage } from "./pages/assets/AllocationPage";
+import { TransferPage } from "./pages/assets/TransferPage";
+import { MaintenancePage } from "./pages/assets/MaintenancePage";
+import { WarrantyPage } from "./pages/assets/WarrantyPage";
+import { DepreciationPage } from "./pages/assets/DepreciationPage";
+import { AuditPage } from "./pages/assets/AuditPage";
+import { DisposalPage } from "./pages/assets/DisposalPage";
+import { IncidentsPage } from "./pages/assets/IncidentsPage";
+import { QRLabelsPage } from "./pages/assets/QRLabelsPage";
+import { ReportsPage as AssetsReportsPage } from "./pages/assets/ReportsPage";
+
+// ─── Enterprise Placement & Career Development ─────────────────────────────
+import { PlacementDashboardPage } from "./pages/placement/PlacementDashboardPage";
+import { CompanyPage as PlacementCompanyPage } from "./pages/placement/CompanyPage";
+import { CampusDrivesPage } from "./pages/placement/CampusDrivesPage";
+import { EligibilityPage as PlacementEligibilityPage } from "./pages/placement/EligibilityPage";
+import { ApplicationsPage as PlacementApplicationsPage } from "./pages/placement/ApplicationsPage";
+import { InterviewPage } from "./pages/placement/InterviewPage";
+import { OffersPage } from "./pages/placement/OffersPage";
+import { InternshipPage } from "./pages/placement/InternshipPage";
+import { ResumePage } from "./pages/placement/ResumePage";
+import { MockInterviewPage } from "./pages/placement/MockInterviewPage";
+import { CareerCounsellingPage } from "./pages/placement/CareerCounsellingPage";
+import { StatisticsPage as PlacementStatisticsPage } from "./pages/placement/StatisticsPage";
+import { ReportsPage as PlacementReportsPage } from "./pages/placement/ReportsPage";
+
+// ─── Enterprise Alumni Management ──────────────────────────────────────────
+import { AlumniDashboardPage } from "./pages/alumni/AlumniDashboardPage";
+import { DirectoryPage as AlumniDirectoryPage } from "./pages/alumni/DirectoryPage";
+import { MembershipPage as AlumniMembershipPage } from "./pages/alumni/MembershipPage";
+import { EmploymentPage as AlumniEmploymentPage } from "./pages/alumni/EmploymentPage";
+import { MentorshipPage as AlumniMentorshipPage } from "./pages/alumni/MentorshipPage";
+import { EventsPage as AlumniEventsPage } from "./pages/alumni/EventsPage";
+import { DonationsPage as AlumniDonationsPage } from "./pages/alumni/DonationsPage";
+import { CampaignsPage as AlumniCampaignsPage } from "./pages/alumni/CampaignsPage";
+import { NewslettersPage as AlumniNewslettersPage } from "./pages/alumni/NewslettersPage";
+import { JobReferralsPage as AlumniJobReferralsPage } from "./pages/alumni/JobReferralsPage";
+import { NetworkingPage as AlumniNetworkingPage } from "./pages/alumni/NetworkingPage";
+import { SuccessStoriesPage as AlumniSuccessStoriesPage } from "./pages/alumni/SuccessStoriesPage";
+import { ReportsPage as AlumniReportsPage } from "./pages/alumni/ReportsPage";
+
+// ─── Enterprise Visitor Management System ──────────────────────────────────
+import { VisitorDashboardPage } from "./pages/visitor/VisitorDashboardPage";
+import { VisitorsPage } from "./pages/visitor/VisitorsPage";
+import { AppointmentsPage as VisitorAppointmentsPage } from "./pages/visitor/AppointmentsPage";
+import { GatePassPage as VisitorGatePassPage } from "./pages/visitor/GatePassPage";
+import { EntryExitPage as VisitorEntryExitPage } from "./pages/visitor/EntryExitPage";
+import { VehiclePage as VisitorVehiclePage } from "./pages/visitor/VehiclePage";
+import { DeliveryPage as VisitorDeliveryPage } from "./pages/visitor/DeliveryPage";
+import { ContractorPage as VisitorContractorPage } from "./pages/visitor/ContractorPage";
+import { EmergencyVisitorsPage } from "./pages/visitor/EmergencyVisitorsPage";
+import { BlacklistPage as VisitorBlacklistPage } from "./pages/visitor/BlacklistPage";
+import { FeedbackPage as VisitorFeedbackPage } from "./pages/visitor/FeedbackPage";
+import { SecurityOfficersPage } from "./pages/visitor/SecurityOfficersPage";
+import { ReportsPage as VisitorReportsPage } from "./pages/visitor/ReportsPage";
+
+// ─── Enterprise AI Academic Assistant ─────────────────────────────────────
+import { AIDashboardPage } from "./pages/ai/AIDashboardPage";
+import { AssistantPage as AIAssistantPage } from "./pages/ai/AssistantPage";
+import { PromptLibraryPage as AIPromptLibraryPage } from "./pages/ai/PromptLibraryPage";
+import { KnowledgeBasePage as AIKnowledgeBasePage } from "./pages/ai/KnowledgeBasePage";
+import { ConversationsPage as AIConversationsPage } from "./pages/ai/ConversationsPage";
+import { RecommendationsPage as AIRecommendationsPage } from "./pages/ai/RecommendationsPage";
+import { UsageAnalyticsPage as AIUsageAnalyticsPage } from "./pages/ai/UsageAnalyticsPage";
+import { ProviderSettingsPage as AIProviderSettingsPage } from "./pages/ai/ProviderSettingsPage";
+import { ConfigurationPage as AIConfigurationPage } from "./pages/ai/ConfigurationPage";
+import { FeedbackPage as AIFeedbackPage } from "./pages/ai/FeedbackPage";
+import { ReportsPage as AIReportsPage } from "./pages/ai/ReportsPage";
+
+// ─── Enterprise Workspace Framework ───────────────────────────────────────
+import { WorkspaceLayout } from "./workspace/WorkspaceLayout";
+import { DockingConsolePage } from "./workspace/docking/DockingConsolePage";
+import { WorkspaceProductivityHub } from "./workspace/productivity/WorkspaceProductivityHub";
+import { AIWorkspacePanel } from "./workspace/ai/AIWorkspacePanel";
+import { WorkspaceReleaseNotes } from "./workspace/final/WorkspaceReleaseNotes";
+
+// ─── Enterprise Reporting Framework ───────────────────────────────────────
+import ReportingPage from "./reporting/ReportingPage";
+
+
 // ─── Lazy Loaded Public Pages ─────────────────────────────────────────────
 const HomePage = lazy(() => import("./pages/public/HomePage").then(m => ({ default: m.HomePage })));
 const AboutPage = lazy(() => import("./pages/public/AboutPage").then(m => ({ default: m.AboutPage })));
@@ -509,8 +593,96 @@ export const App: React.FC = () => {
                   <Route path="/procurement/contracts" element={<VendorContractsPage />} />
                   <Route path="/procurement/reports" element={<ProcurementReportsPage />} />
 
-                  {/* Reports */}
+                  {/* Enterprise Asset Management */}
+                  <Route path="/assets" element={<AssetsDashboardPage />} />
+                  <Route path="/assets/dashboard" element={<AssetsDashboardPage />} />
+                  <Route path="/assets/categories" element={<AssetCategoryPage />} />
+                  <Route path="/assets/items" element={<AssetsPage />} />
+                  <Route path="/assets/allocations" element={<AllocationPage />} />
+                  <Route path="/assets/transfers" element={<TransferPage />} />
+                  <Route path="/assets/maintenance" element={<MaintenancePage />} />
+                  <Route path="/assets/warranties" element={<WarrantyPage />} />
+                  <Route path="/assets/depreciation" element={<DepreciationPage />} />
+                  <Route path="/assets/audits" element={<AuditPage />} />
+                  <Route path="/assets/disposals" element={<DisposalPage />} />
+                  <Route path="/assets/incidents" element={<IncidentsPage />} />
+                  <Route path="/assets/qr-labels" element={<QRLabelsPage />} />
+                  <Route path="/assets/reports" element={<AssetsReportsPage />} />
+
+                  {/* Enterprise Placement & Career Development */}
+                  <Route path="/placement" element={<PlacementDashboardPage />} />
+                  <Route path="/placement/dashboard" element={<PlacementDashboardPage />} />
+                  <Route path="/placement/companies" element={<PlacementCompanyPage />} />
+                  <Route path="/placement/drives" element={<CampusDrivesPage />} />
+                  <Route path="/placement/eligibility" element={<PlacementEligibilityPage />} />
+                  <Route path="/placement/applications" element={<PlacementApplicationsPage />} />
+                  <Route path="/placement/interviews" element={<InterviewPage />} />
+                  <Route path="/placement/offers" element={<OffersPage />} />
+                  <Route path="/placement/internships" element={<InternshipPage />} />
+                  <Route path="/placement/resumes" element={<ResumePage />} />
+                  <Route path="/placement/mock-interviews" element={<MockInterviewPage />} />
+                  <Route path="/placement/counselling" element={<CareerCounsellingPage />} />
+                  <Route path="/placement/statistics" element={<PlacementStatisticsPage />} />
+                  <Route path="/placement/reports" element={<PlacementReportsPage />} />
+
+                  {/* Enterprise Alumni Management */}
+                  <Route path="/alumni" element={<AlumniDashboardPage />} />
+                  <Route path="/alumni/dashboard" element={<AlumniDashboardPage />} />
+                  <Route path="/alumni/directory" element={<AlumniDirectoryPage />} />
+                  <Route path="/alumni/membership" element={<AlumniMembershipPage />} />
+                  <Route path="/alumni/employment" element={<AlumniEmploymentPage />} />
+                  <Route path="/alumni/mentorship" element={<AlumniMentorshipPage />} />
+                  <Route path="/alumni/events" element={<AlumniEventsPage />} />
+                  <Route path="/alumni/donations" element={<AlumniDonationsPage />} />
+                  <Route path="/alumni/campaigns" element={<AlumniCampaignsPage />} />
+                  <Route path="/alumni/newsletters" element={<AlumniNewslettersPage />} />
+                  <Route path="/alumni/job-referrals" element={<AlumniJobReferralsPage />} />
+                  <Route path="/alumni/networking" element={<AlumniNetworkingPage />} />
+                  <Route path="/alumni/success-stories" element={<AlumniSuccessStoriesPage />} />
+                  <Route path="/alumni/reports" element={<AlumniReportsPage />} />
+
+                  {/* Enterprise Visitor Management */}
+                  <Route path="/visitor" element={<VisitorDashboardPage />} />
+                  <Route path="/visitor/dashboard" element={<VisitorDashboardPage />} />
+                  <Route path="/visitor/visitors" element={<VisitorsPage />} />
+                  <Route path="/visitor/appointments" element={<VisitorAppointmentsPage />} />
+                  <Route path="/visitor/gate-pass" element={<VisitorGatePassPage />} />
+                  <Route path="/visitor/entry-exit" element={<VisitorEntryExitPage />} />
+                  <Route path="/visitor/vehicles" element={<VisitorVehiclePage />} />
+                  <Route path="/visitor/deliveries" element={<VisitorDeliveryPage />} />
+                  <Route path="/visitor/contractors" element={<VisitorContractorPage />} />
+                  <Route path="/visitor/emergency" element={<EmergencyVisitorsPage />} />
+                  <Route path="/visitor/blacklist" element={<VisitorBlacklistPage />} />
+                  <Route path="/visitor/feedback" element={<VisitorFeedbackPage />} />
+                  <Route path="/visitor/security-officers" element={<SecurityOfficersPage />} />
+                  <Route path="/visitor/reports" element={<VisitorReportsPage />} />
+
+                  {/* Enterprise AI Academic Assistant */}
+                  <Route path="/ai" element={<AIDashboardPage />} />
+                  <Route path="/ai/dashboard" element={<AIDashboardPage />} />
+                  <Route path="/ai/assistant" element={<AIAssistantPage />} />
+                  <Route path="/ai/prompt-library" element={<AIPromptLibraryPage />} />
+                  <Route path="/ai/knowledge-base" element={<AIKnowledgeBasePage />} />
+                  <Route path="/ai/conversations" element={<AIConversationsPage />} />
+                  <Route path="/ai/recommendations" element={<AIRecommendationsPage />} />
+                  <Route path="/ai/usage" element={<AIUsageAnalyticsPage />} />
+                  <Route path="/ai/providers" element={<AIProviderSettingsPage />} />
+                  <Route path="/ai/configuration" element={<AIConfigurationPage />} />
+                  <Route path="/ai/feedback" element={<AIFeedbackPage />} />
+                  <Route path="/ai/reports" element={<AIReportsPage />} />
+
+                  {/* Enterprise Workspace Framework */}
+                  <Route path="/workspace" element={<WorkspaceLayout />} />
+                  <Route path="/workspace/docking" element={<DockingConsolePage />} />
+                  <Route path="/workspace/productivity" element={<WorkspaceProductivityHub />} />
+                  <Route path="/workspace/ai" element={<AIWorkspacePanel />} />
+                  <Route path="/workspace/changelog" element={<WorkspaceReleaseNotes />} />
+
+                  {/* Reports & Analytics Framework */}
+                  <Route path="/reports" element={<ReportingPage />} />
+                  <Route path="/reporting" element={<ReportingPage />} />
                   <Route path="/reports/naac-nirf" element={<SuperAdminDashboardPage />} />
+
 
                 </Route>
               </Routes>

@@ -1,0 +1,1 @@
+export { PinnedWindowsPanel } from "./WindowNavPanels";

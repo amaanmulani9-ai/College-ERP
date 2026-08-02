@@ -61,6 +61,11 @@ SHARED_APPS = (
     "apps.hr",
     "apps.inventory",
     "apps.procurement",
+    "apps.assets",
+    "apps.placement",
+    "apps.alumni",
+    "apps.visitor",
+    "apps.ai",
 )
 
 
@@ -98,6 +103,11 @@ TENANT_APPS = (
     "apps.hr",
     "apps.inventory",
     "apps.procurement",
+    "apps.assets",
+    "apps.placement",
+    "apps.alumni",
+    "apps.visitor",
+    "apps.ai",
 )
 
 

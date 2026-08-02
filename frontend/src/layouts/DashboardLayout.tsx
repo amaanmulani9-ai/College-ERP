@@ -102,6 +102,7 @@ export const DashboardLayout: React.FC = () => {
         { label: "Examinations", route: "/examinations", icon: <BookOpen className="w-4 h-4" /> },
         { label: "Grades & Results", route: "/results", icon: <BookOpen className="w-4 h-4" /> },
         { label: "Certificates", route: "/certificates", icon: <BookOpen className="w-4 h-4" /> },
+        { label: "AI Assistant Hub", route: "/ai", icon: <Sparkles className="w-4 h-4" /> },
       ],
     },
     {
@@ -112,6 +113,8 @@ export const DashboardLayout: React.FC = () => {
         { label: "Faculty & Staff", route: "/staff", icon: <UserCheck className="w-4 h-4" /> },
         { label: "Parent Portal", route: "/parents", icon: <Users className="w-4 h-4" /> },
         { label: "HR & Personnel", route: "/hr", icon: <Users className="w-4 h-4" /> },
+        { label: "Placement & Careers", route: "/placement", icon: <Users className="w-4 h-4" /> },
+        { label: "Alumni Network", route: "/alumni", icon: <Users className="w-4 h-4" /> },
       ],
     },
     {
@@ -131,6 +134,8 @@ export const DashboardLayout: React.FC = () => {
         { label: "Hostels & Beds", route: "/hostel", icon: <Building className="w-4 h-4" /> },
         { label: "Transport & Fleet", route: "/transport", icon: <Bus className="w-4 h-4" /> },
         { label: "Inventory & Stores", route: "/inventory", icon: <Package className="w-4 h-4" /> },
+        { label: "Assets & Maintenance", route: "/assets", icon: <Building className="w-4 h-4" /> },
+        { label: "Visitor & Security", route: "/visitor", icon: <Shield className="w-4 h-4" /> },
       ],
     },
     {
