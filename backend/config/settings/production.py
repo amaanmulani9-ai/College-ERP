@@ -1,3 +1,4 @@
+from django.core.exceptions import ImproperlyConfigured
 from config.env import bool_env, int_env, list_env, str_env
 
 from .base import *  # noqa: F403
@@ -5,8 +6,8 @@ from .base import *  # noqa: F403
 
 DEBUG = False
 SECRET_KEY = str_env("SECRET_KEY")
-if not SECRET_KEY:
-    raise RuntimeError("SECRET_KEY must be set in production.")
+if not SECRET_KEY or SECRET_KEY.startswith("django-insecure"):
+    raise ImproperlyConfigured("SECRET_KEY environment variable MUST be set to a secure string in production.")
 
 ALLOWED_HOSTS = list_env("ALLOWED_HOSTS")
 if not ALLOWED_HOSTS:

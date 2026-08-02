@@ -25,6 +25,40 @@ export default defineConfig(({ mode }) => {
       outDir: "frontend/dist",
       emptyOutDir: true,
       sourcemap: true,
+      chunkSizeWarningLimit: 1000,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("node_modules")) {
+              if (id.includes("react-dom") || id.includes("react-router-dom") || id.includes("react/")) {
+                return "vendor-react";
+              }
+              if (id.includes("@tanstack")) {
+                return "vendor-tanstack";
+              }
+              if (id.includes("recharts") || id.includes("d3-")) {
+                return "vendor-charts";
+              }
+              if (id.includes("lucide-react")) {
+                return "vendor-icons";
+              }
+              return "vendor";
+            }
+            if (id.includes("frontend/src/workspace")) {
+              return "workspace-center";
+            }
+            if (id.includes("frontend/src/reporting")) {
+              return "reporting-center";
+            }
+            if (id.includes("frontend/src/settings")) {
+              return "settings-center";
+            }
+            if (id.includes("frontend/src/design-system")) {
+              return "design-system";
+            }
+          },
+        },
+      },
     },
   };
 });
