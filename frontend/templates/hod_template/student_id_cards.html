@@ -1,0 +1,308 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; }
+
+.sk-breadcrumb-bar {
+    background: #fff; padding: 15px 25px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+.sk-breadcrumb-left { display: flex; align-items: center; gap: 8px; }
+.sk-breadcrumb-title { color: #4a235a; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+.sk-breadcrumb-path { color: #b2bec3; font-size: 13px; }
+.sk-back-btn {
+    color: #6c5ce7; font-size: 13px; font-weight: 600; text-decoration: none;
+    display: flex; align-items: center; gap: 6px;
+}
+.sk-back-btn:hover { text-decoration: none; color: #5530c5; }
+
+/* Style Tabs */
+.sk-tabs-bar {
+    background: #fff; padding: 12px 20px; border-radius: 10px;
+    margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+}
+.sk-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.sk-tab {
+    padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    border: 1.5px solid #e8e0ff; background: #fff; color: #636e72;
+    cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+    text-decoration: none;
+}
+.sk-tab:hover { border-color: #6c5ce7; color: #6c5ce7; text-decoration: none; }
+.sk-tab.active { background: #6c5ce7; color: #fff; border-color: #6c5ce7; }
+.sk-tab.active:hover { color: #fff; }
+.sk-tab i { font-size: 11px; }
+
+.sk-actions { display: flex; gap: 8px; }
+.sk-action-link {
+    padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    border: 1.5px solid #e8e0ff; background: #fff; color: #636e72;
+    cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+    text-decoration: none;
+}
+.sk-action-link:hover { border-color: #6c5ce7; color: #6c5ce7; text-decoration: none; }
+
+/* ID Cards Grid */
+.sk-cards-grid {
+    display: flex; flex-wrap: wrap; gap: 30px; justify-content: center;
+}
+
+/* Default Style Card */
+.id-style-default {
+    width: 280px; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+}
+.id-style-default .id-top {
+    padding: 20px; text-align: center; position: relative;
+}
+.id-style-default .id-top::after {
+    content: ''; position: absolute; top: 10px; right: 10px;
+    width: 30px; height: 30px; background: rgba(255,255,255,0.15);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+}
+.id-style-default .id-avatar {
+    width: 90px; height: 90px; border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.4);
+    object-fit: cover; margin: 0 auto 10px; display: block;
+    background: rgba(255,255,255,0.2);
+}
+.id-style-default .id-avatar-placeholder {
+    width: 90px; height: 90px; border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 28px; font-weight: 700;
+    margin: 0 auto 10px;
+}
+.id-style-default .id-barcode {
+    background: rgba(255,255,255,0.15); padding: 6px; border-radius: 6px;
+    margin: 10px auto 0; display: inline-block;
+}
+.id-style-default .id-name {
+    font-size: 16px; font-weight: 700; text-transform: uppercase; margin-top: 8px;
+}
+.id-style-default .id-bottom {
+    background: #fff; color: #2d3436; padding: 15px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.id-style-default .id-badge {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    color: #6c5ce7; display: flex; align-items: center; gap: 5px;
+}
+.id-style-default .id-info { font-size: 11px; color: #636e72; line-height: 1.5; }
+.id-style-default .id-info strong { color: #2d3436; }
+.id-style-default .id-qr {
+    width: 50px; height: 50px; border-radius: 6px;
+    border: 2px solid #e8e0ff;
+}
+
+/* Style 1 Card (QR-centric with teal accent) */
+.id-style-1 {
+    width: 280px; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b3a4b 100%);
+    color: #fff;
+}
+.id-style-1 .id-top {
+    padding: 20px; text-align: center; position: relative;
+}
+.id-style-1 .id-accent {
+    position: absolute; top: -20px; right: -20px;
+    width: 80px; height: 80px; background: #2ed573; border-radius: 50%; opacity: 0.3;
+}
+.id-style-1 .id-qr-wrap {
+    background: rgba(255,255,255,0.1); padding: 10px; border-radius: 12px;
+    display: inline-block; margin-bottom: 8px;
+}
+.id-style-1 .id-name {
+    font-size: 15px; font-weight: 700; text-transform: uppercase; margin-top: 5px;
+}
+.id-style-1 .id-bottom {
+    background: #fff; color: #2d3436; padding: 15px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.id-style-1 .id-info { font-size: 11px; color: #636e72; line-height: 1.5; }
+.id-style-1 .id-info strong { color: #2d3436; }
+
+/* Panes */
+.sk-card-pane { display: none; }
+.sk-card-pane.active { display: flex; }
+
+@media print {
+    .sk-breadcrumb-bar, .sk-tabs-bar { display: none !important; }
+}
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-left">
+                <div class="sk-breadcrumb-title"><i class="fas fa-user-graduate" style="color:#6c5ce7;"></i> Students</div>
+                <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right" style="font-size:10px;margin:0 10px;"></i> ID Cards</div>
+            </div>
+            <a href="{% url 'manage_student' %}" class="sk-back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+        </div>
+
+        <!-- Style Tabs -->
+        <div class="sk-tabs-bar">
+            <div class="sk-tabs">
+                <button class="sk-tab active" onclick="switchStyle('default', this)"><i class="fas fa-id-card"></i> Default</button>
+                <button class="sk-tab" onclick="switchStyle('style1', this)"><i class="fas fa-id-card"></i> Style 1</button>
+                <button class="sk-tab" onclick="switchStyle('style2', this)"><i class="fas fa-id-card"></i> Style 2</button>
+                <button class="sk-tab" onclick="switchStyle('style3', this)"><i class="fas fa-id-card"></i> Style 3</button>
+                <button class="sk-tab" onclick="switchStyle('style4', this)"><i class="fas fa-id-card"></i> Style 4</button>
+            </div>
+            <div class="sk-actions">
+                <a href="{% url 'manage_student' %}" class="sk-action-link"><i class="fas fa-search"></i> Search</a>
+                <button class="sk-action-link" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+                <a href="#" class="sk-action-link"><i class="fas fa-sliders-h"></i> Customize</a>
+            </div>
+        </div>
+
+        <!-- Default Style -->
+        <div class="sk-cards-grid sk-card-pane active" id="pane-default">
+            {% for student in students %}
+            <div class="id-style-default">
+                <div class="id-top">
+                    {% if student.admin.profile_pic %}
+                        <img src="{{ student.admin.profile_pic }}" class="id-avatar"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                             alt="{{ student.admin.first_name }}">
+                        <div class="id-avatar-placeholder" style="display:none;">
+                            {{ student.admin.first_name|slice:":1" }}{{ student.admin.last_name|slice:":1" }}
+                        </div>
+                    {% else %}
+                        <div class="id-avatar-placeholder">
+                            {{ student.admin.first_name|slice:":1" }}{{ student.admin.last_name|slice:":1" }}
+                        </div>
+                    {% endif %}
+                    <div class="id-barcode">
+                        <svg class="barcode-svg" data-code="{{ student.id_card_code }}"></svg>
+                    </div>
+                    <div class="id-name">{{ student.admin.first_name|upper }}</div>
+                </div>
+                <div class="id-bottom">
+                    <div>
+                        <div class="id-badge"><i class="fas fa-graduation-cap"></i> STUDENT</div>
+                        <div class="id-info">
+                            <strong>ID</strong> → {{ student.registration_no|default:"—" }}<br>
+                            <strong>Class</strong> → {{ student.course.name|default:"—" }}<br>
+                            <strong>Batch</strong> → {{ student.batch_year }}<br>
+                            <strong>Status</strong> → {{ student.verification_status }}<br>
+                            <strong>DOA</strong> → {{ student.admission_date|date:"d M Y"|default:"—" }}
+                        </div>
+                    </div>
+                    <img src="{% url 'generate_student_qr' student.id %}" class="id-qr" alt="QR"
+                         onerror="this.style.display='none';">
+                </div>
+            </div>
+            {% empty %}
+            <div style="text-align:center; padding:60px; color:#636e72; width:100%;">
+                <i class="fas fa-id-card" style="font-size:48px; color:#ddd; margin-bottom:15px; display:block;"></i>
+                <p>No students found. Add students first.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Style 1 -->
+        <div class="sk-cards-grid sk-card-pane" id="pane-style1">
+            {% for student in students %}
+            <div class="id-style-1">
+                <div class="id-top">
+                    <div class="id-accent"></div>
+                    <div class="id-qr-wrap">
+                        <img src="{% url 'generate_student_qr' student.id %}" style="width:100px; height:100px; border-radius:8px;"
+                             alt="QR" onerror="this.parentElement.innerHTML='<div style=\'width:100px;height:100px;background:#333;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;\'>No QR</div>';">
+                    </div>
+                    <div class="id-barcode">
+                        <svg class="barcode-svg-s1" data-code="{{ student.id_card_code }}"></svg>
+                    </div>
+                    <div class="id-name">{{ student.admin.first_name|upper }}</div>
+                </div>
+                    <div class="id-bottom">
+                        <div class="id-info">
+                            <i class="fas fa-id-badge" style="color:#6c5ce7; margin-right:4px;"></i>
+                            <strong>{{ student.registration_no|default:"—" }}</strong><br>
+                            <strong>CLASS</strong> {{ student.course.name|default:"—" }}<br>
+                            <strong>BATCH</strong> {{ student.batch_year }}<br>
+                            <strong>SEM</strong> {{ student.current_semester }}<br>
+                            <strong>DOA</strong> {{ student.admission_date|date:"d M Y"|default:"—" }}
+                        </div>
+                    {% if student.admin.profile_pic %}
+                        <img src="{{ student.admin.profile_pic }}" style="width:45px; height:45px; border-radius:50%; object-fit:cover;"
+                             onerror="this.style.display='none';" alt="">
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Style 2-4: placeholder panes reusing default -->
+        <div class="sk-cards-grid sk-card-pane" id="pane-style2">
+            <div style="text-align:center; padding:60px; color:#636e72; width:100%;">
+                <i class="fas fa-palette" style="font-size:48px; color:#ddd; margin-bottom:15px; display:block;"></i>
+                <p style="font-size:14px; font-weight:600;">Style 2 — Coming Soon</p>
+                <p style="font-size:12px;">This card style is under development.</p>
+            </div>
+        </div>
+        <div class="sk-cards-grid sk-card-pane" id="pane-style3">
+            <div style="text-align:center; padding:60px; color:#636e72; width:100%;">
+                <i class="fas fa-palette" style="font-size:48px; color:#ddd; margin-bottom:15px; display:block;"></i>
+                <p style="font-size:14px; font-weight:600;">Style 3 — Coming Soon</p>
+                <p style="font-size:12px;">This card style is under development.</p>
+            </div>
+        </div>
+        <div class="sk-cards-grid sk-card-pane" id="pane-style4">
+            <div style="text-align:center; padding:60px; color:#636e72; width:100%;">
+                <i class="fas fa-palette" style="font-size:48px; color:#ddd; margin-bottom:15px; display:block;"></i>
+                <p style="font-size:14px; font-weight:600;">Style 4 — Coming Soon</p>
+                <p style="font-size:12px;">This card style is under development.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block custom_js %}
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<script>
+function switchStyle(style, btn) {
+    document.querySelectorAll('.sk-card-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sk-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('pane-' + style).classList.add('active');
+    btn.classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Generate barcodes for default style
+    document.querySelectorAll('.barcode-svg').forEach(svg => {
+        try {
+            JsBarcode(svg, svg.dataset.code || 'N/A', {
+                format: "CODE128", width: 1.2, height: 25,
+                displayValue: false, margin: 0
+            });
+        } catch(e) {}
+    });
+    document.querySelectorAll('.barcode-svg-s1').forEach(svg => {
+        try {
+            JsBarcode(svg, svg.dataset.code || 'N/A', {
+                format: "CODE128", width: 1.2, height: 25,
+                displayValue: false, margin: 0
+            });
+        } catch(e) {}
+    });
+});
+</script>
+{% endblock custom_js %}

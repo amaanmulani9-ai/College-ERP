@@ -1,0 +1,113 @@
+
+    .admission-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border: none;
+        margin-bottom: 30px;
+    }
+    .admission-header {
+        background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+        color: #fff;
+        border-radius: 12px 12px 0 0;
+        padding: 20px 25px;
+    }
+    .admission-header h3 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 20px;
+    }
+    .form-section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        border-bottom: 2px solid #f1f2f6;
+        padding-bottom: 10px;
+    }
+    .section-number {
+        background: #6c5ce7;
+        color: #fff;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        margin-right: 12px;
+        font-weight: bold;
+    }
+    .form-group label {
+        font-weight: 500;
+        font-size: 13px;
+        color: #57606f;
+        margin-bottom: 8px;
+    }
+    .form-group label span {
+        color: #ff4757;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #ced6e0;
+        padding: 10px 15px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #6c5ce7;
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+    }
+    .btn-submit {
+        background: #6c5ce7;
+        color: #fff;
+        border-radius: 8px;
+        padding: 12px 30px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    .btn-submit:hover {
+        background: #5b4bc4;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+    .btn-reset {
+        background: #f1f2f6;
+        color: #57606f;
+        border-radius: 8px;
+        padding: 12px 30px;
+        font-weight: 600;
+        border: none;
+        transition: all 0.3s ease;
+        margin-right: 10px;
+    }
+    .btn-reset:hover {
+        background: #e4e7eb;
+        color: #2f3542;
+    }
+    .locked-notice {
+        background: #f8f9fa;
+        border: 1px dashed #ced6e0;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        color: #747d8c;
+    }
+    .locked-notice i {
+        font-size: 24px;
+        color: #ff4757;
+        margin-bottom: 10px;
+    }
+    .helper-text {
+        font-size: 11px;
+        color: #a4b0be;
+        margin-top: 4px;
+    }
+    .invalid-feedback {
+        display: block;
+        font-size: 12px;
+        color: #ff4757;
+    }

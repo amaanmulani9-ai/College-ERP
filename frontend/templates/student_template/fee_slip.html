@@ -1,0 +1,142 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}Paid Fee Slip{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    body { background-color: #f8fafc; font-family: 'Inter', 'Poppins', sans-serif; }
+
+    .es-breadcrumb-bar {
+        background: white; border-radius: 12px; padding: 14px 25px;
+        display: flex; align-items: center; gap: 10px; margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; font-size: 14px;
+    }
+    .es-breadcrumb-bar .section { font-weight: 700; color: #1e293b; }
+    .es-breadcrumb-bar .sep { color: #cbd5e1; }
+    .es-breadcrumb-bar .current { color: #64748b; display: flex; align-items: center; gap: 8px; }
+
+    .es-alert {
+        border-radius: 12px; padding: 18px 20px;
+        display: flex; align-items: flex-start; gap: 15px; margin-bottom: 25px; position: relative;
+    }
+    .es-alert.warning { background: #fffbeb; border: 1px solid #fde68a; }
+    .es-alert.success { background: #ecfdf5; border: 1px solid #a7f3d0; }
+    .es-alert-icon { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; flex-shrink: 0; }
+    .es-alert.warning .es-alert-icon { background: #f59e0b; }
+    .es-alert.success .es-alert-icon { background: #10b981; }
+    .es-alert-body h5 { margin: 0 0 5px 0; font-size: 15px; font-weight: 700; }
+    .es-alert.warning .es-alert-body h5 { color: #92400e; }
+    .es-alert.success .es-alert-body h5 { color: #065f46; }
+    .es-alert-body p { margin: 0; font-size: 13px; }
+    .es-alert.warning .es-alert-body p { color: #78350f; }
+    .es-alert.success .es-alert-body p { color: #065f46; }
+    .es-alert-body strong { color: #dc2626; }
+    .es-alert-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px; }
+
+    .es-card { background: white; border-radius: 14px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; margin-bottom: 25px; }
+    .es-section-title { font-weight: 700; color: #31187a; font-size: 15px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+    .es-table { width: 100%; border-collapse: collapse; }
+    .es-table th { text-align: left; padding: 12px 15px; font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #f1f5f9; }
+    .es-table td { padding: 16px 15px; font-size: 14px; color: #1e293b; border-bottom: 1px solid #f8fafc; font-weight: 600; }
+    .es-table tr:last-child td { border-bottom: none; }
+    .badge-paid { background: #ecfdf5; color: #10b981; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .badge-unpaid { background: #ffe4e6; color: #e11d48; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .badge-partial { background: #fffbeb; color: #f59e0b; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+
+    .es-empty { text-align: center; padding: 70px 20px; color: #94a3b8; }
+    .es-empty i { font-size: 50px; margin-bottom: 15px; display: block; color: #e2e8f0; }
+    .es-empty h3 { font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+    .es-empty p { font-size: 14px; max-width: 350px; margin: 0 auto; }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="content">
+    <div class="container-fluid" style="padding: 10px 20px;">
+
+        <!-- Breadcrumb -->
+        <div class="es-breadcrumb-bar">
+            <span class="section">Fees</span>
+            <span class="sep">|</span>
+            <span class="current"><i class="fas fa-home"></i> - Paid Fee Slip</span>
+        </div>
+
+        {% if has_records %}
+            {% if total_pending > 0 %}
+            <!-- Warning Alert — unpaid fees exist -->
+            <div class="es-alert warning">
+                <div class="es-alert-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="es-alert-body">
+                    <h5>Fee Payment Pending</h5>
+                    <p>You have outstanding fees of <strong>₹ {{ total_pending|floatformat:2 }}</strong> due. Please pay before the due date to avoid penalties.</p>
+                </div>
+                <button class="es-alert-close" onclick="this.parentElement.style.display='none'">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            {% else %}
+            <!-- All paid alert -->
+            <div class="es-alert success">
+                <div class="es-alert-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="es-alert-body">
+                    <h5>All Fees Paid</h5>
+                    <p>Congratulations! All your fees are paid up to date.</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Fee Records Table -->
+            <div class="es-card">
+                <div class="es-section-title"><i class="far fa-file-alt"></i> Fee Records</div>
+                <table class="es-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>CATEGORY</th>
+                            <th>AMOUNT</th>
+                            <th>PAID</th>
+                            <th>BALANCE</th>
+                            <th>DUE DATE</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rec in fee_records %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <div style="font-weight:700;">{{ rec.category }}</div>
+                            </td>
+                            <td>₹ {{ rec.amount|floatformat:2 }}</td>
+                            <td style="color:#10b981; font-weight:700;">₹ {{ rec.amount_paid|floatformat:2 }}</td>
+                            <td style="color:{% if rec.balance > 0 %}#dc2626{% else %}#10b981{% endif %}; font-weight:700;">
+                                ₹ {{ rec.balance|floatformat:2 }}
+                            </td>
+                            <td>{{ rec.due_date|date:"d M Y" }}</td>
+                            <td>
+                                {% if rec.status == 'Paid' %}
+                                    <span class="badge-paid">Paid</span>
+                                {% elif rec.status == 'Partial' %}
+                                    <span class="badge-partial">Partial</span>
+                                {% else %}
+                                    <span class="badge-unpaid">Unpaid</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="es-card es-empty">
+                <i class="far fa-file-alt"></i>
+                <h3>No Paid Fee Record Found</h3>
+                <p>There are no submitted fee records available for your account.</p>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock content %}

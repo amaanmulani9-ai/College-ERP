@@ -1,0 +1,154 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Jitsi Meet Embed -->
+        <div class="col-md-9 mb-4">
+            <div class="card erpnext-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0"><i class="fas fa-video text-primary"></i> Virtual Classroom Portal</h5>
+                    <span class="badge bg-success"><i class="fas fa-dot-circle animate-pulse"></i> Live Streaming</span>
+                </div>
+                <div class="card-body p-0" style="min-height: 600px; position: relative;">
+                    <div id="jitsi-container" style="width: 100%; height: 600px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance & Details Sidebar -->
+        <div class="col-md-3 mb-4">
+            <div class="card erpnext-card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-users-cog text-info"></i> Control Panel</h5>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-4">
+                        <h6>Class Details</h6>
+                        <table class="table table-sm table-borderless text-muted small">
+                            <tr>
+                                <td><strong>Title:</strong></td>
+                                <td>{{ live_class.title }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Subject:</strong></td>
+                                <td>{{ live_class.subject.name }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Room Key:</strong></td>
+                                <td><code>{{ live_class.room_name }}</code></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">Joined Students ({{ attendances.count }})</h6>
+                            <button onclick="location.reload()" class="btn btn-xs btn-outline-info" title="Refresh List">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        <div style="max-height: 300px; overflow-y: auto;" class="border rounded p-2 bg-light">
+                            {% if attendances %}
+                                <ul class="list-unstyled mb-0 small">
+                                    {% for att in attendances %}
+                                    <li class="mb-2 pb-1 border-bottom d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ att.student.admin.get_full_name }}</strong>
+                                            <div class="text-muted" style="font-size: 0.75rem;">
+                                                Joined: {{ att.joined_at|date:"H:i:s" }}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            {% if att.left_at %}
+                                                <span class="badge bg-secondary">Left</span>
+                                            {% else %}
+                                                <span class="badge bg-success">In Class</span>
+                                            {% endif %}
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-muted small mb-0 text-center py-3">No students have joined yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-3 border-top">
+                        <a href="{% url 'staff_end_live_class' live_class.id %}" class="btn btn-danger w-100 py-2 font-weight-bold">
+                            <i class="fas fa-phone-slash"></i> End Virtual Class
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Jitsi External API Script -->
+<script src="https://meet.jit.si/external_api.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const domain = "meet.jit.si";
+        const options = {
+            roomName: "{{ live_class.room_name }}",
+            width: "100%",
+            height: "100%",
+            parentNode: document.querySelector('#jitsi-container'),
+            userInfo: {
+                displayName: "Professor {{ request.user.first_name }} {{ request.user.last_name }}",
+                email: "{{ request.user.email }}"
+            },
+            configOverwrite: {
+                startWithAudioMuted: false,
+                startWithVideoMuted: false
+            },
+            interfaceConfigOverwrite: {
+                TOOLBAR_BUTTONS: [
+                    'microphone', 'camera', 'closedcaptions', 'desktop', 'embedmeeting', 'fullscreen',
+                    'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
+                    'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+                    'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
+                    'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone',
+                    'security'
+                ]
+            }
+        };
+        const api = new JitsiMeetExternalAPI(domain, options);
+
+        // Detect meeting ending locally to redirect back nicely
+        api.addEventListener('videoConferenceLeft', () => {
+            window.location.href = "{% url 'staff_end_live_class' live_class.id %}";
+        });
+    });
+
+    // Auto-refresh the attendance sidebar every 15 seconds
+    setInterval(function() {
+        // We'll perform a soft page reload to update the attendance lists
+        // Note: Reloading will not disrupt the Jitsi iframe state since Jitsi API creates a separate iframe,
+        // but to be absolutely safe and avoid flickering, you could use AJAX in a real production system.
+        // For simplicity, a manual reload button or reloading the page is standard, but let's just use the manual button
+        // or a soft check. Let's not auto-reload to avoid disruption to the presenter's video feed.
+    }, 15000);
+</script>
+
+<style>
+.animate-pulse {
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+.btn-xs {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}
+</style>
+{% endblock content %}

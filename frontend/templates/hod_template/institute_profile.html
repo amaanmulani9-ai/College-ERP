@@ -1,0 +1,211 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb {
+        padding: 15px 25px;
+        background: #fff;
+        border-bottom: 1px solid #e0e6ed;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+    }
+    .sk-breadcrumb .breadcrumb-item {
+        color: #647081;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .sk-breadcrumb .breadcrumb-item.active { color: #8a98ac; font-weight: 400; }
+    .sk-breadcrumb .separator { color: #a0a9b6; font-size: 10px; }
+
+    .campuspro-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        padding: 30px;
+        margin: 0 25px 25px;
+        border: 1px solid #e0e6ed;
+    }
+    
+    .campuspro-card-title {
+        font-size: 16px;
+        color: #1b2559;
+        font-weight: 600;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .campuspro-card-title i { color: #4b6bfb; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+        display: block;
+        font-size: 11px;
+        color: #8a98ac;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+    .form-group label .required { color: #ff7675; }
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e0e6ed;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #444;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus {
+        border-color: #4b6bfb;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(75, 107, 251, 0.1);
+    }
+    
+    .logo-upload-container {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    .logo-preview {
+        width: 100px;
+        height: 100px;
+        border-radius: 12px;
+        border: 1px solid #e0e6ed;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        overflow: hidden;
+    }
+    .logo-preview img { width: 100%; height: 100%; object-fit: contain; }
+    .logo-upload-btn {
+        padding: 8px 16px;
+        border: 1px solid #4b6bfb;
+        color: #4b6bfb;
+        background: #fff;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+    .logo-upload-btn:hover { background: #f0f4ff; }
+    
+    .btn-update {
+        background: #4b6bfb;
+        color: #fff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        margin-top: 10px;
+    }
+    .btn-update:hover { background: #3a55d4; }
+    
+    .row { display: flex; flex-wrap: wrap; margin: 0 -10px; }
+    .col-md-6 { flex: 0 0 50%; max-width: 50%; padding: 0 10px; }
+    
+    @media (max-width: 768px) {
+        .col-md-6 { flex: 0 0 100%; max-width: 100%; }
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="sk-breadcrumb">
+    <div class="breadcrumb-item">
+        <i class="fas fa-cog"></i> General Settings
+    </div>
+    <i class="fas fa-chevron-right separator"></i>
+    <div class="breadcrumb-item active">Institute Profile</div>
+</div>
+
+<div class="campuspro-card">
+    <div class="campuspro-card-title">
+        <i class="far fa-edit"></i> Update Profile
+    </div>
+    
+    <div style="font-size: 11px; color: #ff7675; margin-bottom: 25px;">* Indicates required fields</div>
+    
+    <form action="#" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Institute Logo</label>
+                    <div class="logo-upload-container">
+                        <div class="logo-preview">
+                            <!-- Placeholder logo image -->
+                            <div style="background:#0984e3; color:#fff; width:100%; height:100%; display:flex; align-items:center; justify-content:center; text-align:center; font-weight:bold; font-size:12px; line-height:1.2;">YOUR<br>LOGO<br>HERE</div>
+                        </div>
+                        <div>
+                            <button type="button" class="logo-upload-btn"><i class="fas fa-camera"></i> Change Logo</button>
+                            <div style="font-size: 11px; color: #a0a9b6; margin-top: 8px;">JPG, PNG. Max 500KB</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Name of Institute <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Institute Name">
+                </div>
+                
+                <div class="form-group">
+                    <label>Tagline <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Tagline">
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label>Phone Number <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Phone No">
+                </div>
+                
+                <div class="form-group">
+                    <label>Website</label>
+                    <input type="text" class="form-control" placeholder="Website URL">
+                </div>
+                
+                <div class="form-group">
+                    <label>Address <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Address">
+                </div>
+                
+                <div class="form-group">
+                    <label>Country <span class="required">*</span></label>
+                    <select class="form-control">
+                        <option value="">Select Country</option>
+                        <option value="PK">Pakistan</option>
+                        <option value="IN">India</option>
+                        <option value="US">United States</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <button type="button" class="btn-update"><i class="fas fa-sync-alt"></i> Update Profile</button>
+    </form>
+</div>
+{% endblock content %}

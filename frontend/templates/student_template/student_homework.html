@@ -1,0 +1,191 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}Homework{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    body {
+        background-color: #f8fafc;
+        font-family: 'Inter', 'Poppins', sans-serif;
+    }
+    .es-top-bar {
+        background: white;
+        border-radius: 12px;
+        padding: 15px 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        border: 1px solid #f1f5f9;
+    }
+    .es-breadcrumbs {
+        color: #6b46c1;
+        font-weight: 700;
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .es-breadcrumbs span {
+        color: #94a3b8;
+        font-weight: 400;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .es-top-tags {
+        display: flex;
+        gap: 15px;
+    }
+    .es-tag {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 6px 15px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #6b46c1;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .es-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        margin-bottom: 25px;
+        border: 1px solid #f1f5f9;
+    }
+
+    .es-filter-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 20px;
+    }
+    .es-filter-group {
+        flex: 1;
+    }
+    .es-filter-group label {
+        font-size: 11px;
+        color: #94a3b8;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: block;
+        text-transform: uppercase;
+    }
+    .es-input-icon {
+        position: relative;
+    }
+    .es-input-icon select, .es-input-icon input {
+        width: 100%;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 12px 15px;
+        font-size: 14px;
+        color: #64748b;
+        outline: none;
+        background: white;
+    }
+    .es-input-icon i {
+        position: absolute;
+        right: 15px;
+        top: 14px;
+        color: #94a3b8;
+        pointer-events: none;
+    }
+    
+    .es-btn {
+        background: #6b46c1;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        width: 200px;
+        justify-content: center;
+    }
+    .es-btn:hover {
+        background: #5b21b6;
+    }
+
+    .es-empty-state {
+        text-align: center;
+        padding: 80px 20px;
+    }
+    .es-empty-icon {
+        font-size: 50px;
+        color: #cbd5e1;
+        margin-bottom: 15px;
+    }
+    .es-empty-state p {
+        color: #64748b;
+        font-size: 14px;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="content">
+    <div class="container-fluid" style="padding: 10px 20px;">
+        
+        <!-- Top Bar -->
+        <div class="es-top-bar">
+            <div class="es-breadcrumbs">
+                Homework <span><i class="fas fa-home" style="font-size: 12px; margin-top: -2px;"></i> - My Assignments</span>
+            </div>
+            <div class="es-top-tags">
+                <div class="es-tag"><i class="far fa-calendar-alt"></i> 08 Jul, 2026</div>
+                <div class="es-tag"><i class="fas fa-barcode"></i> mscit</div>
+            </div>
+        </div>
+
+        <!-- Filters Card -->
+        <div class="es-card es-filter-row">
+            <div class="es-filter-group">
+                <label>DATE</label>
+                <div class="es-input-icon">
+                    <input type="text" value="08-07-2026" readonly>
+                    <i class="far fa-calendar-alt"></i>
+                </div>
+            </div>
+            <div class="es-filter-group">
+                <label>TEACHER</label>
+                <div class="es-input-icon">
+                    <select>
+                        <option>All Teachers</option>
+                    </select>
+                </div>
+            </div>
+            <div class="es-filter-group">
+                <label>SUBJECT</label>
+                <div class="es-input-icon">
+                    <select>
+                        <option>All Subjects</option>
+                    </select>
+                </div>
+            </div>
+            <button class="es-btn"><i class="fas fa-search"></i> Search</button>
+        </div>
+
+        <!-- Empty State Card -->
+        <div class="es-card es-empty-state">
+            <div class="es-empty-icon">
+                <i class="far fa-clipboard"></i>
+            </div>
+            <p>No homework found for the selected filters.</p>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

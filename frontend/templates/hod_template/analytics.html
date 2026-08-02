@@ -1,0 +1,621 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active">Analytics & Monitoring</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Top KPI Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-gradient-primary text-white border-0 shadow-sm rounded-lg p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase text-white-50 small mb-1">Total Students</h6>
+                        <h3 class="mb-0 font-weight-bold">{{ total_students }}</h3>
+                    </div>
+                    <div class="icon-circle bg-white-20 text-white" style="font-size: 2rem; opacity: 0.8;">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-white-50 small">
+                    <span class="text-white font-weight-bold"><i class="fas fa-venus-mars"></i> {{ male_students }}M / {{ female_students }}F</span> ratio
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-gradient-success text-white border-0 shadow-sm rounded-lg p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase text-white-50 small mb-1">Staff Strength</h6>
+                        <h3 class="mb-0 font-weight-bold">{{ total_staff }}</h3>
+                    </div>
+                    <div class="icon-circle bg-white-20 text-white" style="font-size: 2rem; opacity: 0.8;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-white-50 small">
+                    Active teaching & admin staff
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-gradient-warning text-white border-0 shadow-sm rounded-lg p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase text-white-50 small mb-1">Fees Collection</h6>
+                        <h3 class="mb-0 font-weight-bold">₹{{ total_collected_fees|floatformat:2 }}</h3>
+                    </div>
+                    <div class="icon-circle bg-white-20 text-white" style="font-size: 2rem; opacity: 0.8;">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-white-50 small">
+                    <span class="text-white font-weight-bold">₹{{ total_pending_fees|floatformat:2 }}</span> pending
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-gradient-danger text-white border-0 shadow-sm rounded-lg p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase text-white-50 small mb-1">Average Attendance</h6>
+                        <h3 class="mb-0 font-weight-bold">{{ attendance_rate }}%</h3>
+                    </div>
+                    <div class="icon-circle bg-white-20 text-white" style="font-size: 2rem; opacity: 0.8;">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                </div>
+                <div class="mt-2 text-white-50 small">
+                    Across all academic courses
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabbed Navigation -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white p-3">
+            <ul class="nav nav-pills nav-justified" id="analyticsTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="student-tab" data-toggle="tab" href="#student" role="tab" aria-controls="student" aria-selected="true">
+                        <i class="fas fa-user-graduate me-2"></i> Student Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="teacher-tab" data-toggle="tab" href="#teacher" role="tab" aria-controls="teacher" aria-selected="false">
+                        <i class="fas fa-chalkboard-teacher me-2"></i> Staff Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="finance-tab" data-toggle="tab" href="#finance" role="tab" aria-controls="finance" aria-selected="false">
+                        <i class="fas fa-wallet me-2"></i> Finance Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="placement-tab" data-toggle="tab" href="#placement" role="tab" aria-controls="placement" aria-selected="false">
+                        <i class="fas fa-briefcase me-2"></i> Placements
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="attendance-tab" data-toggle="tab" href="#attendance" role="tab" aria-controls="attendance" aria-selected="false">
+                        <i class="fas fa-chart-line me-2"></i> Attendance Trends
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="monitoring-tab" data-toggle="tab" href="#monitoring" role="tab" aria-controls="monitoring" aria-selected="false">
+                        <i class="fas fa-cogs me-2"></i> System Monitoring
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card-body">
+            <div class="tab-content" id="analyticsTabsContent">
+                
+                <!-- Student Analytics Tab -->
+                <div class="tab-pane fade show active" id="student" role="tabpanel" aria-labelledby="student-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="text-primary font-weight-bold">Student Demographics & Performance</h5>
+                        <a href="{% url 'export_analytics_report' 'student' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-file-csv mr-1"></i> Export Student CSV Report
+                        </a>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-none border">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold mb-3">Students per Course Enrollment</h6>
+                                    <div id="studentCourseChart" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-none border">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold mb-3">Pass/Fail Academics Ratio</h6>
+                                    <div id="studentAcademicChart" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card shadow-none border">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold mb-3">Academic Score Distribution (Average Marks)</h6>
+                                    <div class="row text-center mt-3">
+                                        <div class="col-md-4">
+                                            <h2 class="text-primary font-weight-bold">{{ avg_test_score|floatformat:2 }}</h2>
+                                            <p class="text-muted mb-0">Average Internal Tests score</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h2 class="text-success font-weight-bold">{{ avg_exam_score|floatformat:2 }}</h2>
+                                            <p class="text-muted mb-0">Average Semester Exam score</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h2 class="text-warning font-weight-bold">{{ total_books_issued }}</h2>
+                                            <p class="text-muted mb-0">Issued Books from library</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teacher/Staff Analytics Tab -->
+                <div class="tab-pane fade" id="teacher" role="tabpanel" aria-labelledby="teacher-tab">
+                    <h5 class="text-primary font-weight-bold mb-3">Staff Performance & Leaves</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-none border">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold mb-3">Leave Applications Breakdown</h6>
+                                    <div id="staffLeaveChart" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-none border">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold mb-3">Performance Data Log</h6>
+                                    <div class="table-responsive" style="max-height: 350px;">
+                                        <table class="table table-hover table-striped mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Staff Member</th>
+                                                    <th>Subjects Assigned</th>
+                                                    <th>Attendance Tracked</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for staff in staff_performance %}
+                                                <tr>
+                                                    <td><strong>{{ staff.name }}</strong></td>
+                                                    <td><span class="badge badge-primary">{{ staff.subjects }}</span></td>
+                                                    <td><span class="badge badge-success">{{ staff.attendance_taken }} logs</span></td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted">No staff metrics available.</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Finance Analytics Tab -->
+                <div class="tab-pane fade" id="finance" role="tabpanel" aria-labelledby="finance-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="text-primary font-weight-bold">Fee Collections & Payment Methods</h5>
+                        <a href="{% url 'export_analytics_report' 'finance' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-file-csv mr-1"></i> Export Financial CSV Report
+                        </a>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-none border">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold mb-3">Collected vs Expected Fees Category-wise</h6>
+                                    <div id="financeCategoryChart" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-none border">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold mb-3">Preferred Payment Channels</h6>
+                                    <div id="financePaymentChart" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Placement Analytics Tab -->
+                <div class="tab-pane fade" id="placement" role="tabpanel" aria-labelledby="placement-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="text-primary font-weight-bold">Placement Registration & Drives</h5>
+                        <a href="{% url 'export_analytics_report' 'placement' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-file-csv mr-1"></i> Export Placement CSV Report
+                        </a>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-none border">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold mb-3">Student Selection Funnel</h6>
+                                    <div id="placementFunnelChart" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-none border">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold mb-3">Placement Drive Roles & Packages</h6>
+                                    <div class="table-responsive" style="max-height: 350px;">
+                                        <table class="table table-hover table-striped mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Company Name</th>
+                                                    <th>Job Role</th>
+                                                    <th>Package</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for drive in packages_data %}
+                                                <tr>
+                                                    <td><strong>{{ drive.company }}</strong></td>
+                                                    <td>{{ drive.role }}</td>
+                                                    <td><span class="badge badge-warning text-dark font-weight-bold">{{ drive.package }}</span></td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted">No placement drive active.</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attendance Trends Tab -->
+                <div class="tab-pane fade" id="attendance" role="tabpanel" aria-labelledby="attendance-tab">
+                    <h5 class="text-primary font-weight-bold mb-3">Attendance Rates & Course Trends</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-none border">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold mb-3">Attendance Status Ratio (Present vs Absent)</h6>
+                                    <div id="attendanceRatioChart" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-none border">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold mb-3">Subject-wise Average Attendance (%)</h6>
+                                    <div id="attendanceSubjectChart" style="height: 350px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Monitoring Tab -->
+                <div class="tab-pane fade" id="monitoring" role="tabpanel" aria-labelledby="monitoring-tab">
+                    <h5 class="text-primary font-weight-bold mb-3">Monitoring Stack Configuration</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-none border h-100">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold text-success"><i class="fas fa-chart-line mr-2"></i> Prometheus Exporter Endpoint</h6>
+                                    <p class="text-muted small">
+                                        The application exports core telemetry to Prometheus scraper in open-metrics standard plaintext format.
+                                    </p>
+                                    <div class="p-3 bg-light rounded border mb-3">
+                                        <strong>Endpoint:</strong> <a href="/metrics" target="_blank"><code>/metrics</code></a>
+                                    </div>
+                                    <p class="small text-muted">
+                                        This provides users count metrics, fee totals, placement ratios, attendance metrics, and library details.
+                                    </p>
+                                    <a href="/metrics" target="_blank" class="btn btn-outline-success btn-sm">
+                                        <i class="fas fa-external-link-alt mr-1"></i> Verify Metrics Plaintext
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-none border h-100">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold text-info"><i class="fas fa-tachometer-alt mr-2"></i> Grafana Dashboard Interface</h6>
+                                    <p class="text-muted small">
+                                        A comprehensive dashboard configuration template has been pre-configured and saved inside this project.
+                                    </p>
+                                    <div class="p-3 bg-light rounded border mb-3">
+                                        <strong>File Path:</strong> <code>monitoring/grafana_dashboard.json</code>
+                                    </div>
+                                    <p class="small text-muted">
+                                        Import this json file directly into your Grafana instance to monitor real-time dashboards for Students, Staff, Finance, and Placement telemetry.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card shadow-none border">
+                                <div class="card-body">
+                                    <h6 class="font-weight-bold mb-3"><i class="fas fa-terminal mr-2"></i> Quick Start: Run Monitoring Stack (Prometheus + Loki + Promtail)</h6>
+                                    <p class="text-muted small">
+                                        Follow these steps to run the monitoring stack on your local machine:
+                                    </p>
+                                    <ol class="small text-muted pl-3">
+                                        <li>Install Docker or download Prometheus, Grafana Loki, and Promtail binaries.</li>
+                                        <li>Start Prometheus using the configuration file in this project: <code>prometheus --config.file=monitoring/prometheus.yml</code>.</li>
+                                        <li>Start Loki: <code>loki --config.file=monitoring/loki-config.yml</code>.</li>
+                                        <li>Start Promtail to ship logs: <code>promtail --config.file=monitoring/promtail-config.yml</code>.</li>
+                                        <li>Open Grafana (port 3000), add Prometheus and Loki as data sources, and import the <code>monitoring/grafana_dashboard.json</code>.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block custom_js %}
+<!-- Apache ECharts Library -->
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // ECharts Theme Color Palette
+        const palette = ['#5e64ff', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6f42c1', '#fd7e14', '#20c997'];
+
+        // --- 1. Student Course Enrollment Chart ---
+        const courseChartDom = document.getElementById('studentCourseChart');
+        if (courseChartDom) {
+            const courseChart = echarts.init(courseChartDom);
+            const courseLabels = {{ students_per_course_labels|safe }};
+            const courseData = {{ students_per_course_data|safe }};
+            
+            const option = {
+                color: palette,
+                tooltip: { trigger: 'item', formatter: '{a} <br/>{b} : {c} ({d}%)' },
+                legend: { bottom: '0', left: 'center', type: 'scroll' },
+                series: [{
+                    name: 'Enrollment',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+                    label: { show: false, position: 'center' },
+                    emphasis: { label: { show: true, fontSize: 16, fontWeight: 'bold' } },
+                    labelLine: { show: false },
+                    data: courseLabels.map((lbl, idx) => ({ value: courseData[idx], name: lbl }))
+                }]
+            };
+            courseChart.setOption(option);
+        }
+
+        // --- 2. Student Academics Ratio (Pass/Fail) Chart ---
+        const academicChartDom = document.getElementById('studentAcademicChart');
+        if (academicChartDom) {
+            const academicChart = echarts.init(academicChartDom);
+            const option = {
+                color: ['#28a745', '#dc3545'],
+                tooltip: { trigger: 'item' },
+                legend: { bottom: '0', left: 'center' },
+                series: [{
+                    name: 'Academic Status',
+                    type: 'pie',
+                    radius: '65%',
+                    center: ['50%', '45%'],
+                    data: [
+                        { value: {{ pass_students }}, name: 'Passed' },
+                        { value: {{ fail_students }}, name: 'Failed' }
+                    ],
+                    emphasis: {
+                        itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0, 0, 0, 0.5)' }
+                    }
+                }]
+            };
+            academicChart.setOption(option);
+        }
+
+        // --- 3. Staff Leave Status Chart ---
+        const staffLeaveChartDom = document.getElementById('staffLeaveChart');
+        if (staffLeaveChartDom) {
+            const staffLeaveChart = echarts.init(staffLeaveChartDom);
+            const option = {
+                color: ['#28a745', '#ffc107', '#dc3545'],
+                tooltip: { trigger: 'item' },
+                legend: { bottom: '0', left: 'center' },
+                series: [{
+                    name: 'Leave Applications',
+                    type: 'pie',
+                    radius: ['45%', '70%'],
+                    data: [
+                        { value: {{ staff_leave_approved }}, name: 'Approved' },
+                        { value: {{ staff_leave_pending }}, name: 'Pending' },
+                        { value: {{ staff_leave_rejected }}, name: 'Rejected' }
+                    ],
+                    itemStyle: { borderRadius: 8, borderColor: '#fff', borderWidth: 2 }
+                }]
+            };
+            staffLeaveChart.setOption(option);
+        }
+
+        // --- 4. Finance Expected vs Collected Fees Chart ---
+        const financeCategoryDom = document.getElementById('financeCategoryChart');
+        if (financeCategoryDom) {
+            const financeCategoryChart = echarts.init(financeCategoryDom);
+            const finLabels = {{ finance_categories_labels|safe }};
+            const finExpected = {{ finance_categories_expected|safe }};
+            const finCollected = {{ finance_categories_collected|safe }};
+            
+            const option = {
+                color: ['#5e64ff', '#28a745'],
+                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                legend: { bottom: '0' },
+                grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
+                xAxis: [{ type: 'category', data: finLabels, axisTick: { alignWithLabel: true } }],
+                yAxis: [{ type: 'value' }],
+                series: [
+                    { name: 'Expected', type: 'bar', barGap: 0, label: { show: true, position: 'top' }, data: finExpected },
+                    { name: 'Collected', type: 'bar', label: { show: true, position: 'top' }, data: finCollected }
+                ]
+            };
+            financeCategoryChart.setOption(option);
+        }
+
+        // --- 5. Preferred Payment Channels Chart ---
+        const financePaymentDom = document.getElementById('financePaymentChart');
+        if (financePaymentDom) {
+            const financePaymentChart = echarts.init(financePaymentDom);
+            const payLabels = {{ payment_method_labels|safe }};
+            const payData = {{ payment_method_data|safe }};
+            
+            const option = {
+                color: palette,
+                tooltip: { trigger: 'item' },
+                legend: { left: 'center', bottom: '0' },
+                series: [{
+                    name: 'Payment Methods',
+                    type: 'pie',
+                    radius: '65%',
+                    data: payLabels.map((lbl, idx) => ({ value: payData[idx], name: lbl })),
+                    emphasis: {
+                        itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0, 0, 0, 0.5)' }
+                    }
+                }]
+            };
+            financePaymentChart.setOption(option);
+        }
+
+        // --- 6. Placement Funnel Chart ---
+        const placementFunnelDom = document.getElementById('placementFunnelChart');
+        if (placementFunnelDom) {
+            const placementFunnelChart = echarts.init(placementFunnelDom);
+            const option = {
+                color: palette,
+                tooltip: { trigger: 'item', formatter: '{a} <br/>{b} : {c}' },
+                legend: { bottom: '0', left: 'center' },
+                series: [{
+                    name: 'Placement Funnel',
+                    type: 'funnel',
+                    left: '10%',
+                    top: 10,
+                    bottom: 60,
+                    width: '80%',
+                    min: 0,
+                    maxSize: '100%',
+                    sort: 'descending',
+                    gap: 2,
+                    label: { show: true, position: 'inside' },
+                    labelLine: { show: false },
+                    itemStyle: { borderColor: '#fff', borderWidth: 1 },
+                    emphasis: { label: { fontSize: 18 } },
+                    data: [
+                        { value: {{ applied_count }} + {{ selected_count }} + {{ rejected_count }}, name: 'Total Applicants' },
+                        { value: {{ applied_count }} + {{ selected_count }}, name: 'Evaluated' },
+                        { value: {{ selected_count }}, name: 'Selected' }
+                    ]
+                }]
+            };
+            placementFunnelChart.setOption(option);
+        }
+
+        // --- 7. Attendance Ratio Present vs Absent Chart ---
+        const attendanceRatioDom = document.getElementById('attendanceRatioChart');
+        if (attendanceRatioDom) {
+            const attendanceRatioChart = echarts.init(attendanceRatioDom);
+            const option = {
+                color: ['#28a745', '#dc3545'],
+                tooltip: { trigger: 'item' },
+                legend: { bottom: '0', left: 'center' },
+                series: [{
+                    name: 'Attendance Status',
+                    type: 'pie',
+                    radius: ['50%', '70%'],
+                    data: [
+                        { value: {{ present_attendance }}, name: 'Present' },
+                        { value: {{ absent_attendance }}, name: 'Absent' }
+                    ],
+                    itemStyle: { borderRadius: 8, borderColor: '#fff', borderWidth: 2 }
+                }]
+            };
+            attendanceRatioChart.setOption(option);
+        }
+
+        // --- 8. Subject Wise Attendance Trend Chart ---
+        const attendanceSubjectDom = document.getElementById('attendanceSubjectChart');
+        if (attendanceSubjectDom) {
+            const attendanceSubjectChart = echarts.init(attendanceSubjectDom);
+            const subLabels = {{ subject_attendance_labels|safe }};
+            const subRates = {{ subject_attendance_rates|safe }};
+            
+            const option = {
+                color: ['#17a2b8'],
+                tooltip: { trigger: 'axis', formatter: '{b} : {c}%' },
+                grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
+                xAxis: { type: 'value', max: 100, axisLabel: { formatter: '{value}%' } },
+                yAxis: { type: 'category', data: subLabels },
+                series: [{
+                    name: 'Attendance Rate',
+                    type: 'bar',
+                    label: { show: true, position: 'insideRight', formatter: '{c}%' },
+                    data: subRates
+                }]
+            };
+            attendanceSubjectChart.setOption(option);
+        }
+
+        // Handle Responsive Resize
+        window.addEventListener('resize', function () {
+            const charts = [
+                courseChartDom, academicChartDom, staffLeaveChartDom,
+                financeCategoryDom, financePaymentDom, placementFunnelDom,
+                attendanceRatioDom, attendanceSubjectDom
+            ];
+            charts.forEach(dom => {
+                if (dom) {
+                    const instance = echarts.getInstanceByDom(dom);
+                    if (instance) instance.resize();
+                }
+            });
+        });
+
+        // Trigger resize on Tab switch to render correctly
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            const targetId = $(e.target).attr('href');
+            const chartsInTab = document.querySelectorAll(targetId + ' div[id$="Chart"]');
+            chartsInTab.forEach(dom => {
+                const instance = echarts.getInstanceByDom(dom);
+                if (instance) instance.resize();
+            });
+        });
+
+    });
+</script>
+{% endblock custom_js %}

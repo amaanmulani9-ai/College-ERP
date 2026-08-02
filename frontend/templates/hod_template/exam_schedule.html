@@ -1,0 +1,56 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+{% block content %}
+<div class="container-fluid py-3">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+            <h3 class="mb-1">Exam Schedule</h3>
+            <div class="text-muted small">Scheduled exam events and active exam definitions.</div>
+        </div>
+        <a href="{% url 'admin_blank_award_list' %}" class="btn btn-outline-dark btn-sm"><i class="fas fa-file-alt"></i> Blank Award List</a>
+    </div>
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white"><strong>Exam Calendar</strong></div>
+                <div class="list-group list-group-flush">
+                    {% for event in events %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>{{ event.title }}</strong>
+                                    <div class="text-muted small">{{ event.description|default:"No description" }}</div>
+                                </div>
+                                <span class="badge bg-danger">{{ event.date|date:"d M Y" }}</span>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="list-group-item text-muted">No exam events added yet.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white"><strong>Active Exam Sets</strong></div>
+                <div class="list-group list-group-flush">
+                    {% for exam in exams %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>{{ exam.title }}</strong>
+                                    <div class="text-muted small">{{ exam.subject.course.name }} - {{ exam.subject.name }}</div>
+                                </div>
+                                <span class="badge {% if exam.is_active %}bg-success{% else %}bg-secondary{% endif %}">{{ exam.duration_minutes }} min</span>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="list-group-item text-muted">No exams available yet.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

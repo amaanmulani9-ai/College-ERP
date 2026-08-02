@@ -1,0 +1,1 @@
+export { WorkspaceShortcuts } from "./WorkspaceWidgets";

@@ -1,0 +1,89 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb-bar {
+        background: transparent;
+        padding: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+        background: #fff;
+        padding: 15px 25px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .sk-breadcrumb-title {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 15px;
+    }
+    .sk-breadcrumb-path {
+        color: #2c3e50;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-group-rounded {
+        width: 100%;
+        max-width: 400px;
+        margin-bottom: 25px;
+        position: relative;
+    }
+    .form-group-rounded label {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        background: #6c5ce7;
+        color: #fff;
+        padding: 2px 10px;
+        border-radius: 15px;
+        font-size: 11px;
+        font-weight: 600;
+        z-index: 1;
+    }
+    .form-control-rounded {
+        width: 100%;
+        border-radius: 25px;
+        border: 1px solid #6c5ce7;
+        padding: 12px 20px;
+        font-size: 14px;
+        color: #2c3e50;
+        background: transparent;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    .form-control-rounded:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.1);
+    }
+
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-title">Exams</div>
+            <div style="color:#dfe6e9; margin: 0 15px;">|</div>
+            <div class="sk-breadcrumb-path"><i class="fas fa-home" style="color:#b2bec3;"></i> - Add/update exam marks</div>
+        </div>
+
+        <div class="form-group-rounded">
+            <label>Select Exam*</label>
+            <select class="form-control-rounded">
+                <option>Select an Exam*</option>
+            </select>
+        </div>
+
+    </div>
+</section>
+{% endblock content %}

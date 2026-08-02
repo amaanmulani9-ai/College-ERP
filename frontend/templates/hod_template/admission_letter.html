@@ -1,0 +1,245 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; }
+
+.sk-breadcrumb-bar {
+    background: #fff;
+    padding: 15px 25px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+.sk-breadcrumb-title {
+    color: #4a235a; font-weight: 600; font-size: 14px;
+    display: flex; align-items: center; gap: 8px;
+}
+.sk-breadcrumb-path {
+    color: #b2bec3; font-size: 13px;
+}
+
+.sk-admission-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 50px 40px;
+    text-align: center;
+}
+.sk-admission-icon {
+    width: 70px; height: 70px;
+    background: rgba(108,92,231,0.08);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+    color: #6c5ce7;
+}
+.sk-admission-title {
+    font-size: 22px; font-weight: 700; color: #2d3436;
+    margin-bottom: 8px;
+}
+.sk-admission-subtitle {
+    font-size: 13px; color: #636e72;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+.sk-admission-subtitle span {
+    color: #6c5ce7; font-weight: 600;
+}
+
+.sk-search-form {
+    display: flex;
+    gap: 12px;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+}
+.sk-search-input {
+    flex: 1;
+    padding: 14px 18px 14px 44px;
+    border: 2px solid #f1f2f6;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: #2d3436;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.sk-search-input:focus { border-color: #6c5ce7; }
+.sk-search-input::placeholder { color: #b2bec3; }
+.sk-search-icon {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    color: #b2bec3; font-size: 16px;
+}
+.sk-search-btn {
+    background: #6c5ce7; color: #fff; border: none;
+    border-radius: 12px; padding: 14px 24px;
+    font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer; transition: background 0.2s;
+    white-space: nowrap;
+}
+.sk-search-btn:hover { background: #5530c5; }
+
+/* Results dropdown */
+.sk-results-dropdown {
+    max-width: 480px;
+    margin: 10px auto 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+.sk-result-item {
+    display: block;
+    padding: 12px 18px;
+    background: linear-gradient(90deg, #e8d5ff, #f5e6ff);
+    color: #4a235a;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255,255,255,0.5);
+    transition: background 0.15s;
+}
+.sk-result-item:hover {
+    background: linear-gradient(90deg, #d5b8ff, #e8d5ff);
+    text-decoration: none;
+    color: #2d3436;
+}
+.sk-result-item:last-child { border-bottom: none; }
+
+/* Admission Letter Print Layout */
+.sk-letter {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+    max-width: 700px;
+    margin: 30px auto 0;
+    padding: 40px;
+}
+.sk-letter-header {
+    text-align: center;
+    border-bottom: 2px solid #6c5ce7;
+    padding-bottom: 20px;
+    margin-bottom: 25px;
+}
+.sk-letter-header h3 {
+    font-size: 20px; font-weight: 700; color: #6c5ce7; margin: 0;
+}
+.sk-letter-header p {
+    font-size: 12px; color: #636e72; margin: 5px 0 0;
+}
+.sk-letter-body p {
+    font-size: 13px; color: #2d3436; line-height: 1.8;
+    margin-bottom: 12px;
+}
+.sk-letter-body strong { color: #6c5ce7; }
+.sk-letter-footer {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #636e72;
+}
+.sk-print-btn {
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    margin: 20px auto 0;
+    padding: 12px;
+    background: #6c5ce7;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.sk-print-btn:hover { background: #5530c5; }
+
+@media print {
+    .sk-breadcrumb-bar, .sk-admission-card, .sk-print-btn, .content-header { display: none !important; }
+    .sk-letter { box-shadow: none; margin: 0; padding: 20px; }
+}
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-title"><i class="fas fa-user-graduate" style="color:#6c5ce7;"></i> Students</div>
+            <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right" style="font-size:10px;margin:0 10px;"></i> Admission Letter</div>
+        </div>
+
+        <!-- Search Card -->
+        <div class="sk-admission-card">
+            <div class="sk-admission-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="sk-admission-title">Generate Admission Letter</div>
+            <div class="sk-admission-subtitle">
+                Search for a student by <span>name</span> or <span>registration number</span> to generate their <span>admission</span> letter.
+            </div>
+
+            <form method="GET" class="sk-search-form">
+                <i class="fas fa-search sk-search-icon"></i>
+                <input type="text" name="q" class="sk-search-input" placeholder="amaan" value="{{ query }}" autocomplete="off">
+                <button type="submit" class="sk-search-btn">
+                    <i class="fas fa-arrow-right"></i> Search
+                </button>
+            </form>
+
+            {% if search_results %}
+            <div class="sk-results-dropdown">
+                {% for s in search_results %}
+                <a href="?student_id={{ s.id }}" class="sk-result-item">
+                    {{ s.registration_no|default:"—" }} – {{ s.admin.first_name }} – {{ s.course.name|default:"N/A" }}
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Generated Letter -->
+        {% if student %}
+        <div class="sk-letter" id="admissionLetter">
+            <div class="sk-letter-header">
+                <h3><i class="fas fa-graduation-cap" style="margin-right:8px;"></i> Admission Letter</h3>
+                <p>Official Document - CAMPUS PRO ERP</p>
+            </div>
+            <div class="sk-letter-body">
+                <p>Date: <strong>{{ student.admission_date|date:"d F, Y"|default:"06 July, 2026" }}</strong></p>
+                <p>Dear <strong>{{ student.admin.first_name }} {{ student.admin.last_name }}</strong>,</p>
+                <p>We are pleased to inform you that you have been admitted to <strong>{{ student.course.name|default:"the program" }}</strong>
+                with Registration No. <strong>{{ student.registration_no|default:"—" }}</strong>.</p>
+                <p>Your academic session begins from <strong>{{ student.session|default:"Current Session" }}</strong>
+                and your batch is <strong>{{ student.batch_year }} Batch</strong>.
+                Current semester: <strong>{{ student.current_semester }}</strong>.
+                Please report to the institution with all required documents on or before the date mentioned above.</p>
+                <p>We congratulate you and wish you the very best in your academic journey.</p>
+                <p style="margin-top:30px;">Sincerely,<br><strong>The Administration</strong></p>
+            </div>
+            <div class="sk-letter-footer">
+                <div>Reg No: {{ student.registration_no|default:"—" }}</div>
+                <div>Class: {{ student.course.name|default:"—" }}</div>
+            </div>
+        </div>
+        <button class="sk-print-btn" onclick="window.print()">
+            <i class="fas fa-print" style="margin-right:6px;"></i> Print Letter
+        </button>
+        {% endif %}
+    </div>
+</section>
+{% endblock content %}

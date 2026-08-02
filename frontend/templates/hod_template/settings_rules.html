@@ -1,0 +1,313 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    /* CampusPro Exact Styling */
+    body { background-color: #f8f9fa; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb-bar {
+        background: transparent;
+        padding: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+        font-family: 'Poppins', sans-serif;
+    }
+    .sk-breadcrumb-title {
+        color: #6c5ce7;
+        font-weight: 600;
+        font-size: 15px;
+        margin-right: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .sk-breadcrumb-title i { font-size: 14px; }
+    .sk-breadcrumb-path {
+        color: #888;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .rules-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        margin-bottom: 25px;
+        border-top: 3px solid #6c5ce7;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .rules-card.employee {
+        border-top-color: #4834d4;
+    }
+    
+    .rules-header {
+        padding: 20px 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border-bottom: 1px solid transparent;
+    }
+    .rules-icon-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: rgba(108, 92, 231, 0.1);
+        color: #6c5ce7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+    .rules-card.employee .rules-icon-box {
+        background: rgba(72, 52, 212, 0.1);
+        color: #4834d4;
+    }
+    
+    .rules-title-group h4 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #2d3436;
+    }
+    .rules-title-group p {
+        margin: 0;
+        font-size: 12px;
+        color: #b2bec3;
+        margin-top: 2px;
+    }
+    
+    .rules-body {
+        padding: 0 25px 25px 25px;
+        flex: 1;
+    }
+    .rules-body-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #b2bec3;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        display: block;
+    }
+    .rules-body-label span { color: #ff7675; }
+    
+    /* Editor Toolbar Styles */
+    .editor-container {
+        border: 1px solid #f1f2f6;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #f8f9fa;
+    }
+    .editor-toolbar {
+        background: #fff;
+        border-bottom: 1px solid #f1f2f6;
+        padding: 10px 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .toolbar-btn {
+        background: transparent;
+        border: none;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #b2bec3;
+        font-size: 14px;
+        transition: 0.2s;
+        border-radius: 4px;
+    }
+    .toolbar-btn:hover {
+        background: #f1f2f6;
+        color: #636e72;
+    }
+    .toolbar-btn.highlight {
+        background: #fdcb6e;
+        color: #fff;
+    }
+    .toolbar-select {
+        height: 28px;
+        border: 1px solid #dfe6e9;
+        border-radius: 4px;
+        padding: 0 8px;
+        font-size: 12px;
+        background: #fff;
+        color: #636e72;
+        outline: none;
+    }
+    .toolbar-divider {
+        width: 1px;
+        height: 20px;
+        background: #dfe6e9;
+        margin: 0 5px;
+    }
+    
+    .editor-textarea {
+        width: 100%;
+        border: none;
+        padding: 20px;
+        font-size: 14px;
+        color: #2d3436;
+        resize: vertical;
+        font-family: inherit;
+        outline: none;
+        background: #fff;
+        min-height: 250px;
+    }
+    
+    .save-bar {
+        background: #fff;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+        margin-bottom: 30px;
+    }
+    .save-bar-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #888;
+        font-size: 13px;
+    }
+    .save-bar-info i { color: #b2bec3; font-size: 16px; }
+    
+    .save-rules-btn {
+        padding: 10px 24px;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.2s;
+        border: none;
+        background: #6c5ce7;
+        color: #fff;
+    }
+    .save-rules-btn:hover {
+        background: #5b4bc4;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Breadcrumb Bar -->
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-title"><i class="fas fa-cog"></i> General Settings</div>
+            <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right" style="font-size:10px;"></i> Rules & Regulations</div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="border-radius:8px; border:none; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <!-- Student Rules -->
+                <div class="col-md-6 mb-4">
+                    <div class="rules-card">
+                        <div class="rules-header">
+                            <div class="rules-icon-box">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div class="rules-title-group">
+                                <h4>Student Rules & Regulations</h4>
+                                <p>Displayed on the Admission Letter</p>
+                            </div>
+                        </div>
+                        <div class="rules-body">
+                            <label class="rules-body-label">RULES FOR STUDENTS <span>*</span></label>
+                            <div class="editor-container">
+                                <div class="editor-toolbar">
+                                    <button type="button" class="toolbar-btn"><i class="fas fa-bold"></i></button>
+                                    <button type="button" class="toolbar-btn"><i class="fas fa-underline"></i></button>
+                                    <button type="button" class="toolbar-btn"><i class="fas fa-italic"></i></button>
+                                    <button type="button" class="toolbar-btn highlight"><i class="fas fa-font"></i></button>
+                                    <div class="toolbar-divider"></div>
+                                    <select class="toolbar-select">
+                                        <option value="12">12</option>
+                                        <option value="14" selected>14</option>
+                                        <option value="16">16</option>
+                                        <option value="18">18</option>
+                                    </select>
+                                    <div class="toolbar-divider"></div>
+                                    <button type="button" class="toolbar-btn"><i class="fas fa-list-ul"></i></button>
+                                    <button type="button" class="toolbar-btn"><i class="fas fa-list-ol"></i></button>
+                                    <button type="button" class="toolbar-btn"><i class="fas fa-outdent"></i></button>
+                                </div>
+                                <textarea id="student_rules_editor" name="student_rules" class="editor-textarea" placeholder="">{{ rules.student_rules|default:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee Rules -->
+                <div class="col-md-6 mb-4">
+                    <div class="rules-card employee">
+                        <div class="rules-header">
+                            <div class="rules-icon-box">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <div class="rules-title-group">
+                                <h4>Employee Rules & Regulations</h4>
+                                <p>Displayed on the Job Letter</p>
+                            </div>
+                        </div>
+                        <div class="rules-body">
+                            <label class="rules-body-label">RULES FOR EMPLOYEES <span>*</span></label>
+                            <div class="editor-container">
+                                <div class="editor-toolbar">
+                                    <button type="button" class="toolbar-btn"><i class="fas fa-bold"></i></button>
+                                    <button type="button" class="toolbar-btn"><i class="fas fa-underline"></i></button>
+                                    <button type="button" class="toolbar-btn"><i class="fas fa-italic"></i></button>
+                                    <button type="button" class="toolbar-btn highlight"><i class="fas fa-font"></i></button>
+                                    <div class="toolbar-divider"></div>
+                                    <select class="toolbar-select">
+                                        <option value="12">12</option>
+                                        <option value="14" selected>14</option>
+                                        <option value="16">16</option>
+                                        <option value="18">18</option>
+                                    </select>
+                                    <div class="toolbar-divider"></div>
+                                    <button type="button" class="toolbar-btn"><i class="fas fa-list-ul"></i></button>
+                                    <button type="button" class="toolbar-btn"><i class="fas fa-list-ol"></i></button>
+                                    <button type="button" class="toolbar-btn"><i class="fas fa-outdent"></i></button>
+                                </div>
+                                <textarea id="employee_rules_editor" name="employee_rules" class="editor-textarea" placeholder="">{{ rules.employee_rules|default:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Bar -->
+            <div class="save-bar">
+                <div class="save-bar-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Both rules will be saved together when you click <b>Save Changes</b>.</span>
+                </div>
+                <button type="submit" class="save-rules-btn"><i class="fas fa-check mr-1"></i> Save Changes</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock content %}

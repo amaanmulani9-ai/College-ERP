@@ -2,22 +2,50 @@
 {% load static %}
 {% block page_title %}{{page_title}}{% endblock page_title %}
 
+{% block custom_css %}
+<style>
+    .course-shell {
+        display: grid;
+        grid-template-columns: 320px minmax(0, 1fr);
+        gap: 24px;
+    }
+    .course-side {
+        background: linear-gradient(180deg, #0f172a 0%, #6c5ce7 100%);
+        color: #fff;
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 12px 30px rgba(15,23,42,.16);
+    }
+    .course-side h2 { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+    .course-side p { font-size: 13px; line-height: 1.7; color: rgba(255,255,255,.84); }
+    .course-pill {
+        display:inline-flex; align-items:center; gap:8px;
+        padding:8px 12px; margin: 10px 8px 0 0;
+        border-radius:999px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.15);
+        font-size:12px; font-weight:600;
+    }
+    .course-card {
+        background:#fff; border-radius:16px; padding:28px;
+        box-shadow:0 2px 15px rgba(0,0,0,.03);
+    }
+    @media (max-width: 992px) { .course-shell { grid-template-columns: 1fr; } }
+</style>
+{% endblock custom_css %}
+
 {% block content %}
 
 <section class="content">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <!-- general form elements -->
-                <div class="card card-dark">
-                    <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
-                    </div>
-
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text="Edit Course"%}
-                </div>
-                <!-- /.card -->
-
+        <div class="course-shell">
+            <aside class="course-side">
+                <h2>Course Metadata</h2>
+                <p>Define university, degree level, and semester count here so student progression and report logic stay accurate from the start.</p>
+                <div class="course-pill"><i class="fas fa-university"></i> University</div>
+                <div class="course-pill"><i class="fas fa-layer-group"></i> Semester count</div>
+                <div class="course-pill"><i class="fas fa-graduation-cap"></i> Degree level</div>
+            </aside>
+            <div class="course-card">
+                {% include "main_app/form_template.html" with messages=messages  form=form button_text="Edit Course"%}
             </div>
         </div>
     </div>

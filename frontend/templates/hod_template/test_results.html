@@ -1,0 +1,130 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb-bar {
+        background: transparent;
+        padding: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+        background: #fff;
+        padding: 15px 25px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .sk-breadcrumb-title {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 15px;
+    }
+    .sk-breadcrumb-path {
+        color: #2c3e50;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .pill-tabs {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+    .pill-tab {
+        padding: 10px 25px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #b2bec3;
+        background: #fff;
+        border: 1px solid #dfe6e9;
+        cursor: pointer;
+    }
+    .pill-tab.active {
+        color: #6c5ce7;
+        border-color: #6c5ce7;
+    }
+
+    .form-group-rounded {
+        width: 100%;
+        max-width: 400px;
+        margin-bottom: 25px;
+        position: relative;
+        display: inline-block;
+        margin-right: 15px;
+        vertical-align: top;
+    }
+    .form-group-rounded label {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        background: #6c5ce7;
+        color: #fff;
+        padding: 2px 10px;
+        border-radius: 15px;
+        font-size: 11px;
+        font-weight: 600;
+        z-index: 1;
+    }
+    .form-control-rounded {
+        width: 100%;
+        border-radius: 25px;
+        border: 1px solid #6c5ce7;
+        padding: 12px 20px;
+        font-size: 14px;
+        color: #2c3e50;
+        background: transparent;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    .form-control-rounded:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.1);
+    }
+    .form-control-rounded.optional {
+        border-color: #b2bec3;
+    }
+    .form-group-rounded label.optional {
+        background: #b2bec3;
+    }
+
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-title">Class Tests</div>
+            <div style="color:#dfe6e9; margin: 0 15px;">|</div>
+            <div class="sk-breadcrumb-path"><i class="fas fa-home" style="color:#b2bec3;"></i> - Test Results & Reports</div>
+        </div>
+
+        <div class="pill-tabs">
+            <div class="pill-tab">Class-wise</div>
+            <div class="pill-tab active">Class & Subject</div>
+            <div class="pill-tab">Student & Subject</div>
+            <div class="pill-tab">Date Range</div>
+            <div class="pill-tab">Performance Report</div>
+        </div>
+
+        <div id="tab-content-area">
+            <!-- Dynamic content based on tab selected (using default Class & Subject for now) -->
+            <div class="form-group-rounded">
+                <label>Select Class*</label>
+                <select class="form-control-rounded">
+                    <option>Select a Class*</option>
+                </select>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock content %}

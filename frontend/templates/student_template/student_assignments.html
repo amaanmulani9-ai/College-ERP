@@ -1,0 +1,87 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card erpnext-card mb-4">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h4 class="mb-1"><i class="fas fa-tasks text-success"></i> My Course Assignments</h4>
+                <p class="text-muted mb-0 small">Track submission status, grades, and upcoming due dates in one place.</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <span class="badge bg-light text-dark border">Total {{ assignments|length }}</span>
+                <span class="badge bg-success">Submitted {{ submitted_assignment_ids|length }}</span>
+                <span class="badge bg-warning text-dark">Pending {{ pending_assignment_count|default:"0" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card erpnext-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0"><i class="fas fa-tasks text-success"></i> My Course Assignments</h5>
+            <a href="{% url 'student_lms_home' %}" class="btn btn-sm btn-outline-secondary">Back to LMS</a>
+        </div>
+        <div class="card-body table-responsive">
+            {% if assignments %}
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Subject</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Grade / Marks</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assignment in assignments %}
+                    <tr>
+                        <td><strong>{{ assignment.title }}</strong></td>
+                        <td><span class="badge bg-secondary">{{ assignment.subject.name }}</span></td>
+                        <td>{{ assignment.due_date|date:"M d, Y H:i" }}</td>
+                        <td>
+                            {% if assignment.id in submitted_assignment_ids %}
+                            <span class="badge bg-success"><i class="fas fa-check"></i> Submitted</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-circle"></i> Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if assignment.id in submitted_assignment_ids %}
+                                {% for sub_id, sub in submissions.items %}
+                                    {% if sub_id == assignment.id %}
+                                        {% if sub.marks_obtained > 0 %}
+                                        <span class="badge bg-primary">{{ sub.marks_obtained }} marks</span>
+                                        <small class="d-block text-muted">{{ sub.feedback }}</small>
+                                        {% else %}
+                                        <span class="text-muted small">Awaiting grade</span>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                            <span class="text-muted small">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'student_submit_assignment' assignment.id %}" class="btn btn-sm {% if assignment.id in submitted_assignment_ids %}btn-outline-primary{% else %}btn-success{% endif %}">
+                                {% if assignment.id in submitted_assignment_ids %}View / Edit Submission{% else %}<i class="fas fa-upload"></i> Submit Now{% endif %}
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-clipboard-check fa-3x text-muted mb-3"></i>
+                <h5>No Assignments Available</h5>
+                <p class="text-muted mb-0">Your teachers have not posted assignments for this course yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

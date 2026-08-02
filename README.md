@@ -1,229 +1,138 @@
-<div align="center">
+# Enterprise College ERP Suite
 
+![Version](https://img.shields.io/badge/version-v1.0.0-indigo.svg?style=for-the-badge)
+![License](https://img.shields.io/badge/license-MIT-emerald.svg?style=for-the-badge)
+![Python](https://img.shields.io/badge/python-3.12-blue.svg?style=for-the-badge)
+![Django](https://img.shields.io/badge/django-5.1-092E20.svg?style=for-the-badge)
+![React](https://img.shields.io/badge/react-19.0-61DAFB.svg?style=for-the-badge)
+![TypeScript](https://img.shields.io/badge/typescript-5.7-3178C6.svg?style=for-the-badge)
+![Vite](https://img.shields.io/badge/vite-6.0-646CFF.svg?style=for-the-badge)
+![PostgreSQL](https://img.shields.io/badge/postgresql-16.0-4169E1.svg?style=for-the-badge)
 
-# 🎓 College ERP System 🚀
-**A Next-Generation Enterprise Resource Planning Solution for Educational Institutions**
-
-[![Python Version](https://img.shields.io/badge/Python-3.8+-blue.svg?style=for-the-badge&logo=python)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/Django-4.x-092E20.svg?style=for-the-badge&logo=django)](https://www.djangoproject.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
-[![Author](https://img.shields.io/badge/Developer-Amaan-purple.svg?style=for-the-badge)](https://github.com/amaanmulani9-ai)
-
-*Streamline administration, empower staff, and engage students with a single unified platform.*
-
-[Report a Bug](https://github.com/amaanmulani9-ai/College-ERP/issues) • [Request Feature](https://github.com/amaanmulani9-ai/College-ERP/issues)
-
-</div>
+The **Enterprise College ERP Suite** is a modern, high-performance, multi-tenant SaaS platform built for higher education institutions, universities, and multi-campus collegiate systems.
 
 ---
 
-## 🌟 Overview
-
-**College ERP** is a full-stack educational management system built using the powerful Django web framework. It bridges the gap between Administration, Staff, and Students by providing real-time data synchronization, dynamic dashboards, and automated workflows.
-
-Whether you're managing attendance, tracking academic results, or handling leave requests, College ERP provides an intuitive, glassmorphic UI that feels premium and responsive on any device.
-
----
-
-## 📸 Screenshots
-
-Here are some glimpses of the **College ERP** in action:
-
-| Login Portal | Admin Dashboard |
-|:---:|:---:|
-| ![Login Page](Showcase/Screenshot_01.png) | ![Admin Dashboard](Showcase/Screenshot_02.png) |
-
-| Staff Portal | Student Portal |
-|:---:|:---:|
-| ![Staff Dashboard](Showcase/Screenshot_03.png) | ![Student Dashboard](Showcase/Screenshot_04.png) |
-
----
-
-## 🔥 Key Features
-
-### 👨‍💼 Administration Portal
-- **Global Dashboard:** View real-time analytics on student enrollment, staff counts, and course metrics.
-- **Academic Management:** Create and manage Courses, Subjects, and Academic Sessions.
-- **User Management:** Full CRUD capabilities for Staff, Student, and Parent accounts.
-- **Oversight:** Monitor attendance, review leave applications, and process user feedback.
-- **Financials & Placements:** Manage student fees, generate receipts, and organize campus placement drives.
-- **Document Management:** Securely upload and distribute general college documents.
-
-### 👨‍🏫 Staff Portal
-- **Attendance Tracking:** Quickly take, update, and manage student attendance.
-- **Academic Grading:** Publish and edit student results securely.
-- **Online Exams:** Create, schedule, and grade automated MCQ exams.
-- **Library Management:** Issue books to students and track library inventory.
-- **Communication:** Apply for staff leave and send direct feedback to the Administration.
-
-### 🎓 Student Portal
-- **Academic Dashboard:** View personalized timetables, attendance records, offline results, and online exam scores.
-- **Online Examinations:** Take secure, timed MCQ online exams directly from the portal.
-- **AI Study Assistant:** Get instant help with studying and generate practice quizzes using an integrated AI bot.
-- **Library Access:** Browse the library catalog and track borrowed books.
-- **Requests:** Submit leave applications and request official certificates directly from the dashboard.
-- **Finances:** Track fee structures and log fee payments.
-
-### 👪 Parent Portal
-- **Child Progress:** Securely log in to monitor linked student's academic progress.
-- **Real-time Analytics:** View attendance metrics, offline test scores, and online exam submissions.
-
-### 🌐 Global Features
-- **PWA Ready:** Installable on desktop and mobile devices for offline access and native app-like experience.
-- **Multi-Language (i18n):** Dynamically switch the interface between English, Hindi, and Arabic.
-
-
----
-
-## 💻 Tech Stack
-
-- **Backend:** Python, Django (`backend/`)
-- **Frontend:** HTML5, CSS3 (Custom Glassmorphism Design), JavaScript, Bootstrap 5 (`frontend/`)
-- **Database:** SQLite3 (Development) / PostgreSQL (Production)
-- **Security:** CSRF Protection, Password Hashing, Role-Based Access Control
-
----
-
-## 📁 Project Structure
+## 🏛 Architecture Overview
 
 ```
-College-ERP/
-├── backend/          # Django server, models, views, API logic
-│   ├── college_management_system/
-│   ├── main_app/
-│   ├── manage.py
-│   └── requirements.txt
-├── frontend/         # Templates, CSS/JS, translations
-│   ├── templates/
-│   ├── static/
-│   └── locale/
-├── manage.py         # Run Django commands from project root
-├── Showcase/         # Screenshots
-└── README.md
+                      +------------------------------------------+
+                      |         Enterprise Web & PWA Client      |
+                      |   React 19 · TypeScript 5.7 · Vite 6    |
+                      +--------------------+---------------------+
+                                           | REST API / JSON
+                                           v
+                      +--------------------+---------------------+
+                      |         Django REST Framework API        |
+                      |    Python 3.12 · Multi-Tenant Middleware |
+                      +--------------------+---------------------+
+                                           |
+         +---------------------------------+---------------------------------+
+         |                                 |                                 |
+         v                                 v                                 v
++------------------+             +-------------------+             +-------------------+
+|  PostgreSQL DB   |             |   Redis Cache &   |             |  Service Worker   |
+| Multi-Tenancy    |             |  Celery Workers   |             |  Offline Action   |
+| Schema Isolation |             |  Task Queues      |             |  PWA Queue        |
++------------------+             +-------------------+             +-------------------+
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Key Modules & Capabilities
 
-Follow these steps to get a local copy up and running on your machine.
+### 1. Backend ERP Core (30 Domain Applications)
+- **Admissions & Enrollment**: Application tracking, document verification, entrance merit list calculation.
+- **Academic Administration**: Departments, courses, curriculum trees, semester credits, prerequisites.
+- **Examinations & Grading**: Exam scheduling, gradebook matrix, GPA/CGPA computation, transcript generation.
+- **Finance & Fee Collection**: Fee structure configuration, online payment gateway, ledger entries, receipts.
+- **Hostel & Housing**: Room allocation, warden management, mess billing, gate pass tracking.
+- **Library Management**: Accession register, ISBN catalog, book issuance/returns, overdue fine calculation.
+- **Faculty Load & HR**: Staff profiles, payroll processing, leave management, teaching workload distribution.
+- **Transport & Logistics**: Vehicle fleet tracking, route management, student bus pass allocation.
+- **IAM & Audit Trails**: Role-Based Access Control (RBAC), multi-tenancy isolation, detailed audit logs.
+
+### 2. Desktop & Touch Workspace
+- Touch-optimized tab workspace (`frontend/src/components/workspace/`).
+- Docking side panels, recent items history, workspace favorites.
+- Global Command Palette (<kbd>Ctrl+K</kbd> / <kbd>⌘K</kbd>) & Docked AI Assistant.
+
+### 3. Reporting & Analytics
+- Visual drag-and-drop report builder.
+- Dynamic charts (Bar, Line, Pie, Area) with live filtering.
+- Automated scheduled PDF, XLSX, and CSV report export & email distribution.
+
+### 4. Progressive Web App (PWA) & Mobile Engine
+- Standalone installable PWA (`frontend/src/mobile/pwa/`).
+- Network RTT latency monitoring and offline banner notification.
+- Offline action queue with automatic background synchronization upon reconnection.
+
+### 5. Motion, State, & Accessibility Systems
+- **Motion System** (`frontend/src/ux/motion/`): GPU-accelerated transition wrappers and micro-animations.
+- **State System** (`frontend/src/ux/states/`): Standardized shimmer skeletons, empty states, and HTTP error recovery.
+- **Accessibility System** (`frontend/src/ux/accessibility/`): WCAG 2.1 AA keyboard focus traps, ARIA live region announcements, and shortcut help overlays (<kbd>?</kbd>).
+
+---
+
+## ⚙️ Quick Start & Installation
 
 ### Prerequisites
-Make sure you have [Python 3.8+](https://www.python.org/downloads/) installed on your system.
+- Python 3.12+
+- Node.js 20+ & npm 10+
+- PostgreSQL 16+ (or local SQLite for dev)
 
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/amaanmulani9-ai/College-ERP.git
-   cd College-ERP
-   ```
-
-2. **Create a virtual environment (Recommended)**
-   ```bash
-   python -m venv venv
-   # Activate on Windows:
-   venv\Scripts\activate
-   # Activate on macOS/Linux:
-   source venv/bin/activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r backend/requirements.txt
-   ```
-
-4. **Apply database migrations**
-   ```bash
-   python manage.py makemigrations
-   python manage.py migrate
-   ```
-
-5. **Create a Superuser (Admin Account)**
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-6. **Run the development server**
-   ```bash
-   python manage.py runserver
-   ```
-
-7. **Access the application**
-   Open your browser and navigate to `http://localhost:8000`.
-
----
-
-## ☁️ Deploy on Vercel (with Supabase Postgres)
-
-### 1. Connect Supabase to Vercel
-
-1. Create a project at [supabase.com](https://supabase.com)
-2. In **Project Settings → Database**, copy the connection strings
-3. In Vercel → **Project Settings → Environment Variables**, add:
-
-| Variable | Value |
-|----------|-------|
-| `POSTGRES_PRISMA_URL` | **Transaction pooler** (port `6543`) — app runtime |
-| `POSTGRES_HOST` | `db.your-project-ref.supabase.co` |
-| `POSTGRES_USER` | `postgres` |
-| `POSTGRES_PASSWORD` | Your database password |
-| `POSTGRES_DATABASE` | `postgres` |
-| `SUPABASE_URL` | `https://your-project-ref.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | From Supabase API settings |
-| `SUPABASE_SERVICE_ROLE_KEY` | From Supabase API settings (server only) |
-| `SECRET_KEY` | A long random Django secret |
-| `DEBUG` | `False` |
-
-**Important:** For migrations, use the **direct** host (`db.xxx.supabase.co:5432`), not the pooler on port 5432. The build command handles this automatically via `POSTGRES_HOST`.
-
-### 2. Deploy
-
+### Backend Setup
 ```bash
-git push
+cd backend
+python -m venv venv
+# On Windows:
+..\venv\Scripts\activate
+# On Linux/macOS:
+source venv/bin/activate
+
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver 0.0.0.0:8000
 ```
 
-Vercel will run migrations (direct connection) → `collectstatic` → deploy.
-
-### 3. Create admin account
-
+### Frontend Setup
 ```bash
-vercel env pull .env.local
-python manage.py createsuperuser
+npm install
+npm run dev
 ```
 
 ---
 
-## 🔐 Default Demo Accounts
+## 🐳 Docker Deployment
 
-If you have seeded the database with test data, you can use the following default accounts to explore the system:
-
-| Role | Email Address | Password |
-|------|---------------|----------|
-| **Staff** | `staffone@staff.com` | `staffone` |
-| **Student** | `studentone@student.com` | `studentone` |
+```bash
+# Build and launch complete stack with Docker Compose
+docker-compose up --build -d
+```
 
 ---
 
-## 🤝 Contributing
+## 🧪 Testing & Verification
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+```bash
+# Run Django backend checks & migrations test
+cd backend
+python manage.py check
+python manage.py makemigrations --check
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+# Run Pytest suite (201 tests passing)
+pytest
+
+# Run Frontend TypeScript check & Production Build
+cd ..
+npx tsc --noEmit
+npm run build
+```
 
 ---
 
-## 📜 License
+## 📄 License & Contributing
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the **MIT License**. See `LICENSE` for more information.
 
----
-
-<div align="center">
-  <b>Built with ❤️ by <a href="https://github.com/amaanmulani9-ai">Amaan</a></b><br>
-  <i>If you find this project helpful, please consider giving it a ⭐!</i>
-</div>
+Contributions are welcome! Please read `CONTRIBUTING.md` and follow our `CODE_OF_CONDUCT.md`.

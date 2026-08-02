@@ -252,6 +252,11 @@
         <!-- Left Column: Submission Form -->
         <div class="form-card">
             <h4 class="form-card-title"><i class="fas fa-file-signature text-primary"></i> Request Certificate</h4>
+            <div class="mb-3 p-3 rounded" style="background:#f8fafc;border:1px solid #e5e7eb;">
+                <div class="small text-muted text-uppercase fw-bold mb-1">Student Context</div>
+                <div class="fw-bold">{{ student.admin.get_full_name }}</div>
+                <div class="small text-muted">{{ student.course.name|default:"Student" }} | Batch {{ student.batch_year }} | Sem {{ student.current_semester }}</div>
+            </div>
             <form action="{% url 'student_request_certificate' %}" method="POST">
                 {% csrf_token %}
                 <div class="mb-3">
@@ -279,6 +284,20 @@
         <div class="history-card">
             <div class="p-3 bg-light border-bottom">
                 <h5 class="m-0 font-weight-bold text-uppercase font-size-11" style="color: #4b5563; letter-spacing: 0.5px;">Certificate Request Status</h5>
+            </div>
+            <div class="row g-0 border-bottom">
+                <div class="col-4 p-3 text-center">
+                    <div class="text-muted small text-uppercase fw-bold">Approved</div>
+                    <div class="h4 mb-0">{{ approved_count|default:"0" }}</div>
+                </div>
+                <div class="col-4 p-3 text-center border-start border-end">
+                    <div class="text-muted small text-uppercase fw-bold">Pending</div>
+                    <div class="h4 mb-0">{{ pending_count|default:"0" }}</div>
+                </div>
+                <div class="col-4 p-3 text-center">
+                    <div class="text-muted small text-uppercase fw-bold">Rejected</div>
+                    <div class="h4 mb-0">{{ rejected_count|default:"0" }}</div>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
@@ -325,8 +344,8 @@
                                             <i class="fas fa-eye me-1"></i> View & Save
                                         </button>
                                     {% else %}
-                                        <button class="btn btn-sm btn-outline-secondary" disabled>
-                                            <i class="fas fa-lock me-1"></i> Locked
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" onclick="openCertificateStatus('{{ req.get_certificate_type_display }}', '{{ req.status }}')">
+                                            <i class="fas fa-circle-info me-1"></i> View Status
                                         </button>
                                     {% endif %}
                                 </td>
@@ -405,6 +424,10 @@ function closeCertificateModal() {
     document.getElementById('certModalOverlay').style.display = 'none';
 }
 
+function openCertificateStatus(type, status) {
+    alert(type + ' request is currently ' + status.toLowerCase() + '. We will update the certificate here once it is approved.');
+}
+
 function viewOrnamentalCertificate(type, approvedDate) {
     const titleEl = document.getElementById('certTypeTitle');
     const textEl = document.getElementById('certDynamicText');
@@ -413,10 +436,10 @@ function viewOrnamentalCertificate(type, approvedDate) {
     // Set Issue Date
     dateEl.innerText = approvedDate || new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
     
-    const studentName = "<b>Amaan Mulani</b>";
-    const rollNo = "<b>PAT/2026/0001</b>";
-    const courseName = "<b>Computer Science & Engineering</b>";
-    const batchYears = "<b>2026 - 2027</b>";
+    const studentName = "<b>{{ student.admin.get_full_name|escapejs }}</b>";
+    const rollNo = "<b>{{ student.unique_student_code|default:student.registration_no|default:student.id|escapejs }}</b>";
+    const courseName = "<b>{{ student.course.name|escapejs }}</b>";
+    const batchYears = "<b>{{ student.academic_year_label|escapejs }}</b>";
     
     if (type === 'Bonafide') {
         titleEl.innerText = "Bonafide Certificate";

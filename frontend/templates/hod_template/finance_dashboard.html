@@ -1,0 +1,150 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block page_title %}Admin Finance Dashboard{% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Finance Administration</li>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row">
+        
+        <!-- Reports and Quick Actions -->
+        <div class="col-md-12 mb-4">
+            <div class="card bg-dark text-white">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-1">Accounting & Reporting</h4>
+                        <p class="text-muted mb-0">Manage generalized ledger exports and tax compliance.</p>
+                    </div>
+                    <div>
+                        <a href="{% url 'generate_gst_report' %}" class="btn btn-success">
+                            <i class="fas fa-file-csv me-2"></i> Download Monthly GST Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scholarship Assignment -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Grant New Scholarship</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'admin_finance_dashboard' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="grant_scholarship">
+                        
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold">Select Student</label>
+                            <select class="form-select" name="student_id" required>
+                                <option value="">-- Choose Student --</option>
+                                {% for student in students %}
+                                    <option value="{{ student.id }}">{{ student.admin.first_name }} {{ student.admin.last_name }} ({{ student.admin.email }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold">Scholarship Name / Reason</label>
+                            <input type="text" class="form-control" name="name" placeholder="e.g., Merit Excellence 2026" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label font-weight-bold">Discount Percentage (%)</label>
+                            <input type="number" step="0.01" class="form-control" name="discount" placeholder="e.g., 50.00" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100">Grant Scholarship</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Refunds -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Pending Refund Requests</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for refund in refunds %}
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>Refund #{{ refund.id }}</strong> (Payment #{{ refund.payment.id }})
+                                        <p class="text-muted mb-0 font-size-12">{{ refund.reason }}</p>
+                                    </div>
+                                    <form method="POST" action="{% url 'admin_finance_dashboard' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="approve_refund">
+                                        <input type="hidden" name="refund_id" value="{{ refund.id }}">
+                                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                    </form>
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item text-muted text-center py-4">No pending refund requests.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Global Transaction Ledger (Recent)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover font-size-13">
+                            <thead>
+                                <tr>
+                                    <th>Pay ID</th>
+                                    <th>Txn Ref (Gateway)</th>
+                                    <th>Student</th>
+                                    <th>Amount Paid</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                <tr>
+                                    <td>#{{ payment.id }}</td>
+                                    <td><code>{{ payment.transaction_id|default:"N/A" }}</code></td>
+                                    <td>{{ payment.invoice.student.admin.email }}</td>
+                                    <td class="text-success font-weight-bold">INR {{ payment.amount_paid }}</td>
+                                    <td>
+                                        {% if payment.status == 'Completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% elif payment.status == 'Failed' %}
+                                            <span class="badge bg-danger">Failed</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ payment.created_at|date:"M d, Y H:i" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No transactions recorded yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

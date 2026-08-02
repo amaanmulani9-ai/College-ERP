@@ -1,0 +1,91 @@
+{% extends 'main_app/base.html' %}
+
+{% block page_title %}Library Overview{% endblock page_title %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'admin_home' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">Library</li>
+{% endblock breadcrumb %}
+
+{% block custom_css %}
+<style>
+.lux-page { font-family: 'Poppins', sans-serif; }
+.lux-band { background:#101828; color:#fff; border-radius:8px; padding:22px; display:flex; justify-content:space-between; gap:16px; margin-bottom:16px; box-shadow:0 14px 35px rgba(16,24,40,.18); }
+.lux-band h2 { margin:0 0 4px; font-size:22px; font-weight:800; }
+.lux-band p { margin:0; color:#cbd5e1; font-size:13px; }
+.lux-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.lux-btn { border:0; border-radius:6px; padding:10px 13px; background:#fff; color:#101828; text-decoration:none; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:8px; }
+.lux-btn.secondary { background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.18); }
+.lux-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:16px; }
+.lux-stat, .lux-panel { background:#fff; border:1px solid #edf0f4; border-radius:8px; box-shadow:0 8px 22px rgba(16,24,40,.05); }
+.lux-stat { padding:18px; }
+.lux-value { font-size:28px; font-weight:900; color:#101828; line-height:1; }
+.lux-label { margin-top:8px; color:#667085; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+.lux-panel { overflow:hidden; }
+.lux-head { padding:15px 18px; border-bottom:1px solid #eef2f6; display:flex; align-items:center; justify-content:space-between; }
+.lux-head h3 { margin:0; font-size:15px; font-weight:900; color:#101828; }
+.lux-body { padding:18px; }
+.lux-table { width:100%; border-collapse:collapse; font-size:12px; }
+.lux-table th { background:#f8fafc; color:#667085; text-transform:uppercase; letter-spacing:.04em; font-size:10px; padding:10px; }
+.lux-table td { border-top:1px solid #eef2f6; padding:11px 10px; color:#344054; }
+.lux-pill { display:inline-flex; border-radius:999px; padding:4px 9px; background:#eef2ff; color:#4f46e5; font-size:11px; font-weight:800; }
+@media(max-width:768px){.lux-band{flex-direction:column}.lux-actions{width:100%}.lux-btn{justify-content:center;flex:1}}
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="lux-page">
+    <div class="lux-band">
+        <div>
+            <h2>Library command center</h2>
+            <p>Catalog, issuing, overdue tracking, and live library activity in one workspace.</p>
+        </div>
+        <div class="lux-actions">
+            <a class="lux-btn" href="{% url 'admin_library_catalog' %}"><i class="fas fa-plus"></i> Add Book</a>
+            <a class="lux-btn secondary" href="{% url 'admin_library_issue' %}"><i class="fas fa-share-square"></i> Issue Book</a>
+            <a class="lux-btn secondary" href="{% url 'admin_library_overdue' %}"><i class="fas fa-clock"></i> Overdue</a>
+        </div>
+    </div>
+
+    <div class="lux-grid">
+        <div class="lux-stat"><div class="lux-value">{{ total_books }}</div><div class="lux-label">Catalog Books</div></div>
+        <div class="lux-stat"><div class="lux-value">{{ issued_books }}</div><div class="lux-label">Issued Books</div></div>
+        <div class="lux-stat"><div class="lux-value">{{ overdue_books }}</div><div class="lux-label">Overdue Books</div></div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-7 mb-3">
+            <div class="lux-panel">
+                <div class="lux-head"><h3>Recent Issues</h3><a class="lux-pill" href="{% url 'admin_library_issue' %}">Issue Desk</a></div>
+                <div class="lux-body p-0">
+                    <table class="lux-table">
+                        <thead><tr><th>Student</th><th>ISBN</th><th>Issued</th><th>Due</th></tr></thead>
+                        <tbody>
+                        {% for issue in recent_issues %}
+                        <tr><td>{{ issue.student_id }}</td><td>{{ issue.isbn }}</td><td>{{ issue.issued_date }}</td><td>{{ issue.expiry_date }}</td></tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center py-4">No issued books yet.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5 mb-3">
+            <div class="lux-panel">
+                <div class="lux-head"><h3>Popular Categories</h3><a class="lux-pill" href="{% url 'admin_library_catalog' %}">Catalog</a></div>
+                <div class="lux-body">
+                    {% for category in popular_categories %}
+                    <div style="display:flex;justify-content:space-between;border-bottom:1px solid #eef2f6;padding:10px 0;">
+                        <strong>{{ category.category|default:"Uncategorized" }}</strong>
+                        <span class="lux-pill">{{ category.total }}</span>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted mb-0">Add books to see category analytics.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -2,17 +2,18 @@
 
 ## Supported Versions
 
-Currently, the `main` branch is the only supported version receiving security updates.
-
 | Version | Supported          |
 | ------- | ------------------ |
-| 2.0.x   | :white_check_mark: |
-| 1.0.x   | :x:                |
+| 1.0.x   | :white_check_mark: |
+| < 1.0   | :x:                |
 
 ## Reporting a Vulnerability
 
-Security is a top priority for College ERP. If you discover a security vulnerability, please do **not** disclose it publicly.
+If you discover a security vulnerability within the Enterprise College ERP Suite, please send an email to `security@college-erp.org`.
 
-Instead, please send an email to **amaanmulani9@gmail.com**.
+Please include:
+- Description of the vulnerability.
+- Steps to reproduce the issue.
+- Potential impact.
 
-We will review the report and attempt to respond within 48 hours. If the vulnerability is confirmed, we will issue a patch and notify the community. Thank you for helping keep College ERP safe!
+We respond to security reports within 24 hours.

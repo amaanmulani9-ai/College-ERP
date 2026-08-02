@@ -1,0 +1,228 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb-bar {
+        background: transparent;
+        padding: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+    }
+    .sk-breadcrumb-title {
+        color: #6c5ce7;
+        font-weight: 600;
+        font-size: 15px;
+        margin-right: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .sk-breadcrumb-title i { font-size: 14px; }
+    .sk-breadcrumb-path {
+        color: #888;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .center-card-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+    }
+    
+    .collect-fees-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        width: 100%;
+        max-width: 700px;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .collect-fees-card h2 {
+        color: #2c3e50;
+        font-weight: 700;
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    .collect-fees-card p {
+        color: #7f8fa6;
+        font-size: 14px;
+        margin-bottom: 30px;
+    }
+
+    .tab-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 40px;
+        background: #f8f9fa;
+        padding: 5px;
+        border-radius: 8px;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .tab-btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: #7f8fa6;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+    }
+
+    .tab-btn i { font-size: 14px; }
+
+    .tab-btn.active {
+        background: #fff;
+        border: 1px solid #000;
+        color: #6c5ce7;
+    }
+
+    .tab-content {
+        display: none;
+        text-align: left;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .form-group label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #b2bec3;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .form-group label i { font-size: 12px; }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #dfe6e9;
+        padding: 12px 15px;
+        font-size: 14px;
+        color: #2d3436;
+        height: auto;
+    }
+    .form-control:focus {
+        border-color: #6c5ce7;
+        box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.1);
+    }
+    
+    .form-control::placeholder {
+        color: #b2bec3;
+    }
+
+    .submit-btn {
+        background: #6c5ce7;
+        color: #fff;
+        border: none;
+        padding: 12px 40px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 15px;
+        margin-top: 15px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .submit-btn:hover { background: #5b4bc4; }
+
+    .form-row-custom {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-title"><i class="fas fa-money-bill-wave"></i> Fees</div>
+            <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right" style="font-size:10px;"></i> Collect Fees</div>
+        </div>
+
+        <div class="center-card-wrapper">
+            <div class="collect-fees-card">
+                <h2>Collect Fees</h2>
+                <p>Choose how you want to collect fees today.</p>
+
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="switchTab('student')"><i class="far fa-user"></i> Student Wise</button>
+                    <button class="tab-btn" onclick="switchTab('family')"><i class="fas fa-users"></i> Family Wise</button>
+                    <button class="tab-btn" onclick="switchTab('scan')"><i class="fas fa-barcode"></i> Scan Paid Invoice</button>
+                </div>
+
+                <!-- Student Wise Tab -->
+                <div id="tab-student" class="tab-content active">
+                    <div class="form-group">
+                        <label><i class="fas fa-search"></i> SEARCH STUDENT *</label>
+                        <input type="text" class="form-control" placeholder="Type student name or registration number">
+                    </div>
+                </div>
+
+                <!-- Family Wise Tab -->
+                <div id="tab-family" class="tab-content">
+                    <div class="form-row-custom">
+                        <div class="form-group mb-0">
+                            <label><i class="far fa-calendar-alt"></i> FEE MONTH *</label>
+                            <input type="text" class="form-control" value="July, 2026">
+                        </div>
+                        <div class="form-group mb-0">
+                            <label><i class="fas fa-users"></i> SELECT FAMILY *</label>
+                            <select class="form-control">
+                                <option value="" disabled selected>Select Family</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button class="submit-btn"><i class="fas fa-lock"></i> Submit</button>
+                    </div>
+                </div>
+                
+                <!-- Scan Tab -->
+                <div id="tab-scan" class="tab-content">
+                    <p class="text-center text-muted">Scan functionality goes here.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        event.currentTarget.classList.add('active');
+        document.getElementById('tab-' + tabId).classList.add('active');
+    }
+</script>
+{% endblock custom_js %}

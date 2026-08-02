@@ -1,0 +1,36 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title"><i class="fab fa-whatsapp"></i> WhatsApp Integration</h3>
+            </div>
+            <div class="card-body">
+                <form action="{% url 'admin_whatsapp' %}" method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="group">Select Recipient Group</label>
+                        <select id="group" class="form-control" name="group" required title="Recipient Group">
+                            <option value="">-- Select --</option>
+                            <option value="all_students">All Students</option>
+                            <option value="all_staff">All Staff</option>
+                            <option value="specific">Specific Numbers (Comma Separated)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Message Content</label>
+                        <textarea class="form-control" name="message" rows="5" required placeholder="Type your WhatsApp message here..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success"><i class="fas fa-paper-plane"></i> Send WhatsApp Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

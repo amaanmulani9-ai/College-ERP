@@ -1,10 +1,50 @@
 [project]
 name = "college-erp"
 version = "1.0.0"
-requires-python = ">=3.10"
+description = "Enterprise Multi-Tenant SaaS College ERP Architecture Foundation"
+requires-python = ">=3.13"
+
+[tool.black]
+line-length = 120
+target-version = ['py313']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | migrations
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+multi_line_output = 3
+include_trailing_comma = true
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+exclude = ['migrations/', 'venv/']
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q --ds=config.settings.test"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+pythonpath = ["backend"]
 
 [tool.vercel]
-entrypoint = "backend/college_management_system/wsgi.py"
+entrypoint = "backend/config/wsgi.py"
 
 [tool.vercel.scripts]
 build = "bash scripts/vercel_build.sh"

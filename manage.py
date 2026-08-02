@@ -8,7 +8,7 @@ def main():
     backend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'backend')
     os.chdir(backend_dir)
     sys.path.insert(0, backend_dir)
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'college_management_system.settings')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.development')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

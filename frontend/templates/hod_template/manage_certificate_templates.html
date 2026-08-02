@@ -1,0 +1,71 @@
+{% extends 'main_app/base.html' %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Create Certificate Template</h3>
+                    </div>
+                    <form role="form" method="POST" action="{% url 'manage_certificate_templates' %}">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Template Title</label>
+                                <input type="text" class="form-control" name="title" required placeholder="e.g. Course Completion Certificate">
+                            </div>
+                            <div class="form-group">
+                                <label>Applicable For</label>
+                                <select class="form-control" name="applicable_for" required>
+                                    <option value="Student">Student</option>
+                                    <option value="Staff">Staff</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Body Text</label>
+                                <textarea class="form-control" name="body_text" rows="4" required placeholder="This is to certify that [name] has completed..."></textarea>
+                                <small class="form-text text-muted">Use variables like [name], [course], [date]</small>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Create Template</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Existing Templates</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Applicable For</th>
+                                    <th>Created At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for t in templates %}
+                                <tr>
+                                    <td>{{ t.id }}</td>
+                                    <td>{{ t.title }}</td>
+                                    <td>{{ t.applicable_for }}</td>
+                                    <td>{{ t.created_at }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center">No templates found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

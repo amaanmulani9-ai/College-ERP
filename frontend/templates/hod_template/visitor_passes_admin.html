@@ -1,0 +1,130 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid py-3">
+    <!-- Add Visitor Collapse Button -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0 text-dark font-weight-bold"><i class="fas fa-id-badge text-primary mr-2"></i> Visitor Pass Management</h5>
+        <button class="btn btn-primary font-weight-bold" type="button" data-toggle="collapse" data-target="#collapseAddVisitor" aria-expanded="false" aria-controls="collapseAddVisitor" style="border-radius: 8px;">
+            <i class="fas fa-plus mr-1"></i> Register Walk-in Visitor
+        </button>
+    </div>
+
+    <!-- Collapsible Add Visitor Form -->
+    <div class="collapse mb-4" id="collapseAddVisitor">
+        <div class="card shadow-sm border-0 p-4" style="border-radius: 15px; background: #ffffff;">
+            <h6 class="font-weight-bold mb-3 text-dark"><i class="fas fa-user-plus mr-2 text-success"></i> Walk-in Visitor Registration</h6>
+            <form method="POST" action="{% url 'admin_visitor_passes' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="manual_add">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold text-muted small mb-1">Visitor Full Name</label>
+                        <input type="text" class="form-control" name="name" placeholder="Full Name" required style="border-radius: 8px;">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold text-muted small mb-1">Phone Number</label>
+                        <input type="text" class="form-control" name="phone" placeholder="Phone Number" required style="border-radius: 8px;">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="font-weight-bold text-muted small mb-1">Email (Optional)</label>
+                        <input type="email" class="form-control" name="email" placeholder="Email Address" style="border-radius: 8px;">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold text-muted small mb-1">Purpose of Visit</label>
+                        <input type="text" class="form-control" name="purpose" placeholder="e.g. Admission Enquiry, Meeting HOD" required style="border-radius: 8px;">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold text-muted small mb-1">Host Person / Dept</label>
+                        <input type="text" class="form-control" name="host_person" placeholder="e.g. Dr. Verma / Administration" required style="border-radius: 8px;">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="font-weight-bold text-muted small mb-1">Visit Date</label>
+                        <input type="date" class="form-control" name="visit_date" style="border-radius: 8px;">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end" style="gap: 8px;">
+                    <button type="button" class="btn btn-light" data-toggle="collapse" data-target="#collapseAddVisitor">Cancel</button>
+                    <button type="submit" class="btn btn-success font-weight-bold px-4" style="border-radius: 8px;"><i class="fas fa-check mr-2"></i> Register & Issue Pass</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card erpnext-card shadow-sm">
+        <div class="card-header bg-transparent border-bottom">
+            <h6 class="card-title mb-0"><i class="fas fa-list text-primary"></i> Registered Visitor Records</h6>
+        </div>
+        <div class="card-body">
+            {% if passes %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Visitor Name</th>
+                            <th>Contact Info</th>
+                            <th>Host Person</th>
+                            <th>Visit Date</th>
+                            <th>Pass Code</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pass in passes %}
+                        <tr>
+                            <td>
+                                <strong>{{ pass.name }}</strong>
+                                <br><small class="text-muted">{{ pass.purpose }}</small>
+                            </td>
+                            <td>
+                                {{ pass.email }}<br>
+                                <small class="text-muted">{{ pass.phone }}</small>
+                            </td>
+                            <td>{{ pass.host_person }}</td>
+                            <td>{{ pass.visit_date }}</td>
+                            <td><code>{{ pass.pass_code }}</code></td>
+                            <td>
+                                {% if pass.status == 'Approved' %}
+                                    <span class="badge bg-success">Approved</span>
+                                {% elif pass.status == 'Rejected' %}
+                                    <span class="badge bg-danger">Rejected</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if pass.status == 'Pending' %}
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="pass_id" value="{{ pass.id }}">
+                                    <button type="submit" name="action" value="approve" class="btn btn-sm btn-success me-1">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                </form>
+                                {% else %}
+                                <button class="btn btn-sm btn-outline-secondary" disabled>Processed</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-user-friends fa-4x text-muted mb-3"></i>
+                <p class="text-muted">No visitor pass requests received yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,272 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    .sk-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+        margin-bottom: 25px;
+    }
+    .sk-breadcrumb-bar {
+        background: #fff;
+        padding: 15px 25px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .sk-breadcrumb-title {
+        color: #6c5ce7;
+        font-weight: 600;
+        font-size: 16px;
+        margin-right: 15px;
+    }
+    .sk-breadcrumb-path {
+        color: #b2bec3;
+        font-size: 13px;
+    }
+    .sk-card-title {
+        color: #2d3436;
+        font-size: 18px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .sk-card-subtitle {
+        color: #b2bec3;
+        font-size: 13px;
+        margin-bottom: 25px;
+        margin-left: 30px;
+    }
+    .sk-save-btn {
+        background: #6c5ce7;
+        color: #fff;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        display: block;
+        width: 200px;
+        margin: 30px auto 0;
+    }
+    .sk-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .sk-box {
+        border: 1px solid #f1f2f6;
+        border-radius: 8px;
+        padding: 20px;
+    }
+    .sk-box-title {
+        color: #636e72;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    .sk-option-row {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    .sk-option {
+        border: 2px solid #f1f2f6;
+        border-radius: 8px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        flex: 1;
+        text-align: center;
+        justify-content: center;
+        font-weight: 500;
+        color: #2d3436;
+    }
+    .sk-option input {
+        display: none;
+    }
+    .sk-option.active {
+        border-color: #6c5ce7;
+        background: rgba(108, 92, 231, 0.05);
+    }
+    
+    .sk-color-circle {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    .sk-color-circle input {
+        display: none;
+    }
+    .sk-select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #f1f2f6;
+        border-radius: 8px;
+        color: #2d3436;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-title"><i class="fas fa-cog"></i> General Settings</div>
+            <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right" style="font-size:10px;margin-right:10px;"></i> Theme & Language</div>
+        </div>
+        
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="sk-card">
+            <div class="sk-card-title"><i class="fas fa-paint-roller" style="color:#6c5ce7;"></i> Portal Appearance</div>
+            <div class="sk-card-subtitle">Change theme colors, active items background, text direction, and portal language.</div>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <div class="sk-grid">
+                    
+                    <div class="sk-box">
+                        <div class="sk-box-title">THEME PLACEMENT</div>
+                        <div class="sk-option-row">
+                            <label class="sk-option {% if theme.theme_placement == 'LTR' %}active{% endif %}">
+                                <input type="radio" name="theme_placement" value="LTR" {% if theme.theme_placement == 'LTR' %}checked{% endif %}>
+                                <span><i class="fas fa-align-left" style="color:#6c5ce7;margin-right:5px;"></i> LTR (Left To Right)</span>
+                            </label>
+                            <label class="sk-option {% if theme.theme_placement == 'RTL' %}active{% endif %}">
+                                <input type="radio" name="theme_placement" value="RTL" {% if theme.theme_placement == 'RTL' %}checked{% endif %}>
+                                <span><i class="fas fa-align-right" style="color:#6c5ce7;margin-right:5px;"></i> RTL (Right To Left)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="sk-box">
+                        <div class="sk-box-title">SIDEBAR BACKGROUND</div>
+                        <div class="sk-option-row">
+                            <label class="sk-option {% if theme.sidebar_background == 'Light' %}active{% endif %}">
+                                <input type="radio" name="sidebar_background" value="Light" {% if theme.sidebar_background == 'Light' %}checked{% endif %}>
+                                <span>Light <i class="fas fa-check" style="color:#27ae60;margin-left:5px; {% if theme.sidebar_background != 'Light' %}display:none;{% endif %}"></i></span>
+                            </label>
+                            <label class="sk-option {% if theme.sidebar_background == 'Dark' %}active{% endif %}" style="background:#2d3436; color:#fff;">
+                                <input type="radio" name="sidebar_background" value="Dark" {% if theme.sidebar_background == 'Dark' %}checked{% endif %}>
+                                <span>Dark <i class="fas fa-check" style="color:#27ae60;margin-left:5px; {% if theme.sidebar_background != 'Dark' %}display:none;{% endif %}"></i></span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="sk-box">
+                        <div class="sk-box-title">HEADER BACKGROUND</div>
+                        <div class="sk-option-row" style="gap:10px;">
+                            <label class="sk-color-circle" style="background:#2d3436;">
+                                <input type="radio" name="header_background" value="Dark" {% if theme.header_background == 'Dark' %}checked{% endif %}>
+                                <i class="fas fa-check" style="{% if theme.header_background != 'Dark' %}display:none;{% endif %}"></i>
+                            </label>
+                            <label class="sk-color-circle" style="background:#e74c3c;">
+                                <input type="radio" name="header_background" value="Red" {% if theme.header_background == 'Red' %}checked{% endif %}>
+                                <i class="fas fa-check" style="{% if theme.header_background != 'Red' %}display:none;{% endif %}"></i>
+                            </label>
+                            <label class="sk-color-circle" style="background:#27ae60;">
+                                <input type="radio" name="header_background" value="Green" {% if theme.header_background == 'Green' %}checked{% endif %}>
+                                <i class="fas fa-check" style="{% if theme.header_background != 'Green' %}display:none;{% endif %}"></i>
+                            </label>
+                            <label class="sk-color-circle" style="background:#3498db;">
+                                <input type="radio" name="header_background" value="Blue" {% if theme.header_background == 'Blue' %}checked{% endif %}>
+                                <i class="fas fa-check" style="{% if theme.header_background != 'Blue' %}display:none;{% endif %}"></i>
+                            </label>
+                            <label class="sk-color-circle" style="background:#fff; border:1px solid #ccc;">
+                                <input type="radio" name="header_background" value="White" {% if theme.header_background == 'White' %}checked{% endif %}>
+                                <i class="fas fa-check" style="color:#333; {% if theme.header_background != 'White' %}display:none;{% endif %}"></i>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="sk-box">
+                        <div class="sk-box-title">ACTIVE ITEM BACKGROUND</div>
+                        <div class="sk-option-row" style="gap:10px;">
+                            <label class="sk-color-circle" style="background:#2d3436;">
+                                <input type="radio" name="active_item_background" value="#2d3436" {% if theme.active_item_background == '#2d3436' %}checked{% endif %}>
+                                <i class="fas fa-check" style="{% if theme.active_item_background != '#2d3436' %}display:none;{% endif %}"></i>
+                            </label>
+                            <label class="sk-color-circle" style="background:#e74c3c;">
+                                <input type="radio" name="active_item_background" value="#e74c3c" {% if theme.active_item_background == '#e74c3c' %}checked{% endif %}>
+                                <i class="fas fa-check" style="{% if theme.active_item_background != '#e74c3c' %}display:none;{% endif %}"></i>
+                            </label>
+                            <label class="sk-color-circle" style="background:#6c5ce7;">
+                                <input type="radio" name="active_item_background" value="#6c5ce7" {% if theme.active_item_background == '#6c5ce7' %}checked{% endif %}>
+                                <i class="fas fa-check" style="{% if theme.active_item_background != '#6c5ce7' %}display:none;{% endif %}"></i>
+                            </label>
+                            <label class="sk-color-circle" style="background:#e67e22;">
+                                <input type="radio" name="active_item_background" value="#e67e22" {% if theme.active_item_background == '#e67e22' %}checked{% endif %}>
+                                <i class="fas fa-check" style="{% if theme.active_item_background != '#e67e22' %}display:none;{% endif %}"></i>
+                            </label>
+                            <label class="sk-color-circle" style="background:#3498db;">
+                                <input type="radio" name="active_item_background" value="#3498db" {% if theme.active_item_background == '#3498db' %}checked{% endif %}>
+                                <i class="fas fa-check" style="{% if theme.active_item_background != '#3498db' %}display:none;{% endif %}"></i>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="sk-box" style="grid-column: span 2;">
+                        <div class="sk-box-title">LANGUAGE</div>
+                        <select name="language" class="sk-select">
+                            <option value="English" {% if theme.language == 'English' %}selected{% endif %}>English (Default)</option>
+                            <option value="Spanish" {% if theme.language == 'Spanish' %}selected{% endif %}>Spanish</option>
+                            <option value="French" {% if theme.language == 'French' %}selected{% endif %}>French</option>
+                            <option value="Urdu" {% if theme.language == 'Urdu' %}selected{% endif %}>Urdu</option>
+                        </select>
+                    </div>
+                    
+                </div>
+                
+                <button type="submit" class="sk-save-btn"><i class="fas fa-check"></i> Save Theme Settings</button>
+            </form>
+        </div>
+
+    </div>
+</section>
+
+<script>
+    // Simple JS to toggle active states on radio buttons visually
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Find parent row
+            const row = this.closest('.sk-option-row');
+            // Remove active/checks from all siblings
+            row.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
+            row.querySelectorAll('.fa-check').forEach(icon => icon.style.display = 'none');
+            
+            // Add to current
+            if (this.closest('.sk-option')) {
+                this.closest('.sk-option').classList.add('active');
+            }
+            const icon = this.parentElement.querySelector('.fa-check');
+            if (icon) icon.style.display = 'inline-block';
+        });
+    });
+</script>
+{% endblock content %}

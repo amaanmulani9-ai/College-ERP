@@ -1,0 +1,346 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb {
+        padding: 15px 25px;
+        background: #fff;
+        border-bottom: 1px solid #e0e6ed;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 14px;
+    }
+    .breadcrumb-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .sk-breadcrumb .breadcrumb-item {
+        color: #647081;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .sk-breadcrumb .breadcrumb-item.active { color: #8a98ac; font-weight: 400; }
+    .sk-breadcrumb .separator { color: #a0a9b6; font-size: 10px; }
+    
+    .btn-pdf {
+        border: 1px solid #e0e6ed;
+        background: #fff;
+        color: #8a98ac;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-pdf:hover { background: #f8f9fa; }
+    
+    .row { display: flex; flex-wrap: wrap; margin: 0 -12.5px; padding: 0 25px; }
+    .col-md-4 { flex: 0 0 33.333333%; max-width: 33.333333%; padding: 0 12.5px; }
+    .col-md-8 { flex: 0 0 66.666667%; max-width: 66.666667%; padding: 0 12.5px; }
+    
+    .campuspro-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        padding: 25px;
+        margin-bottom: 25px;
+        border: 1px solid #e0e6ed;
+    }
+    
+    .profile-card {
+        text-align: center;
+        padding-top: 30px;
+    }
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin: 0 auto 15px;
+        background: #f0f4ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 50px;
+        color: #4b6bfb;
+        overflow: hidden;
+    }
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .profile-name {
+        font-size: 18px;
+        color: #6c5ce7;
+        font-weight: 600;
+        margin-bottom: 25px;
+    }
+    
+    .info-list {
+        text-align: left;
+    }
+    .info-item {
+        margin-bottom: 12px;
+    }
+    .info-label {
+        font-size: 11px;
+        color: #a0a9b6;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+    }
+    .info-value {
+        font-size: 13px;
+        color: #1b2559;
+        font-weight: 600;
+    }
+    
+    .report-card-title {
+        font-size: 15px;
+        color: #e84393;
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .report-card-title i { font-size: 14px; }
+    .report-card-title.blue { color: #4b6bfb; }
+    
+    .stats-row {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .stat-box {
+        flex: 1;
+        padding: 15px;
+        border-radius: 8px;
+        color: #fff;
+    }
+    .stat-box.blue { background: #74b9ff; }
+    .stat-box.purple { background: #a29bfe; }
+    .stat-box.red { background: #ff7675; }
+    .stat-label { font-size: 11px; text-transform: uppercase; margin-bottom: 10px; font-weight: 500; }
+    .stat-value { font-size: 24px; font-weight: 700; text-align: right; }
+    .stat-sub { font-size: 10px; opacity: 0.8; }
+    
+    .empty-report {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+        color: #a0a9b6;
+    }
+    .empty-report i { font-size: 40px; color: #d0d6e0; margin-bottom: 15px; }
+    .empty-report span { font-size: 13px; font-weight: 500; }
+
+    @media (max-width: 992px) {
+        .col-md-4, .col-md-8 { flex: 0 0 100%; max-width: 100%; }
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="sk-breadcrumb">
+    <div class="breadcrumb-left">
+        <div class="breadcrumb-item">
+            <i class="fas fa-user-graduate"></i> Students
+        </div>
+        <i class="fas fa-chevron-right separator"></i>
+        <div class="breadcrumb-item active">Student Report</div>
+    </div>
+    <button class="btn-pdf"><i class="far fa-file-pdf"></i> Get PDF</button>
+</div>
+
+<div class="row">
+    <!-- Left Column: Profile Info -->
+    <div class="col-md-4">
+        <div class="campuspro-card profile-card">
+            <div class="profile-avatar">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="profile-name">amaan</div>
+            
+            <div class="info-list">
+                <div class="info-item">
+                    <div class="info-label">Registration No</div>
+                    <div class="info-value"><i class="fas fa-arrow-right" style="color:#e0e6ed;font-size:10px;"></i> 011</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Date of Admission</div>
+                    <div class="info-value"><i class="fas fa-arrow-right" style="color:#e0e6ed;font-size:10px;"></i> 06 July, 2026</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Class</div>
+                    <div class="info-value"><i class="fas fa-arrow-right" style="color:#e0e6ed;font-size:10px;"></i> mscit</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Family</div>
+                    <div class="info-value"><i class="fas fa-arrow-right" style="color:#e0e6ed;font-size:10px;"></i> -</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Discount in Fee</div>
+                    <div class="info-value"><i class="fas fa-arrow-right" style="color:#e0e6ed;font-size:10px;"></i> 200 %</div>
+                </div>
+                
+                <hr style="border: 0; border-top: 1px dashed #e0e6ed; margin: 20px 0;">
+                
+                <div class="info-item">
+                    <div class="info-label">Date Of Birth</div>
+                    <div class="info-value"><i class="fas fa-arrow-right" style="color:#e0e6ed;font-size:10px;"></i> -</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Gender</div>
+                    <div class="info-value"><i class="fas fa-arrow-right" style="color:#e0e6ed;font-size:10px;"></i> -</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Any Identification Mark?</div>
+                    <div class="info-value"><i class="fas fa-arrow-right" style="color:#e0e6ed;font-size:10px;"></i> -</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Blood Group</div>
+                    <div class="info-value"><i class="fas fa-arrow-right" style="color:#e0e6ed;font-size:10px;"></i> -</div>
+                </div>
+                
+                <hr style="border: 0; border-top: 1px dashed #e0e6ed; margin: 20px 0;">
+                
+                <div class="info-item" style="text-align: center; color: #a0a9b6; font-size: 12px; margin-top: 30px;">
+                    <i class="fas fa-info-circle"></i> Complete profile setup to view all details.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right Column: Reports -->
+    <div class="col-md-8">
+        <div style="display: flex; gap: 25px; flex-wrap: wrap;">
+            <!-- Attendance & Class Tests (Left Side of Right Column) -->
+            <div style="flex: 1; min-width: 300px;">
+                <!-- Attendance Report -->
+                <div class="campuspro-card">
+                    <div class="report-card-title">
+                        <span style="background:#e84393;color:#fff;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;">1</span> Attendance Report
+                    </div>
+                    
+                    <div style="display:flex; justify-content:center; gap:30px; margin-bottom: 20px;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid #ff7675; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #ff7675;">
+                            <span style="font-size:16px;font-weight:700;">0%</span>
+                            <span style="font-size:10px;">Overall</span>
+                        </div>
+                        <div style="width: 80px; height: 80px; border-radius: 50%; border: 4px solid #ff7675; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #ff7675;">
+                            <span style="font-size:16px;font-weight:700;">0%</span>
+                            <span style="font-size:10px;">Jul 2026</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-row">
+                        <div class="stat-box blue">
+                            <div class="stat-label">Presents <i class="fas fa-arrow-right"></i></div>
+                            <div class="stat-value">0</div>
+                            <div class="stat-sub">This Month</div>
+                        </div>
+                        <div class="stat-box purple">
+                            <div class="stat-label">Leaves <i class="fas fa-arrow-right"></i></div>
+                            <div class="stat-value">0</div>
+                            <div class="stat-sub">This Month</div>
+                        </div>
+                        <div class="stat-box red">
+                            <div class="stat-label">Absents <i class="fas fa-arrow-right"></i></div>
+                            <div class="stat-value">0</div>
+                            <div class="stat-sub">This Month</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Class Tests Report -->
+                <div class="campuspro-card">
+                    <div class="report-card-title blue">
+                        <span style="background:#4b6bfb;color:#fff;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;">2</span> Class Tests Report
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div style="font-size: 15px; color: #1b2559; font-weight: 600;"><i class="fas fa-book" style="color:#a0a9b6;"></i> java</div>
+                            <div style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid #e0e6ed; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #1b2559;">
+                                <span style="font-size:14px;font-weight:700;">0%</span>
+                                <span style="font-size:9px;">score</span>
+                            </div>
+                        </div>
+                        <div style="font-size:11px; color:#a0a9b6; margin-bottom:5px;">
+                            <i class="fas fa-circle" style="color:#ff7675;font-size:8px;"></i> TOTAL CLASS TESTS (0)
+                        </div>
+                        <div style="font-size:11px; color:#a0a9b6; margin-bottom:5px;">
+                            <i class="fas fa-circle" style="color:#a29bfe;font-size:8px;"></i> TOTAL MARKS (0)
+                        </div>
+                        <div style="font-size:11px; color:#a0a9b6;">
+                            <i class="fas fa-circle" style="color:#4b6bfb;font-size:8px;"></i> OBTAINED MARKS (0)
+                        </div>
+                    </div>
+                    
+                    <hr style="border: 0; border-top: 1px solid #f4f6f9; margin: 20px 0;">
+                    
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div style="font-size: 15px; color: #1b2559; font-weight: 600;"><i class="fas fa-book" style="color:#a0a9b6;"></i> python</div>
+                            <div style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid #e0e6ed; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #1b2559;">
+                                <span style="font-size:14px;font-weight:700;">0%</span>
+                                <span style="font-size:9px;">score</span>
+                            </div>
+                        </div>
+                        <div style="font-size:11px; color:#a0a9b6; margin-bottom:5px;">
+                            <i class="fas fa-circle" style="color:#ff7675;font-size:8px;"></i> TOTAL CLASS TESTS (0)
+                        </div>
+                        <div style="font-size:11px; color:#a0a9b6; margin-bottom:5px;">
+                            <i class="fas fa-circle" style="color:#a29bfe;font-size:8px;"></i> TOTAL MARKS (0)
+                        </div>
+                        <div style="font-size:11px; color:#a0a9b6;">
+                            <i class="fas fa-circle" style="color:#4b6bfb;font-size:8px;"></i> OBTAINED MARKS (0)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Examination & Fee Report (Right Side of Right Column) -->
+            <div style="flex: 1; min-width: 300px;">
+                <!-- Examination Report -->
+                <div class="campuspro-card">
+                    <div class="report-card-title">
+                        <span style="background:#e84393;color:#fff;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;">3</span> Examination Report
+                    </div>
+                    
+                    <div class="empty-report">
+                        <i class="fas fa-search"></i>
+                        <span>No Record Found.</span>
+                    </div>
+                </div>
+                
+                <!-- Fee Report -->
+                <div class="campuspro-card">
+                    <div class="report-card-title blue">
+                        <span style="background:#4b6bfb;color:#fff;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;">4</span> Fee Report
+                    </div>
+                    
+                    <div class="empty-report">
+                        <i class="fas fa-search"></i>
+                        <span>No Record Found.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

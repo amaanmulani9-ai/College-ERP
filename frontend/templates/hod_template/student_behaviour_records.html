@@ -1,0 +1,79 @@
+{% extends 'main_app/base.html' %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Assign Behaviour Record</h3>
+                    </div>
+                    <form role="form" method="POST" action="{% url 'student_behaviour_records' %}">
+                        {% csrf_token %}
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Student</label>
+                                <select class="form-control" name="student" required>
+                                    {% for s in students %}
+                                    <option value="{{ s.id }}">{{ s.admin.first_name }} {{ s.admin.last_name }} ({{ s.admin.email }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Incident</label>
+                                <select class="form-control" name="incident" required>
+                                    {% for i in incidents %}
+                                    <option value="{{ i.id }}">{{ i.title }} ({% if i.is_negative %}-{% else %}+{% endif %}{{ i.point }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Comment (Optional)</label>
+                                <textarea class="form-control" name="comment"></textarea>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">Assign Record</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Behaviour Records</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Student</th>
+                                    <th>Incident</th>
+                                    <th>Points</th>
+                                    <th>Comment</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in records %}
+                                <tr>
+                                    <td>{{ r.id }}</td>
+                                    <td>{{ r.student.admin.first_name }} {{ r.student.admin.last_name }}</td>
+                                    <td>{{ r.incident.title }}</td>
+                                    <td>{% if r.incident.is_negative %}-{% else %}+{% endif %}{{ r.incident.point }}</td>
+                                    <td>{{ r.comment|truncatechars:30 }}</td>
+                                    <td>{{ r.date }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="6" class="text-center">No records found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

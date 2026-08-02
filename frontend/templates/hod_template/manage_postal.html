@@ -1,0 +1,237 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<style>
+    :root {
+        --color-purple: #6c5ce7;
+        --color-cyan: #02aab0;
+        --radius-2xl: 15px;
+        --shadow-2: rgba(0, 0, 0, 0.08) 0px 4px 15px 0px;
+    }
+    
+    .postal-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 24px;
+    }
+    @media(max-width: 992px) {
+        .postal-grid { grid-template-columns: 1fr; }
+    }
+    
+    .desk-card {
+        background: #ffffff;
+        border-radius: var(--radius-2xl);
+        padding: 24px;
+        box-shadow: var(--shadow-2);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        margin-bottom: 24px;
+        height: fit-content;
+    }
+    
+    .form-control-custom {
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        padding: 10px 14px;
+        font-size: 14px;
+        color: #1e293b;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control-custom:focus {
+        border-color: var(--color-purple);
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+    }
+    
+    .table-responsive {
+        border-radius: 10px;
+        overflow: hidden;
+        border: 1px solid #eef2f6;
+    }
+    
+    .desk-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .desk-table th {
+        background-color: #f8fafc;
+        color: #64748b;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 12px 18px;
+        text-align: left;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    .desk-table td {
+        padding: 14px 18px;
+        font-size: 14px;
+        color: #1e293b;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: top;
+    }
+    .desk-table tr:hover td {
+        background-color: #f8fafc;
+    }
+    
+    .postal-tabs {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 18px;
+        border-bottom: 2px solid #eef2f6;
+        padding-bottom: 8px;
+    }
+    .postal-tab-btn {
+        background: none;
+        border: none;
+        font-weight: 700;
+        color: #64748b;
+        font-size: 14px;
+        cursor: pointer;
+        padding: 6px 12px;
+        position: relative;
+    }
+    .postal-tab-btn.active {
+        color: var(--color-purple);
+    }
+    .postal-tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: var(--color-purple);
+        border-radius: 5px;
+    }
+</style>
+
+<div class="container-fluid py-3">
+    <div class="postal-grid">
+        <!-- Left panel: Add Postal Record -->
+        <div class="desk-card">
+            <h5 class="font-weight-bold mb-3" style="color: #0f172a;"><i class="fas fa-plus-circle mr-2 text-primary"></i> Add Postal Record</h5>
+            <form method="POST" action="{% url 'manage_postal' %}">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Record Type</label>
+                    <select class="form-control-custom" name="postal_type" required>
+                        <option value="Receive">Postal Receive</option>
+                        <option value="Dispatch">Postal Dispatch</option>
+                    </select>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">From Title</label>
+                    <input type="text" class="form-control-custom" name="from_title" placeholder="Sender / From Name" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">To Title</label>
+                    <input type="text" class="form-control-custom" name="to_title" placeholder="Recipient / To Name" required>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Reference No</label>
+                    <input type="text" class="form-control-custom" name="reference_no" placeholder="e.g. REF-1234">
+                </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Address</label>
+                    <input type="text" class="form-control-custom" name="address" placeholder="Postal Address">
+                </div>
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold text-muted small mb-1">Note / Description</label>
+                    <textarea class="form-control-custom" name="note" rows="3" placeholder="Additional details..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 font-weight-bold" style="border-radius: 8px;"><i class="fas fa-save mr-2"></i> Save Postal Record</button>
+            </form>
+        </div>
+        
+        <!-- Right panel: Postal lists -->
+        <div class="desk-card">
+            <div class="postal-tabs">
+                <button class="postal-tab-btn active" onclick="switchTab('receives_panel', this)">
+                    <i class="fas fa-inbox mr-1"></i> Postal Receives ({{ receives|length }})
+                </button>
+                <button class="postal-tab-btn" onclick="switchTab('dispatches_panel', this)">
+                    <i class="fas fa-paper-plane mr-1"></i> Postal Dispatches ({{ dispatches|length }})
+                </button>
+            </div>
+            
+            <!-- Receives Table -->
+            <div id="receives_panel" class="postal-tab-content">
+                <div class="table-responsive">
+                    <table class="desk-table">
+                        <thead>
+                            <tr>
+                                <th>From / Sender</th>
+                                <th>To / Recipient</th>
+                                <th>Reference Details</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in receives %}
+                            <tr>
+                                <td><strong>{{ r.from_title }}</strong></td>
+                                <td>{{ r.to_title }}</td>
+                                <td>
+                                    {% if r.reference_no %}<span class="badge bg-light text-dark border mb-1">Ref: {{ r.reference_no }}</span><br>{% endif %}
+                                    {% if r.address %}<small class="text-muted"><i class="fas fa-map-marker-alt"></i> {{ r.address }}</small><br>{% endif %}
+                                    {% if r.note %}<small class="text-indigo"><i class="fas fa-info-circle"></i> {{ r.note }}</small>{% endif %}
+                                </td>
+                                <td class="text-muted font-weight-bold">{{ r.date|date:"F d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-4 text-muted">No postal receives logged.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Dispatches Table -->
+            <div id="dispatches_panel" class="postal-tab-content" style="display: none;">
+                <div class="table-responsive">
+                    <table class="desk-table">
+                        <thead>
+                            <tr>
+                                <th>To / Recipient</th>
+                                <th>From / Sender</th>
+                                <th>Reference Details</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in dispatches %}
+                            <tr>
+                                <td><strong>{{ d.to_title }}</strong></td>
+                                <td>{{ d.from_title }}</td>
+                                <td>
+                                    {% if d.reference_no %}<span class="badge bg-light text-dark border mb-1">Ref: {{ d.reference_no }}</span><br>{% endif %}
+                                    {% if d.address %}<small class="text-muted"><i class="fas fa-map-marker-alt"></i> {{ d.address }}</small><br>{% endif %}
+                                    {% if d.note %}<small class="text-indigo"><i class="fas fa-info-circle"></i> {{ d.note }}</small>{% endif %}
+                                </td>
+                                <td class="text-muted font-weight-bold">{{ d.date|date:"F d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="4" class="text-center py-4 text-muted">No postal dispatches logged.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function switchTab(panelId, btn) {
+    document.querySelectorAll('.postal-tab-content').forEach(p => p.style.display = 'none');
+    document.querySelectorAll('.postal-tab-btn').forEach(b => b.classList.remove('active'));
+    
+    document.getElementById(panelId).style.display = 'block';
+    btn.classList.add('active');
+}
+</script>
+{% endblock content %}

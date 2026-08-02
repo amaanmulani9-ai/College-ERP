@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Letter - {{ staff.admin.get_full_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f2f5;
+            color: #222;
+            font-size: 13px;
+        }
+
+        /* ── No-print top bar ── */
+        .no-print-bar {
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .no-print-bar h5 { margin: 0; font-size: 1rem; color: #374151; }
+
+        /* ── Outer Letter Wrapper ── */
+        .letter-wrapper {
+            max-width: 800px;
+            margin: 28px auto 40px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            overflow: hidden;
+        }
+
+        /* ── Header / Banner ── */
+        .letter-header {
+            background: linear-gradient(135deg, #1b263b 0%, #0d1b2a 100%);
+            color: #fff;
+            padding: 24px 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .letter-header .school-logo {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .letter-header .school-logo i { font-size: 2rem; color: #6c5ce7; }
+        .letter-header .school-info h2 { font-size: 1.3rem; margin: 0 0 4px; letter-spacing: .5px; }
+        .letter-header .school-info small { opacity: .75; font-size: 0.78rem; }
+
+        /* ── Colored Ribbon ── */
+        .letter-ribbon {
+            background: linear-gradient(90deg, #6c5ce7, #a29bfe);
+            color: #fff;
+            text-align: center;
+            padding: 8px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        /* ── Body ── */
+        .letter-body { padding: 28px 30px; }
+
+        /* ── Employee Info Card ── */
+        .emp-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: #f8f9ff;
+            border: 1px solid #e0dcff;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 22px;
+        }
+        .emp-card .emp-photo {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #6c5ce7;
+            flex-shrink: 0;
+        }
+        .emp-card .emp-details h4 { margin: 0 0 4px; font-size: 1.05rem; color: #1b263b; }
+        .emp-card .emp-details .role-badge {
+            display: inline-block;
+            background: #6c5ce7;
+            color: #fff;
+            font-size: 0.72rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .emp-card .emp-details small { color: #6b7280; }
+
+        /* ── Details Table ── */
+        .details-table { width: 100%; border-collapse: collapse; margin-bottom: 22px; }
+        .details-table th, .details-table td {
+            padding: 8px 12px;
+            font-size: 12.5px;
+            border: 1px solid #e5e7eb;
+        }
+        .details-table th {
+            background: #f3f4f6;
+            font-weight: 600;
+            color: #374151;
+            width: 35%;
+        }
+        .details-table td { color: #111827; }
+        .details-table tr:nth-child(even) td { background: #fafafa; }
+
+        /* ── Portal Login Section ── */
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6c5ce7;
+            margin: 20px 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #e0dcff;
+        }
+
+        /* ── QR Codes Row ── */
+        .qr-row {
+            display: flex;
+            gap: 16px;
+            margin: 16px 0 22px;
+        }
+        .qr-box {
+            flex: 1;
+            text-align: center;
+            padding: 12px 8px;
+            background: #f8f9ff;
+            border: 1px solid #e0dcff;
+            border-radius: 10px;
+        }
+        .qr-box img { width: 70px; height: 70px; margin-bottom: 6px; }
+        .qr-box .qr-label { font-size: 0.7rem; color: #6b7280; font-weight: 600; }
+
+        /* ── Rules ── */
+        .rules-box {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 22px;
+        }
+        .rules-box ol { padding-left: 18px; margin: 0; }
+        .rules-box ol li { margin-bottom: 4px; color: #374151; font-size: 12px; }
+
+        /* ── Signature Row ── */
+        .signature-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 28px;
+            padding-top: 16px;
+            border-top: 1px dashed #d1d5db;
+        }
+        .sign-block { text-align: center; }
+        .sign-block .sign-line {
+            width: 140px;
+            border-top: 1px solid #374151;
+            margin: 0 auto 4px;
+        }
+        .sign-block small { color: #6b7280; font-size: 0.72rem; }
+
+        /* ── Footer ── */
+        .letter-footer {
+            background: #f3f4f6;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.72rem;
+            color: #9ca3af;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        /* ── Print Styles ── */
+        @media print {
+            body { background: #fff; }
+            .no-print-bar { display: none !important; }
+            .letter-wrapper { box-shadow: none; margin: 0; border-radius: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- No-print action bar -->
+<div class="no-print-bar">
+    <h5><i class="fas fa-file-contract me-2" style="color:#6c5ce7;"></i>Staff Job Letter Preview</h5>
+    <div>
+        <a href="{% url 'admin_job_letter' %}" class="btn btn-sm btn-outline-secondary me-2">
+            <i class="fas fa-arrow-left me-1"></i>Back
+        </a>
+        <button onclick="window.print()" class="btn btn-sm btn-primary" style="background:#6c5ce7; border-color:#6c5ce7;">
+            <i class="fas fa-print me-1"></i>Print / Save as PDF
+        </button>
+    </div>
+</div>
+
+<!-- Letter Document -->
+<div class="letter-wrapper">
+
+    <!-- Header -->
+    <div class="letter-header">
+        <div class="school-logo">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="school-info">
+            <h2>CAMPUS PRO ERP</h2>
+            <small>Official Employee Appointment & Job Letter</small><br>
+            <small>Portal: {{ site_url }}</small>
+        </div>
+    </div>
+
+    <!-- Ribbon -->
+    <div class="letter-ribbon">Letter of Appointment</div>
+
+    <!-- Body -->
+    <div class="letter-body">
+
+        <!-- Employee Identity Card -->
+        <div class="emp-card">
+            <img class="emp-photo"
+                 src="{{ staff.admin.profile_pic|default:'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}"
+                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'"
+                 alt="{{ staff.admin.get_full_name }}">
+            <div class="emp-details">
+                <h4>{{ staff.admin.get_full_name }}</h4>
+                <span class="role-badge">{{ staff.course.name|default:"General Department" }}</span><br>
+                <small>Employee ID: <strong>EMP-{{ staff.admin.id|stringformat:"04d" }}</strong></small><br>
+                <small>Status: <strong style="color:#10b981;">● ACTIVE</strong></small>
+            </div>
+        </div>
+
+        <!-- Employee Details Table -->
+        <div class="section-title"><i class="fas fa-id-card me-1"></i>Employee Information</div>
+        <table class="details-table">
+            <tr>
+                <th>Registration ID</th>
+                <td>EMP-{{ staff.admin.id|stringformat:"04d" }}</td>
+                <th>Full Name</th>
+                <td>{{ staff.admin.get_full_name }}</td>
+            </tr>
+            <tr>
+                <th>Role / Department</th>
+                <td>{{ staff.course.name|default:"N/A" }}</td>
+                <th>Gender</th>
+                <td>{{ staff.admin.get_gender_display|default:staff.admin.gender|default:"—" }}</td>
+            </tr>
+            <tr>
+                <th>Monthly Salary</th>
+                <td>₹ {{ staff.monthly_salary|floatformat:2 }}</td>
+                <th>Date of Joining</th>
+                <td>{{ staff.date_of_joining|default:"—" }}</td>
+            </tr>
+            <tr>
+                <th>Experience</th>
+                <td>{{ staff.experience }} Year{{ staff.experience|pluralize }}</td>
+                <th>Blood Group</th>
+                <td>{{ staff.blood_group|default:"—" }}</td>
+            </tr>
+            <tr>
+                <th>Religion</th>
+                <td>{{ staff.religion|default:"—" }}</td>
+                <th>Email Address</th>
+                <td>{{ staff.admin.email }}</td>
+            </tr>
+            <tr>
+                <th>Home Address</th>
+                <td colspan="3">{{ staff.admin.address|default:"—" }}</td>
+            </tr>
+        </table>
+
+        <!-- Portal Login Details -->
+        <div class="section-title"><i class="fas fa-key me-1"></i>Portal Login Credentials</div>
+        <table class="details-table" style="margin-bottom: 20px;">
+            <tr>
+                <th>Login URL</th>
+                <td>{{ site_url }}</td>
+            </tr>
+            <tr>
+                <th>Username / Email</th>
+                <td>{{ staff.admin.email }}</td>
+            </tr>
+            <tr>
+                <th>Password</th>
+                <td>
+                    {% if staff.job_letter_password %}
+                        {{ staff.job_letter_password }}
+                    {% else %}
+                        <em style="color:#9ca3af;">Contact administrator to set your portal password.</em>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+
+        <!-- QR Codes -->
+        <div class="section-title"><i class="fas fa-qrcode me-1"></i>Quick Access QR Codes</div>
+        <div class="qr-row">
+            <div class="qr-box">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data={{ site_url }}" alt="Web Portal QR">
+                <div class="qr-label">Web Portal</div>
+            </div>
+            <div class="qr-box">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=https://play.google.com/store" alt="Android App QR">
+                <div class="qr-label">Android App</div>
+            </div>
+            <div class="qr-box">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=70x70&data=https://apps.apple.com" alt="iOS App QR">
+                <div class="qr-label">iOS App</div>
+            </div>
+        </div>
+
+        <!-- Rules & Regulations -->
+        <div class="section-title"><i class="fas fa-gavel me-1"></i>Rules &amp; Regulations</div>
+        <div class="rules-box">
+            <ol>
+                {% for line in employee_rules.splitlines %}
+                    {% if line.strip %}
+                        <li>{{ line|cut:"1. "|cut:"2. "|cut:"3. "|cut:"4. "|cut:"5. "|cut:"6. "|cut:"7. "|cut:"8. "|cut:"9. "|cut:"10. " }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ol>
+        </div>
+
+        <!-- Signature Row -->
+        <div class="signature-row">
+            <div class="sign-block">
+                <div class="sign-line"></div>
+                <small>Employee Signature</small>
+            </div>
+            <div class="sign-block">
+                <div class="sign-line"></div>
+                <small>HOD / Principal Signature</small>
+            </div>
+            <div class="sign-block">
+                <div class="sign-line"></div>
+                <small>Official Stamp</small>
+            </div>
+        </div>
+
+    </div><!-- /letter-body -->
+
+    <!-- Footer -->
+    <div class="letter-footer">
+        This is a computer-generated document. Date Issued: {% now "d M Y" %} &nbsp;|&nbsp; CAMPUS PRO ERP
+    </div>
+
+</div><!-- /letter-wrapper -->
+
+</body>
+</html>

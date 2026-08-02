@@ -1,0 +1,13 @@
+from django.apps import AppConfig
+
+
+class AdmissionsConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.admissions"
+    verbose_name = "Admissions Management"
+
+    def ready(self):
+        try:
+            import apps.admissions.signals  # noqa: F401
+        except ImportError:
+            pass

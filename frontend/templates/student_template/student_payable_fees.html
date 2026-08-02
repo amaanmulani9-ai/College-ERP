@@ -257,6 +257,10 @@
 
 {% block content %}
 <div class="container-fluid px-0">
+    <div class="d-flex justify-content-end gap-2 mb-3 flex-wrap">
+        <a href="{% url 'student_fee_slip' %}" class="btn btn-outline-secondary btn-sm"><i class="fas fa-receipt"></i> Fee Slip</a>
+        <a href="{% url 'whatsapp_center' %}?template=payment_link&audience=course_students&course={{ request.user.student.course.id }}" class="btn btn-success btn-sm"><i class="fab fa-whatsapp"></i> WhatsApp Payment Link</a>
+    </div>
     
     <!-- Financial Metrics Widgets -->
     <div class="row fee-summary-row g-4">

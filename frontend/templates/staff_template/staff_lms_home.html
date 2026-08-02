@@ -1,0 +1,139 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-md-12 d-flex gap-2 flex-wrap">
+            <a href="{% url 'staff_add_course' %}" class="btn btn-primary">
+                <i class="fas fa-video"></i> Add Video Course
+            </a>
+            <a href="{% url 'staff_add_assignment' %}" class="btn btn-success">
+                <i class="fas fa-tasks"></i> Publish Assignment
+            </a>
+            <a href="{% url 'staff_add_material' %}" class="btn btn-info text-white">
+                <i class="fas fa-file-alt"></i> Upload Study Material
+            </a>
+        </div>
+    </div>
+
+    <!-- Video Courses Section -->
+    <div class="card erpnext-card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0"><i class="fas fa-play-circle text-primary"></i> My Video Courses</h5>
+        </div>
+        <div class="card-body">
+            {% if courses %}
+            <div class="row">
+                {% for course in courses %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border shadow-sm">
+                        {% if course.thumbnail %}
+                        <img src="{{ course.thumbnail.url }}" class="card-img-top" alt="{{ course.title }}" style="height: 160px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 160px;">
+                            <i class="fas fa-video fa-3x text-muted"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <span class="badge bg-primary mb-2">{{ course.category.name }}</span>
+                            <h5 class="card-title">{{ course.title }}</h5>
+                            <p class="card-text text-muted small">{{ course.description|truncatewords:15 }}</p>
+                            <p class="small mb-2"><strong>Subject:</strong> {{ course.subject.name }}</p>
+                            <a href="{% url 'staff_manage_lessons' course.id %}" class="btn btn-sm btn-outline-primary w-100">
+                                <i class="fas fa-list"></i> Manage Lessons ({{ course.lessons.count }})
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">No video courses created yet. Click "Add Video Course" to get started.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Assignments Section -->
+    <div class="card erpnext-card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0"><i class="fas fa-clipboard-list text-success"></i> Published Assignments</h5>
+        </div>
+        <div class="card-body table-responsive">
+            {% if assignments %}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Subject</th>
+                        <th>Due Date</th>
+                        <th>Submissions</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assignment in assignments %}
+                    <tr>
+                        <td><strong>{{ assignment.title }}</strong></td>
+                        <td>{{ assignment.subject.name }}</td>
+                        <td>{{ assignment.due_date|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <span class="badge bg-info">{{ assignment.submissions.count }} submitted</span>
+                        </td>
+                        <td>
+                            <a href="{% url 'staff_view_submissions' assignment.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i> View & Grade
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted">No assignments published yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Study Materials Section -->
+    <div class="card erpnext-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0"><i class="fas fa-folder-open text-info"></i> Study Materials & Notes</h5>
+        </div>
+        <div class="card-body table-responsive">
+            {% if materials %}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Subject</th>
+                        <th>Description</th>
+                        <th>Uploaded On</th>
+                        <th>File</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for material in materials %}
+                    <tr>
+                        <td><strong>{{ material.title }}</strong></td>
+                        <td>{{ material.subject.name }}</td>
+                        <td>{{ material.description|truncatewords:10 }}</td>
+                        <td>{{ material.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <a href="{{ material.file.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted">No study materials uploaded yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,35 +1,51 @@
-# Byte-compiled / pycacahe
+# Python & Byte-compiled
 __pycache__/
 *.py[cod]
 *$py.class
+*.coverage
+.coverage
+.mypy_cache/
+.pytest_cache/
 
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
+# Log & Backup files
 *.log
-local_settings.py
-db.sqlite3
-backend/staticfiles/
+logs/
+legacy_backup/
+.claude/
 
-# Environments
-.vscode
+# Databases
+*.sqlite3
+db.sqlite3
+backend/test.sqlite3
+
+# Environment & Configs
 .env
+.env.local
 .venv
 env/
 venv/
 ENV/
-env.bak/
-venv.bak/
 
-# mkdocs documentation
+# Build & Dependencies
+node_modules/
+dist/
+build/
+backend/staticfiles/
+media/uploads/
+*.tsbuildinfo
+
+# IDE & Tooling
+.vscode/
+.idea/
+.gemini/
+.reticle.json
+scratch/
+
+# Android & Gradle
+.gradle/
+android_apk/.gradle/
+android_apk/build_out/
+android_apk/app/.gradle/
+
+# Documentation builds
 /site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/

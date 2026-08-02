@@ -1,0 +1,196 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid py-3">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Selector Card -->
+            <div class="card erpnext-card shadow-sm mb-4" id="quiz-config-card">
+                <div class="card-header bg-transparent border-bottom">
+                    <h5 class="card-title mb-0"><i class="fas fa-brain text-primary"></i> Practice Quiz Selection</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Select Subject</label>
+                        <select id="quiz-subject" class="form-select">
+                            {% for sub in subjects %}
+                            <option value="{{ sub.id }}">{{ sub.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="btn btn-primary w-100 py-2" onclick="generateQuiz()" id="genQuizBtn">
+                        <i class="fas fa-magic"></i> Generate AI Quiz
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Play Arena -->
+            <div class="card erpnext-card shadow-sm mb-4 d-none" id="quiz-arena-card">
+                <div class="card-header bg-transparent border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0"><i class="fas fa-list-ol text-info"></i> Practice Arena</h5>
+                    <span class="badge bg-primary px-3 py-2" id="arena-timer">Active Session</span>
+                </div>
+                <div class="card-body" id="quiz-questions-container">
+                    <!-- Dynamic Questions injected here -->
+                </div>
+                <div class="card-footer bg-transparent border-top">
+                    <button class="btn btn-success w-100 py-2" onclick="evaluateQuiz()" id="submitQuizBtn">
+                        <i class="fas fa-check-double"></i> Submit Quiz Answers
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Results Screen -->
+            <div class="card erpnext-card shadow-sm mb-4 d-none" id="quiz-result-card">
+                <div class="card-body text-center p-5">
+                    <div class="mb-3" id="result-icon-box">
+                        <!-- Success/fail icon -->
+                    </div>
+                    <h3 class="fw-bold mb-1" id="result-title">Quiz Evaluated</h3>
+                    <p class="text-muted" id="result-subtitle">Here is your score</p>
+                    
+                    <h1 class="display-3 fw-bold text-primary my-4" id="result-score">0 / 5</h1>
+                    
+                    <div class="alert alert-info py-2" id="result-feedback">
+                        Review feedback
+                    </div>
+                    
+                    <button class="btn btn-outline-primary px-4 mt-3" onclick="resetQuizArena()">
+                        <i class="fas fa-redo"></i> Try Another Subject
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let activeQuiz = null;
+
+    function generateQuiz() {
+        const subjectId = document.getElementById('quiz-subject').value;
+        const btn = document.getElementById('genQuizBtn');
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating Questions via Local LLM...';
+        
+        fetch("{% url 'student_ai_quiz' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ subject_id: subjectId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-magic"></i> Generate AI Quiz';
+            
+            if (data.status === 'success') {
+                activeQuiz = data.quiz;
+                renderQuizQuestions(activeQuiz.questions);
+            } else {
+                alert("Ollama Error: " + data.message);
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-magic"></i> Generate AI Quiz';
+            console.error(err);
+        });
+    }
+
+    function renderQuizQuestions(questions) {
+        // Toggle card visual states
+        document.getElementById('quiz-config-card').classList.add('d-none');
+        const arena = document.getElementById('quiz-arena-card');
+        arena.classList.remove('d-none');
+        
+        const container = document.getElementById('quiz-questions-container');
+        container.innerHTML = "";
+        
+        questions.forEach((q, index) => {
+            const block = document.createElement('div');
+            block.className = "mb-4 pb-3 border-bottom";
+            
+            const title = document.createElement('h6');
+            title.className = "fw-bold mb-3";
+            title.innerText = `Q${index+1}. ${q.question}`;
+            block.appendChild(title);
+            
+            q.options.forEach((opt, oIdx) => {
+                const optWrap = document.createElement('div');
+                optWrap.className = "form-check mb-2";
+                
+                const radio = document.createElement('input');
+                radio.className = "form-check-input";
+                radio.type = "radio";
+                radio.name = `q-${index}`;
+                radio.id = `q-${index}-opt-${oIdx+1}`;
+                radio.value = oIdx + 1;
+                
+                const label = document.createElement('label');
+                label.className = "form-check-label";
+                label.htmlFor = `q-${index}-opt-${oIdx+1}`;
+                label.innerText = opt;
+                
+                optWrap.appendChild(radio);
+                optWrap.appendChild(label);
+                block.appendChild(optWrap);
+            });
+            
+            container.appendChild(block);
+        });
+    }
+
+    function evaluateQuiz() {
+        if (!activeQuiz) return;
+        
+        let score = 0;
+        const questions = activeQuiz.questions;
+        
+        questions.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="q-${index}"]:checked`);
+            if (selected) {
+                const answer = parseInt(selected.value);
+                if (answer === q.correct) {
+                    score += 1;
+                }
+            }
+        });
+        
+        // Show result screen
+        document.getElementById('quiz-arena-card').classList.add('d-none');
+        const resCard = document.getElementById('quiz-result-card');
+        resCard.classList.remove('d-none');
+        
+        document.getElementById('result-score').innerText = `${score} / 5`;
+        
+        const iconBox = document.getElementById('result-icon-box');
+        const feedback = document.getElementById('result-feedback');
+        
+        if (score >= 4) {
+            iconBox.innerHTML = '<i class="fas fa-trophy fa-4x text-warning"></i>';
+            feedback.innerText = "Excellent score! You have strong core comprehension of this subject. Keep it up!";
+            feedback.className = "alert alert-success py-2";
+        } else if (score >= 3) {
+            iconBox.innerHTML = '<i class="fas fa-check-circle fa-4x text-success"></i>';
+            feedback.innerText = "Good job! You passed the quiz. Go through your notes to get a perfect score next time.";
+            feedback.className = "alert alert-info py-2";
+        } else {
+            iconBox.innerHTML = '<i class="fas fa-exclamation-circle fa-4x text-danger"></i>';
+            feedback.innerText = "Keep studying! Try reviewing syllabus modules and practice again.";
+            feedback.className = "alert alert-warning py-2";
+        }
+    }
+
+    function resetQuizArena() {
+        document.getElementById('quiz-result-card').classList.add('d-none');
+        document.getElementById('quiz-config-card').classList.remove('d-none');
+        activeQuiz = null;
+    }
+</script>
+{% endblock content %}

@@ -1,0 +1,178 @@
+
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb-bar {
+        background: transparent;
+        padding: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+    }
+    .sk-breadcrumb-title {
+        color: #6c5ce7;
+        font-weight: 600;
+        font-size: 15px;
+        margin-right: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .sk-breadcrumb-title i { font-size: 14px; }
+    .sk-breadcrumb-path {
+        color: #888;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .top-actions-bar {
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+
+    .form-group-inline {
+        display: flex;
+        flex-direction: column;
+    }
+    .form-group-inline label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #b2bec3;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+    .form-control-inline {
+        border-radius: 6px;
+        border: 1px solid #dfe6e9;
+        padding: 8px 15px;
+        font-size: 14px;
+        color: #2d3436;
+        width: 250px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    .btn-outline-purple {
+        border: 1px solid #6c5ce7;
+        color: #6c5ce7;
+        background: #fff;
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 13px;
+    }
+    .btn-outline-yellow {
+        border: 1px solid #f39c12;
+        color: #f39c12;
+        background: #fff;
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 13px;
+    }
+    .btn-solid-purple {
+        background: #6c5ce7;
+        color: #fff;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 13px;
+    }
+
+    .stats-card {
+        background: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        width: 300px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .stats-card h5 {
+        font-size: 11px;
+        font-weight: 600;
+        color: #b2bec3;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+    .stats-card h2 {
+        color: #ff7675;
+        font-size: 32px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .student-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 25px;
+        text-align: center;
+        width: 220px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .student-avatar {
+        width: 80px;
+        height: 80px;
+        background: #f1f2f6;
+        border-radius: 50%;
+        margin: 0 auto 15px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    .student-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .student-name {
+        color: #6c5ce7;
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+    .student-id {
+        color: #b2bec3;
+        font-size: 12px;
+        margin-bottom: 2px;
+    }
+    .student-course {
+        color: #b2bec3;
+        font-size: 12px;
+        margin-bottom: 20px;
+    }
+    .student-card-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+    .student-action-btn {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .btn-download {
+        background: #6c5ce7;
+        color: #fff;
+    }
+    .btn-call {
+        background: #f1f2f6;
+        color: #b2bec3;
+    }
+

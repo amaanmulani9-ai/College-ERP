@@ -1,0 +1,81 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block content %}
+<div class="container-fluid py-3">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0 text-dark font-weight-bold"><i class="fas fa-user-plus text-primary mr-2"></i> Admissions Center</h4>
+        <span class="badge bg-primary text-white px-3 py-1 font-weight-bold">Total Students: {{ total_students }}</span>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="card shadow-sm border-0 mb-4 p-3" style="border-radius: 12px; background: #ffffff;">
+        <form method="GET" action="{% url 'backoffice_admissions' %}" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="fas fa-search"></i></span>
+                    <input type="text" name="q" value="{{ query }}" class="form-control border-start-0" placeholder="Search by name or email..." style="border-radius: 0 8px 8px 0;">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <select name="course" class="form-select" style="border-radius: 8px;">
+                    <option value="">All Courses</option>
+                    {% for c in courses %}
+                    <option value="{{ c.id }}" {% if course_filter == c.id|stringformat:"i" %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100 font-weight-bold" style="border-radius: 8px;"><i class="fas fa-filter"></i> Apply Filters</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Students Directory Table -->
+    <div class="card shadow-sm border-0" style="border-radius: 15px; background: #ffffff; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="width: 100%;">
+                <thead class="table-light">
+                    <tr style="font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px;">
+                        <th class="ps-4">Student Details</th>
+                        <th>Email / Contact</th>
+                        <th>Course</th>
+                        <th>Session</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in students %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-light text-primary d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; border-radius: 10px;">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
+                                <div>
+                                    <strong class="text-dark d-block">{{ s.admin.get_full_name }}</strong>
+                                    <small class="text-muted">PRN: PAT-{{ s.id|stringformat:"04d" }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-dark">{{ s.admin.email }}</span>
+                            <br><small class="text-muted"><i class="fas fa-phone mr-1"></i> {{ s.admin.mobile|default:"N/A" }}</small>
+                        </td>
+                        <td><span class="badge bg-info-light text-info border border-info">{{ s.course.name }}</span></td>
+                        <td><span class="text-muted">{{ s.session.start_year.year }} - {{ s.session.end_year.year }}</span></td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline-primary" style="border-radius: 6px;" onclick="alert('Student details view offline.')"><i class="fas fa-eye"></i> View Profile</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center py-5 text-muted">No student records found matching filters.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}

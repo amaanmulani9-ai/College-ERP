@@ -2,21 +2,50 @@
 {% load static %}
 {% block page_title %}{{page_title}}{% endblock page_title %}
 
+{% block custom_css %}
+<style>
+    .session-shell {
+        display: grid;
+        grid-template-columns: 320px minmax(0, 1fr);
+        gap: 24px;
+    }
+    .session-side {
+        background: linear-gradient(180deg, #111827 0%, #4f46e5 100%);
+        color: #fff;
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: 0 12px 30px rgba(17,24,39,.16);
+    }
+    .session-side h2 { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
+    .session-side p { font-size: 13px; line-height: 1.7; color: rgba(255,255,255,.84); }
+    .session-pill {
+        display:inline-flex; align-items:center; gap:8px;
+        padding:8px 12px; margin: 10px 8px 0 0;
+        border-radius:999px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.15);
+        font-size:12px; font-weight:600;
+    }
+    .session-card {
+        background:#fff; border-radius:16px; padding:28px;
+        box-shadow:0 2px 15px rgba(0,0,0,.03);
+    }
+    @media (max-width: 992px) { .session-shell { grid-template-columns: 1fr; } }
+</style>
+{% endblock custom_css %}
+
 {% block content %}
 
 <section class="content">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <!-- general form elements -->
-                <div class="card card-dark">
-                    <div class="card-header">
-                        <h3 class="card-title">{{page_title}}</h3>
-                    </div>
-                    {% include "main_app/form_template.html" with messages=messages  form=form button_text="Update Session"%}
-                </div>
-                <!-- /.card -->
-
+        <div class="session-shell">
+            <aside class="session-side">
+                <h2>Academic Session</h2>
+                <p>Edit batch label, date span, and active state so the promotion and verification flows stay aligned.</p>
+                <div class="session-pill"><i class="fas fa-calendar-alt"></i> Batch wise</div>
+                <div class="session-pill"><i class="fas fa-toggle-on"></i> Active / inactive</div>
+                <div class="session-pill"><i class="fas fa-shield-alt"></i> Clear audit trail</div>
+            </aside>
+            <div class="session-card">
+                {% include "main_app/form_template.html" with messages=messages  form=form button_text="Update Session"%}
             </div>
         </div>
     </div>

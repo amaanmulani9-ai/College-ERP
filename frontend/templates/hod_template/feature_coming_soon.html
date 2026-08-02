@@ -1,0 +1,123 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ feature_name }}{% endblock page_title %}
+
+{% block custom_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --sk-primary: #6c5ce7;
+        --sk-text: #2d3436;
+        --sk-text-meta: #b2bec3;
+        --sk-bg: #f7f9fa;
+        --sk-card-bg: #ffffff;
+        --sk-border: #f1f2f6;
+    }
+    body { font-family: 'Poppins', sans-serif; background-color: var(--sk-bg); }
+
+    /* Dark Mode */
+    .dark-mode body, .dark-mode .content-wrapper, .dark-mode .main-footer { background-color: #000000 !important; }
+    .dark-mode .sk-card, .dark-mode .sk-breadcrumb-bar { background-color: #1a1a1a !important; color: #fff !important; }
+    .dark-mode .sk-card-title { color: #fff !important; }
+    .dark-mode .sk-text, .dark-mode .sk-text-meta { color: #ddd !important; }
+    .dark-mode .sk-coming-soon-icon { background-color: #2a2a2a; color: #888; }
+    
+    .sk-breadcrumb-bar {
+        background: var(--sk-card-bg);
+        padding: 15px 25px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    
+    .sk-breadcrumb-title {
+        color: var(--sk-primary);
+        font-weight: 600;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .sk-card {
+        background: var(--sk-card-bg);
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+        margin-bottom: 25px;
+        text-align: center;
+    }
+
+    .sk-coming-soon-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 0;
+    }
+
+    .sk-coming-soon-icon {
+        width: 120px;
+        height: 120px;
+        background: #f8f9fa;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 50px;
+        color: #dcdde1;
+        margin-bottom: 25px;
+    }
+
+    .sk-coming-soon-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--sk-text);
+        margin-bottom: 15px;
+    }
+
+    .sk-coming-soon-desc {
+        color: var(--sk-text-meta);
+        font-size: 15px;
+        max-width: 400px;
+        line-height: 1.6;
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        
+        <!-- Breadcrumb Bar -->
+        <div class="sk-breadcrumb-bar">
+            <div class="sk-breadcrumb-title">
+                {{ feature_name }} 
+            </div>
+            <div style="font-size: 13px; color: var(--sk-text-meta);">
+                <i class="fas fa-home"></i> - {{ feature_name }}
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="sk-card">
+            <div class="sk-coming-soon-container">
+                <div class="sk-coming-soon-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h2 class="sk-coming-soon-title">{{ feature_name }} is Coming Soon</h2>
+                <p class="sk-coming-soon-desc">
+                    This module is currently being built and integrated. Check back soon for updates and new features related to {{ feature_name }}.
+                </p>
+                <a href="{% url 'admin_home' %}" style="margin-top: 30px; background: #6c5ce7; color: white; padding: 10px 25px; border-radius: 50px; font-weight: 500; font-size: 14px; display: inline-block;">
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock content %}

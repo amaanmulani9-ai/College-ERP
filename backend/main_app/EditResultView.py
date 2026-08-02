@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
 from django.contrib import messages
-from .models import Subject, Staff, Student, StudentResult
+from .models import Subject, Staff, StudentResult
 from .forms import EditResultForm
 from django.urls import reverse
 
@@ -34,7 +34,7 @@ class EditResultView(View):
                 result.save()
                 messages.success(request, "Result Updated")
                 return redirect(reverse('edit_student_result'))
-            except Exception as e:
+            except Exception:
                 messages.warning(request, "Result Could Not Be Updated")
         else:
             messages.warning(request, "Result Could Not Be Updated")

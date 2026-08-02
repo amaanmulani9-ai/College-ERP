@@ -1,0 +1,239 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block custom_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --sk-brand:        #673de5;
+    --sk-brand-dark:   #5530c5;
+    --sk-brand-light:  rgba(103,61,229,.10);
+    --sk-text-primary: #222222;
+    --sk-text-secondary: #ffffff;
+    --sk-text-muted:   #666666;
+    --sk-text-meta:    #8c8c8c;
+    --sk-surface:      #000000;
+    --sk-surface-base: #f3f3f3;
+    --sk-white:        #ffffff;
+    --r-md: 8px;
+    --r-xl: 12px;
+    --dur-fast: 150ms;
+}
+body { font-family: 'Poppins', sans-serif; background-color: #f7f9fa; }
+
+/* Dark Mode */
+.dark-mode body, .dark-mode .content-wrapper, .dark-mode .main-footer { background-color: #000000 !important; }
+.dark-mode .sk-breadcrumb-bar { background: #1a1a1a; color: #a3a3a3; border: 1px solid #333; box-shadow: none; }
+.dark-mode .sk-breadcrumb-bar span { color: #ffffff; }
+.dark-mode .sk-card { background: #1a1a1a; border: 1px solid #333; box-shadow: none; }
+.dark-mode .sk-input { background: #222; border-color: #444; color: #fff; }
+.dark-mode .sk-input:focus { border-color: var(--sk-brand); }
+.dark-mode .logo-preview-box { background: #222; border-color: #444; }
+.dark-mode .sk-label { color: #a3a3a3; }
+
+/* Breadcrumb Bar */
+.sk-breadcrumb-bar {
+    background: var(--sk-white);
+    border-radius: var(--r-md);
+    padding: 12px 20px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sk-text-muted);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+.sk-breadcrumb-bar i { color: var(--sk-brand); margin-right: 8px; font-size: 14px; }
+.sk-breadcrumb-bar span { color: var(--sk-text-primary); font-weight: 600; margin-left: 6px; }
+
+/* Card */
+.sk-card {
+    background: var(--sk-white);
+    border-radius: var(--r-xl);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+    padding: 30px;
+    border: none;
+}
+.sk-card-title {
+    color: var(--sk-brand);
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+.sk-required-note {
+    color: #ef4444;
+    font-size: 11px;
+    margin-bottom: 30px;
+}
+
+/* Form Elements */
+.sk-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--sk-text-meta);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: block;
+}
+.sk-label .req { color: #ef4444; }
+.sk-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--r-md);
+    font-size: 13px;
+    color: var(--sk-text-primary);
+    transition: all var(--dur-fast);
+    background: #fff;
+}
+.sk-input:focus {
+    outline: none;
+    border-color: var(--sk-brand);
+    box-shadow: 0 0 0 3px var(--sk-brand-light);
+}
+.sk-input::placeholder { color: #cbd5e1; }
+
+/* Logo Box */
+.logo-preview-box {
+    width: 90px; height: 90px;
+    border-radius: var(--r-md);
+    border: 1px solid #e2e8f0;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    background: #f8fafc;
+}
+.logo-preview-box img { max-width: 100%; max-height: 100%; object-fit: cover; }
+.logo-preview-box .placeholder { color: #94a3b8; font-size: 24px; }
+
+/* Buttons */
+.sk-btn-outline {
+    color: var(--sk-brand);
+    border: 1px solid var(--sk-brand);
+    background: transparent;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all var(--dur-fast);
+}
+.sk-btn-outline:hover { background: var(--sk-brand-light); }
+.sk-btn-primary {
+    background: var(--sk-brand);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 30px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all var(--dur-fast);
+}
+.sk-btn-primary:hover { background: var(--sk-brand-dark); transform: translateY(-1px); }
+
+.form-group { margin-bottom: 24px; }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="sk-breadcrumb-bar">
+    <i class="fas fa-cog"></i> General Settings &gt; <span>Institute Profile</span>
+</div>
+
+<div class="sk-card">
+    <div class="sk-card-title"><i class="far fa-edit"></i> Update Profile</div>
+    <div class="sk-required-note">* Indicates required fields</div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="sk-label">INSTITUTE LOGO</label>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="logo-preview-box">
+                            {% if profile.logo %}
+                                <img src="{{ profile.logo.url }}" alt="Logo">
+                            {% else %}
+                                <div style="background: #006699; color: white; width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 11px; font-weight: 800; line-height: 1.1;">
+                                    YOUR<br>LOGO<br>HERE
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="sk-btn-outline mb-2">
+                                <i class="fas fa-camera"></i> Change Logo
+                                <input type="file" name="logo" style="display:none;" accept="image/*">
+                            </label>
+                            <div style="font-size:10px; color:var(--sk-text-meta);">JPG, PNG. Max 500KB</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="sk-label">NAME OF INSTITUTE <span class="req">*</span></label>
+                    <input type="text" class="sk-input" name="name" value="{{ profile.name|default:'' }}" placeholder="Institute Name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="sk-label">TARGET LINE <span class="req">*</span></label>
+                    <input type="text" class="sk-input" name="target_line" value="{{ profile.target_line|default:'' }}" placeholder="Target Line" required>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6">
+                <div class="form-group" style="margin-top: 15px;">
+                    <label class="sk-label">PHONE NUMBER <span class="req">*</span></label>
+                    <input type="text" class="sk-input" name="phone" value="{{ profile.phone|default:'' }}" placeholder="Phone No" required>
+                </div>
+
+                <div class="form-group" style="margin-top: 50px;">
+                    <label class="sk-label">WEBSITE</label>
+                    <input type="url" class="sk-input" name="website" value="{{ profile.website|default:'' }}" placeholder="Website URL">
+                </div>
+
+                <div class="form-group">
+                    <label class="sk-label">ADDRESS <span class="req">*</span></label>
+                    <input type="text" class="sk-input" name="address" value="{{ profile.address|default:'' }}" placeholder="Address" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="sk-label">COUNTRY <span class="req">*</span></label>
+                    <select class="sk-input" name="country" required>
+                        <option value="" disabled {% if not profile.country %}selected{% endif %}>Select Country</option>
+                        <option value="India" {% if profile.country == 'India' %}selected{% endif %}>India</option>
+                        <option value="USA" {% if profile.country == 'USA' %}selected{% endif %}>USA</option>
+                        <option value="UK" {% if profile.country == 'UK' %}selected{% endif %}>UK</option>
+                        <option value="Canada" {% if profile.country == 'Canada' %}selected{% endif %}>Canada</option>
+                        <option value="Australia" {% if profile.country == 'Australia' %}selected{% endif %}>Australia</option>
+                        <!-- Keep fallback for arbitrary existing countries -->
+                        {% if profile.country and profile.country not in "India,USA,UK,Canada,Australia" %}
+                        <option value="{{ profile.country }}" selected>{{ profile.country }}</option>
+                        {% endif %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="sk-btn-primary">
+                <i class="fas fa-sync-alt"></i> Update Profile
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock content %}

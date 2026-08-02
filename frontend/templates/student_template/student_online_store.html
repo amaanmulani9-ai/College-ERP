@@ -1,0 +1,221 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}Online Store{% endblock page_title %}
+{% block content %}
+<style>
+    .es-store-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .es-breadcrumbs {
+        color: #6b46c1;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .es-breadcrumbs span {
+        color: #94a3b8;
+        margin: 0 8px;
+    }
+    .es-store-actions {
+        display: flex;
+        gap: 15px;
+    }
+    .es-store-action-btn {
+        color: #64748b;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .es-store-action-btn:hover {
+        color: #6b46c1;
+    }
+    
+    .es-store-banner {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        border-radius: 12px;
+        color: white;
+        padding: 40px 30px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+    }
+    .es-store-banner h2 {
+        font-weight: 700;
+        font-size: 28px;
+        margin-bottom: 10px;
+        position: relative;
+        z-index: 2;
+    }
+    .es-store-banner p {
+        opacity: 0.9;
+        font-size: 15px;
+        max-width: 60%;
+        margin-bottom: 0;
+        position: relative;
+        z-index: 2;
+    }
+    .es-store-banner .bg-icon {
+        position: absolute;
+        right: 40px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 140px;
+        color: rgba(255, 255, 255, 0.1);
+        z-index: 1;
+    }
+
+    .es-products-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 20px;
+    }
+    .es-products-title h4 {
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 5px;
+        font-size: 18px;
+    }
+    .es-products-title p {
+        color: #94a3b8;
+        font-size: 13px;
+        margin: 0;
+    }
+    
+    .es-cart-btn {
+        background: #7c3aed;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .es-cart-btn .badge {
+        background: #f43f5e;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 11px;
+    }
+
+    .es-search-filter-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    .es-store-search {
+        flex: 1;
+        position: relative;
+    }
+    .es-store-search i {
+        position: absolute;
+        left: 15px;
+        top: 12px;
+        color: #94a3b8;
+    }
+    .es-store-search input {
+        width: 100%;
+        padding: 10px 15px 10px 40px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        outline: none;
+        color: #1e293b;
+        font-size: 14px;
+    }
+    .es-filter-btn {
+        background: #6b46c1;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .es-empty-state {
+        background: white;
+        border-radius: 12px;
+        padding: 60px 20px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        margin-top: 20px;
+    }
+    .es-empty-icon {
+        font-size: 50px;
+        color: #e2e8f0;
+        margin-bottom: 15px;
+    }
+    .es-empty-state h4 {
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+    .es-empty-state p {
+        color: #94a3b8;
+        font-size: 14px;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+</style>
+
+<div class="content">
+    <div class="container-fluid" style="padding: 20px;">
+        
+        <!-- Top Navigation -->
+        <div class="es-store-top">
+            <div class="es-breadcrumbs">
+                <i class="fas fa-shopping-cart" style="margin-right: 5px;"></i> Store <span>&gt;</span> Online Store
+            </div>
+            <div class="es-store-actions">
+                <a href="#" class="es-store-action-btn"><i class="far fa-list-alt"></i> My Orders</a>
+                <a href="#" class="es-store-action-btn"><i class="fas fa-truck"></i> Track Order</a>
+            </div>
+        </div>
+
+        <!-- Banner -->
+        <div class="es-store-banner">
+            <h2>Welcome to the School Store</h2>
+            <p>Browse uniforms, books, stationery and more. Items shown are approved for your class.</p>
+            <i class="fas fa-shopping-bag bg-icon"></i>
+        </div>
+
+        <!-- Products Header -->
+        <div class="es-products-header">
+            <div class="es-products-title">
+                <h4>Products</h4>
+                <p>0 products found</p>
+            </div>
+            <button class="es-cart-btn">
+                <i class="fas fa-shopping-cart"></i> Cart <span class="badge">0</span>
+            </button>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="es-search-filter-row">
+            <div class="es-store-search">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search products by name or code...">
+            </div>
+            <button class="es-filter-btn"><i class="fas fa-list"></i> All</button>
+        </div>
+
+        <!-- Empty State -->
+        <div class="es-empty-state">
+            <div class="es-empty-icon"><i class="fas fa-box-open"></i></div>
+            <h4>No Products Found</h4>
+            <p>There are no products available for your class at the moment.</p>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

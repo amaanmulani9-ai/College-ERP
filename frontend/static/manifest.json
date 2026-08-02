@@ -1,21 +1,24 @@
 {
-  "name": "Patkar College ERP",
-  "short_name": "College ERP",
-  "description": "Student & Staff Management System for Patkar College",
+  "name": "CampusPro ERP - College & School Management System",
+  "short_name": "CampusPro ERP",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1e3a8a",
+  "background_color": "#f8fafc",
+  "theme_color": "#0284c7",
+  "orientation": "portrait-primary",
+  "description": "Complete Mobile & Web College ERP Software for Students, Faculty, and Staff.",
   "icons": [
     {
-      "src": "/static/icons/icon-192x192.png",
+      "src": "/static/image/logo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/static/icons/icon-512x512.png",
+      "src": "/static/image/logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

@@ -6,958 +6,656 @@
 {% block custom_css %}
 <style>
     :root {
-        --ms-primary: #1e3a8a;
-        --ms-secondary: #3b82f6;
-        --ms-gold: #d97706;
-        --ms-dark: #1f2937;
-        --ms-light: #f3f4f6;
-        --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-        --accent-glow: 0 0 15px rgba(59, 130, 246, 0.2);
+        --campuspro-bg: #f4f6f9;
+        --campuspro-primary: #0f5f6c;
+        --campuspro-text: #555;
+        --campuspro-light-text: #a0a9b6;
+        --card-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
-
-    body.dark-mode {
-        --ms-light: #111827;
-        --ms-dark: #f3f4f6;
+    
+    body {
+        background-color: var(--campuspro-bg);
+        font-family: 'Poppins', sans-serif;
     }
-
-    /* College Prestigious Header Banner */
-    .college-banner {
-        background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
-        border-radius: 16px;
-        color: #ffffff;
-        padding: 24px 30px;
-        margin-bottom: 24px;
-        box-shadow: var(--card-shadow);
-        position: relative;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .college-banner::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -20%;
-        width: 400px;
-        height: 400px;
-        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 60%);
-        pointer-events: none;
-    }
-
-    .college-name {
-        font-family: 'Outfit', 'Inter', sans-serif;
-        font-size: 1.4rem;
-        font-weight: 800;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        margin-bottom: 12px;
-        line-height: 1.4;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        padding-bottom: 12px;
-    }
-
-    .student-profile-summary {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-
-    .student-avatar-container {
-        position: relative;
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        border: 3px solid rgba(255, 255, 255, 0.2);
-        overflow: hidden;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-
-    .student-avatar-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .student-details-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 12px 24px;
-        flex-grow: 1;
-    }
-
-    .student-meta-item {
-        font-size: 0.85rem;
-    }
-
-    .student-meta-label {
-        color: rgba(255, 255, 255, 0.6);
-        font-weight: 500;
-        display: block;
-        text-transform: uppercase;
-        font-size: 0.7rem;
-        letter-spacing: 0.5px;
-        margin-bottom: 2px;
-    }
-
-    .student-meta-val {
-        font-weight: 600;
-        color: #ffffff;
-    }
-
-    /* Stats Quick Access Cards */
-    .stat-badge-card {
-        background: #ffffff;
+    
+    /* Profile Card */
+    .profile-card {
+        background: #fff;
         border-radius: 12px;
-        padding: 18px 20px;
-        border: 1px solid rgba(0,0,0,0.05);
+        padding: 20px;
         box-shadow: var(--card-shadow);
-        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+    
+    .profile-card-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .profile-card-img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 4px solid #f4f6f9;
+        object-fit: cover;
+        margin-bottom: 10px;
+    }
+    
+    .profile-card-name {
+        font-size: 22px;
+        font-weight: 700;
+        color: #9b59b6;
+        text-transform: lowercase;
+    }
+    
+    .profile-section-bg {
+        background: #f8f9fc;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .profile-section-plain {
+        padding: 0 15px;
+        margin-bottom: 15px;
+    }
+    
+    .profile-item {
+        margin-bottom: 15px;
+        text-align: left;
+        line-height: 1.2;
+    }
+    
+    .profile-label {
+        font-size: 11px;
+        color: #9e9cb7;
+        display: block;
+        margin-bottom: 2px;
+        font-weight: 500;
+        text-decoration: underline;
+        text-decoration-color: #e5e5f0;
+        text-underline-offset: 3px;
+    }
+    
+    .profile-value {
+        font-size: 13px;
+        font-weight: 700;
+        color: #31187a;
+        display: block;
+    }
+    
+    .profile-arrow {
+        color: #a7a5c6;
+        margin-right: 4px;
+        font-size: 11px;
+    }
+    
+    /* Welcome Banner */
+    .welcome-banner {
+        background: #fff;
+        border-radius: 4px;
+        padding: 15px 20px;
+        border-left: 4px solid var(--campuspro-primary);
+        box-shadow: var(--card-shadow);
+        margin-bottom: 20px;
         display: flex;
         align-items: center;
-        gap: 16px;
+        font-size: 15px;
+        color: #333;
+    }
+    
+    .welcome-banner i {
+        color: #ff9f43;
+        margin-right: 10px;
+        font-size: 18px;
     }
 
-    body.dark-mode .stat-badge-card {
-        background: #1f2937;
-        border-color: rgba(255,255,255,0.05);
+    .launchpad-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
     }
-
-    .stat-badge-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.08);
-    }
-
-    .stat-badge-icon {
-        width: 48px;
-        height: 48px;
+    .launchpad-item {
+        background: #fff;
         border-radius: 10px;
+        box-shadow: var(--card-shadow);
+        padding: 14px 16px;
+        text-decoration: none;
+        color: inherit;
+        border: 1px solid transparent;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .launchpad-item:hover {
+        transform: translateY(-2px);
+        border-color: rgba(75, 107, 251, 0.15);
+        box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+        text-decoration: none;
+    }
+    .launchpad-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.25rem;
+        color: #fff;
+        flex-shrink: 0;
     }
-
-    .stat-badge-icon.primary { background: rgba(30, 58, 138, 0.1); color: #1e3a8a; }
-    .stat-badge-icon.success { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-    .stat-badge-icon.warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-    .stat-badge-icon.danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
-
-    body.dark-mode .stat-badge-icon.primary { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
-
-    .stat-badge-info h4 {
+    .launchpad-text strong {
+        display: block;
+        font-size: 13px;
+        color: #1f2937;
+        margin-bottom: 2px;
+    }
+    .launchpad-text span {
+        display: block;
+        font-size: 11px;
+        color: var(--campuspro-light-text);
+        line-height: 1.4;
+    }
+    .launchpad-meta {
+        margin-top: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .launch-meta-pill {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: 11px;
+        color: #4b5563;
+        font-weight: 600;
+    }
+    
+    /* Quick Stats Cards */
+    .stat-card {
+        background: #fff;
+        border-radius: 4px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+    }
+    
+    .stat-card.blue::after { background-color: #00bcd4; }
+    .stat-card.green::after { background-color: #4caf50; }
+    .stat-card.orange::after { background-color: #ff9800; }
+    .stat-card.red::after { background-color: #f44336; }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: #fff;
+        margin-right: 15px;
+    }
+    
+    .stat-icon.blue { background-color: #00bcd4; }
+    .stat-icon.green { background-color: #4caf50; }
+    .stat-icon.orange { background-color: #ff9800; }
+    .stat-icon.red { background-color: #f44336; }
+    
+    .stat-info h3 {
         margin: 0;
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: var(--ms-dark);
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
     }
-
-    .stat-badge-info p {
+    
+    .stat-info p {
         margin: 0;
-        font-size: 0.8rem;
-        color: #6b7280;
-        font-weight: 500;
+        font-size: 13px;
+        color: var(--campuspro-light-text);
+        text-transform: uppercase;
     }
-
-    body.dark-mode .stat-badge-info p { color: #9ca3af; }
-
-    /* Dashboard Cards */
+    
+    /* Reusing some existing dashboard card styles */
     .dashboard-card {
         background: #ffffff;
-        border-radius: 16px;
-        border: 1px solid rgba(0,0,0,0.04);
+        border-radius: 4px;
         box-shadow: var(--card-shadow);
         margin-bottom: 24px;
         overflow: hidden;
-    }
-
-    body.dark-mode .dashboard-card {
-        background: #1f2937;
-        border-color: rgba(255,255,255,0.05);
     }
 
     .dashboard-card-header {
-        padding: 18px 24px;
-        background: rgba(30, 58, 138, 0.02);
-        border-bottom: 1px solid rgba(0,0,0,0.05);
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eaeaea;
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
-
-    body.dark-mode .dashboard-card-header {
-        background: rgba(255,255,255,0.01);
-        border-bottom-color: rgba(255,255,255,0.05);
-    }
-
     .dashboard-card-title {
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: var(--ms-dark);
+        font-size: 15px;
+        font-weight: 600;
+        color: #333;
         margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
     }
-
     .dashboard-card-body {
-        padding: 24px;
-    }
-
-    /* Attendance Subject Bars */
-    .att-subject-item {
-        margin-bottom: 16px;
-    }
-
-    .att-subject-header {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.85rem;
-        margin-bottom: 6px;
-    }
-
-    .att-subject-name {
-        font-weight: 600;
-        color: var(--ms-dark);
-    }
-
-    .att-subject-percent {
-        font-weight: 700;
-    }
-
-    .progress-bar-container {
-        height: 8px;
-        background: #e5e7eb;
-        border-radius: 4px;
-        overflow: hidden;
-    }
-
-    body.dark-mode .progress-bar-container {
-        background: #374151;
-    }
-
-    .progress-bar-fill {
-        height: 100%;
-        border-radius: 4px;
-        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .badge-low-att {
-        font-size: 0.7rem;
-        background: rgba(239, 68, 68, 0.1);
-        color: #ef4444;
-        border: 1px solid rgba(239, 68, 68, 0.2);
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-weight: 600;
-        margin-left: 6px;
-    }
-
-    /* Notice Board Numbered Feed */
-    .notice-board-list {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
-
-    .notice-item {
-        display: flex;
-        gap: 16px;
-        align-items: flex-start;
-        padding-bottom: 14px;
-        border-bottom: 1px dashed rgba(0,0,0,0.06);
-    }
-
-    body.dark-mode .notice-item {
-        border-bottom-color: rgba(255,255,255,0.06);
-    }
-
-    .notice-item:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
-    }
-
-    .notice-number {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: rgba(30, 58, 138, 0.08);
-        color: #1e3a8a;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 0.9rem;
-        flex-shrink: 0;
-    }
-
-    body.dark-mode .notice-number {
-        background: rgba(59, 130, 246, 0.15);
-        color: #3b82f6;
-    }
-
-    .notice-content {
-        flex-grow: 1;
-    }
-
-    .notice-text {
-        font-size: 0.85rem;
-        color: var(--ms-dark);
-        margin: 0 0 4px 0;
-        font-weight: 500;
-    }
-
-    .notice-date {
-        font-size: 0.75rem;
-        color: #9ca3af;
-    }
-
-    /* Today's Lectures Card */
-    .lecture-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 16px;
-        background: #f9fafb;
-        border-radius: 10px;
-        border-left: 4px solid var(--ms-secondary);
-        margin-bottom: 12px;
-    }
-
-    body.dark-mode .lecture-item {
-        background: #374151;
-    }
-
-    .lecture-info {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .lecture-subject {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: var(--ms-dark);
-    }
-
-    .lecture-meta {
-        font-size: 0.75rem;
-        color: #6b7280;
-        margin-top: 2px;
-        display: flex;
-        gap: 12px;
-    }
-
-    body.dark-mode .lecture-meta { color: #9ca3af; }
-
-    .lecture-room {
-        background: rgba(245, 158, 11, 0.1);
-        color: #d97706;
-        font-weight: 600;
-        font-size: 0.7rem;
-        padding: 2px 6px;
-        border-radius: 4px;
-    }
-
-    /* AI Academic Assistant Chat Box */
-    .ai-chat-box {
-        display: flex;
-        flex-direction: column;
-        height: 350px;
-    }
-
-    .ai-chat-messages {
-        flex-grow: 1;
-        overflow-y: auto;
-        padding: 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        background: #f9fafb;
-        border-radius: 8px;
-        border: 1px solid rgba(0,0,0,0.05);
-        margin-bottom: 12px;
-    }
-
-    body.dark-mode .ai-chat-messages {
-        background: #111827;
-        border-color: rgba(255,255,255,0.05);
-    }
-
-    .chat-bubble {
-        max-width: 85%;
-        padding: 10px 14px;
-        border-radius: 12px;
-        font-size: 0.85rem;
-        line-height: 1.4;
-    }
-
-    .chat-bubble.bot {
-        background: #ffffff;
-        color: var(--ms-dark);
-        align-self: flex-start;
-        border: 1px solid rgba(0,0,0,0.05);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    }
-
-    body.dark-mode .chat-bubble.bot {
-        background: #374151;
-        border-color: rgba(255,255,255,0.05);
-    }
-
-    .chat-bubble.user {
-        background: var(--ms-primary);
-        color: #ffffff;
-        align-self: flex-end;
-        border-bottom-right-radius: 2px;
-    }
-
-    .ai-chat-input-group {
-        display: flex;
-        gap: 8px;
-    }
-
-    .ai-chat-input {
-        flex-grow: 1;
-        border-radius: 20px;
-        border: 1px solid #d1d5db;
-        padding: 8px 16px;
-        font-size: 0.85rem;
-        background: #ffffff;
-        color: var(--ms-dark);
-    }
-
-    body.dark-mode .ai-chat-input {
-        border-color: #4b5563;
-        background: #1f2937;
-    }
-
-    .ai-chat-input:focus {
-        outline: none;
-        border-color: var(--ms-secondary);
-        box-shadow: var(--accent-glow);
-    }
-
-    .ai-chat-send-btn {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        background: var(--ms-primary);
-        color: #ffffff;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
-
-    .ai-chat-send-btn:hover {
-        background: var(--ms-secondary);
-    }
-
-    /* Floating Settings Button */
-    .settings-toggle-btn {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        width: 55px;
-        height: 55px;
-        border-radius: 50%;
-        background: var(--ms-primary);
-        color: #ffffff;
-        border: none;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.4rem;
-        cursor: pointer;
-        z-index: 1000;
-        transition: all 0.3s;
+        padding: 20px;
     }
     
-    .settings-toggle-btn:hover {
-        transform: rotate(45deg) scale(1.1);
-        background: var(--ms-secondary);
-    }
+    /* Notice Board & Other Styles from before */
+    .notice-board-list { display: flex; flex-direction: column; gap: 16px; }
+    .notice-item { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 14px; border-bottom: 1px dashed rgba(0,0,0,0.06); }
+    .notice-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .notice-number { width: 32px; height: 32px; border-radius: 50%; background: rgba(30, 58, 138, 0.08); color: #1e3a8a; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+    .notice-text { font-size: 0.85rem; color: #333; margin: 0 0 4px 0; font-weight: 500; }
+    .notice-date { font-size: 0.75rem; color: #9ca3af; }
     
-    /* Settings Panel Sidebar Drawer */
-    .settings-drawer {
-        position: fixed;
-        top: 0;
-        right: -320px;
-        width: 320px;
-        height: 100%;
-        background: #ffffff;
-        box-shadow: -10px 0 30px rgba(0,0,0,0.1);
-        z-index: 1200;
-        transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        padding: 30px 24px;
-        overflow-y: auto;
-        border-left: 1px solid rgba(0,0,0,0.06);
-    }
-    
-    body.dark-mode .settings-drawer {
-        background: #1f2937;
-        border-left-color: rgba(255,255,255,0.06);
-    }
-    
-    .settings-drawer.open {
-        right: 0;
-    }
-    
-    .settings-drawer-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-        border-bottom: 1px solid rgba(0,0,0,0.08);
-        padding-bottom: 14px;
-    }
-    
-    body.dark-mode .settings-drawer-header {
-        border-bottom-color: rgba(255,255,255,0.08);
-    }
-    
-    .settings-drawer-title {
-        font-size: 0.95rem;
-        font-weight: 800;
-        text-transform: uppercase;
-        color: var(--ms-dark);
-        margin: 0;
-        letter-spacing: 0.5px;
-    }
-    
-    .settings-section {
-        margin-bottom: 24px;
-    }
-    
-    .settings-section-title {
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #6b7280;
-        margin-bottom: 12px;
-        letter-spacing: 0.5px;
-    }
-    
-    body.dark-mode .settings-section-title { color: #9ca3af; }
-    
-    /* Layout Choices */
-    .layout-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-    
-    .layout-option {
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 10px;
-        font-size: 0.8rem;
-        font-weight: 700;
-        text-align: center;
-        cursor: pointer;
-        background: #f9fafb;
-        color: #4b5563;
-        transition: all 0.2s;
-    }
-    
-    body.dark-mode .layout-option {
-        border-color: #374151;
-        background: #1f2937;
-        color: #d1d5db;
-    }
-    
-    .layout-option:hover {
-        border-color: var(--ms-secondary);
-    }
-    
-    .layout-option.active {
-        border-color: var(--ms-primary);
-        background: rgba(30, 58, 138, 0.04);
-        color: var(--ms-primary);
-    }
-    
-    body.dark-mode .layout-option.active {
-        border-color: #60a5fa;
-        background: rgba(96, 165, 250, 0.08);
-        color: #60a5fa;
-    }
-    
-    /* Color circles */
-    .color-circles {
-        display: flex;
-        gap: 12px;
-    }
-    
-    .color-circle {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        cursor: pointer;
-        border: 2px solid transparent;
-        transition: all 0.2s;
-    }
-    
-    .color-circle:hover {
-        transform: scale(1.15);
-    }
-    
-    .color-circle.active {
-        border-color: #111827;
-        box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
-    
-    body.dark-mode .color-circle.active {
-        border-color: #ffffff;
-    }
+    /* AI Chat */
+    .ai-chat-box { display: flex; flex-direction: column; height: 350px; }
+    .ai-chat-messages { flex-grow: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 12px; background: #f9fafb; border-radius: 4px; border: 1px solid #eee; margin-bottom: 12px; }
+    .chat-bubble { max-width: 85%; padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; line-height: 1.4; }
+    .chat-bubble.bot { background: #ffffff; color: #333; align-self: flex-start; border: 1px solid #eee; }
+    .chat-bubble.user { background: var(--campuspro-primary); color: #ffffff; align-self: flex-end; border-bottom-right-radius: 2px; }
+    .ai-chat-input-group { display: flex; gap: 8px; }
+    .ai-chat-input { flex-grow: 1; border-radius: 20px; border: 1px solid #d1d5db; padding: 8px 16px; font-size: 0.85rem; }
+    .ai-chat-input:focus { outline: none; border-color: var(--campuspro-primary); }
+    .ai-chat-send-btn { width: 38px; height: 38px; border-radius: 50%; background: var(--campuspro-primary); color: #ffffff; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .ai-chat-send-btn:hover { background: #3b50c0; }
 </style>
 {% endblock custom_css %}
 
 {% block content %}
-<div class="container-fluid px-0">
+<div class="container-fluid px-3 py-4">
     
-    <!-- Prestigious College & Student Header Banner -->
-    <div class="college-banner">
-        <div class="college-name">
-            SIR SITARAM AND LADY SHANTABAI PATKAR COLLEGE OF ARTS AND SCIENCE AND V. P. VARDE COLLEGE OF COMMERCE AND ECONOMICS (AUTONOMOUS).
-        </div>
-        
-        <div class="student-profile-summary">
-            <div class="student-avatar-container">
-                <img src="{% if student.admin.profile_pic %}{{ student.admin.profile_pic.url }}{% else %}https://ui-avatars.com/api/?name={{ student.admin.get_full_name|urlencode }}&background=5e64ff&color=fff&size=80&rounded=true{% endif %}" alt="Student Photo" class="student-avatar-img">
-            </div>
-            
-            <div class="student-details-grid">
-                <div class="student-meta-item">
-                    <span class="student-meta-label">Student Name</span>
-                    <span class="student-meta-val">{{ student.admin.get_full_name }}</span>
-                </div>
-                <div class="student-meta-item">
-                    <span class="student-meta-label">Enrollment Number</span>
-                    <span class="student-meta-val">{% if student.studentregistration.prn_no %}{{ student.studentregistration.prn_no }}{% else %}PAT/2026/{{ student.id|stringformat:"04d" }}{% endif %}</span>
-                </div>
-                <div class="student-meta-item">
-                    <span class="student-meta-label">Course / Program</span>
-                    <span class="student-meta-val">{{ student.course.name }}</span>
-                </div>
-                <div class="student-meta-item">
-                    <span class="student-meta-label">Academic Batch</span>
-                    <span class="student-meta-val">{{ student.session }}</span>
-                </div>
-                <div class="student-meta-item">
-                    <span class="student-meta-label">Blood Group</span>
-                    <span class="student-meta-val">{{ student.studentregistration.blood_group|default:"B+" }}</span>
-                </div>
-                <div class="student-meta-item">
-                    <span class="student-meta-label">Admission Category</span>
-                    <span class="student-meta-val">{{ student.studentregistration.caste_category|default:"General" }}</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ⚠️ Attendance Warning Banner -->
-    {% for s in subject_attendance_data %}{% if s.low %}
-    {% if forloop.first %}
-    <div class="alert alert-warning alert-dismissible fade show d-flex align-items-start gap-3 mb-3" role="alert" style="border-left:4px solid #ffc107;border-radius:10px;">
-        <i class="fas fa-exclamation-triangle fa-lg mt-1" style="color:#ffc107;"></i>
-        <div>
-            <strong>⚠️ Low Attendance Warning!</strong> You have fallen below 75% attendance in one or more subjects:
-            <ul class="mb-0 mt-1">
-    {% endif %}
-                <li><strong>{{ s.name }}</strong> &mdash; {{ s.percent }}% ({{ s.present }}/{{ s.total }} classes)</li>
-    {% if forloop.last %}
-            </ul>
-            <small class="text-muted">Maintain at least 75% attendance to be eligible for exams.</small>
-        </div>
-        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
-    </div>
-    {% endif %}
-    {% endif %}{% endfor %}
-
-    <!-- Quick Access Stat Widgets -->
-    <div class="row mb-4 g-3">
-        <div class="col-6 col-md-3">
-            <div class="stat-badge-card">
-                <div class="stat-badge-icon success">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div class="stat-badge-info">
-                    <h4>{{ percent_present }}%</h4>
-                    <p>Attendance</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-6 col-md-3">
-            <div class="stat-badge-card">
-                <div class="stat-badge-icon primary">
-                    <i class="fas fa-book-open"></i>
-                </div>
-                <div class="stat-badge-info">
-                    <h4>{{ total_subject }}</h4>
-                    <p>Total Subjects</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-6 col-md-3">
-            <div class="stat-badge-card">
-                <div class="stat-badge-icon warning">
-                    <i class="fas fa-rupee-sign"></i>
-                </div>
-                <div class="stat-badge-info">
-                    <h4>{{ pending_fees|floatformat:0 }}</h4>
-                    <p>Pending Fees</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-6 col-md-3">
-            <div class="stat-badge-card">
-                <div class="stat-badge-icon danger">
-                    <i class="fas fa-briefcase"></i>
-                </div>
-                <div class="stat-badge-info">
-                    <h4>{{ active_drives }}</h4>
-                    <p>Active Placements</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Dashboard Grid -->
     <div class="row">
-        
-        <!-- Left Column: Academic Data -->
-        <div class="col-lg-7">
-            
-            <!-- Semester Wise Result (Visual Bar Chart) -->
-            <div class="dashboard-card">
-                <div class="dashboard-card-header">
-                    <h3 class="dashboard-card-title">
-                        <i class="fas fa-chart-bar text-primary"></i> Semester Wise Result
-                    </h3>
+        <!-- Left Column: Profile Card -->
+        <div class="col-lg-3 col-md-4">
+            <div class="profile-card">
+                <div class="profile-card-header">
+                    <img src="{% if student.admin.profile_pic %}{{ student.admin.profile_pic.url }}{% else %}https://ui-avatars.com/api/?name={{ student.admin.get_full_name|urlencode }}&background=00bcd4&color=fff&size=100&rounded=true{% endif %}" alt="Student Photo" class="profile-card-img">
+                    <div class="profile-card-name">{{ student.admin.first_name|lower }}</div>
+                    <div style="font-size:11px;color:#94a3b8;font-weight:600;margin-top:4px;">{{ student.course.name|default:"Student" }} | Sem {{ student.current_semester }}</div>
                 </div>
-                <div class="dashboard-card-body">
-                    {% if results %}
-                        <canvas id="semesterResultChart" style="height: 280px; max-height: 280px; width: 100%;"></canvas>
-                    {% else %}
-                        <div class="text-center py-4 text-muted">
-                            <i class="fas fa-file-invoice-dollar fa-2x mb-2"></i>
-                            <p class="mb-0 font-size-14">No exam results published for this semester yet.</p>
-                        </div>
-                    {% endif %}
+                
+                <!-- Top block -->
+                <div class="profile-section-bg">
+                    <div class="profile-item">
+                        <span class="profile-label">Registration No</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {% if student.registration_no %}{{ student.registration_no }}{% else %}{{ student.unique_student_code|default:"Pending" }}{% endif %}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Date of Admission</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.admission_date|date:"d F, Y"|default:"Pending" }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Class</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.course.name }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Verification</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.verification_status }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Unique Code</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.unique_student_code|default:"Pending" }}</span>
+                    </div>
+                    <div class="profile-item" style="margin-bottom:0;">
+                        <span class="profile-label">Discount in Fee</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {% if student.discount_in_fee %}{{ student.discount_in_fee }}{% else %}0{% endif %} %</span>
+                    </div>
+                </div>
+                
+                <!-- Middle plain block -->
+                <div class="profile-section-plain">
+                    <div class="profile-item">
+                        <span class="profile-label">Date Of Birth</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {% if student.dob %}{{ student.dob|date:"d M, Y" }}{% endif %}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Gender</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {% if student.admin.gender == 'M' %}Male{% elif student.admin.gender == 'F' %}Female{% else %}—{% endif %}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Any Identification Mark?</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.identification_mark|default:"" }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Blood Group</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.blood_group|default:"" }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Disease If Any?</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.disease|default:"" }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Student Birth Form ID / NIC</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.cnic|default:"" }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Cast</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.cast|default:"" }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Previous School</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.previous_school|default:"" }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Previous ID / Board Roll No</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.previous_roll_no|default:"" }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Any Additional Note</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.additional_note|default:"" }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Orphan Student</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.orphan|default:"" }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">OSC</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.osc|default:"" }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Religion</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.religion|default:"" }}</span>
+                    </div>
+                    <div class="profile-item" style="margin-bottom:0;">
+                        <span class="profile-label">Total Siblings</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {% if student.siblings %}{{ student.siblings }}{% else %}0{% endif %}</span>
+                    </div>
+                </div>
+                
+                <!-- Bottom block -->
+                <div class="profile-section-bg" style="margin-bottom: 0;">
+                    <div class="profile-item">
+                        <span class="profile-label">Father Name</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.father_name|default:"" }}</span>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-label">Mother Name</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.mother_name|default:"" }}</span>
+                    </div>
+                    <div class="profile-item" style="margin-bottom:0;">
+                        <span class="profile-label">Address</span>
+                        <span class="profile-value"><i class="fas fa-level-up-alt fa-rotate-90 profile-arrow"></i> {{ student.admin.address|default:"" }}</span>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Subject-wise Attendance & Defaulter Warnings -->
-            <div class="dashboard-card">
-                <div class="dashboard-card-header">
-                    <h3 class="dashboard-card-title">
-                        <i class="fas fa-user-clock text-success"></i> Subject Attendance Status
-                    </h3>
-                    <span class="badge bg-light text-dark font-size-12">Min. Goal: 75%</span>
-                </div>
-                <div class="dashboard-card-body">
-                    {% for item in subject_attendance_data %}
-                        <div class="att-subject-item">
-                            <div class="att-subject-header">
-                                <span class="att-subject-name">
-                                    {{ item.name }}
-                                    {% if item.low %}
-                                        <span class="badge-low-att">⚠️ Low Attendance</span>
-                                    {% endif %}
-                                </span>
-                                <span class="att-subject-percent {% if item.low %}text-danger{% else %}text-success{% endif %}">
-                                    {{ item.percent }}% ({{ item.present }}/{{ item.total }})
-                                </span>
-                            </div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar-fill {% if item.low %}bg-danger{% else %}bg-success{% endif %}" 
-                                     style="width: {{ item.percent }}%;"></div>
-                            </div>
-                        </div>
-                    {% empty %}
-                        <p class="text-muted text-center py-3">No subject-wise attendance logs found.</p>
-                    {% endfor %}
-                </div>
-            </div>
-            
         </div>
         
-        <!-- Right Column: Notifications, Schedule, and AI Chat -->
-        <div class="col-lg-5">
+        <!-- Right Column: Welcome and Dashboard Content -->
+        <div class="col-lg-9 col-md-8">
             
-            <!-- Today's Lectures Schedule -->
-            <div class="dashboard-card">
-                <div class="dashboard-card-header">
-                    <h3 class="dashboard-card-title">
-                        <i class="fas fa-clock text-warning"></i> Today's Lectures Schedule
-                    </h3>
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <i class="fas fa-bullhorn"></i>
+                Welcome {{ student.admin.first_name }} at Student Portal.
+            </div>
+
+            <!-- SMART AI STUDENT CARDS -->
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="stat-card blue shadow-sm cursor-pointer border-0" onclick="openPredictiveAnalyticsModal()" style="cursor: pointer; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.05)); border: 1px solid rgba(99,102,241,0.2) !important;">
+                        <div class="stat-icon blue" style="background: #6366f1;">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 class="text-indigo-600 font-bold" style="font-size: 15px; color: #4f46e5;">Predictive Academic Meter</h3>
+                            <p style="text-transform: none; font-size: 11px;">Click to view AI Risk Score & Performance Forecast &rarr;</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="dashboard-card-body">
-                    {% for lecture in today_lectures %}
-                        <div class="lecture-item">
-                            <div class="lecture-info">
-                                <span class="lecture-subject">{{ lecture.subject.name }}</span>
-                                <span class="lecture-meta">
-                                    <span><i class="far fa-user me-1"></i> {{ lecture.subject.staff }}</span>
-                                    <span><i class="far fa-clock me-1"></i> {{ lecture.start_time|time:"H:i" }} - {{ lecture.end_time|time:"H:i" }}</span>
-                                </span>
-                            </div>
-                            <span class="lecture-room"><i class="fas fa-map-marker-alt me-1"></i> {{ lecture.classroom }}</span>
+                <div class="col-md-6">
+                    <div class="stat-card green shadow-sm cursor-pointer border-0" onclick="openReceiptFraudModal(1)" style="cursor: pointer; background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(6,182,212,0.05)); border: 1px solid rgba(16,185,129,0.2) !important;">
+                        <div class="stat-icon green" style="background: #10b981;">
+                            <i class="fas fa-shield-check"></i>
                         </div>
-                    {% empty %}
-                        <div class="text-center py-4 text-muted">
-                            <i class="fas fa-coffee fa-2x mb-2 text-warning"></i>
-                            <p class="mb-0 font-size-14">No classes scheduled for today! Enjoy your day off.</p>
+                        <div class="stat-info">
+                            <h3 class="text-emerald-600 font-bold" style="font-size: 15px; color: #059669;">Fee Receipt Security Seal</h3>
+                            <p style="text-transform: none; font-size: 11px;">Click to inspect SHA-256 ledger checksum &rarr;</p>
                         </div>
-                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="launchpad-grid">
+                <a href="{% url 'student_live_classes' %}" class="launchpad-item">
+                    <div class="launchpad-icon" style="background: linear-gradient(135deg, #ef4444, #f97316);"><i class="fas fa-video"></i></div>
+                    <div class="launchpad-text">
+                        <strong>Live Classes</strong>
+                        <span>{{ live_now|default:"0" }} live now, {{ upcoming_live_classes|length|default:"0" }} next up</span>
+                    </div>
+                </a>
+                <a href="{% url 'student_assignments' %}" class="launchpad-item">
+                    <div class="launchpad-icon" style="background: linear-gradient(135deg, #0f5f6c, #c99746);"><i class="fas fa-tasks"></i></div>
+                    <div class="launchpad-text">
+                        <strong>Assignments</strong>
+                        <span>{{ assignment_count|default:"0" }} course tasks available</span>
+                    </div>
+                </a>
+                <a href="{% url 'student_materials' %}" class="launchpad-item">
+                    <div class="launchpad-icon" style="background: linear-gradient(135deg, #10b981, #22c55e);"><i class="fas fa-folder-open"></i></div>
+                    <div class="launchpad-text">
+                        <strong>Study Materials</strong>
+                        <span>{{ material_count|default:"0" }} downloads ready</span>
+                    </div>
+                </a>
+                <a href="{% url 'student_certificates' %}" class="launchpad-item">
+                    <div class="launchpad-icon" style="background: linear-gradient(135deg, #8b5cf6, #6b46c1);"><i class="fas fa-certificate"></i></div>
+                    <div class="launchpad-text">
+                        <strong>Certificates</strong>
+                        <span>{{ certificate_count|default:"0" }} requests in your queue</span>
+                    </div>
+                </a>
+                <a href="{% url 'student_payable_fees' %}" class="launchpad-item">
+                    <div class="launchpad-icon" style="background: linear-gradient(135deg, #f59e0b, #ef4444);"><i class="fas fa-rupee-sign"></i></div>
+                    <div class="launchpad-text">
+                        <strong>Fee Status</strong>
+                        <span>{{ fee_pending_count|default:"0" }} active dues</span>
+                    </div>
+                </a>
+                <a href="{% url 'student_view_result' %}" class="launchpad-item">
+                    <div class="launchpad-icon" style="background: linear-gradient(135deg, #1f2937, #4b5563);"><i class="fas fa-chart-line"></i></div>
+                    <div class="launchpad-text">
+                        <strong>Exam Results</strong>
+                        <span>See subject-wise performance instantly</span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="launchpad-meta">
+                <span class="launch-meta-pill">Batch {{ student.batch_year }}</span>
+                <span class="launch-meta-pill">Sem {{ student.current_semester }}</span>
+                <span class="launch-meta-pill">{{ student.verification_status }}</span>
+                <span class="launch-meta-pill">{{ student.unique_student_code|default:"Code pending" }}</span>
+                {% if student.is_passed_out %}
+                    <span class="launch-meta-pill">Pass out</span>
+                {% endif %}
+            </div>
+            
+            <!-- Warning Alert (if any) -->
+            {% for s in subject_attendance_data %}{% if s.low %}
+            {% if forloop.first %}
+            <div class="alert alert-warning alert-dismissible fade show mb-4" role="alert" style="border-radius:4px; font-size:14px;">
+                <strong>⚠️ Low Attendance Warning!</strong> You have fallen below 75% attendance in one or more subjects. Maintain at least 75% attendance to be eligible for exams.
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
+            {% endif %}{% endfor %}
+
+            <!-- Quick Stats Row -->
+            <div class="row">
+                <div class="col-xl-3 col-sm-6">
+                    <div class="stat-card blue">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ percent_present|default:"0" }}%</h3>
+                            <p>Attendance</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-sm-6">
+                    <div class="stat-card green">
+                        <div class="stat-icon green">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ total_subject|default:"0" }}</h3>
+                            <p>Total Subjects</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-sm-6">
+                    <div class="stat-card orange">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ pending_fees|floatformat:0|default:"0" }}</h3>
+                            <p>Pending Fees</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-sm-6">
+                    <div class="stat-card red">
+                        <div class="stat-icon red">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>{{ active_drives|default:"0" }}</h3>
+                            <p>Active Placements</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <!-- Notice Board (Numbered circular badge feed matching MasterSoft) -->
-            <div class="dashboard-card">
-                <div class="dashboard-card-header">
-                    <h3 class="dashboard-card-title">
-                        <i class="fas fa-bullhorn text-danger"></i> Notice Board
-                    </h3>
-                </div>
-                <div class="dashboard-card-body">
-                    <div class="notice-board-list">
-                        <!-- Dynamic Notifications -->
-                        {% for notice in notifications %}
-                            <div class="notice-item">
-                                <div class="notice-number">{{ forloop.counter }}</div>
-                                <div class="notice-content">
-                                    <p class="notice-text">{{ notice.message }}</p>
-                                    <span class="notice-date"><i class="far fa-calendar-alt me-1"></i> {{ notice.created_at|date:"F d, Y" }}</span>
+            <!-- Below Stats: Charts & Widgets -->
+            <div class="row">
+                <!-- Semester Result Chart -->
+                <div class="col-lg-7">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h3 class="dashboard-card-title">
+                                Semester Wise Result
+                            </h3>
+                        </div>
+                        <div class="dashboard-card-body">
+                            {% if results %}
+                                <canvas id="semesterResultChart" style="height: 280px; max-height: 280px; width: 100%;"></canvas>
+                            {% else %}
+                                <div class="text-center py-4 text-muted">
+                                    <i class="fas fa-file-invoice-dollar fa-2x mb-2"></i>
+                                    <p class="mb-0 font-size-14">No exam results published for this semester yet.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- AI Chat Assistant -->
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h3 class="dashboard-card-title">
+                                Patkar College AI Assistant
+                            </h3>
+                        </div>
+                        <div class="dashboard-card-body">
+                            <div class="ai-chat-box">
+                                <div class="ai-chat-messages" id="aiChatMessages">
+                                    <div class="chat-bubble bot">
+                                        Hello {{ student.admin.first_name }}! I am your <b>Patkar College AI Assistant</b>. 🎓<br><br>
+                                        I am linked to your student record and can answer questions in real-time. Try asking me:<br>
+                                        • <i>"What is my attendance?"</i><br>
+                                        • <i>"Do I have any pending fees?"</i><br>
+                                        • <i>"Predict my SGPA"</i><br>
+                                        • <i>"What jobs are available?"</i>
+                                    </div>
+                                </div>
+                                <div class="ai-chat-input-group">
+                                    <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="Ask about attendance, fees, SGPA..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+                                    <button class="ai-chat-send-btn" onclick="sendChatMessage()">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
                                 </div>
                             </div>
-                        {% endfor %}
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Today's Events Card -->
-            <div class="dashboard-card">
-                <div class="dashboard-card-header">
-                    <h3 class="dashboard-card-title">
-                        <i class="far fa-calendar-alt text-primary"></i> Today's Events
-                    </h3>
-                </div>
-                <div class="dashboard-card-body text-center py-4">
-                    <div class="text-muted font-size-14 font-weight-600">Event Not Available.</div>
-                </div>
-            </div>
-
-            <!-- Event Notifications Card -->
-            <div class="dashboard-card">
-                <div class="dashboard-card-header">
-                    <h3 class="dashboard-card-title">
-                        <i class="far fa-bell text-warning"></i> Event Notifications
-                    </h3>
-                </div>
-                <div class="dashboard-card-body text-center py-4">
-                    <div class="text-muted font-size-14 font-weight-600">Event Not Available.</div>
-                </div>
-            </div>
-            
-            <!-- AI Academic Assistant Live Chat -->
-            <div class="dashboard-card">
-                <div class="dashboard-card-header" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: #ffffff;">
-                    <h3 class="dashboard-card-title" style="color: #ffffff;">
-                        <i class="fas fa-robot text-warning me-2"></i> Patkar College AI Assistant
-                    </h3>
-                    <span class="badge bg-warning text-dark font-size-12">Online</span>
-                </div>
-                <div class="dashboard-card-body">
-                    <div class="ai-chat-box">
-                        <div class="ai-chat-messages" id="aiChatMessages">
-                            <div class="chat-bubble bot">
-                                Hello Amaan! I am your <b>Patkar College AI Assistant</b>. 🎓<br><br>
-                                I am linked to your student record and can answer questions in real-time. Try asking me:<br>
-                                • <i>"What is my attendance?"</i><br>
-                                • <i>"Do I have any pending fees?"</i><br>
-                                • <i>"Predict my SGPA"</i><br>
-                                • <i>"What jobs are available?"</i>
+                
+                <!-- Notice Board & Schedule -->
+                <div class="col-lg-5">
+                    <!-- Notice Board -->
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h3 class="dashboard-card-title">
+                                Notice Board
+                            </h3>
+                        </div>
+                        <div class="dashboard-card-body">
+                            <div class="notice-board-list">
+                                {% for notice in notifications %}
+                                    <div class="notice-item">
+                                        <div class="notice-number">{{ forloop.counter }}</div>
+                                        <div class="notice-content">
+                                            <p class="notice-text">{{ notice.message }}</p>
+                                            <span class="notice-date"><i class="far fa-calendar-alt me-1"></i> {{ notice.created_at|date:"F d, Y" }}</span>
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <div class="text-center py-3 text-muted" style="font-size: 13px;">No new notices.</div>
+                                {% endfor %}
                             </div>
                         </div>
-                        <div class="ai-chat-input-group">
-                            <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="Ask about attendance, fees, SGPA..." onkeydown="if(event.key==='Enter') sendChatMessage()">
-                            <button class="ai-chat-send-btn" onclick="sendChatMessage()">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
+                    </div>
+                    
+                    <!-- Today's Lectures -->
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h3 class="dashboard-card-title">
+                                Today's Lectures
+                            </h3>
+                        </div>
+                        <div class="dashboard-card-body">
+                            {% for lecture in today_lectures %}
+                                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #f0f0f0;">
+                                    <div>
+                                        <div style="font-weight:600; font-size:14px; color:#333;">{{ lecture.subject.name }}</div>
+                                        <div style="font-size:12px; color:#a0a9b6;">{{ lecture.subject.staff }}</div>
+                                    </div>
+                                    <div style="font-size:12px; color:#0f5f6c; font-weight:500;">
+                                        {{ lecture.start_time|time:"H:i" }}
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <div class="text-center py-4 text-muted">
+                                    <p class="mb-0" style="font-size:13px;">No classes scheduled for today.</p>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
             </div>
             
         </div>
-        
     </div>
     
-    <!-- Copyright Footer -->
-    <footer class="text-center py-4 mt-5 border-top" style="color: #6b7280; font-size: 0.85rem; font-weight: 500;">
-        &copy; Amaan ERP solution
-    </footer>
-    
-</div>
-
-<!-- Floating Settings Customizer Button -->
-<button class="settings-toggle-btn" onclick="toggleSettingsDrawer()">
-    <i class="fas fa-cog"></i>
-</button>
-
-<!-- Sliding Settings Customizer Drawer -->
-<div class="settings-drawer" id="settingsDrawer">
-    <div class="settings-drawer-header">
-        <h5 class="settings-drawer-title"><i class="fas fa-sliders-h me-2 text-primary"></i> Setting Panel</h5>
-        <button class="btn-close" onclick="toggleSettingsDrawer()"></button>
-    </div>
-    
-    <div class="settings-section">
-        <div class="settings-section-title">Select Layout</div>
-        <div class="layout-grid">
-            <div class="layout-option active" onclick="setLayout('ltr')">LTR</div>
-            <div class="layout-option" onclick="setLayout('rtl')">RTL</div>
-        </div>
-    </div>
-    
-    <div class="settings-section">
-        <div class="settings-section-title">Sidebar Color</div>
-        <div class="color-circles">
-            <div class="color-circle active" style="background: #1e3a8a;" onclick="setSidebarColor('#1e3a8a', this)"></div>
-            <div class="color-circle" style="background: #10b981;" onclick="setSidebarColor('#10b981', this)"></div>
-            <div class="color-circle" style="background: #d97706;" onclick="setSidebarColor('#d97706', this)"></div>
-            <div class="color-circle" style="background: #8b5cf6;" onclick="setSidebarColor('#8b5cf6', this)"></div>
-            <div class="color-circle" style="background: #1f2937;" onclick="setSidebarColor('#1f2937', this)"></div>
-        </div>
-    </div>
-    
-    <div class="settings-section">
-        <div class="settings-section-title">Color Theme</div>
-        <div class="layout-grid">
-            <div class="layout-option active" id="theme-light-btn" onclick="setDashboardTheme('light')">Light Theme</div>
-            <div class="layout-option" id="theme-dark-btn" onclick="setDashboardTheme('dark')">Dark Theme</div>
-        </div>
-    </div>
-    
-    <div class="settings-section">
-        <div class="settings-section-title">Sidebar Layout</div>
-        <div class="form-check form-switch mt-2">
-            <input class="form-check-input" type="checkbox" id="miniSidebarSwitch" onchange="toggleMiniSidebar(this.checked)">
-            <label class="form-check-label font-size-13 font-weight-500" for="miniSidebarSwitch">Mini Sidebar</label>
-        </div>
-        <div class="form-check form-switch mt-2">
-            <input class="form-check-input" type="checkbox" id="stickyHeaderSwitch" checked onchange="toggleStickyHeader(this.checked)">
-            <label class="form-check-label font-size-13 font-weight-500" for="stickyHeaderSwitch">Sticky Header</label>
-        </div>
-    </div>
 </div>
 {% endblock content %}
 
@@ -971,25 +669,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const tests = {{ result_test_scores|safe }};
         const exams = {{ result_exam_scores|safe }};
         
-        const isDarkMode = document.body.classList.contains('dark-mode');
-        const textColor = isDarkMode ? '#e0e0e0' : '#374151';
-        const gridColor = isDarkMode ? '#4b5563' : '#f3f4f6';
-        
         const resultChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: subjects,
                 datasets: [
                     {
-                        label: 'Internal Test (Out of 20)',
-                        backgroundColor: '#f59e0b',
-                        borderRadius: 4,
+                        label: 'Internal Test',
+                        backgroundColor: '#ff9f43',
                         data: tests
                     },
                     {
-                        label: 'End-Sem Exam (Out of 80)',
-                        backgroundColor: '#3b82f6',
-                        borderRadius: 4,
+                        label: 'End-Sem Exam',
+                        backgroundColor: '#00bcd4',
                         data: exams
                     }
                 ]
@@ -997,26 +689,13 @@ document.addEventListener('DOMContentLoaded', function() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            color: textColor,
-                            font: { size: 11, weight: '600' }
-                        }
-                    }
-                },
                 scales: {
                     y: {
                         stacked: true,
-                        max: 100,
-                        ticks: { color: textColor },
-                        grid: { color: gridColor }
+                        max: 100
                     },
                     x: {
-                        stacked: true,
-                        ticks: { color: textColor },
-                        grid: { display: false }
+                        stacked: true
                     }
                 }
             }
@@ -1032,19 +711,15 @@ function sendChatMessage() {
     
     if (!messageText) return;
     
-    // Clear input
     inputEl.value = '';
     
-    // Append user bubble
     const userBubble = document.createElement('div');
     userBubble.className = 'chat-bubble user';
     userBubble.innerText = messageText;
     messagesContainer.appendChild(userBubble);
     
-    // Auto-scroll
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
     
-    // Append typing indicator
     const typingBubble = document.createElement('div');
     typingBubble.className = 'chat-bubble bot';
     typingBubble.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Patkar AI is typing...';
@@ -1052,7 +727,6 @@ function sendChatMessage() {
     messagesContainer.appendChild(typingBubble);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
     
-    // Fetch response from server AJAX
     fetch("{% url 'student_ai_chat' %}", {
         method: "POST",
         headers: {
@@ -1063,15 +737,12 @@ function sendChatMessage() {
     })
     .then(response => response.json())
     .then(data => {
-        // Remove typing indicator
         const typingEl = document.getElementById('ai-typing-indicator');
         if (typingEl) typingEl.remove();
         
-        // Append bot bubble
         const botBubble = document.createElement('div');
         botBubble.className = 'chat-bubble bot';
         
-        // Convert newlines to breaks and simple markdown-like bold text
         let formattedReply = data.reply
             .replace(/\n/g, '<br>')
             .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
@@ -1092,102 +763,5 @@ function sendChatMessage() {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     });
 }
-
-// --- Setting Panel Customizer Functions ---
-function toggleSettingsDrawer() {
-    const drawer = document.getElementById('settingsDrawer');
-    if (drawer) {
-        drawer.classList.toggle('open');
-    }
-}
-
-function setLayout(dir) {
-    const body = document.body;
-    const options = document.querySelectorAll('#settingsDrawer .layout-option');
-    
-    if (dir === 'rtl') {
-        body.style.direction = 'rtl';
-        if (options.length >= 2) {
-            options[0].classList.remove('active');
-            options[1].classList.add('active');
-        }
-    } else {
-        body.style.direction = 'ltr';
-        if (options.length >= 2) {
-            options[0].classList.add('active');
-            options[1].classList.remove('active');
-        }
-    }
-}
-
-function setSidebarColor(color, btn) {
-    const sidebar = document.querySelector('.erpnext-sidebar');
-    if (sidebar) {
-        sidebar.style.setProperty('background-color', color, 'important');
-    }
-    
-    // Update active circle indicator
-    const circles = document.querySelectorAll('.color-circle');
-    circles.forEach(c => c.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-}
-
-function setDashboardTheme(theme) {
-    const body = document.body;
-    const themeSwitch = document.getElementById('theme-switch');
-    const lightBtn = document.getElementById('theme-light-btn');
-    const darkBtn = document.getElementById('theme-dark-btn');
-    
-    if (theme === 'dark') {
-        body.classList.add('dark-mode');
-        if (themeSwitch) themeSwitch.checked = true;
-        if (lightBtn && darkBtn) {
-            lightBtn.classList.remove('active');
-            darkBtn.classList.add('active');
-        }
-        localStorage.setItem('theme', 'dark');
-    } else {
-        body.classList.remove('dark-mode');
-        if (themeSwitch) themeSwitch.checked = false;
-        if (lightBtn && darkBtn) {
-            lightBtn.classList.add('active');
-            darkBtn.classList.remove('active');
-        }
-        localStorage.setItem('theme', 'light');
-    }
-}
-
-function toggleMiniSidebar(checked) {
-    const body = document.body;
-    if (checked) {
-        body.classList.add('sidebar-collapsed');
-    } else {
-        body.classList.remove('sidebar-collapsed');
-    }
-}
-
-function toggleStickyHeader(checked) {
-    const navbar = document.querySelector('.erpnext-navbar');
-    if (navbar) {
-        if (checked) {
-            navbar.style.setProperty('position', 'sticky', 'important');
-        } else {
-            navbar.style.setProperty('position', 'relative', 'important');
-        }
-    }
-}
-
-// Sync settings on page load
-document.addEventListener('DOMContentLoaded', function() {
-    const body = document.body;
-    const isDark = body.classList.contains('dark-mode');
-    const lightBtn = document.getElementById('theme-light-btn');
-    const darkBtn = document.getElementById('theme-dark-btn');
-    
-    if (isDark && lightBtn && darkBtn) {
-        lightBtn.classList.remove('active');
-        darkBtn.classList.add('active');
-    }
-});
 </script>
 {% endblock custom_js %}

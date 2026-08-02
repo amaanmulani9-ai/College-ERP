@@ -1,4 +1,6 @@
-import urllib.request, urllib.parse, http.cookiejar
+import urllib.request
+import urllib.parse
+import http.cookiejar
 
 BASE = 'http://127.0.0.1:8000'
 

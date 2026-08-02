@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institution Onboarding | CampusPro ERP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --bg-base: #f8fafc;
+            --surface: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-lg: 14px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Bar */
+        .onboarding-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #0284c7, #38bdf8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .step-indicator {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 14.28%; /* Step 1 default */
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Content Body */
+        .onboarding-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .wizard-card {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            width: 100%;
+            max-width: 680px;
+            padding: 40px;
+        }
+
+        .wizard-step { display: none; }
+        .wizard-step.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .step-title span.req { color: #ef4444; }
+
+        .step-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .type-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .type-option {
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fff;
+        }
+
+        .type-option:hover {
+            border-color: var(--primary);
+            background: #f0f9ff;
+        }
+
+        .type-option.selected {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+        }
+
+        select.form-control, input.form-control, textarea.form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-dark);
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        select.form-control:focus, input.form-control:focus, textarea.form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+        }
+
+        /* Upload Area */
+        .upload-box {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+
+        .upload-box:hover {
+            border-color: var(--primary);
+            background: #f0f9ff;
+        }
+
+        .upload-box i {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        /* Verified Badge Box */
+        .verified-badge-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .verified-badge-box i {
+            font-size: 20px;
+            color: #16a34a;
+            margin-top: 2px;
+        }
+
+        .verified-badge-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #15803d;
+        }
+
+        .verified-badge-sub {
+            font-size: 12px;
+            color: #166534;
+            margin-top: 2px;
+        }
+
+        /* Action Footer Buttons */
+        .wizard-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: var(--text-dark);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .toggle-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border-color);
+            background: white;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .toggle-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="onboarding-header">
+        <a href="#" class="brand-logo">
+            <div class="brand-icon">M</div>
+            CampusPro ERP
+        </a>
+        <div class="step-indicator" id="stepIndicator">Step 1 of 7</div>
+    </header>
+
+    <div class="progress-container">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="onboarding-body">
+        <div class="wizard-card">
+            
+            <form id="onboardingForm" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- STEP 1: Institution Type & Session Cycle -->
+                <div class="wizard-step active" id="step1">
+                    <h2 class="step-title">Select your institution type <span class="req">*</span></h2>
+                    <p class="step-subtitle">Choose the type of educational institution you're registering</p>
+                    
+                    <div class="type-grid mb-4">
+                        <div class="type-option {% if profile.institution_type == 'School' %}selected{% endif %}" onclick="selectInstType('School')">
+                            School
+                        </div>
+                        <div class="type-option {% if profile.institution_type == 'College' %}selected{% endif %}" onclick="selectInstType('College')">
+                            College
+                        </div>
+                    </div>
+                    <input type="hidden" name="institution_type" id="inputInstitutionType" value="{{ profile.institution_type }}">
+
+                    <h2 class="step-title mt-4">Select your Session Cycle <span class="req">*</span></h2>
+                    <p class="step-subtitle">Select the academic session cycle for your institution</p>
+                    
+                    <select name="session_cycle" class="form-control">
+                        {% for cycle in session_cycles %}
+                        <option value="{{ cycle }}" {% if profile.session_cycle == cycle %}selected{% endif %}>{{ cycle }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <div class="wizard-footer">
+                        <div></div>
+                        <button type="button" class="btn btn-primary" onclick="nextStep(2)">Continue <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Institution Name & Logo -->
+                <div class="wizard-step" id="step2">
+                    <h2 class="step-title">What's your institution name? <span class="req">*</span></h2>
+                    <p class="step-subtitle">This will be displayed to students, faculty, and parents</p>
+
+                    <div class="form-group">
+                        <input type="text" name="institution_name" class="form-control" value="{{ profile.institution_name }}" placeholder="Enter institution name" required>
+                    </div>
+
+                    <h2 class="step-title">Upload your institution logo (Optional)</h2>
+                    <p class="step-subtitle">This will be your brand identity across reports and dashboards</p>
+
+                    <div class="upload-box" onclick="document.getElementById('logoInput').click()">
+                        <i class="fas fa-upload"></i>
+                        <div style="font-size: 14px; font-weight: 600;">Upload Logo</div>
+                        <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">PNG, JPG up to 2MB</div>
+                        <input type="file" name="logo" id="logoInput" style="display: none;" onchange="showFileName(this, 'logoName')">
+                        <div id="logoName" style="font-size: 12px; color: var(--primary); margin-top: 8px; font-weight: 600;"></div>
+                    </div>
+
+                    <div class="verified-badge-box">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <div class="verified-badge-title">Email Verified</div>
+                            <div class="verified-badge-sub">Your email <strong>{{ profile.email }}</strong> has been verified during registration.</div>
+                        </div>
+                    </div>
+
+                    <div class="wizard-footer">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep(1)"><i class="fas fa-arrow-left"></i> Back</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep(3)">Continue <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Website URL & Affiliation Number -->
+                <div class="wizard-step" id="step3">
+                    <h2 class="step-title">Website URL (Optional)</h2>
+                    <p class="step-subtitle">Connect your online presence with your management system</p>
+                    
+                    <div class="form-group">
+                        <input type="url" name="website_url" class="form-control" value="{{ profile.website_url }}" placeholder="https://www.yourinstitution.edu">
+                    </div>
+
+                    <h2 class="step-title">Affiliation Number (Optional)</h2>
+                    <p class="step-subtitle">Verify your institution's official registration or accreditation credentials</p>
+
+                    <div class="form-group">
+                        <input type="text" name="affiliation_number" class="form-control" value="{{ profile.affiliation_number }}" placeholder="Enter affiliation / university code">
+                    </div>
+
+                    <div class="wizard-footer">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep(2)"><i class="fas fa-arrow-left"></i> Back</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep(4)">Continue <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- STEP 4: Institution Address & Fee Structure Type -->
+                <div class="wizard-step" id="step4">
+                    <h2 class="step-title">Institution Address <span class="req">*</span></h2>
+                    <p class="step-subtitle">Your official campus location used for official transcripts & invoices</p>
+
+                    <div class="form-group">
+                        <textarea name="address" class="form-control" rows="3" placeholder="Enter complete address">{{ profile.address }}</textarea>
+                    </div>
+
+                    <h2 class="step-title">Fee Structure Type <span class="req">*</span></h2>
+                    <p class="step-subtitle">Select your primary fee collection schedule preference</p>
+
+                    <div class="form-group">
+                        <select name="fee_structure_type" class="form-control">
+                            {% for f_type in fee_types %}
+                            <option value="{{ f_type }}" {% if profile.fee_structure_type == f_type %}selected{% endif %}>{{ f_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <h2 class="step-title">Allow Fee Installments? <span class="req">*</span></h2>
+                    <p class="step-subtitle">Enable payment flexibility options for students</p>
+
+                    <div class="toggle-options">
+                        <div class="toggle-btn {% if profile.allow_fee_installments %}active{% endif %}" onclick="selectInstallment('Yes')">Yes</div>
+                        <div class="toggle-btn {% if not profile.allow_fee_installments %}active{% endif %}" onclick="selectInstallment('No')">No</div>
+                    </div>
+                    <input type="hidden" name="allow_fee_installments" id="inputInstallments" value="{% if profile.allow_fee_installments %}Yes{% else %}No{% endif %}">
+
+                    <div class="wizard-footer">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep(3)"><i class="fas fa-arrow-left"></i> Back</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep(5)">Continue <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- STEP 5: Principal's Signature Upload -->
+                <div class="wizard-step" id="step5">
+                    <h2 class="step-title">Principal's Signature (Optional)</h2>
+                    <p class="step-subtitle">Upload authorized digital signature to automatically render on certificates & fee receipts</p>
+
+                    <div class="upload-box" onclick="document.getElementById('sigInput').click()">
+                        <i class="fas fa-file-signature"></i>
+                        <div style="font-size: 14px; font-weight: 600;">Upload Signature</div>
+                        <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">PNG, JPG up to 1MB</div>
+                        <input type="file" name="principal_signature" id="sigInput" style="display: none;" onchange="showFileName(this, 'sigName')">
+                        <div id="sigName" style="font-size: 12px; color: var(--primary); margin-top: 8px; font-weight: 600;"></div>
+                    </div>
+
+                    <div class="wizard-footer">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep(4)"><i class="fas fa-arrow-left"></i> Back</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep(6)">Continue <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- STEP 6: Review Configuration -->
+                <div class="wizard-step" id="step6">
+                    <h2 class="step-title">Review Setup Configuration</h2>
+                    <p class="step-subtitle">Confirm your campus configuration before launching your ERP environment</p>
+
+                    <div style="background: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; font-size: 13px;">
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                            <span style="color: var(--text-muted);">Institution Type:</span>
+                            <strong id="reviewType">College</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                            <span style="color: var(--text-muted);">Session Cycle:</span>
+                            <strong id="reviewCycle">April to March</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e2e8f0;">
+                            <span style="color: var(--text-muted);">Fee Structure:</span>
+                            <strong id="reviewFee">Monthly</strong>
+                        </div>
+                    </div>
+
+                    <div class="wizard-footer">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep(5)"><i class="fas fa-arrow-left"></i> Back</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep(7)">Confirm & Finish <i class="fas fa-check-circle"></i></button>
+                    </div>
+                </div>
+
+                <!-- STEP 7: Completion & Finish -->
+                <div class="wizard-step" id="step7">
+                    <div style="text-align: center; padding: 20px 0;">
+                        <div style="width: 64px; height: 64px; border-radius: 50%; background: #f0fdf4; color: #16a34a; font-size: 32px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h2 class="step-title">Campus Setup Complete!</h2>
+                        <p class="step-subtitle">Your institution ERP environment is fully configured and ready for live campus administration.</p>
+
+                        <button type="submit" class="btn btn-primary" style="padding: 14px 32px; font-size: 15px; margin-top: 10px;">
+                            Launch Campus Dashboard <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function updateStepUI() {
+            document.querySelectorAll('.wizard-step').forEach(el => el.classList.remove('active'));
+            document.getElementById('step' + currentStep).classList.add('active');
+            
+            document.getElementById('stepIndicator').textContent = `Step ${currentStep} of 7`;
+            const pct = (currentStep / 7) * 100;
+            document.getElementById('progressFill').style.width = pct + '%';
+        }
+
+        function nextStep(step) {
+            currentStep = step;
+            updateStepUI();
+        }
+
+        function prevStep(step) {
+            currentStep = step;
+            updateStepUI();
+        }
+
+        function selectInstType(type) {
+            document.querySelectorAll('.type-option').forEach(el => el.classList.remove('selected'));
+            event.target.classList.add('selected');
+            document.getElementById('inputInstitutionType').value = type;
+        }
+
+        function selectInstallment(val) {
+            document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('inputInstallments').value = val;
+        }
+
+        function showFileName(input, targetId) {
+            if (input.files && input.files[0]) {
+                document.getElementById(targetId).textContent = "Selected: " + input.files[0].name;
+            }
+        }
+    </script>
+</body>
+</html>

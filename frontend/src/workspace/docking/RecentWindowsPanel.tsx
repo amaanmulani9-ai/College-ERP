@@ -1,0 +1,1 @@
+export { RecentWindowsPanel } from "./WindowNavPanels";

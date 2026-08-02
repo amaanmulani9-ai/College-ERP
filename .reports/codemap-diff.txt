@@ -1,0 +1,16 @@
+Fresh Scans Generated: 2026-07-06
+
+Files Added/Tracked in Architecture Maps:
+- docs/CODEMAPS/architecture.md (High-level system blocks, tenant routes)
+- docs/CODEMAPS/backend.md (Backend endpoints, middleware pipelines)
+- docs/CODEMAPS/frontend.md (Frontend template structures, visual scripts)
+- docs/CODEMAPS/data.md (Postgres schema setups, ER relationships)
+- docs/CODEMAPS/dependencies.md (Docker integrations, Ollama AI, Keycloak SSO)
+
+Recent Codebase Architecture Modifications:
+- Added Student/Staff Batch Operations and Promotes views under admin dashboard.
+- Integrated Server-Side PNG QR Code Generator (qrcode python package).
+- Built Printable CSS PVC Card Grid Sheet layout for bulk student printing.
+- Implemented Flippable 3D Custom ID Cards in student/staff dashboards.
+- Fixed Postgres ORM properties aggregation bug using F() expressions in HOD analytics.
+- Applied select_related() optimizations to batch operation databases calls.

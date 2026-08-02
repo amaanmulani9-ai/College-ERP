@@ -1,0 +1,239 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}Account Statement{% endblock page_title %}
+
+{% block custom_css %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+body { font-family: 'Poppins', sans-serif; background-color: #f8f9fa; }
+
+/* Breadcrumb */
+.sk-breadcrumb-card {
+    background: #fff; padding: 18px 25px; border-radius: 8px;
+    display: flex; align-items: center; margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+.sk-breadcrumb-title { color: #4a235a; font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.sk-breadcrumb-path { color: #636e72; font-size: 14px; margin-left: 8px; }
+.sk-breadcrumb-path i { font-size: 10px; margin-right: 8px; color: #b2bec3; }
+
+/* Cards */
+.sk-card {
+    background: #fff; border-radius: 12px; padding: 25px 30px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.03); margin-bottom: 25px;
+}
+.sk-card-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+.sk-card-title {
+    font-size: 16px; font-weight: 700; color: #1e272e;
+    display: flex; align-items: center; gap: 10px;
+}
+.sk-card-title i { color: #6c5ce7; }
+.sk-date-range-text { font-size: 13px; color: #636e72; font-weight: 500; }
+
+/* Overview Section */
+.sk-overview-row { display: flex; align-items: stretch; gap: 30px; }
+.sk-circles-col { display: flex; gap: 25px; align-items: center; }
+
+.sk-circle-wrap { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.sk-circle {
+    width: 80px; height: 80px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 6px solid #f1f2f6; margin-bottom: 12px; font-size: 14px; font-weight: 700;
+}
+.sk-circle.income { color: #00b894; }
+.sk-circle.expense { color: #ff7675; }
+.sk-circle.net { color: #6c5ce7; }
+
+.sk-circle-label { font-size: 11px; font-weight: 700; color: #636e72; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 0.5px; }
+.sk-circle-val { font-size: 14px; font-weight: 700; }
+.sk-circle-val.income-val { color: #00b894; }
+.sk-circle-val.expense-val { color: #ff7675; }
+.sk-circle-val.net-val { color: #6c5ce7; }
+
+/* Divider */
+.sk-vertical-divider { width: 1px; background-color: #f1f2f6; }
+
+/* Charts Col */
+.sk-charts-col { flex: 1; display: flex; gap: 20px; }
+.sk-chart-box { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding-bottom: 5px; }
+.sk-chart-title { font-size: 11px; font-weight: 700; color: #636e72; text-transform: uppercase; letter-spacing: 0.5px; }
+.sk-chart-line { height: 1px; width: 100%; margin-top: 50px; }
+.sk-chart-line.income-line { background-color: #00b894; }
+.sk-chart-line.expense-line { background-color: #ff7675; }
+
+/* Action Bar */
+.sk-action-bar {
+    background: #fff; border-radius: 12px; padding: 20px 25px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.03); margin-bottom: 25px;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.sk-btn-primary {
+    background: #6c5ce7; color: #fff; border: none; padding: 10px 20px;
+    border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 10px;
+}
+.sk-action-right { display: flex; align-items: center; gap: 20px; }
+.sk-switch-group { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #636e72; font-weight: 500; }
+.sk-switch { width: 40px; height: 20px; background: #dfe6e9; border-radius: 20px; position: relative; cursor: pointer; }
+.sk-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: 0.3s; }
+.sk-btn-outline {
+    background: #fff; color: #6c5ce7; border: 1px solid rgba(108,92,231,0.2); padding: 8px 16px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;
+}
+.sk-btn-outline:hover { background: #f8f7ff; }
+.sk-btn-icon-red {
+    background: #fff0f0; color: #ff7675; border: 1px solid rgba(255,118,117,0.2);
+    width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px;
+}
+
+/* Statement Records Table */
+.sk-table-actions { display: flex; gap: 8px; margin-bottom: 20px; }
+.sk-action-pill {
+    background: #6c5ce7; color: #fff; border: none; padding: 8px 16px;
+    border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s;
+}
+.sk-action-pill:hover { opacity: 0.9; }
+
+.sk-search-box { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #2d3436; }
+.sk-search-box input { border: 1px solid #f1f2f6; border-radius: 6px; padding: 8px 12px; outline: none; width: 200px; }
+
+table.sk-table { width: 100%; border-collapse: collapse; }
+table.sk-table thead th {
+    background: #f8f7ff; color: #4a235a; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; padding: 15px; text-align: left;
+    border-bottom: 2px solid #e8e0ff;
+}
+table.sk-table tbody td {
+    padding: 15px; border-bottom: 1px solid #f1f2f6; font-size: 13px; color: #2d3436;
+}
+table.sk-table tbody tr.sk-empty-row td { text-align: center; color: #6c5ce7; padding: 20px; font-weight: 500; }
+table.sk-table tfoot td {
+    padding: 15px; font-weight: 700; font-size: 14px; border-bottom: 1px solid #2d3436; border-top: 1px solid #2d3436;
+}
+.sk-totals-label { text-align: right; color: #2d3436; }
+.sk-table-footer-text { font-size: 13px; color: #b2bec3; margin-top: 15px; }
+
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<section class="content" style="padding: 10px;">
+    <div class="container-fluid">
+        
+        <!-- Breadcrumb -->
+        <div class="sk-breadcrumb-card">
+            <div class="sk-breadcrumb-title"><i class="fas fa-layer-group"></i> Accounts</div>
+            <div class="sk-breadcrumb-path"><i class="fas fa-chevron-right"></i> Account Statement</div>
+        </div>
+
+        <!-- Financial Overview Card -->
+        <div class="sk-card">
+            <div class="sk-card-header-flex">
+                <div class="sk-card-title"><i class="fas fa-chart-pie"></i> Financial Overview</div>
+                <div class="sk-date-range-text">01 Jul 2026 - 08 Jul 2026</div>
+            </div>
+            
+            <div class="sk-overview-row">
+                <!-- Circles -->
+                <div class="sk-circles-col">
+                    <div class="sk-circle-wrap">
+                        <div class="sk-circle income">0%</div>
+                        <div class="sk-circle-label">INCOME</div>
+                        <div class="sk-circle-val income-val">$ 0</div>
+                    </div>
+                    <div class="sk-circle-wrap">
+                        <div class="sk-circle expense">0%</div>
+                        <div class="sk-circle-label">EXPENSE</div>
+                        <div class="sk-circle-val expense-val">$ 0</div>
+                    </div>
+                    <div class="sk-circle-wrap">
+                        <div class="sk-circle net">0%</div>
+                        <div class="sk-circle-label">NET MARGIN</div>
+                        <div class="sk-circle-val net-val">$ 0</div>
+                    </div>
+                </div>
+                
+                <!-- Divider -->
+                <div class="sk-vertical-divider"></div>
+
+                <!-- Daily Charts -->
+                <div class="sk-charts-col">
+                    <div class="sk-chart-box">
+                        <div class="sk-chart-title">DAILY INCOME</div>
+                        <div class="sk-chart-line income-line"></div>
+                    </div>
+                    <div class="sk-chart-box">
+                        <div class="sk-chart-title">DAILY EXPENSE</div>
+                        <div class="sk-chart-line expense-line"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="sk-action-bar">
+            <button class="sk-btn-primary">
+                <i class="far fa-calendar-alt"></i> Jul 1, 2026 - Jul 8, 2026 <i class="fas fa-chevron-down" style="margin-left:5px; font-size:10px;"></i>
+            </button>
+            <div class="sk-action-right">
+                <div class="sk-switch-group">
+                    <div class="sk-switch"></div>
+                    <span>Show References</span>
+                </div>
+                <button class="sk-btn-outline"><i class="fas fa-redo"></i> Reset Balance</button>
+                <button class="sk-btn-icon-red"><i class="far fa-trash-alt"></i></button>
+            </div>
+        </div>
+
+        <!-- Statement Records Card -->
+        <div class="sk-card" style="padding-top: 30px;">
+            <div class="sk-card-title" style="margin-bottom: 20px;"><i class="far fa-file-alt"></i> Statement Records</div>
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap;">
+                <div class="sk-table-actions">
+                    <button class="sk-action-pill">Copy</button>
+                    <button class="sk-action-pill">CSV</button>
+                    <button class="sk-action-pill">Excel</button>
+                    <button class="sk-action-pill">PDF</button>
+                    <button class="sk-action-pill">Print</button>
+                </div>
+                <div class="sk-search-box">
+                    Search: <input type="text">
+                </div>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table class="sk-table">
+                    <thead>
+                        <tr>
+                            <th>DATE</th>
+                            <th style="width: 40%;">DESCRIPTION</th>
+                            <th>EXPENSE</th>
+                            <th>INCOME</th>
+                            <th>NET BALANCE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="sk-empty-row">
+                            <td colspan="5">No data available in table</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2" class="sk-totals-label">Totals</td>
+                            <td style="color:#ff7675;">$ 0</td>
+                            <td style="color:#00b894;">$ 0</td>
+                            <td style="color:#6c5ce7;">$ 0</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <div class="sk-table-footer-text">
+                Showing 0 to 0 of 0 entries
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock content %}

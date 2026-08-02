@@ -1,0 +1,1 @@
+export { WorkspaceFavorites } from "./WorkspaceWidgets";

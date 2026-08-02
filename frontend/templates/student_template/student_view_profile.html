@@ -4,168 +4,322 @@
 
 {% block custom_css %}
 <style>
-    .profile-card {
-        background: #ffffff;
-        border: 1px solid var(--border-color);
-        border-radius: 16px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-        max-width: 700px;
-        margin: 0 auto;
-        overflow: hidden;
+    .bread-container {
+        padding: 14px 24px;
+        background: rgba(20, 22, 32, 0.5);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 12px;
+        margin-bottom: 25px;
+        font-weight: 500;
+        color: #e4e4e7;
     }
-
-    .profile-header-gradient {
-        background: linear-gradient(135deg, var(--primary-color) 0%, #6f42c1 100%);
-        padding: 40px 20px;
+    
+    .profile-sidebar {
+        padding: 35px 25px;
         text-align: center;
-        color: #ffffff;
-        position: relative;
+        background: rgba(20, 22, 32, 0.65);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
     }
-
-    /* Live Preview Circle */
-    .avatar-preview-container {
+    
+    .profile-img-container {
         width: 130px;
         height: 130px;
+        margin: 0 auto 20px;
         border-radius: 50%;
-        border: 4px solid #ffffff;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        margin: 0 auto -20px auto;
-        position: relative;
-        background-color: #f8f9fc;
+        background: rgba(255, 255, 255, 0.02);
+        border: 2px solid rgba(99, 102, 241, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         overflow: hidden;
-        z-index: 5;
+        position: relative;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     }
-
-    .avatar-preview-img {
+    
+    .profile-img-container img {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
-
-    .avatar-preview-icon {
-        font-size: 110px;
-        color: #d1d8dd;
+    
+    .profile-status {
+        position: absolute;
+        bottom: 8px;
+        right: 12px;
+        width: 14px;
+        height: 14px;
+        background: #10b981;
+        border: 2px solid rgba(20, 22, 32, 1);
+        border-radius: 50%;
+    }
+    
+    .profile-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 6px;
+    }
+    
+    .profile-role {
+        display: inline-block;
+        padding: 4px 14px;
+        background: rgba(99, 102, 241, 0.12);
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        color: #818cf8;
+        font-size: 0.72rem;
+        font-weight: 700;
+        border-radius: 20px;
+        margin-bottom: 25px;
+        letter-spacing: 0.75px;
+    }
+    
+    .profile-detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 0.88rem;
+    }
+    
+    .profile-detail-label {
+        color: #a1a1aa;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .profile-detail-icon {
+        width: 28px;
+        height: 28px;
+        background: rgba(99, 102, 241, 0.12);
+        color: #818cf8;
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 100%;
-        width: 100%;
+        border-radius: 8px;
+        font-size: 0.8rem;
     }
-
-    .profile-body {
-        padding: 40px;
-        padding-top: 30px;
-    }
-
-    .form-group {
-        margin-bottom: 24px;
-    }
-
-    .form-group label {
+    
+    .profile-detail-value {
         font-weight: 600;
-        color: var(--dark-color);
+        color: #ffffff;
+    }
+    
+    .settings-section {
+        padding: 30px;
+        background: rgba(20, 22, 32, 0.65);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+    }
+    
+    .settings-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 22px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .login-details-box {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        margin-bottom: 30px;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+    }
+    
+    .detail-row:not(:last-child) {
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+    
+    .detail-label {
+        font-size: 0.72rem;
+        color: #a1a1aa;
+        font-weight: 700;
+        letter-spacing: 0.75px;
+    }
+    
+    .detail-value {
+        font-weight: 600;
+        color: #ffffff;
+        font-size: 0.88rem;
+    }
+    
+    .form-group-custom {
+        margin-bottom: 22px;
+    }
+    
+    .form-group-custom label {
+        font-size: 0.72rem;
+        color: #a1a1aa;
+        font-weight: 700;
+        letter-spacing: 0.75px;
         margin-bottom: 8px;
         display: block;
-        font-size: 13.5px;
     }
-
-    /* Form Fields Override for Premium Look */
-    form input, form select, form textarea {
-        display: block;
-        width: 100%;
+    
+    .form-group-custom input {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
         padding: 12px 16px;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 1.5;
-        color: var(--dark-color);
-        background-color: #f8f9fc;
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        transition: all 0.2s ease;
+        width: 100%;
+        font-size: 0.9rem;
+        color: #ffffff;
+        box-shadow: none;
+        outline: none;
+        transition: all 0.3s ease;
     }
-
-    form input:focus, form select:focus, form textarea:focus {
+    
+    .form-group-custom input:focus {
         border-color: var(--primary-color);
-        background-color: #ffffff;
-        outline: 0;
-        box-shadow: 0 0 0 3px rgba(94, 100, 255, 0.25);
+        background: rgba(255, 255, 255, 0.06);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
     }
-
-    .dark-mode .profile-card,
-    .dark-mode .profile-body {
-        background-color: #2d3748;
-        border-color: #4a5568;
-        color: #e2e8f0;
+    
+    .btn-update {
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--info-color) 100%);
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+        transition: all 0.3s ease;
     }
-
-    .dark-mode .form-group label {
-        color: #f7fafc;
-    }
-
-    .dark-mode form input,
-    .dark-mode form select,
-    .dark-mode form textarea {
-        background-color: #1a202c;
-        border-color: #4a5568;
-        color: #f7fafc;
-    }
-
-    .dark-mode form input:focus,
-    .dark-mode form select:focus,
-    .dark-mode form textarea:focus {
-        background-color: #2d3748;
-        border-color: #66b3ff;
-    }
-
-    .dark-mode .avatar-preview-container {
-        background-color: #4a5568;
-        border-color: #2d3748;
+    
+    .btn-update:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+        color: white;
     }
 </style>
 {% endblock custom_css %}
 
 {% block content %}
-<div class="profile-card">
-    <!-- Header with Background Gradient -->
-    <div class="profile-header-gradient">
-        <h4 style="margin: 0; font-weight: 700; font-size: 20px;">{{ request.user.get_full_name|default:request.user.username }}</h4>
-        <p style="margin: 5px 0 0 0; font-size: 13px; opacity: 0.8;">Student Portal • View & Edit Account Profile</p>
-    </div>
+<div class="bread-container">
+    <span style="font-weight: 700;">Account</span> &nbsp;|&nbsp; <i class="fas fa-home" style="color: #a1a1aa;"></i> <span style="color: #a1a1aa;">- Account Settings</span>
+</div>
 
-    <!-- Live Picture Preview Circle -->
-    <div class="avatar-preview-container">
-        {% if request.user.profile_pic %}
-        <img src="{{ request.user.profile_pic }}" alt="Avatar Preview" class="avatar-preview-img" id="avatar-preview">
-        {% else %}
-        <i class="fas fa-user-circle avatar-preview-icon" id="avatar-icon"></i>
-        <img src="" alt="Avatar Preview" class="avatar-preview-img" id="avatar-preview" style="display: none;">
-        {% endif %}
-    </div>
-
-    <!-- Edit Form Body -->
-    <div class="profile-body">
-        <form role="form" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            
-            {% for field in form %}
-            <div class="form-group">
-                <label>{{ field.label }}</label>
-                {{ field }}
-                {% if field.help_text %}
-                <small class="text-muted d-block mt-1">{{ field.help_text }}</small>
+<div class="row">
+    <!-- Left Column: Profile Snapshot -->
+    <div class="col-md-4 mb-4">
+        <div class="profile-sidebar">
+            <div class="profile-img-container">
+                {% if request.user.profile_pic %}
+                <img src="{{ request.user.profile_pic }}" alt="Profile">
+                {% else %}
+                <i class="fas fa-user text-muted" style="font-size: 3rem;"></i>
                 {% endif %}
-                {% for error in field.errors %}
-                <small class="text-danger d-block mt-1">{{ error }}</small>
-                {% endfor %}
+                <div class="profile-status"></div>
             </div>
-            {% endfor %}
+            <div class="profile-name">{{ request.user.get_full_name|default:request.user.email }}</div>
+            <div class="profile-role">STUDENT</div>
             
-            <div class="d-grid mt-4">
-                <button type="submit" class="btn btn-primary btn-block" style="padding: 12px; font-weight: 600;">
-                    <i class="fas fa-save me-1"></i> Update Profile Details
-                </button>
+            <div class="text-left mt-3">
+                <div class="profile-detail-item">
+                    <div class="profile-detail-label">
+                        <div class="profile-detail-icon"><i class="fas fa-id-card"></i></div>
+                        Registration No
+                    </div>
+                    <div class="profile-detail-value">{{ request.user.student.registration_no|default:request.user.student.unique_student_code|default:"Pending" }}</div>
+                </div>
+                <div class="profile-detail-item">
+                    <div class="profile-detail-label">
+                        <div class="profile-detail-icon"><i class="fas fa-graduation-cap"></i></div>
+                        Class
+                    </div>
+                    <div class="profile-detail-value">{{ request.user.student.course.name|default:"Student" }}</div>
+                </div>
+                <div class="profile-detail-item">
+                    <div class="profile-detail-label">
+                        <div class="profile-detail-icon"><i class="fas fa-shield-alt"></i></div>
+                        Verification
+                    </div>
+                    <div class="profile-detail-value">{{ request.user.student.verification_status }}</div>
+                </div>
             </div>
-        </form>
+        </div>
+    </div>
+    
+    <!-- Right Column: Settings -->
+    <div class="col-md-8 mb-4">
+        <div class="settings-section">
+            <div class="settings-title">
+                <i class="fas fa-lock" style="color: #818cf8; font-size: 1.1rem;"></i> Account Login Details
+            </div>
+            
+            <div class="login-details-box">
+                <div class="detail-row">
+                    <div class="detail-label">USERNAME</div>
+                    <div class="detail-value">{{ request.user.email }}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">PASSWORD</div>
+                    <div class="detail-value">
+                        •••••••••••• <i class="fas fa-eye" style="color: #a1a1aa; margin-left: 10px;"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-title">
+                <i class="fas fa-cog" style="color: #818cf8; font-size: 1.1rem;"></i> Update Login Details
+            </div>
+            
+            <form role="form" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group-custom">
+                            <label>USERNAME</label>
+                            {{ form.email }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group-custom">
+                            <label>PASSWORD</label>
+                            {{ form.password }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hidden fields to pass validation for the rest of the form -->
+                <div style="display: none;">
+                    {% for field in form %}
+                        {% if field.name != 'email' and field.name != 'password' %}
+                            {{ field }}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                
+                <div class="clearfix mt-3">
+                    <button type="submit" class="btn-update float-right">
+                        <i class="fas fa-sync-alt"></i> Update Credentials
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock content %}
@@ -181,30 +335,6 @@
                 alert("Security Note:\n\nUpdating your password will terminate your current session.\nYou will be required to log in again with your new password.");
             }
         });
-
-        // Interactive Live Image Preview
-        const fileInput = document.getElementById('id_profile_pic');
-        const previewImg = document.getElementById('avatar-preview');
-        const previewIcon = document.getElementById('avatar-icon');
-
-        if (fileInput) {
-            fileInput.addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        if (previewImg) {
-                            previewImg.src = e.target.result;
-                            previewImg.style.display = 'block';
-                        }
-                        if (previewIcon) {
-                            previewIcon.style.display = 'none';
-                        }
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
     });
 </script>
 {% endblock custom_js %}

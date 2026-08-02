@@ -1,0 +1,313 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    
+    .sk-breadcrumb {
+        padding: 15px 25px;
+        background: #fff;
+        border-bottom: 1px solid #e0e6ed;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+    }
+    .sk-breadcrumb .breadcrumb-item {
+        color: #647081;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .sk-breadcrumb .breadcrumb-item.active { color: #8a98ac; font-weight: 400; }
+    .sk-breadcrumb .separator { color: #a0a9b6; font-size: 10px; }
+
+    .row { display: flex; flex-wrap: wrap; margin: 0 -12.5px; padding: 0 25px; }
+    .col-md-7 { flex: 0 0 58.333333%; max-width: 58.333333%; padding: 0 12.5px; }
+    .col-md-5 { flex: 0 0 41.666667%; max-width: 41.666667%; padding: 0 12.5px; }
+    
+    .campuspro-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        padding: 30px;
+        margin-bottom: 25px;
+        border: 1px solid #e0e6ed;
+    }
+    
+    .campuspro-card-title {
+        font-size: 16px;
+        color: #1b2559;
+        font-weight: 600;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .campuspro-card-title i { color: #4b6bfb; }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+        display: block;
+        font-size: 10px;
+        color: #8a98ac;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+    .form-group label .required { color: #ff7675; }
+    
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e0e6ed;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #444;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus {
+        border-color: #4b6bfb;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(75, 107, 251, 0.1);
+    }
+    
+    .btn-update {
+        background: #4b6bfb;
+        color: #fff;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        margin-top: 10px;
+    }
+    .btn-update:hover { background: #3a55d4; }
+    
+    /* Right Side Panel */
+    .school-profile-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .school-logo {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: #4b6bfb;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        text-align: center;
+        margin: 0 auto 15px;
+        line-height: 1.2;
+    }
+    .school-name {
+        font-size: 16px;
+        color: #1b2559;
+        font-weight: 700;
+    }
+    
+    .account-info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .account-info-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 15px 0;
+        border-bottom: 1px solid #f4f6f9;
+        gap: 15px;
+    }
+    .account-info-item:last-child { border-bottom: none; }
+    .account-info-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        color: #fff;
+        flex-shrink: 0;
+    }
+    .account-info-content {
+        flex: 1;
+    }
+    .account-info-label {
+        font-size: 10px;
+        color: #8a98ac;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: block;
+    }
+    .account-info-value {
+        font-size: 13px;
+        color: #1b2559;
+        font-weight: 600;
+    }
+    
+    .btn-delete {
+        background: transparent;
+        color: #ff7675;
+        border: 1px solid #ff7675;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        transition: all 0.2s;
+        margin-top: 20px;
+    }
+    .btn-delete:hover {
+        background: #ff7675;
+        color: #fff;
+    }
+
+    @media (max-width: 992px) {
+        .col-md-5, .col-md-7 { flex: 0 0 100%; max-width: 100%; }
+    }
+</style>
+{% endblock custom_css %}
+
+{% block content %}
+<div class="sk-breadcrumb">
+    <div class="breadcrumb-item">
+        <i class="fas fa-cog"></i> General Settings
+    </div>
+    <i class="fas fa-chevron-right separator"></i>
+    <div class="breadcrumb-item active">Account Settings</div>
+</div>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="campuspro-card">
+            <div class="campuspro-card-title">
+                <i class="far fa-edit"></i> Edit Account
+            </div>
+            
+            <form action="#" method="POST">
+                {% csrf_token %}
+                <div class="row" style="padding:0;">
+                    <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding-right: 10px;">
+                        <div class="form-group">
+                            <label>Username / Email <span class="required">*</span></label>
+                            <input type="email" class="form-control" value="amaanmulani09@gmail.com" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding-left: 10px;">
+                        <div class="form-group">
+                            <label>Password <span class="required">*</span></label>
+                            <div style="position:relative;">
+                                <input type="password" class="form-control" value="password123">
+                                <i class="far fa-eye" style="position:absolute; right:15px; top:12px; color:#a0a9b6; cursor:pointer;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row" style="padding:0;">
+                    <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding-right: 10px;">
+                        <div class="form-group">
+                            <label>Time Zone <span class="required">*</span></label>
+                            <select class="form-control">
+                                <option value="Asia/Karachi" selected>Asia/Karachi</option>
+                                <option value="Asia/Kolkata">Asia/Kolkata</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding-left: 10px;">
+                        <div class="form-group">
+                            <label>Currency <span class="required">*</span></label>
+                            <select class="form-control">
+                                <option value="USD" selected>Dollars (USD)</option>
+                                <option value="PKR">PKR (Rs)</option>
+                                <option value="INR">INR (₹)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row" style="padding:0;">
+                    <div class="col-md-6" style="flex: 0 0 50%; max-width: 50%; padding-right: 10px;">
+                        <div class="form-group">
+                            <label>Currency Symbol</label>
+                            <input type="text" class="form-control" value="$">
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn-update"><i class="fas fa-check"></i> Update Settings</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="col-md-5">
+        <div class="campuspro-card">
+            <div class="school-profile-header">
+                <div class="school-logo">YOUR<br>LOGO<br>HERE</div>
+                <div class="school-name">Your School</div>
+            </div>
+            
+            <ul class="account-info-list">
+                <li class="account-info-item">
+                    <div class="account-info-icon" style="background: #4b6bfb;"><i class="far fa-user"></i></div>
+                    <div class="account-info-content">
+                        <span class="account-info-label">Account Details</span>
+                        <div style="font-size: 13px; color: #8a98ac;">amaanmulani09@gmail.com</div>
+                    </div>
+                </li>
+                <li class="account-info-item">
+                    <div class="account-info-icon" style="background: transparent; color: #8a98ac; padding:0; width:auto; margin-top:2px;"><i class="far fa-envelope"></i></div>
+                    <div class="account-info-content">
+                        <span class="account-info-label">Username</span>
+                        <div class="account-info-value">amaanmulani09@gmail.com</div>
+                    </div>
+                </li>
+                <li class="account-info-item">
+                    <div class="account-info-icon" style="background: transparent; color: #8a98ac; padding:0; width:auto; margin-top:2px;"><i class="fas fa-unlock-alt"></i></div>
+                    <div class="account-info-content">
+                        <span class="account-info-label">Password</span>
+                        <div class="account-info-value">••••••••••••••</div>
+                    </div>
+                </li>
+                <li class="account-info-item">
+                    <div class="account-info-icon" style="background: transparent; color: #8a98ac; padding:0; width:auto; margin-top:2px;"><i class="fas fa-tags"></i></div>
+                    <div class="account-info-content">
+                        <span class="account-info-label">Subscription</span>
+                        <div class="account-info-value">YEARLY</div>
+                    </div>
+                </li>
+                <li class="account-info-item">
+                    <div class="account-info-icon" style="background: transparent; color: #8a98ac; padding:0; width:auto; margin-top:2px;"><i class="far fa-calendar-alt"></i></div>
+                    <div class="account-info-content">
+                        <span class="account-info-label">Expiry</span>
+                        <div class="account-info-value">June 13, 2024</div>
+                    </div>
+                </li>
+            </ul>
+            
+            <button class="btn-delete"><i class="far fa-trash-alt"></i> Delete Account</button>
+        </div>
+    </div>
+</div>
+{% endblock content %}

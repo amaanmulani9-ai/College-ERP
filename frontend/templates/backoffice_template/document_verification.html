@@ -1,0 +1,121 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+
+{% block page_title %}{{ page_title }}{% endblock page_title %}
+
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <!-- Summary Cards -->
+        <div class="row">
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-info shadow-sm rounded">
+                    <div class="inner">
+                        <h3>{{ pending_count }}</h3>
+                        <p>Pending Verification</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-file-invoice"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-success shadow-sm rounded">
+                    <div class="inner">
+                        <h3>{{ verified_count }}</h3>
+                        <p>OCR Verified</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-check-circle"></i></div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-6">
+                <div class="small-box bg-warning shadow-sm rounded">
+                    <div class="inner">
+                        <h3>{{ flagged_count }}</h3>
+                        <p>Flagged for Review</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Document Verification Table -->
+        <div class="card card-primary card-outline shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="card-title font-weight-bold"><i class="fas fa-microchip text-primary mr-2"></i> Student Document OCR Verification Logs</h3>
+                <div class="btn-group">
+                    <a href="{% url 'backoffice_document_verification' %}" class="btn btn-sm btn-outline-secondary">All</a>
+                    <a href="{% url 'backoffice_document_verification' %}?status=Pending" class="btn btn-sm btn-outline-info">Pending</a>
+                    <a href="{% url 'backoffice_document_verification' %}?status=Verified" class="btn btn-sm btn-outline-success">Verified</a>
+                    <a href="{% url 'backoffice_document_verification' %}?status=Flagged" class="btn btn-sm btn-outline-warning">Flagged</a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>App No</th>
+                                <th>Student Name</th>
+                                <th>Course</th>
+                                <th>Documents</th>
+                                <th>OCR Score</th>
+                                <th>OCR Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reg in registrations %}
+                            <tr>
+                                <td><span class="badge badge-light font-weight-normal border">{{ reg.application_no }}</span></td>
+                                <td>
+                                    <strong>{{ reg.first_name }} {{ reg.surname }}</strong><br>
+                                    <small class="text-muted"><i class="fas fa-envelope mr-1"></i>{{ reg.student_email }}</small>
+                                </td>
+                                <td>{{ reg.course_name|default:"N/A" }}</td>
+                                <td>
+                                    {% if reg.aadhar_file %}
+                                        <a href="{{ reg.aadhar_file.url }}" target="_blank" class="badge badge-info"><i class="fas fa-id-card mr-1"></i>Aadhaar</a>
+                                    {% endif %}
+                                    {% if reg.marksheet_file %}
+                                        <a href="{{ reg.marksheet_file.url }}" target="_blank" class="badge badge-secondary"><i class="fas fa-file-alt mr-1"></i>Marksheet</a>
+                                    {% endif %}
+                                    {% if not reg.aadhar_file and not reg.marksheet_file %}
+                                        <span class="text-muted small">No file uploaded</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="progress progress-sm rounded mb-1" style="height: 6px;">
+                                        <div class="progress-bar {% if reg.ocr_score >= 80 %}bg-success{% elif reg.ocr_score >= 50 %}bg-warning{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ reg.ocr_score }}%;"></div>
+                                    </div>
+                                    <small class="font-weight-bold">{{ reg.ocr_score }}% Match</small>
+                                </td>
+                                <td>
+                                    {% if reg.ocr_status == 'Verified' %}
+                                        <span class="badge badge-success"><i class="fas fa-check-circle mr-1"></i>Verified</span>
+                                    {% elif reg.ocr_status == 'Flagged' %}
+                                        <span class="badge badge-warning"><i class="fas fa-flag mr-1"></i>Flagged</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary"><i class="fas fa-clock mr-1"></i>Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'run_document_ocr_trigger' reg.id %}" class="btn btn-sm btn-outline-primary" title="Trigger Document OCR Engine">
+                                        <i class="fas fa-play mr-1"></i>Run OCR
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">
+                                    <i class="fas fa-folder-open fa-2x mb-2 d-block text-secondary"></i>
+                                    No student registrations currently pending OCR document verification.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock main_content %}
