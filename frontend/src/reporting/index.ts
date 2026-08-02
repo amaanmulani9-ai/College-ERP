@@ -24,3 +24,4 @@ export * from "./charts";
 export * from "./builder";
 export * from "./executive";
 export * from "./distribution";
+export * from "./final";
