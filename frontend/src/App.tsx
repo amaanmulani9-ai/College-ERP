@@ -309,7 +309,8 @@ import { AIWorkspacePanel } from "./workspace/ai/AIWorkspacePanel";
 import { WorkspaceReleaseNotes } from "./workspace/final/WorkspaceReleaseNotes";
 
 // ─── Enterprise Reporting Framework ───────────────────────────────────────
-import ReportingPage from "./reporting/ReportingPage";
+const ReportingPage = lazy(() => import("./reporting/ReportingPage"));
+const SettingsPage = lazy(() => import("./settings/SettingsPage"));
 
 
 // ─── Lazy Loaded Public Pages ─────────────────────────────────────────────
@@ -683,8 +684,10 @@ export const App: React.FC = () => {
                   <Route path="/reporting" element={<ReportingPage />} />
                   <Route path="/reporting/builder" element={<ReportingPage />} />
                   <Route path="/reporting/executive" element={<ReportingPage />} />
-                  <Route path="/reporting/distribution" element={<ReportingPage />} />
-                  <Route path="/reports/naac-nirf" element={<SuperAdminDashboardPage />} />
+                  {/* Enterprise Settings Center */}
+                  <Route path="/settings" element={<SettingsPage />} />
+                  <Route path="/settings/*" element={<SettingsPage />} />
+
 
 
 
