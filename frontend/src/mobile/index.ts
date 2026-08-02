@@ -18,3 +18,4 @@ export * from "./PWAInstallBanner";
 export * from "./MobileFoundationCenter";
 export * from "./workspace";
 export * from "./dashboard";
+export * from "./pwa";
