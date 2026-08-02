@@ -12,7 +12,8 @@ import { FavoriteReports } from "./components/FavoriteReports";
 import { AnalyticsDashboard } from "./charts/AnalyticsDashboard";
 import { ReportBuilder } from "./builder/ReportBuilder";
 import { ExecutiveAnalyticsCenter } from "./executive/ExecutiveAnalyticsCenter";
-import { X, Play, LayoutGrid, BarChart3, Wrench, ShieldCheck } from "lucide-react";
+import { ReportDistributionCenter } from "./distribution/ReportDistributionCenter";
+import { X, Play, LayoutGrid, BarChart3, Wrench, ShieldCheck, Send } from "lucide-react";
 
 export const ReportingLayoutContent: React.FC = () => {
   const {
@@ -28,7 +29,7 @@ export const ReportingLayoutContent: React.FC = () => {
   } = useReporting();
 
   const [activeTabMode, setActiveTabMode] = useState<
-    "catalog" | "analytics" | "builder" | "executive"
+    "catalog" | "analytics" | "builder" | "executive" | "distribution"
   >("catalog");
 
   // Filter reports based on activeCategory and searchQuery
@@ -59,7 +60,7 @@ export const ReportingLayoutContent: React.FC = () => {
       {/* Main Workspace Content Area */}
       <div className="flex-1 flex flex-col min-w-0 p-4 sm:p-6 overflow-y-auto">
         {/* Mode Switcher Header Tabs */}
-        <div className="flex items-center gap-2 mb-4 p-1 bg-slate-900 border border-slate-800 rounded-xl w-fit">
+        <div className="flex items-center gap-2 mb-4 p-1 bg-slate-900 border border-slate-800 rounded-xl w-fit flex-wrap">
           <button
             onClick={() => setActiveTabMode("catalog")}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
@@ -107,9 +108,23 @@ export const ReportingLayoutContent: React.FC = () => {
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <span>Executive Center</span>
           </button>
+
+          <button
+            onClick={() => setActiveTabMode("distribution")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+              activeTabMode === "distribution"
+                ? "bg-indigo-600 text-white shadow-md"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <Send className="w-3.5 h-3.5 text-violet-400" />
+            <span>Distribution Hub</span>
+          </button>
         </div>
 
-        {activeTabMode === "executive" ? (
+        {activeTabMode === "distribution" ? (
+          <ReportDistributionCenter />
+        ) : activeTabMode === "executive" ? (
           <ExecutiveAnalyticsCenter />
         ) : activeTabMode === "builder" ? (
           <ReportBuilder />
