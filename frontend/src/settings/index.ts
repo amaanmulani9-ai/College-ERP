@@ -10,3 +10,4 @@ export * from "./SettingsHome";
 export * from "./SettingsLayout";
 export * from "./SettingsPage";
 export * from "./institution";
+export * from "./security";

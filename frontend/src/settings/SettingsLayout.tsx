@@ -6,6 +6,7 @@ import { SettingsBreadcrumbs } from "./SettingsBreadcrumbs";
 import { SettingsHome } from "./SettingsHome";
 import { SettingsSearch } from "./SettingsSearch";
 import { InstitutionSettingsCenter } from "./institution/InstitutionSettingsCenter";
+import { SecuritySettingsCenter } from "./security/SecuritySettingsCenter";
 import { SettingPageItem } from "./types";
 import { useTabs } from "../workspace/TabContext";
 import { ArrowLeft, Save, Sliders, CheckCircle2 } from "lucide-react";
@@ -37,6 +38,18 @@ export const SettingsLayoutContent: React.FC = () => {
     selectedPage?.category === "Institution" ||
     selectedPage?.category === "Academic";
 
+  const isSecurityOrIAM =
+    activeCategory === "Users" ||
+    activeCategory === "Roles & Permissions" ||
+    activeCategory === "Authentication" ||
+    activeCategory === "Security" ||
+    activeCategory === "Audit Logs" ||
+    selectedPage?.category === "Users" ||
+    selectedPage?.category === "Roles & Permissions" ||
+    selectedPage?.category === "Authentication" ||
+    selectedPage?.category === "Security" ||
+    selectedPage?.category === "Audit Logs";
+
   return (
     <div className="flex h-full min-h-[calc(100vh-4rem)] bg-slate-950 text-slate-100 font-sans">
       {/* Category Sidebar */}
@@ -60,9 +73,11 @@ export const SettingsLayoutContent: React.FC = () => {
           }
         />
 
-        {/* Dynamic View: Institution & Academic Center vs General Config View vs Settings Home */}
+        {/* Dynamic View: Institution vs Security vs General Config View vs Settings Home */}
         {isInstitutionOrAcademic ? (
           <InstitutionSettingsCenter />
+        ) : isSecurityOrIAM ? (
+          <SecuritySettingsCenter />
         ) : selectedPage ? (
           <div className="space-y-6">
             <div className="flex items-center justify-between p-4 bg-slate-900 border border-slate-800 rounded-xl shadow-md">
